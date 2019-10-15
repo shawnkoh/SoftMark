@@ -5,7 +5,6 @@ import * as helmet from "helmet";
 import * as morgan from "morgan";
 import { createConnection } from "typeorm";
 import routes from "./routes";
-// ormconfig MUST be imported after dotenv is configured
 import ormconfig from "../ormconfig";
 
 createConnection(ormconfig)
