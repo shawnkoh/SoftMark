@@ -34,7 +34,7 @@
     "typescript": "^3.6.4"
   },
   "scripts": {
-    "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='../.env"
+    "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'"
   },
   "husky": {
     "hooks": {

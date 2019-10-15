@@ -1,26 +1,26 @@
 import { ConnectionOptions } from "typeorm";
 
 const {
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_HOST,
-  DB_PORT,
-  DB_NAME,
-  DB_DISABLE_SSL
+  POSTGRES_USERNAME,
+  POSTGRES_PASSWORD,
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_NAME,
+  POSTGRES_DISABLE_SSL
 } = process.env;
 
-if (!DB_USERNAME || !DB_PASSWORD || !DB_HOST || !DB_PORT || !DB_NAME) {
+if (!POSTGRES_USERNAME || !POSTGRES_PASSWORD || !POSTGRES_HOST || !POSTGRES_PORT || !POSTGRES_NAME) {
   throw new Error("Missing database config!");
 }
 
 export const postgres: ConnectionOptions = {
   type: "postgres",
-  username: DB_USERNAME,
-  password: DB_PASSWORD,
-  host: DB_HOST,
-  port: Number(DB_PORT),
-  database: DB_NAME,
-  ssl: DB_DISABLE_SSL ? false : true,
+  username: POSTGRES_USERNAME,
+  password: POSTGRES_PASSWORD,
+  host: POSTGRES_HOST,
+  port: Number(POSTGRES_PORT),
+  database: POSTGRES_NAME,
+  ssl: POSTGRES_DISABLE_SSL ? false : true,
   synchronize: true,
   logging: false,
   entities: [`${__dirname}/src/entities/**/*.js`, "src/entities/**/*.ts"],
