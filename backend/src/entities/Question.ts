@@ -1,7 +1,8 @@
-import { Entity, ManyToOne } from "typeorm";
+import { Entity, ManyToOne, OneToMany } from "typeorm";
 import { Discardable } from "./Discardable";
-import { Script } from "./Script";
+import { Mark } from "./Mark";
 import { QuestionTemplate } from "./QuestionTemplate";
+import { Script } from "./Script";
 
 @Entity()
 export class Question extends Discardable {
@@ -12,4 +13,7 @@ export class Question extends Discardable {
 
   @ManyToOne(type => Script, script => script.questions)
   script!: Script;
+
+  @OneToMany(type => Mark, mark => mark.question)
+  marks!: Mark[];
 }
