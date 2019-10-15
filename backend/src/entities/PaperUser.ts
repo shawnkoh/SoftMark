@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsString, IsEnum } from "class-validator";
+import { IsNotEmpty, IsEnum } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Paper } from "./Paper";
 import { User } from "./User";
@@ -30,4 +31,7 @@ export class PaperUser extends Discardable {
 
   @OneToMany(type => Mark, mark => mark.paperUser)
   marks!: Mark[];
+
+  @OneToMany(type => Comment, comment => comment.paperUser)
+  comments!: Comment[];
 }

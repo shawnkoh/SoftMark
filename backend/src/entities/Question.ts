@@ -3,6 +3,7 @@ import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
+import { Comment } from "./Comment";
 
 @Entity()
 export class Question extends Discardable {
@@ -16,4 +17,7 @@ export class Question extends Discardable {
 
   @OneToMany(type => Mark, mark => mark.question)
   marks!: Mark[];
+
+  @OneToMany(type => Comment, comment => comment.question)
+  comments!: Comment[];
 }
