@@ -4,15 +4,6 @@
   "private": true,
   "main": "index.js",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.1",
-    "class-validator": "^0.10.2",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "helmet": "^3.21.1",
-    "jsonwebtoken": "^8.5.1",
-    "morgan": "^1.9.1",
-    "typeorm": "^0.2.19",
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "^1.17.1",
     "@types/cors": "^2.8.6",
@@ -21,15 +12,26 @@
     "@types/helmet": "^0.0.44",
     "@types/jsonwebtoken": "^8.3.3",
     "@types/morgan": "^1.7.37",
-    "@types/node": "^8.0.29"
+    "@types/node": "^8.0.29",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.1",
+    "class-validator": "^0.10.2",
+    "cors": "^2.8.5",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.9.1",
+    "pg": "^7.12.1",
+    "typeorm": "^0.2.19"
   },
   "devDependencies": {
     "husky": "^3.0.5",
     "prettier": "1.18.2",
     "pretty-quick": "^1.11.1",
-    "typescript": "^3.6.4",
     "ts-node": "3.3.0",
-    "ts-node-dev": "^1.0.0-pre.42"
+    "ts-node-dev": "^1.0.0-pre.42",
+    "typescript": "^3.6.4"
   },
   "scripts": {
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='../.env"
