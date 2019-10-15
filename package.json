@@ -1,0 +1,8 @@
+{
+  "name": "cs3216-final-project",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}

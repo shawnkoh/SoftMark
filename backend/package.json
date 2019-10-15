@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "husky": "^3.0.5",
+    "prettier": "1.18.2",
+    "pretty-quick": "^1.11.1"
+  },
+  "scripts": {
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  }
+}
