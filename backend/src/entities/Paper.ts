@@ -6,6 +6,7 @@ import { Column, Entity, OneToMany } from "typeorm";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
+import { Script } from "./Script";
 
 @Entity()
 export class Paper extends Discardable {
@@ -21,4 +22,7 @@ export class Paper extends Discardable {
 
   @OneToMany(type => QuestionTemplate, questionTemplate => questionTemplate.paper)
   questionTemplates!: QuestionTemplate[];
+
+  @OneToMany(type => Script, script => script.paper)
+  scripts!: Script[];
 }
