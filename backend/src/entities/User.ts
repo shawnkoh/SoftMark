@@ -4,9 +4,10 @@ import {
   IsOptional,
   IsString
 } from "class-validator";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { sign } from "jsonwebtoken";
 import { Discardable } from "./Discardable";
+import { PaperUser } from "./PaperUser";
 import { UserRole } from "../types/users";
 import {
   BearerTokenType,
@@ -18,6 +19,8 @@ import {
 
 @Entity()
 export class User extends Discardable {
+  entityName = "User";
+  
   @Column({ unique: true })
   @IsNotEmpty()
   @IsEmail()
@@ -79,5 +82,6 @@ export class User extends Discardable {
     return { accessToken, refreshToken };
   };
 
-  entityName = "User";
+  @OneToMany(type => PaperUser, paperUser => paperUser.user)
+  paperUsers!: PaperUser[];
 }
