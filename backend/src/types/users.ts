@@ -1,6 +1,6 @@
 export enum UserRole {
   Admin = "ADMIN",
-  Customer = "Customer"
+  User = "USER"
 }
 
 export function isUserRole(role: any): role is UserRole {

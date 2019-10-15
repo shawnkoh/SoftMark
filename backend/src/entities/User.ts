@@ -33,10 +33,10 @@ export class User extends Discardable {
   @Column({
     type: "enum",
     enum: UserRole,
-    default: UserRole.Student
+    default: UserRole.User
   })
   @IsNotEmpty()
-  role: UserRole = UserRole.Student;
+  role: UserRole = UserRole.User;
 
   @Column({ default: false })
   @IsNotEmpty()
