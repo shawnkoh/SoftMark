@@ -1,4 +1,5 @@
 export enum PaperUserRole {
+  Owner = "OWNER",
   Examiner = "EXAMINER",
   Marker = "MARKER",
   Student = "STUDENT"
