@@ -19,7 +19,9 @@
     "pretty-quick": "^1.11.1",
     "typescript": "^3.6.4"
   },
-  "scripts": {},
+  "scripts": {
+    "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='../.env"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
