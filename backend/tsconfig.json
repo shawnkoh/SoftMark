@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "skipLibCheck": true,
     "baseUrl": "./",
     "lib": ["es5", "es6", "es2018"],
     "target": "es2018",
