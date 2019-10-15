@@ -42,12 +42,7 @@ export class User extends Discardable {
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
-  faculty?: string;
-
-  @Column({ nullable: true })
-  @IsOptional()
-  @IsString()
-  major?: string;
+  name?: string;
 
   createPayload = (): EntityTokenPayload<User> => ({
     type: BearerTokenType.EntityToken,
