@@ -31,10 +31,12 @@
     "pretty-quick": "^1.11.1",
     "ts-node": "3.3.0",
     "ts-node-dev": "^1.0.0-pre.42",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.6.4"
   },
   "scripts": {
-    "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'"
+    "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'",
+    "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js"
   },
   "husky": {
     "hooks": {
