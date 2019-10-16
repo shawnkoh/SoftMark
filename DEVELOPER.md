@@ -36,6 +36,10 @@ API Design Guidelines
 - [Robustness Principle](https://tools.ietf.org/html/rfc1122)
   - Be liberal in what you accept, and conservative in what you send
 
+# Permissions
+
+- [Reference](https://blog.nodeswat.com/implement-access-control-in-node-js-8567e7b484d1)
+
 # Algolia
 
 ## Search API Key
