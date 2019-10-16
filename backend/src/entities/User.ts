@@ -8,7 +8,6 @@ import { Column, Entity, OneToMany } from "typeorm";
 import { sign } from "jsonwebtoken";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
-import { UserRole } from "../types/users";
 import {
   BearerTokenType,
   EntityTokenPayload,
@@ -30,14 +29,6 @@ export class User extends Discardable {
   @IsNotEmpty()
   password?: string;
 
-  @Column({
-    type: "enum",
-    enum: UserRole,
-    default: UserRole.User
-  })
-  @IsNotEmpty()
-  role: UserRole = UserRole.User;
-
   @Column({ default: false })
   @IsNotEmpty()
   emailVerified: boolean = false;
@@ -51,15 +42,13 @@ export class User extends Discardable {
     type: BearerTokenType.EntityToken,
     entityName: this.entityName,
     id: this.id,
-    email: this.email,
-    role: this.role,
+    email: this.email
   });
 
   getCredentials = (): Credentials => ({
     id: this.id,
     email: this.email,
-    emailVerified: this.emailVerified,
-    role: this.role,
+    emailVerified: this.emailVerified
   });
 
   createAuthenticationTokens = () => {

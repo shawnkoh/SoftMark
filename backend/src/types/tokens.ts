@@ -1,5 +1,3 @@
-import { UserRole } from "./users";
-
 export type BearerToken = string;
 
 export enum BearerTokenType {
@@ -22,7 +20,6 @@ export type Credentials = {
   id: number;
   email: string;
   emailVerified: boolean;
-  role: UserRole;
 };
 
 export type AccessTokenPayload = Payload<BearerTokenType.AccessToken> &
@@ -64,8 +61,7 @@ function hasCredentials(payload: any) {
   return (
     typeof payload.id === "number" &&
     typeof payload.email === "string" &&
-    typeof payload.emailVerified === "boolean" &&
-    Object.values(UserRole).includes(payload.role)
+    typeof payload.emailVerified === "boolean"
   );
 }
 
