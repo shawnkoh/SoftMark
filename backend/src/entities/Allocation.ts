@@ -4,12 +4,12 @@ import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 
 @Entity()
-export class Job extends Discardable {
-  entityName = "Job";
+export class Allocation extends Discardable {
+  entityName = "Allocation";
 
-  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.jobs)
+  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.allocations)
   questionTemplate!: QuestionTemplate;
 
-  @ManyToOne(type => PaperUser, paperUser => paperUser.jobs)
+  @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
   paperUser!: PaperUser;
 }
