@@ -36,6 +36,7 @@
   },
   "scripts": {
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'",
+    "start:remote": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env'",
     "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js"
   },
   "husky": {
