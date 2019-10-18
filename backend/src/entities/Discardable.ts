@@ -6,4 +6,11 @@ export abstract class Discardable extends Base {
   @Column({ nullable: true })
   @IsOptional()
   discardedAt?: Date;
+
+  getBase = () => ({
+    id: this.id,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+    discardedAt: this.discardedAt
+  });
 }

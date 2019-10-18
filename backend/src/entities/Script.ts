@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
 import { Discardable } from "./Discardable";
 import { Paper } from "./Paper";
 import { Question } from "./Question";
@@ -7,9 +7,12 @@ import { Question } from "./Question";
 export class Script extends Discardable {
   entityName = "Script";
 
+  @Column()
+  paperId!: number;
+
   @ManyToOne(type => Paper, paper => paper.paperUsers)
-  paper!: Paper;
+  paper!: Promise<Paper>;
 
   @OneToMany(type => Question, question => question.script)
-  questions!: Question[];
+  questions!: Promise<Question[]>;
 }

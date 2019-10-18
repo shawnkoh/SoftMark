@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { QuestionTemplate } from "./QuestionTemplate";
@@ -10,8 +10,14 @@ import { Bookmark } from "./Bookmark";
 export class Question extends Discardable {
   entityName = "Question";
 
+  @Column()
+  questionTemplateId!: number;
+  
   @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.questions)
   questionTemplate!: QuestionTemplate;
+
+  @Column()
+  scriptId!: number;
 
   @ManyToOne(type => Script, script => script.questions)
   script!: Script;

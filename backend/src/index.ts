@@ -3,6 +3,7 @@ import * as cors from "cors";
 import * as express from "express";
 import * as helmet from "helmet";
 import * as morgan from "morgan";
+import "reflect-metadata";
 import { createConnection } from "typeorm";
 import routes from "./routes";
 import ormconfig from "../ormconfig";

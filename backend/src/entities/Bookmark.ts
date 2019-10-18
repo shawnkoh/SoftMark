@@ -1,4 +1,4 @@
-import { Entity, ManyToOne } from "typeorm";
+import { Entity, ManyToOne, Column } from "typeorm";
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
@@ -7,9 +7,15 @@ import { Question } from "./Question";
 export class Bookmark extends Base {
   entityName = "Bookmark";
 
-  @ManyToOne(type => Question, question => question.bookmarks)
-  question!: Question;
+  @Column()
+  questionId!: number;
 
+  @ManyToOne(type => Question, question => question.bookmarks)
+  question!: Promise<Question>;
+
+  @Column()
+  paperUserId!: number;
+  
   @ManyToOne(type => PaperUser, paperUser => paperUser.bookmarks)
-  paperUser!: PaperUser;
+  paperUser!: Promise<PaperUser>;
 }

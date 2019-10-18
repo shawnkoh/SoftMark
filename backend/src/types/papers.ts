@@ -1,5 +1,4 @@
-import { PaperUserRole } from "./paperUsers";
-import { PaperUser } from "../entities/PaperUser";
+import { PaperUserRole, PaperUserListData } from "./paperUsers";
 
 export interface PaperListData {
   id: number;
@@ -11,5 +10,5 @@ export interface PaperListData {
 }
 
 export interface PaperData extends PaperListData {
-  paperUsers: PaperUser[];
+  paperUsers: PaperUserListData[];
 }

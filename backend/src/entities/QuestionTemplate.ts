@@ -9,8 +9,11 @@ import { Question } from "./Question";
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
+  @Column()
+  paperId!: number;
+
   @ManyToOne(type => Paper, paper => paper.questionTemplates)
-  paper!: Paper;
+  paper!: Promise<Paper>;
 
   @Column()
   @IsNotEmpty()
@@ -23,8 +26,8 @@ export class QuestionTemplate extends Discardable {
   marks!: number;
 
   @OneToMany(type => Question, question => question.questionTemplate)
-  questions!: Question[];
+  questions!: Promise<Question[]>;
 
   @OneToMany(type => Allocation, allocation => allocation.questionTemplate)
-  allocations!: Allocation[];
+  allocations!: Promise<Allocation[]>;
 }

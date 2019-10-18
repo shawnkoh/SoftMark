@@ -72,5 +72,5 @@ export class User extends Discardable {
   };
 
   @OneToMany(type => PaperUser, paperUser => paperUser.user)
-  paperUsers!: PaperUser[];
+  paperUsers!: Promise<PaperUser[]>;
 }
