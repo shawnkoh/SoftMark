@@ -1,3 +1,8 @@
+export interface QuestionTemplatePostData {
+  name: string;
+  marks: number;
+}
+
 export interface QuestionTemplateListData {
   id: number;
   name: string;
@@ -8,5 +13,4 @@ export interface QuestionTemplateListData {
 }
 
 export interface QuestionTemplateData extends QuestionTemplateListData {
-
 }
