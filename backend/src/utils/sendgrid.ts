@@ -3,10 +3,7 @@ import * as sendgrid from "@sendgrid/mail";
 import { MailData } from "@sendgrid/helpers/classes/mail";
 import { User } from "../entities/User";
 import { PaperUser } from "../entities/PaperUser";
-import {
-  BearerTokenType,
-  ResetPasswordTokenPayload
-} from "../types/tokens";
+import { BearerTokenType, ResetPasswordTokenPayload } from "../types/tokens";
 
 const baseUrl = "https://nus.reviews";
 
@@ -14,7 +11,7 @@ function send(user: User, subject: string, message: string) {
   if (process.env.NODE_ENV !== "production") {
     return;
   }
-  
+
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
     to: user.email,

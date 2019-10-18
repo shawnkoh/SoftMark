@@ -1,7 +1,5 @@
 import { ConnectionOptions } from "typeorm";
 
-require('dotenv').config({path: 'env.development'});
-
 const {
   POSTGRES_USERNAME,
   POSTGRES_PASSWORD,

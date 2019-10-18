@@ -13,7 +13,10 @@ export class QuestionTemplate extends Discardable {
   @Column()
   scriptTemplateId!: number;
 
-  @ManyToOne(type => ScriptTemplate, scriptTemplate => scriptTemplate.questionTemplates)
+  @ManyToOne(
+    type => ScriptTemplate,
+    scriptTemplate => scriptTemplate.questionTemplates
+  )
   scriptTemplate?: ScriptTemplate;
 
   @Column()

@@ -1,4 +1,3 @@
-  
 import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";

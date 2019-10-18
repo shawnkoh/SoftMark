@@ -3,8 +3,9 @@
 On development
 
 1. Run `yarn install`
-2. Run `cd backend`
-3. Run `yarn start:remote`
+2. Run `docker-compose up`
+3. Run `cd backend`
+4. Run `yarn start`
 
 On production
 

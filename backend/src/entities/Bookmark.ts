@@ -15,7 +15,7 @@ export class Bookmark extends Base {
 
   @Column()
   paperUserId!: number;
-  
+
   @ManyToOne(type => PaperUser, paperUser => paperUser.bookmarks)
   paperUser?: PaperUser;
 }
