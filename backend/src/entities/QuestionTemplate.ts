@@ -4,6 +4,7 @@ import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
 import { Question } from "./Question";
 import { ScriptTemplate } from "./ScriptTemplate";
+import { QuestionTemplateListData } from "../types/questionTemplates";
 
 @Entity()
 export class QuestionTemplate extends Discardable {
@@ -30,4 +31,10 @@ export class QuestionTemplate extends Discardable {
 
   @OneToMany(type => Allocation, allocation => allocation.questionTemplate)
   allocations!: Promise<Allocation[]>;
+
+  getListData = (): QuestionTemplateListData => ({
+    ...this.getBase(),
+    name: this.name,
+    marks: this.marks
+  });
 }

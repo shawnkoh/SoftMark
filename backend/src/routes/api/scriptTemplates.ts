@@ -7,6 +7,5 @@ export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.post("/", ScriptTemplatesController.create);
-router.get("/:id", ScriptTemplatesController.show);
 
 export default router;
