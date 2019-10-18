@@ -1,7 +1,6 @@
-export interface AllocationListData {
-  id: number;
+import { BaseData } from "./entities";
+
+export interface AllocationListData extends BaseData {
   questionTemplateId: number;
   paperUserId: number;
-  createdAt: Date;
-  updatedAt: Date
 }
