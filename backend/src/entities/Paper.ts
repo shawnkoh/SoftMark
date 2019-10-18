@@ -2,7 +2,6 @@ import { IsNotEmpty, IsString } from "class-validator";
 import { Column, Entity, OneToMany } from "typeorm";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
-import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
 import { PaperData, PaperListData } from "../types/papers";
 import { PaperUserRole } from "../types/paperUsers";
@@ -22,12 +21,6 @@ export class Paper extends Discardable {
 
   @OneToMany(type => ScriptTemplate, scriptTemplate => scriptTemplate.paper)
   scriptTemplates!: Promise<ScriptTemplate[]>;
-
-  @OneToMany(
-    type => QuestionTemplate,
-    questionTemplate => questionTemplate.paper
-  )
-  questionTemplates!: Promise<QuestionTemplate[]>;
 
   @OneToMany(type => Script, script => script.paper)
   scripts!: Promise<Script[]>;
