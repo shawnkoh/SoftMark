@@ -1,15 +1,29 @@
-import { Entity, ManyToOne } from "typeorm";
-import { Discardable } from "./Discardable";
+import { Entity, ManyToOne, Column } from "typeorm";
+import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
+import { AllocationListData } from "../types/allocations";
+
 
 @Entity()
-export class Allocation extends Discardable {
+export class Allocation extends Base {
   entityName = "Allocation";
 
-  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.allocations)
-  questionTemplate!: QuestionTemplate;
+  @Column()
+  questionTemplateId!: number;
 
+  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.allocations)
+  questionTemplate!: Promise<QuestionTemplate>;
+
+  @Column()
+  paperUserId!: number;
+  
   @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
-  paperUser!: PaperUser;
+  paperUser!: Promise<PaperUser>;
+
+  getListData = (): AllocationListData => ({
+    ...this.getBase(),
+    questionTemplateId: this.questionTemplateId,
+    paperUserId: this.paperUserId,
+  });
 }

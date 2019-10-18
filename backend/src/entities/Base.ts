@@ -21,5 +21,11 @@ export abstract class Base {
     entityName: this.entityName
   });
 
+  getBase = () => ({
+    id: this.id,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt
+  });
+
   abstract entityName: string;
 }

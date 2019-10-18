@@ -8,11 +8,17 @@ import { Question } from "./Question";
 export class Mark extends Discardable {
   entityName = "Mark";
 
+  @Column()
+  questionId!: number;
+
   @ManyToOne(type => Question, question => question.marks)
-  question!: Question;
+  question!: Promise<Question>;
+
+  @Column()
+  paperUserId!: number;
 
   @ManyToOne(type => PaperUser, paperUser => paperUser.marks)
-  paperUser!: PaperUser;
+  paperUser!: Promise<PaperUser>;
 
   @Column()
   @IsNotEmpty()
