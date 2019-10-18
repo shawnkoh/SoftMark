@@ -5,28 +5,7 @@ import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserRole } from "../types/paperUsers";
-
-const check = async (
-  userId: number,
-  paperId: number | string,
-  role?: PaperUserRole
-): Promise<false | { paper: Paper; paperUser: PaperUser }> => {
-  const paper = await getRepository(Paper).findOneOrFail(paperId, {
-    relations: ["paperUsers"]
-  });
-  const paperUser = paper.paperUsers!.find(
-    paperUser => paperUser.userId === userId
-  );
-  if (
-    !paperUser ||
-    (role === PaperUserRole.Marker &&
-      paperUser.role === PaperUserRole.Student) ||
-    (role === PaperUserRole.Owner && paperUser.role !== PaperUserRole.Owner)
-  ) {
-    return false;
-  }
-  return { paper, paperUser };
-};
+import { allowedPaperUser } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -74,7 +53,7 @@ export async function index(request: Request, response: Response) {
 export async function show(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await check(payload.id, Number(request.params.id));
+    const allowed = await allowedPaperUser(payload.id, Number(request.params.id));
     if (!allowed) {
       response.sendStatus(404);
       return;
@@ -92,7 +71,7 @@ export async function show(request: Request, response: Response) {
 export async function update(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await check(
+    const allowed = await allowedPaperUser(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner
@@ -117,7 +96,7 @@ export async function update(request: Request, response: Response) {
 export async function discard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await check(
+    const allowed = await allowedPaperUser(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner
@@ -139,7 +118,7 @@ export async function discard(request: Request, response: Response) {
 export async function undiscard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await check(
+    const allowed = await allowedPaperUser(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner
