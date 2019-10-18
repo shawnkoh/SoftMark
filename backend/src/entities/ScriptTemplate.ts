@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
 import { Discardable } from "./Discardable";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
@@ -12,16 +12,20 @@ export class ScriptTemplate extends Discardable {
   paperId!: number;
 
   @ManyToOne(type => Paper, paper => paper.scriptTemplates)
-  paper!: Promise<Paper>;
+  paper?: Paper;
 
   @OneToMany(
     type => QuestionTemplate,
     questionTemplate => questionTemplate.scriptTemplate
   )
-  questionTemplates!: Promise<QuestionTemplate[]>;
+  questionTemplates?: QuestionTemplate[];
 
   getData = async (): Promise<ScriptTemplateData> => {
-    const questionTemplates = await this.questionTemplates;
+    const questionTemplates =
+      this.questionTemplates ||
+      (await getRepository(QuestionTemplate).find({
+        where: { scriptTemplate: this }
+      }));
     return {
       ...this.getBase(),
       questionTemplates: questionTemplates.map(questionTemplate =>

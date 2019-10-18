@@ -15,6 +15,7 @@ import {
   RefreshTokenPayload,
   AccessTokenPayload
 } from "../types/tokens";
+import { UserData } from "../types/users";
 
 @Entity()
 export class User extends Discardable {
@@ -72,5 +73,12 @@ export class User extends Discardable {
   };
 
   @OneToMany(type => PaperUser, paperUser => paperUser.user)
-  paperUsers!: Promise<PaperUser[]>;
+  paperUsers?: PaperUser[];
+
+  getData = (): UserData => ({
+    ...this.getBase(),
+    email: this.email,
+    emailVerified: this.emailVerified,
+    name: this.name
+  })
 }

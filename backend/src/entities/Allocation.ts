@@ -13,13 +13,13 @@ export class Allocation extends Base {
   questionTemplateId!: number;
 
   @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.allocations)
-  questionTemplate!: Promise<QuestionTemplate>;
+  questionTemplate?: QuestionTemplate;
 
   @Column()
   paperUserId!: number;
   
   @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
-  paperUser!: Promise<PaperUser>;
+  paperUser?: PaperUser;
 
   getListData = (): AllocationListData => ({
     ...this.getBase(),

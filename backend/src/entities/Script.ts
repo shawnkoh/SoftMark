@@ -11,8 +11,8 @@ export class Script extends Discardable {
   paperId!: number;
 
   @ManyToOne(type => Paper, paper => paper.paperUsers)
-  paper!: Promise<Paper>;
+  paper?: Paper;
 
   @OneToMany(type => Question, question => question.script)
-  questions!: Promise<Question[]>;
+  questions?: Question[];
 }

@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsEnum } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
 import { Allocation } from "./Allocation";
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";
@@ -18,13 +18,13 @@ export class PaperUser extends Discardable {
   paperId!: number;
 
   @ManyToOne(type => Paper, paper => paper.paperUsers)
-  paper!: Paper;
+  paper?: Paper;
 
   @Column()
   userId!: number;
 
-  @ManyToOne(type => User, user => user.paperUsers)
-  user!: User;
+  @ManyToOne(type => User, user => user.paperUsers, { eager: true })
+  user?: User;
 
   @Column({
     type: "enum",
@@ -35,23 +35,37 @@ export class PaperUser extends Discardable {
   role!: PaperUserRole;
 
   @OneToMany(type => Allocation, allocation => allocation.paperUser)
-  allocations!: Allocation[];
+  allocations?: Allocation[];
 
   @OneToMany(type => Mark, mark => mark.paperUser, { eager: true })
-  marks!: Mark[];
+  marks?: Mark[];
 
   @OneToMany(type => Bookmark, bookmark => bookmark.paperUser, { eager: true })
-  bookmarks!: Bookmark[];
+  bookmarks?: Bookmark[];
 
   @OneToMany(type => Comment, comment => comment.paperUser)
-  comments!: Comment[];
+  comments?: Comment[];
 
-  getListData = (): PaperUserListData => ({
+  getListData = async (): Promise<PaperUserListData> => ({
     ...this.getBase(),
+    user: this.user
+      ? this.user.getData()
+      : (await getRepository(User).findOneOrFail(this.userId)).getData(),
     role: this.role,
-    allocations: this.allocations,
-    // Defined only when using find*
-    markCount: this.marks ? this.marks.length : 0,
-    bookmarkCount: this.bookmarks ? this.bookmarks.length : 0,
+    allocations:
+      this.allocations ||
+      (await getRepository(Allocation).find({
+        where: { paperUser: this.id }
+      })),
+    markCount: this.marks
+      ? this.marks.length
+      : await getRepository(Mark).count({
+          where: { paperUser: this.id }
+        }),
+    bookmarkCount: this.bookmarks
+      ? this.bookmarks.length
+      : await getRepository(Bookmark).count({
+          where: { paperUser: this.id }
+        })
   });
 }
