@@ -5,10 +5,10 @@ import { pick } from "lodash";
 import { getRepository } from "typeorm";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
-// import {
-//   sendVerificationEmail,
-//   sendResetPasswordEmail
-// } from "../utils/sendgrid";
+import {
+  sendVerificationEmail,
+  sendResetPasswordEmail
+} from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -19,7 +19,9 @@ export async function create(request: Request, response: Response) {
     user.password = hashSync(user.password!);
     await getRepository(User).save(user);
 
-    // sendVerificationEmail(user);
+    if (process.env.NODE_ENV === "production") {
+      sendVerificationEmail(user);
+    }
 
     const data = {
       user: user.getData(),
@@ -83,7 +85,9 @@ export async function requestResetPassword(
       where: { email }
     });
 
-    // sendResetPasswordEmail(user);
+    if (process.env.NODE_ENV === "production") {
+      sendResetPasswordEmail(user);
+    }
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(404);
