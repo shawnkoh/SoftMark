@@ -2,18 +2,19 @@ import { IsNotEmpty, IsString, IsNumber } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
-import { Paper } from "./Paper";
 import { Question } from "./Question";
+import { ScriptTemplate } from "./ScriptTemplate";
+import { QuestionTemplateListData } from "../types/questionTemplates";
 
 @Entity()
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
   @Column()
-  paperId!: number;
+  scriptTemplateId!: number;
 
-  @ManyToOne(type => Paper, paper => paper.questionTemplates)
-  paper!: Promise<Paper>;
+  @ManyToOne(type => ScriptTemplate, scriptTemplate => scriptTemplate.questionTemplates)
+  scriptTemplate!: Promise<ScriptTemplate>;
 
   @Column()
   @IsNotEmpty()
@@ -30,4 +31,10 @@ export class QuestionTemplate extends Discardable {
 
   @OneToMany(type => Allocation, allocation => allocation.questionTemplate)
   allocations!: Promise<Allocation[]>;
+
+  getListData = (): QuestionTemplateListData => ({
+    ...this.getBase(),
+    name: this.name,
+    marks: this.marks
+  });
 }

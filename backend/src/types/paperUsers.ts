@@ -1,4 +1,5 @@
 import { AllocationListData } from "./allocations";
+import { DiscardableData } from "./entities";
 
 export enum PaperUserRole {
   Owner = "OWNER",
@@ -10,13 +11,9 @@ export function isPaperUserRole(role: any): role is PaperUserRole {
   return Object.values(PaperUserRole).includes(role);
 }
 
-export interface PaperUserListData {
-  id: number;
+export interface PaperUserListData extends DiscardableData {
   role: PaperUserRole;
   allocations: AllocationListData[];
   markCount: number;
   bookmarkCount: number;
-  createdAt: Date;
-  updatedAt: Date
-  discardedAt?: Date;
 }

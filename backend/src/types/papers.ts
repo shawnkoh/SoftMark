@@ -1,12 +1,13 @@
 import { PaperUserRole, PaperUserListData } from "./paperUsers";
+import { DiscardableData } from "./entities";
 
-export interface PaperListData {
-  id: number;
+export interface PaperPostData {
+  name: string;
+}
+
+export interface PaperListData extends DiscardableData {
   name: string;
   role: PaperUserRole;
-  createdAt: Date;
-  updatedAt: Date
-  discardedAt?: Date;
 }
 
 export interface PaperData extends PaperListData {

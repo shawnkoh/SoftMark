@@ -1,12 +1,11 @@
-export interface QuestionTemplateListData {
-  id: number;
+import { DiscardableData } from "./entities";
+
+export interface QuestionTemplatePostData {
   name: string;
   marks: number;
-  createdAt: Date;
-  updatedAt: Date;
-  discardedAt?: Date;
 }
 
-export interface QuestionTemplateData extends QuestionTemplateListData {
+export type QuestionTemplateListData = QuestionTemplatePostData & DiscardableData;
 
+export interface QuestionTemplateData extends QuestionTemplateListData {
 }
