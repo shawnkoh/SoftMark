@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany, getRepository } from "typeorm";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Script } from "./Script";
@@ -17,13 +17,13 @@ export class Paper extends Discardable {
   name!: string;
 
   @OneToMany(type => PaperUser, paperUser => paperUser.paper)
-  paperUsers!: Promise<PaperUser[]>;
+  paperUsers?: PaperUser[];
 
   @OneToMany(type => ScriptTemplate, scriptTemplate => scriptTemplate.paper)
-  scriptTemplates!: Promise<ScriptTemplate[]>;
+  scriptTemplates?: ScriptTemplate[];
 
   @OneToMany(type => Script, script => script.paper)
-  scripts!: Promise<Script[]>;
+  scripts?: Script[];
 
   getListData = (role: PaperUserRole): PaperListData => ({
     ...this.getBase(),
@@ -32,10 +32,14 @@ export class Paper extends Discardable {
   });
 
   getData = async (role: PaperUserRole): Promise<PaperData> => {
-    const paperUsers = await this.paperUsers;
+    const paperUsers = await getRepository(PaperUser).find({
+      where: { paper: this }
+    });
     return {
       ...this.getListData(role),
-      paperUsers: paperUsers.map(paperUser => paperUser.getListData())
+      paperUsers: await Promise.all(
+        paperUsers.map(async paperUser => await paperUser.getListData())
+      )
     };
   };
 }

@@ -1,6 +1,7 @@
 import { hashSync, compareSync } from "bcryptjs";
 import { validateOrReject } from "class-validator";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import { pick } from "lodash";
 import { getRepository } from "typeorm";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -12,45 +13,19 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 export async function create(request: Request, response: Response) {
   try {
     const user = new User();
-    user.password = request.body.password;
-    user.email = request.body.email;
-
+    Object.assign(user, pick(request.body, "email", "password", "name"));
     await validateOrReject(user);
+
     user.password = hashSync(user.password!);
     await getRepository(User).save(user);
 
     // sendVerificationEmail(user);
 
-    const result = { ...user, ...user.createAuthenticationTokens() };
-    delete result.password;
-    response.status(201).json(result);
-  } catch (error) {
-    response.sendStatus(400);
-    console.error(error);
-  }
-}
-
-export async function index(
-  request: Request,
-  response: Response,
-  next: NextFunction
-) {
-  try {
-    const userList = await getRepository(User).find();
-    response.status(200).json(userList);
-  } catch (error) {
-    response.sendStatus(400);
-  }
-}
-
-export async function show(
-  request: Request,
-  response: Response,
-  next: NextFunction
-) {
-  try {
-    const user = await getRepository(User).findOneOrFail(request.params.id);
-    response.status(200).json(user);
+    const data = {
+      user: user.getData(),
+      ...user.createAuthenticationTokens()
+    };
+    response.status(201).json(data);
   } catch (error) {
     response.sendStatus(400);
   }
@@ -94,41 +69,6 @@ export async function changePassword(request: Request, response: Response) {
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(400);
-    console.error(error);
-  }
-}
-
-export async function discard(
-  request: Request,
-  response: Response,
-  next: NextFunction
-) {
-  try {
-    await getRepository(User).findOneOrFail(request.params.id);
-    await getRepository(User).update(request.params.id, {
-      discardedAt: new Date()
-    });
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-    return;
-  }
-}
-
-export async function undiscard(
-  request: Request,
-  response: Response,
-  next: NextFunction
-) {
-  try {
-    await getRepository(User).findOneOrFail(request.params.id);
-    await getRepository(User).update(request.params.id, {
-      discardedAt: undefined
-    });
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-    return;
   }
 }
 
@@ -147,6 +87,5 @@ export async function requestResetPassword(
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(404);
-    console.error(error);
   }
 }

@@ -14,20 +14,20 @@ export class Question extends Discardable {
   questionTemplateId!: number;
   
   @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.questions)
-  questionTemplate!: QuestionTemplate;
+  questionTemplate?: QuestionTemplate;
 
   @Column()
   scriptId!: number;
 
   @ManyToOne(type => Script, script => script.questions)
-  script!: Script;
+  script?: Script;
 
   @OneToMany(type => Mark, mark => mark.question)
-  marks!: Mark[];
+  marks?: Mark[];
 
   @OneToMany(type => Bookmark, bookmark => bookmark.question)
-  bookmarks!: Bookmark[];
+  bookmarks?: Bookmark[];
 
   @OneToMany(type => Comment, comment => comment.question)
-  comments!: Comment[];
+  comments?: Comment[];
 }

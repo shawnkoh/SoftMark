@@ -14,7 +14,7 @@ export class QuestionTemplate extends Discardable {
   scriptTemplateId!: number;
 
   @ManyToOne(type => ScriptTemplate, scriptTemplate => scriptTemplate.questionTemplates)
-  scriptTemplate!: Promise<ScriptTemplate>;
+  scriptTemplate?: ScriptTemplate;
 
   @Column()
   @IsNotEmpty()
@@ -27,10 +27,10 @@ export class QuestionTemplate extends Discardable {
   marks!: number;
 
   @OneToMany(type => Question, question => question.questionTemplate)
-  questions!: Promise<Question[]>;
+  questions?: Question[];
 
   @OneToMany(type => Allocation, allocation => allocation.questionTemplate)
-  allocations!: Promise<Allocation[]>;
+  allocations?: Allocation[];
 
   getListData = (): QuestionTemplateListData => ({
     ...this.getBase(),

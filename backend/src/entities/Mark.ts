@@ -12,13 +12,13 @@ export class Mark extends Discardable {
   questionId!: number;
 
   @ManyToOne(type => Question, question => question.marks)
-  question!: Promise<Question>;
+  question?: Question;
 
   @Column()
   paperUserId!: number;
 
   @ManyToOne(type => PaperUser, paperUser => paperUser.marks)
-  paperUser!: Promise<PaperUser>;
+  paperUser?: PaperUser;
 
   @Column()
   @IsNotEmpty()

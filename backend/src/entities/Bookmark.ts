@@ -11,11 +11,11 @@ export class Bookmark extends Base {
   questionId!: number;
 
   @ManyToOne(type => Question, question => question.bookmarks)
-  question!: Promise<Question>;
+  question?: Question;
 
   @Column()
   paperUserId!: number;
   
   @ManyToOne(type => PaperUser, paperUser => paperUser.bookmarks)
-  paperUser!: Promise<PaperUser>;
+  paperUser?: PaperUser;
 }

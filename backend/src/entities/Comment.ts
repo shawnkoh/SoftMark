@@ -12,13 +12,13 @@ export class Comment extends Discardable {
   questionId!: number;
 
   @ManyToOne(type => Question, question => question.comments)
-  question!: Promise<Question>;
+  question?: Question;
 
   @Column()
   paperUserId!: number;
 
   @ManyToOne(type => PaperUser, paperUser => paperUser.comments)
-  paperUser!: Promise<PaperUser>;
+  paperUser?: PaperUser;
 
   @Column()
   @IsNotEmpty()
