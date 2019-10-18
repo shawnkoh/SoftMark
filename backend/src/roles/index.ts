@@ -1,6 +1,7 @@
 import { getRepository } from "typeorm";
 import { PaperUser } from "../entities/PaperUser";
 
+// TODO: Temporarily deprecated
 export interface Role {
   can: Action[];
   inherits?: string[];

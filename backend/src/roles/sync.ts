@@ -1,3 +1,4 @@
+// TODO: Temporarily deprecated
 export interface Role {
   can: Action[];
   inherits?: string[];

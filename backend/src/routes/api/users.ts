@@ -1,6 +1,5 @@
 import { Router } from "express";
 import * as UsersController from "../../controllers/UsersController";
-import { checkRole } from "../../middlewares/checkRole";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
 
