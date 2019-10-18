@@ -10,9 +10,4 @@ router.post("/", UsersController.create);
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.patch("/change_password", UsersController.changePassword);
 
-router.get("/", UsersController.index);
-router.get("/:id", UsersController.show);
-router.delete("/:id", UsersController.discard);
-router.patch("/:id/undiscard", UsersController.undiscard);
-
 export default router;
