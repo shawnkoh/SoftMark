@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { getRepository, getManager, IsNull } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { AccessTokenSignedPayload } from "../types/tokens";
-import { PaperUserRole } from "../types/paperUsers";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { PaperUserRole } from "../types/paperUsers";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { getEntityArray } from "../utils/entities";
 
 const check = async (
@@ -13,9 +13,12 @@ const check = async (
   paperId: number | string,
   role?: PaperUserRole
 ): Promise<false | { paper: Paper; paperUser: PaperUser }> => {
-  const paper = await getRepository(Paper).findOneOrFail(paperId);
-  const paperUsers = await paper.paperUsers;
-  const paperUser = paperUsers.find(paperUser => paperUser.userId === userId);
+  const paper = await getRepository(Paper).findOneOrFail(paperId, {
+    relations: ["paperUsers"]
+  });
+  const paperUser = paper.paperUsers!.find(
+    paperUser => paperUser.userId === userId
+  );
   if (
     !paperUser ||
     (role === PaperUserRole.Marker &&
@@ -46,7 +49,7 @@ export async function create(request: Request, response: Response) {
     const questionTemplates = await getEntityArray(
       request.body.questionTemplates,
       QuestionTemplate,
-      { scriptTemplate: Promise.resolve(scriptTemplate) }
+      { scriptTemplate }
     );
 
     await getManager().transaction(async manager => {

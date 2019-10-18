@@ -8,20 +8,17 @@ import { PaperUserRole } from "../types/paperUsers";
 
 const check = async (
   userId: number,
-  paperId: number,
+  paperId: number | string,
   role?: PaperUserRole
 ): Promise<false | { paper: Paper; paperUser: PaperUser }> => {
-  const paper = await getRepository(Paper).findOneOrFail(paperId);
-  const paperUsers = await paper.paperUsers;
-  const paperUser = paperUsers.find(paperUser => paperUser.userId === userId);
-  if (!paperUser) {
-    return false;
-  }
-
-  if (!role || role === PaperUserRole.Student) {
-    return { paper, paperUser };
-  }
+  const paper = await getRepository(Paper).findOneOrFail(paperId, {
+    relations: ["paperUsers"]
+  });
+  const paperUser = paper.paperUsers!.find(
+    paperUser => paperUser.userId === userId
+  );
   if (
+    !paperUser ||
     (role === PaperUserRole.Marker &&
       paperUser.role === PaperUserRole.Student) ||
     (role === PaperUserRole.Owner && paperUser.role !== PaperUserRole.Owner)
@@ -65,7 +62,7 @@ export async function index(request: Request, response: Response) {
     });
 
     const data = paperUsers.map(paperUser =>
-      paperUser.paper.getListData(paperUser.role)
+      paperUser.paper!.getListData(paperUser.role)
     );
     response.status(200).json(data);
   } catch (error) {
