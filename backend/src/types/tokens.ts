@@ -72,6 +72,15 @@ function hasCredentials(payload: any) {
   );
 }
 
+export function isAuthorizationTokenPayload(
+  payload: any
+): payload is AuthorizationTokenPayload {
+  return (
+    isPayload(payload) &&
+    payload.type === BearerTokenType.AuthorizationToken
+  )
+}
+
 export function isAccessTokenPayload(
   payload: any
 ): payload is AccessTokenPayload {
