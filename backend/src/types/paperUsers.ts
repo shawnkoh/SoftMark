@@ -14,7 +14,7 @@ export function isPaperUserRole(role: any): role is PaperUserRole {
 
 export interface PaperUserPostData {
   email: string;
-  role: PaperUserRole;
+  role : PaperUserRole;
 }
 
 export interface PaperUserListData extends DiscardableData {

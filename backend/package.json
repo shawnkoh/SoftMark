@@ -36,6 +36,7 @@
     "typescript": "^3.6.4"
   },
   "scripts": {
+    "lint": "prettier --write \"src/**/*.{ts,tsx}\" --tab-width 2",
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'",
     "start:remote": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env'",
     "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js"
