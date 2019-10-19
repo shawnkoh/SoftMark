@@ -11,6 +11,10 @@ import {
 const baseUrl = "https://nus.reviews";
 
 function send(user: User, subject: string, message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    return;
+  }
+  
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
     to: user.email,
