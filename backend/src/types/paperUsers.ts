@@ -12,6 +12,11 @@ export function isPaperUserRole(role: any): role is PaperUserRole {
   return Object.values(PaperUserRole).includes(role);
 }
 
+export interface PaperUserPostData {
+  email: string;
+  role: PaperUserRole;
+}
+
 export interface PaperUserListData extends DiscardableData {
   user: UserData;
   role: PaperUserRole;

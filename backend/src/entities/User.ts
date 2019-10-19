@@ -1,9 +1,4 @@
-import {
-  IsNotEmpty,
-  IsEmail,
-  IsOptional,
-  IsString
-} from "class-validator";
+import { IsNotEmpty, IsEmail, IsOptional, IsString } from "class-validator";
 import { Column, Entity, OneToMany } from "typeorm";
 import { sign } from "jsonwebtoken";
 import { Discardable } from "./Discardable";
@@ -13,21 +8,21 @@ import {
   EntityTokenPayload,
   Credentials,
   RefreshTokenPayload,
-  AccessTokenPayload
+  AccessTokenPayload,
+  AuthorizationTokenPayload
 } from "../types/tokens";
 import { UserData } from "../types/users";
 
 @Entity()
 export class User extends Discardable {
   entityName = "User";
-  
+
   @Column({ unique: true })
   @IsNotEmpty()
   @IsEmail()
   email!: string;
 
-  @Column({ select: false })
-  @IsNotEmpty()
+  @Column({ nullable: true, select: false })
   password?: string;
 
   @Column({ default: false })
@@ -51,6 +46,17 @@ export class User extends Discardable {
     email: this.email,
     emailVerified: this.emailVerified
   });
+
+  createAuthorizationToken = () => {
+    const payload: AuthorizationTokenPayload = {
+      type: BearerTokenType.AuthorizationToken,
+      id: this.id
+    };
+    const token = sign(payload, process.env.JWT_SECRET!, {
+      expiresIn: "30d"
+    });
+    return token;
+  };
 
   createAuthenticationTokens = () => {
     const credentials = this.getCredentials();
@@ -80,5 +86,5 @@ export class User extends Discardable {
     email: this.email,
     emailVerified: this.emailVerified,
     name: this.name
-  })
+  });
 }
