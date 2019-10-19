@@ -3,8 +3,9 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserRole } from "../types/paperUsers";
+import { PaperData } from "../types/papers";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedPaperUser } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
@@ -53,14 +54,26 @@ export async function index(request: Request, response: Response) {
 export async function show(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await allowedPaperUser(payload.id, Number(request.params.id));
+    const allowed = await allowedPaperUser(
+      payload.id,
+      Number(request.params.id)
+    );
     if (!allowed) {
       response.sendStatus(404);
       return;
     }
     const { paper, paperUser } = allowed;
 
-    const data = await paper.getData(paperUser!.role);
+    let data: PaperData;
+    // TODO: Student check is not tested - waiting for paperUser
+    if (paperUser.role === PaperUserRole.Student) {
+      data = {
+        ...paper.getListData(paperUser.role),
+        paperUsers: [await paperUser.getListData()]
+      };
+    } else {
+      data = await paper.getData(paperUser.role);
+    }
     response.status(200).json(data);
   } catch (error) {
     response.sendStatus(400);
