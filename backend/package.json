@@ -30,9 +30,6 @@
     "typeorm": "^0.2.19"
   },
   "devDependencies": {
-    "husky": "^3.0.9",
-    "prettier": "1.18.2",
-    "pretty-quick": "^2.0.0",
     "ts-node": "3.3.0",
     "ts-node-dev": "^1.0.0-pre.42",
     "tsconfig-paths": "^3.9.0",
@@ -42,10 +39,5 @@
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env.development'",
     "start:remote": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env'",
     "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
   }
 }
