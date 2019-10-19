@@ -1,6 +1,7 @@
 export type BearerToken = string;
 
 export enum BearerTokenType {
+  AuthorizationToken,
   AccessToken,
   RefreshToken,
   EntityToken,
@@ -22,6 +23,9 @@ export type Credentials = {
   emailVerified: boolean;
 };
 
+export type AuthorizationTokenPayload = Payload<
+  BearerTokenType.AuthorizationToken
+> & { id: number };
 export type AccessTokenPayload = Payload<BearerTokenType.AccessToken> &
   Credentials;
 export type AccessTokenSignedPayload = AccessTokenPayload & TokenLifespan;
@@ -44,7 +48,10 @@ export type ResetPasswordTokenSignedPayload = ResetPasswordTokenPayload &
 
 // Type checkers
 
-export function isBearerToken(token: string): token is BearerToken {
+export function isBearerToken(token: string | undefined): token is BearerToken {
+  if (!token) {
+    return false;
+  }
   const words = token.split(" ");
   return words[0] === "Bearer" && !!words[1];
 }
