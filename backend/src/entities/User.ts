@@ -53,7 +53,7 @@ export class User extends Discardable {
       id: this.id
     };
     const token = sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: "1 month"
+      expiresIn: "30d"
     });
     return token;
   };
