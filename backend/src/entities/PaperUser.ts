@@ -6,9 +6,9 @@ import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { Paper } from "./Paper";
-import { PaperUserRole } from "../types/paperUsers";
+import { Script } from "./Script";
 import { User } from "./User";
-import { PaperUserListData } from "../types/paperUsers";
+import { PaperUserRole, PaperUserListData } from "../types/paperUsers";
 
 @Entity()
 export class PaperUser extends Discardable {
@@ -45,6 +45,9 @@ export class PaperUser extends Discardable {
 
   @OneToMany(type => Comment, comment => comment.paperUser)
   comments?: Comment[];
+
+  @OneToMany(type => Script, script => script.paperUser)
+  scripts?: Script[];
 
   getListData = async (): Promise<PaperUserListData> => ({
     ...this.getBase(),
