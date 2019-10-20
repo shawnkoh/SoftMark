@@ -64,7 +64,7 @@ export async function update(request: Request, response: Response) {
     const allowed = await allowedPaperUser(
       userId,
       paperUser.paperId,
-      role
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
@@ -92,7 +92,8 @@ export async function discard(request: Request, response: Response) {
     const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: IsNull() }} );
     const allowed = await allowedPaperUser(
       userId,
-      paperUser.paperId
+      paperUser.paperId,
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
@@ -115,10 +116,10 @@ export async function undiscard(request: Request, response: Response) {
     const userId = payload.id;
     const paperUserId = Number(request.params.id);    
     let paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: Not(IsNull()) }} );
-    console.log(paperUser);
     const allowed = await allowedPaperUser(
       userId,
-      paperUser.paperId
+      paperUser.paperId,
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
