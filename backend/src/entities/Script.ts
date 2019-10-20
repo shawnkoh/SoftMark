@@ -1,5 +1,6 @@
 import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
 import { Discardable } from "./Discardable";
+import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
@@ -19,6 +20,9 @@ export class Script extends Discardable {
 
   @ManyToOne(type => Paper, paper => paper.paperUsers)
   paper?: Paper;
+
+  @OneToMany(type => Page, page => page.script)
+  pages?: Page[];
 
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];

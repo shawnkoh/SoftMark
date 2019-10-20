@@ -1,10 +1,11 @@
 import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
+import { Bookmark } from "./Bookmark";
+import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
+import { PageQuestion } from "./PageQuestion";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
-import { Comment } from "./Comment";
-import { Bookmark } from "./Bookmark";
 
 @Entity()
 export class Question extends Discardable {
@@ -12,8 +13,11 @@ export class Question extends Discardable {
 
   @Column()
   questionTemplateId!: number;
-  
-  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.questions)
+
+  @ManyToOne(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.questions
+  )
   questionTemplate?: QuestionTemplate;
 
   @Column()
@@ -21,6 +25,9 @@ export class Question extends Discardable {
 
   @ManyToOne(type => Script, script => script.questions)
   script?: Script;
+
+  @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.question)
+  pageQuestions?: PageQuestion[];
 
   @OneToMany(type => Mark, mark => mark.question)
   marks?: Mark[];
