@@ -1,13 +1,12 @@
 import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, IsNull, Not } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
 import { allowedPaperUser } from "../utils/papers";
-import { allowedToEditPaperUser } from "../utils/paperUsers";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -26,8 +25,13 @@ export async function create(request: Request, response: Response) {
 
     const postData: PaperUserPostData = request.body;
 
-    const userEmail = postData.email;
-    const user = await getRepository(User).findOneOrFail({ email: userEmail });
+    const email = postData.email;
+    let user = await getRepository(User).findOne({ email: email });
+    if (!user) {
+      user = new User();
+      user.email = email;
+    }
+    await validateOrReject(user);
 
     const paper = await getRepository(Paper).findOneOrFail(paperId);
     await validateOrReject(paper);
@@ -38,9 +42,10 @@ export async function create(request: Request, response: Response) {
     paperUser.role = postData.role;
     await validateOrReject(paperUser);
 
+    await getRepository(User).save(user);
     await getRepository(PaperUser).save(paperUser);
 
-    const data = await paperUser.getListData();
+    const data = await paperUser.getData();
     response.status(201).json(data);
   } catch (error) {
     console.log(error);
@@ -51,29 +56,28 @@ export async function create(request: Request, response: Response) {
 export async function update(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
+    const userId = payload.id;
     const paperUserId = Number(request.params.id);
-    const allowed = await allowedToEditPaperUser(
-      payload.id,
-      paperUserId
+    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: IsNull() }} );
+    const postData: Partial<PaperUserPostData> = request.body;
+    const { role } = postData;
+    const allowed = await allowedPaperUser(
+      userId,
+      paperUser.paperId,
+      role
     );
-
     if (!allowed) {
       response.sendStatus(404);
       return;
     }
    
-    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
-    const postData: Partial<PaperUserPostData> = request.body;
-    const { role } = postData;
-
     if (role) {
       paperUser.role = role;
     }
-
     await validateOrReject(paperUser);
     await getRepository(PaperUser).save(paperUser);
 
-    const data = await paperUser.getListData();
+    const data = await paperUser.getData();
     response.status(201).json(data);
   } catch (error) {
     response.sendStatus(400);
@@ -83,10 +87,12 @@ export async function update(request: Request, response: Response) {
 export async function discard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
+    const userId = payload.id;
     const paperUserId = Number(request.params.id);
-    const allowed = await allowedToEditPaperUser(
-      payload.id,
-      paperUserId
+    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: IsNull() }} );
+    const allowed = await allowedPaperUser(
+      userId,
+      paperUser.paperId
     );
     if (!allowed) {
       response.sendStatus(404);
@@ -106,12 +112,13 @@ export async function discard(request: Request, response: Response) {
 export async function undiscard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const paperUserId = Number(request.params.id);
-    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
-    const allowed = await allowedToEditPaperUser(
-      payload.id,
-      paperUserId,
-      true
+    const userId = payload.id;
+    const paperUserId = Number(request.params.id);    
+    let paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: Not(IsNull()) }} );
+    console.log(paperUser);
+    const allowed = await allowedPaperUser(
+      userId,
+      paperUser.paperId
     );
     if (!allowed) {
       response.sendStatus(404);
@@ -121,8 +128,9 @@ export async function undiscard(request: Request, response: Response) {
     await getRepository(PaperUser).update(paperUserId, {
       discardedAt: undefined
     });
-    
-    const data = await paperUser.getListData();
+
+    paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
+    const data = await paperUser.getData();
     response.status(200).json(data);
   } catch (error) {
     response.sendStatus(400);
