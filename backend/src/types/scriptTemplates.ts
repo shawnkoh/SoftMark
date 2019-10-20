@@ -1,4 +1,7 @@
-import { QuestionTemplatePostData, QuestionTemplateListData } from "./questionTemplates";
+import {
+  QuestionTemplatePostData,
+  QuestionTemplateListData
+} from "./questionTemplates";
 import { DiscardableData } from "./entities";
 
 export interface ScriptTemplatePostData {

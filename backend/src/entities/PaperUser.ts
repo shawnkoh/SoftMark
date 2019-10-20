@@ -75,4 +75,27 @@ export class PaperUser extends Discardable {
           where: { paperUser: this.id }
         })
   });
+
+  getData = async (): Promise<PaperUserListData> => ({
+    ...this.getBase(),
+    user: this.user
+      ? this.user.getData()
+      : (await getRepository(User).findOneOrFail(this.userId)).getData(),
+    role: this.role,
+    allocations:
+      this.allocations ||
+      (await getRepository(Allocation).find({
+        where: { paperUser: this.id }
+      })),
+    markCount: this.marks
+      ? this.marks.length
+      : await getRepository(Mark).count({
+          where: { paperUser: this.id }
+        }),
+    bookmarkCount: this.bookmarks
+      ? this.bookmarks.length
+      : await getRepository(Bookmark).count({
+          where: { paperUser: this.id }
+        })
+  });
 }

@@ -12,5 +12,4 @@ export interface UserListData extends DiscardableData {
   name?: string;
 }
 
-export interface UserData extends UserListData {
-}
+export interface UserData extends UserListData {}

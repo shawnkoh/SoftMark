@@ -76,9 +76,8 @@ export function isAuthorizationTokenPayload(
   payload: any
 ): payload is AuthorizationTokenPayload {
   return (
-    isPayload(payload) &&
-    payload.type === BearerTokenType.AuthorizationToken
-  )
+    isPayload(payload) && payload.type === BearerTokenType.AuthorizationToken
+  );
 }
 
 export function isAccessTokenPayload(

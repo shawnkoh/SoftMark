@@ -4,7 +4,6 @@ import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { AllocationListData } from "../types/allocations";
 
-
 @Entity()
 export class Allocation extends Base {
   entityName = "Allocation";
@@ -12,18 +11,21 @@ export class Allocation extends Base {
   @Column()
   questionTemplateId!: number;
 
-  @ManyToOne(type => QuestionTemplate, questionTemplate => questionTemplate.allocations)
+  @ManyToOne(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.allocations
+  )
   questionTemplate?: QuestionTemplate;
 
   @Column()
   paperUserId!: number;
-  
+
   @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
   paperUser?: PaperUser;
 
   getListData = (): AllocationListData => ({
     ...this.getBase(),
     questionTemplateId: this.questionTemplateId,
-    paperUserId: this.paperUserId,
+    paperUserId: this.paperUserId
   });
 }

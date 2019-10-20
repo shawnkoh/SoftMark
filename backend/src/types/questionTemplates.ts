@@ -5,7 +5,7 @@ export interface QuestionTemplatePostData {
   marks: number;
 }
 
-export type QuestionTemplateListData = QuestionTemplatePostData & DiscardableData;
+export type QuestionTemplateListData = QuestionTemplatePostData &
+  DiscardableData;
 
-export interface QuestionTemplateData extends QuestionTemplateListData {
-}
+export interface QuestionTemplateData extends QuestionTemplateListData {}

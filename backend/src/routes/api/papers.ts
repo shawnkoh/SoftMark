@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as PapersController from "../../controllers/PapersController";
+import * as PaperUsersController from "../../controllers/PaperUsersController";
 import * as ScriptTemplatesController from "../../controllers/ScriptTemplatesController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
@@ -13,7 +14,7 @@ router.get("/:id", PapersController.show);
 router.patch("/:id", PapersController.update);
 router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
-
-router.get("/:id/script_template", ScriptTemplatesController.show)
+router.post("/:id/users", PaperUsersController.create);
+router.get("/:id/script_template", ScriptTemplatesController.show);
 
 export default router;

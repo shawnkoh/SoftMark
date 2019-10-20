@@ -13,11 +13,10 @@ export const checkPaperUserRole = (role: PaperUserRole) => {
       where: { id: payload.id }
     });
 
-    const papers = {
-    }
+    const papers = {};
     user.paperUsers.forEach(paperUser => {
       console.log(paperUser);
-      paperUser.paper.id
+      paperUser.paper.id;
     });
 
     // if (roles.includes(userRole)) {
