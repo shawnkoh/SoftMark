@@ -9,4 +9,3 @@ router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.post("/:id/marks", MarksController.create);
 
 export default router;
-

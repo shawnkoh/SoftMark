@@ -3,6 +3,7 @@ import { Entity, ManyToOne, Column } from "typeorm";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
+import { MarkData } from "../types/marks";
 
 @Entity()
 export class Mark extends Discardable {
@@ -29,4 +30,11 @@ export class Mark extends Discardable {
   @IsNotEmpty()
   @IsNumber()
   timeSpent!: number;
+
+  getData = async (): Promise<MarkData> => ({
+    ...this.getBase(),
+    questionId: this.questionId,
+    paperUserId: this.paperUserId,
+    score: this.score
+  });
 }

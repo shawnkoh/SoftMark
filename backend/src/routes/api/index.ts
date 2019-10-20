@@ -10,7 +10,7 @@ import users from "./users";
 const routes = Router();
 
 routes.use("/auth", auth);
-routes.use("/marks", marks)
+routes.use("/marks", marks);
 routes.use("/papers", papers);
 routes.use("/paper_users", paperUsers);
 routes.use("/questions", questions);
