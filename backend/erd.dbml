@@ -1,0 +1,164 @@
+Table user {
+  id int [pk]
+  
+  email varchar [not null, unique]
+  password varchar
+  email_verified boolean [not null, unique]
+  name varchar [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table paper {
+  id int [pk]
+  
+  name varchar [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table paper_user {
+  id int [pk]
+  paper_id int [ref: > paper.id]
+  user_id int [ref: > user.id]
+  
+  role enum [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table script_template {
+  id int [pk]
+  paper_id int [ref: > paper.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table page_template {
+  id int [pk]
+  script_template_id int [ref: > script_template.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table question_template {
+  id int [pk]
+  script_template_id int [ref: > script_template.id]
+  
+  name varchar [not null]
+  score int [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table page_template_question_template {
+  id int [pk]
+  page_template_id int [ref: > page_template.id]
+  question_template_id int [ref: > question_template.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table allocation {
+  id int [pk]
+  question_template_id int [ref: > question_template.id]
+  paper_user_id int [ref: > paper_user.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table bookmark {
+  id int [pk]
+  paper_user_id int [ref: > paper_user.id]
+  question_id int [ref: > question.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table question {
+  id int [pk]
+  question_template_id int [ref: > question_template.id]
+  script_id int [ref: > script.id]
+  
+  order int [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table script {
+  id int [pk]
+  paper_user_id int [ref: > paper_user.id]
+  paper_id int [ref: > paper.id]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table page {
+  id int [pk]
+  page_template_id int [ref: > page_template.id]
+  script_id int [ref: > script.id]
+  
+  image bytea [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table annotation {
+  id int [pk]
+  page_id int [ref: > page.id]
+  paper_user_id int [ref: > paper_user.id]
+  
+  annotation json [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table comment {
+  id int [pk]
+  question_id int [ref: > question.id]
+  paper_user_id int [ref: > paper_user.id]
+  
+  annotation json [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table mark {
+  id int [pk]
+  question_id int [ref: > question.id]
+  paper_user_id int [ref: > paper_user.id]
+  
+  score int [not null]
+  time_spent int
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
