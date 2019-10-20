@@ -116,10 +116,19 @@ Table script {
 
 Table page {
   id int [pk]
-  page_template_id int [ref: > page_template.id]
   script_id int [ref: > script.id]
   
   image bytea [not null]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  discarded_at datetime [not null]
+}
+
+Table page_question {
+  id int [pk]
+  page_id int [ref: > page.id]
+  question_id int [ref: > question.id]
   
   created_at datetime [not null]
   updated_at datetime [not null]

@@ -12,7 +12,7 @@ export const allowedPaperUser = async (
     relations: ["paperUsers"]
   });
   const paperUser = paper.paperUsers!.find(
-    paperUser => paperUser.userId === userId
+    paperUser => paperUser.userId === userId && !paperUser.discardedAt
   );
   if (
     !paperUser ||
