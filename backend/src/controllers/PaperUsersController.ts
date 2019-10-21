@@ -48,7 +48,6 @@ export async function create(request: Request, response: Response) {
     const data = await paperUser.getData();
     response.status(201).json(data);
   } catch (error) {
-    console.log(error);
     response.sendStatus(400);
   }
 }
@@ -58,19 +57,22 @@ export async function update(request: Request, response: Response) {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const userId = payload.id;
     const paperUserId = Number(request.params.id);
-    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: IsNull() }} );
+    const paperUser = await getRepository(PaperUser).findOneOrFail(
+      paperUserId,
+      { where: { discardedAt: IsNull() } }
+    );
     const postData: Partial<PaperUserPostData> = request.body;
     const { role } = postData;
     const allowed = await allowedPaperUser(
       userId,
       paperUser.paperId,
-      role
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
       return;
     }
-   
+
     if (role) {
       paperUser.role = role;
     }
@@ -89,10 +91,14 @@ export async function discard(request: Request, response: Response) {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const userId = payload.id;
     const paperUserId = Number(request.params.id);
-    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: IsNull() }} );
+    const paperUser = await getRepository(PaperUser).findOneOrFail(
+      paperUserId,
+      { where: { discardedAt: IsNull() } }
+    );
     const allowed = await allowedPaperUser(
       userId,
-      paperUser.paperId
+      paperUser.paperId,
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
@@ -113,12 +119,14 @@ export async function undiscard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const userId = payload.id;
-    const paperUserId = Number(request.params.id);    
-    let paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, { where: { discardedAt: Not(IsNull()) }} );
-    console.log(paperUser);
+    const paperUserId = Number(request.params.id);
+    let paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId, {
+      where: { discardedAt: Not(IsNull()) }
+    });
     const allowed = await allowedPaperUser(
       userId,
-      paperUser.paperId
+      paperUser.paperId,
+      PaperUserRole.Owner
     );
     if (!allowed) {
       response.sendStatus(404);
