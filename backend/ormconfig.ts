@@ -1,5 +1,16 @@
 import { ConnectionOptions } from "typeorm";
 
+switch (process.env.NODE_ENV) {
+  case "development":
+    require("dotenv").config({ path: ".env.development" });
+    break;
+  case "test":
+    require("dotenv").config({ path: ".env.test" });
+    break;
+  case "production":
+    break;
+}
+
 const {
   POSTGRES_USERNAME,
   POSTGRES_PASSWORD,
@@ -9,7 +20,13 @@ const {
   POSTGRES_DISABLE_SSL
 } = process.env;
 
-if (!POSTGRES_USERNAME || !POSTGRES_PASSWORD || !POSTGRES_HOST || !POSTGRES_PORT || !POSTGRES_NAME) {
+if (
+  !POSTGRES_USERNAME ||
+  !POSTGRES_PASSWORD ||
+  !POSTGRES_HOST ||
+  !POSTGRES_PORT ||
+  !POSTGRES_NAME
+) {
   throw new Error("Missing database config!");
 }
 
