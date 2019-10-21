@@ -1,5 +1,12 @@
 import { IsNotEmpty, IsEnum } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  getRepository,
+  Unique
+} from "typeorm";
 import { Allocation } from "./Allocation";
 import { Annotation } from "./Annotation";
 import { Bookmark } from "./Bookmark";
@@ -16,6 +23,7 @@ import {
 } from "../types/paperUsers";
 
 @Entity()
+@Unique(["paper", "user"])
 export class PaperUser extends Discardable {
   entityName = "PaperUser";
 
