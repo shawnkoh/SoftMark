@@ -48,7 +48,6 @@ export async function create(request: Request, response: Response) {
     const data = await paperUser.getData();
     response.status(201).json(data);
   } catch (error) {
-    console.log(error);
     response.sendStatus(400);
   }
 }
