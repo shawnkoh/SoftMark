@@ -39,7 +39,32 @@ API Design Guidelines
 
 # Permissions
 
-- [Reference](https://blog.nodeswat.com/implement-access-control-in-node-js-8567e7b484d1)
+- allowedPaperUser(...) is used to define the permission for the requester accessing the route
+
+# Entities
+
+I was trying to make the entities reflect exactly how typeORM works.
+
+When you load an entity from the db, your related objects may not be loaded
+
+- Fields that may not be loaded are defined with ?
+- Fields always loaded are defined with !
+- Fields can be intentionally hiden with select: false, e.g. User.password. Defined with ?
+- Nullable fields are defined with !: type | null e.g. discardedAt!: Date | null
+- This is because discardedAt is always loaded, but when it is loaded it may be null.
+
+There’s a few ways to load them, you can set eager: true in the entities file, so when you load an entity you will automatically eagerly load those with eager: true
+This has some serious limitations though, so I don’t really advice it - it only works for find\* commands, stuff like save won’t load the eager ones
+
+You can also do find(id, { relations: [“paperUser”, “paperUser.user”] })
+This is preferred - its very explicit so you know what exactly is loaded
+
+typeORM documentation doesn’t cover this too well because they only guide you how to use ts without strict mode
+
+# Test
+
+- Refer to papers.spec.ts for an example
+- Take note that if you want to close the api server manually, you should always close it before calling expect() because if expect fails, it immediately quits executing.
 
 # Algolia
 
