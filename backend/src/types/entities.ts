@@ -5,5 +5,5 @@ export interface BaseData {
 }
 
 export interface DiscardableData extends BaseData {
-  discardedAt?: Date;
+  discardedAt: Date | null;
 }
