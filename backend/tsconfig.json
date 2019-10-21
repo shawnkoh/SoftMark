@@ -12,7 +12,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "strict": true,
-    "resolveJsonModule": true,
-    "types": ["node"]
+    "resolveJsonModule": true
+    // "types": ["node"]
   }
 }
