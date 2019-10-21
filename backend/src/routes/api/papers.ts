@@ -14,7 +14,9 @@ router.get("/:id", PapersController.show);
 router.patch("/:id", PapersController.update);
 router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
+
 router.post("/:id/users", PaperUsersController.create);
+
 router.get("/:id/script_template", ScriptTemplatesController.show);
 
 export default router;
