@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, Unique } from "typeorm";
 import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
 import { Question } from "./Question";
@@ -7,6 +7,7 @@ import { ScriptTemplate } from "./ScriptTemplate";
 import { QuestionTemplateListData } from "../types/questionTemplates";
 
 @Entity()
+@Unique(["scriptTemplate", "name"])
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
