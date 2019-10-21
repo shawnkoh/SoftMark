@@ -3,9 +3,9 @@ import { Base } from "./Base";
 import { IsOptional } from "class-validator";
 
 export abstract class Discardable extends Base {
-  @Column({ nullable: true })
+  @Column({ type: "timestamp without time zone", nullable: true })
   @IsOptional()
-  discardedAt?: Date;
+  discardedAt!: Date | null;
 
   getBase = () => ({
     id: this.id,

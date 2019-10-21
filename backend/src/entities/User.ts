@@ -22,17 +22,17 @@ export class User extends Discardable {
   @IsEmail()
   email!: string;
 
-  @Column({ nullable: true, select: false })
-  password?: string;
+  @Column({ type: "character varying", nullable: true, select: false })
+  password?: string | null;
 
   @Column({ default: false })
   @IsNotEmpty()
   emailVerified: boolean = false;
 
-  @Column({ nullable: true })
+  @Column({ type: "character varying", nullable: true })
   @IsOptional()
   @IsString()
-  name?: string;
+  name!: string | null;
 
   createPayload = (): EntityTokenPayload<User> => ({
     type: BearerTokenType.EntityToken,
