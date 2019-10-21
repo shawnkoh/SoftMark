@@ -5,8 +5,6 @@ services:
     image: postgres:11-alpine
     ports:
       - 35432:5432
-    # volumes:
-    # - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -16,12 +14,7 @@ services:
     image: postgres:11-alpine
     ports:
       - 54320:5432
-    # volumes:
-    # - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: db
-# volumes:
-#   postgres_data:
-#     driver: local
