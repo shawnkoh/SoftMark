@@ -1,7 +1,8 @@
-import { Entity, ManyToOne, Column } from "typeorm";
+import { Entity, ManyToOne, Column, getRepository } from "typeorm";
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
 import { Question } from "./Question";
+import { PageQuestionListData, PageQuestionData } from "../types/PageQuestions";
 
 @Entity()
 export class PageQuestion extends Discardable {
@@ -18,4 +19,33 @@ export class PageQuestion extends Discardable {
 
   @ManyToOne(type => Question, question => question.pageQuestions)
   question?: Question;
+
+  retrieveFromRepostitory = async (): Promise<void> => {
+    this.page = await getRepository(Page).findOneOrFail(this.pageId);
+    this.question = await getRepository(Question).findOneOrFail(
+      this.questionId
+    );
+  };
+
+  getListData = async (): Promise<PageQuestionListData> => {
+    return {
+      ...this.getBase(),
+      questionId: this.questionId,
+      pageId: this.pageId
+    };
+  };
+
+  getData = async (): Promise<QuestionData> => {
+    this.page = await getRepository(Page).findOneOrFail(this.pageId);
+    this.question = await getRepository(Question).findOneOrFail(
+      this.questionId
+    );
+    return {
+      ...this.getBase(),
+      questionId: this.questionId,
+      question: await this.question.getListData(),
+      pageId: this.pageId,
+      page: await this.page.getListData()
+    };
+  };
 }
