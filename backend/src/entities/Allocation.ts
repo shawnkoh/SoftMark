@@ -23,7 +23,16 @@ export class Allocation extends Base {
   @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
   paperUser?: PaperUser;
 
+  @Column()
+  totalAllocated!: number;
+
   getListData = (): AllocationListData => ({
+    ...this.getBase(),
+    questionTemplateId: this.questionTemplateId,
+    paperUserId: this.paperUserId
+  });
+
+  getData = (): AllocationListData => ({
     ...this.getBase(),
     questionTemplateId: this.questionTemplateId,
     paperUserId: this.paperUserId
