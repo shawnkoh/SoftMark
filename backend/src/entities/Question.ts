@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToMany, Column } from "typeorm";
+import { Entity, ManyToOne, OneToMany, Column, Unique } from "typeorm";
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
@@ -8,6 +8,7 @@ import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
 
 @Entity()
+@Unique(["script", "questionTemplate"])
 export class Question extends Discardable {
   entityName = "Question";
 

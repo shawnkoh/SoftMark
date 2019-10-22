@@ -1,5 +1,12 @@
 import { IsNotEmpty, IsEnum } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  getRepository,
+  Unique
+} from "typeorm";
 import { Allocation } from "./Allocation";
 import { Annotation } from "./Annotation";
 import { Bookmark } from "./Bookmark";
@@ -9,9 +16,14 @@ import { Mark } from "./Mark";
 import { Paper } from "./Paper";
 import { Script } from "./Script";
 import { User } from "./User";
-import { PaperUserRole, PaperUserListData } from "../types/paperUsers";
+import {
+  PaperUserRole,
+  PaperUserListData,
+  PaperUserData
+} from "../types/paperUsers";
 
 @Entity()
+@Unique(["paper", "user"])
 export class PaperUser extends Discardable {
   entityName = "PaperUser";
 
@@ -76,26 +88,7 @@ export class PaperUser extends Discardable {
         })
   });
 
-  getData = async (): Promise<PaperUserListData> => ({
-    ...this.getBase(),
-    user: this.user
-      ? this.user.getData()
-      : (await getRepository(User).findOneOrFail(this.userId)).getData(),
-    role: this.role,
-    allocations:
-      this.allocations ||
-      (await getRepository(Allocation).find({
-        where: { paperUser: this.id }
-      })),
-    markCount: this.marks
-      ? this.marks.length
-      : await getRepository(Mark).count({
-          where: { paperUser: this.id }
-        }),
-    bookmarkCount: this.bookmarks
-      ? this.bookmarks.length
-      : await getRepository(Bookmark).count({
-          where: { paperUser: this.id }
-        })
+  getData = async (): Promise<PaperUserData> => ({
+    ...(await this.getListData())
   });
 }

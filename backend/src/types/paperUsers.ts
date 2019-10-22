@@ -24,3 +24,5 @@ export interface PaperUserListData extends DiscardableData {
   markCount: number;
   bookmarkCount: number;
 }
+
+export interface PaperUserData extends PaperUserListData {}
