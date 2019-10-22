@@ -28,11 +28,17 @@ describe("POST papers/:id/users", () => {
       "owner@u.nus.edu",
       "setMeUp?"
     );
-    const res = await request(server.server)
+    const validResponse = await request(server.server)
       .post("/v1/papers/1/users")
       .set("Authorization", `Bearer ${accessToken}`)
       .send();
-    expect(res.status).not.toEqual(404);
+    expect(validResponse.status).not.toEqual(404);
+
+    const rejectResponse = await request(server.server)
+      .post("/v1/papers/2/users")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send();
+    expect(rejectResponse.status).toEqual(404);
   });
 
   it("should not allow a Marker to access this route", async () => {
