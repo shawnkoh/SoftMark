@@ -2,12 +2,10 @@ import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { getRepository, IsNull, Not } from "typeorm";
 import { Allocation } from "../entities/Allocation";
-import { User } from "../entities/User";
+import { PaperUser } from "../entities/PaperUser";
+import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedMarker } from "../utils/marks";
 import { AllocationPostData } from "../types/allocations";
-import { QuestionTemplate } from "src/entities/QuestionTemplate";
-import { PaperUser } from "src/entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
 import { allowedPaperUser } from "../utils/papers";
 
