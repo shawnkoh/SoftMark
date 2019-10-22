@@ -8,9 +8,12 @@ export const allowedPaperUser = async (
   paperId: number | string,
   role?: PaperUserRole
 ): Promise<false | { paper: Paper; paperUser: PaperUser }> => {
-  const paper = await getRepository(Paper).findOneOrFail(paperId, {
+  const paper = await getRepository(Paper).findOne(paperId, {
     relations: ["paperUsers"]
   });
+  if (!paper) {
+    return false;
+  }
   const paperUser = paper.paperUsers!.find(
     paperUser => paperUser.userId === userId && !paperUser.discardedAt
   );
