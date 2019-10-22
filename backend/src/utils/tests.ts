@@ -15,12 +15,8 @@ export async function synchronize(apiServer: ApiServer) {
 }
 
 export async function loadFixtures(apiServer: ApiServer) {
-  const papers: Paper[] = [];
-  let paper = new Paper();
+  const paper = new Paper();
   paper.name = "CS1010 Midterms";
-  papers.push(paper);
-  // paper.name = "CS1010 Finals";
-  // papers.push(paper);
 
   const users: User[] = [];
 
@@ -58,7 +54,7 @@ export async function loadFixtures(apiServer: ApiServer) {
   paperUsers.push(paperUser);
 
   await getRepository(User).insert(users);
-  await getRepository(Paper).insert(papers);
+  await getRepository(Paper).insert(paper);
   await getRepository(PaperUser).insert(paperUsers);
 }
 
