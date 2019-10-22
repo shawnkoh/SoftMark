@@ -13,9 +13,8 @@ export class ApiServer {
   public connection: Connection | null = null;
   public server: Server | null = null;
 
-  async initialize(dropBeforeSync?: boolean) {
+  async initialize() {
     this.connection = await createConnection(ormconfig);
-    dropBeforeSync && (await this.connection.synchronize(dropBeforeSync));
 
     const app = express();
     app.use(bodyParser.json());
