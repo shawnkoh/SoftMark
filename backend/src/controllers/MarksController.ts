@@ -5,13 +5,13 @@ import { Allocation } from "../entities/Allocation";
 import { Mark } from "../entities/Mark";
 import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
+import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedMarker } from "../utils/marks";
 import { MarkPostData, MarkPatchData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
 import { allowedPaperUser } from "../utils/papers";
-import { QuestionTemplate } from "src/entities/QuestionTemplate";
 
 export async function create(request: Request, response: Response) {
   try {

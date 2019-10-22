@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Column } from "typeorm";
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
-import { AllocationListData } from "../types/allocations";
+import { AllocationListData, AllocationData } from "../types/allocations";
 
 @Entity()
 export class Allocation extends Base {
@@ -32,9 +32,7 @@ export class Allocation extends Base {
     paperUserId: this.paperUserId
   });
 
-  getData = (): AllocationListData => ({
-    ...this.getBase(),
-    questionTemplateId: this.questionTemplateId,
-    paperUserId: this.paperUserId
+  getData = (): AllocationData => ({
+    ...this.getListData()
   });
 }

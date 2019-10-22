@@ -9,5 +9,6 @@ export interface AllocationPostData extends BaseData {
 export interface AllocationListData extends BaseData {
   questionTemplateId: number;
   paperUserId: number;
-  totalAllocated: number;
 }
+
+export interface AllocationData extends AllocationListData {}
