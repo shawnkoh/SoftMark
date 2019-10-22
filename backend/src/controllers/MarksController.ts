@@ -24,18 +24,23 @@ export async function create(request: Request, response: Response) {
       paperUserId,
       { where: { discardedAt: IsNull() } }
     );
-    const question = await getRepository(Question).findOneOrFail(questionId,
-      { where: { discardedAt: IsNull() } });
+    const question = await getRepository(Question).findOneOrFail(questionId, {
+      where: { discardedAt: IsNull() }
+    });
     const questionTemplateId = question.questionTemplateId;
-    const questionTemplate = await getRepository(QuestionTemplate).findOneOrFail(questionTemplateId,
-      { where: { discardedAt: IsNull() } });
-    const allocation = await getRepository(Allocation).findOneOrFail( { questionTemplateId, paperUserId });
+    const questionTemplate = await getRepository(
+      QuestionTemplate
+    ).findOneOrFail(questionTemplateId, { where: { discardedAt: IsNull() } });
+    const allocation = await getRepository(Allocation).findOneOrFail({
+      questionTemplateId,
+      paperUserId
+    });
     if (!allocation) {
       response.sendStatus(404);
       return;
     }
 
-    // TODO: pick an unmarked question and allocate it to paperUser if allocation with paperUser 
+    // TODO: pick an unmarked question and allocate it to paperUser if allocation with paperUser
     // exists and there is still cap
     /* const unMarkedQuestionsOfQuestionTemplate = await getRepository(Question)
       .createQueryBuilder("question")
