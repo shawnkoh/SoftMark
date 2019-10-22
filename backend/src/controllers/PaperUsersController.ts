@@ -33,12 +33,9 @@ export async function create(request: Request, response: Response) {
     }
 
     const paperUser = new PaperUser();
-    // console.log(postData);
     paperUser.paper = paper;
     paperUser.user = user;
     paperUser.role = role;
-    // Object.assign(paperUser, paper, user, postData.role);
-    console.log("paperUser is " + paperUser);
     await validateOrReject(paperUser);
 
     if (!hasUser) {
