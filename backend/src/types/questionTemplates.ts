@@ -5,7 +5,12 @@ export interface QuestionTemplatePostData {
   marks: number;
 }
 
-export type QuestionTemplateListData = QuestionTemplatePostData &
-  DiscardableData;
+export interface QuestionTemplateListData extends DiscardableData {
+  name: string;
+  marks: number;
+  parentQuestionTemplateId: number | null;
+}
 
-export interface QuestionTemplateData extends QuestionTemplateListData {}
+export interface QuestionTemplateData extends QuestionTemplateListData {
+  childQuestionTemplates: QuestionTemplateListData[];
+}
