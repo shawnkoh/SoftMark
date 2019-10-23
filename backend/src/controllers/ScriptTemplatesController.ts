@@ -8,6 +8,8 @@ import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { getEntityArray } from "../utils/entities";
 import { allowedPaperUser, allowedOrFail } from "../utils/papers";
+import { ScriptTemplatePatchData } from "../types/scriptTemplates";
+import { isQuestionTemplatePatchData } from "../types/questionTemplates";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -83,9 +85,28 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-    Object.assign(scriptTemplate, pick(request.body, "questionTemplates"));
-    await validateOrReject(scriptTemplate);
-    await getRepository(ScriptTemplate).save(scriptTemplate);
+    const { questionTemplates } = request.body as ScriptTemplatePatchData;
+    const entities = await Promise.all(
+      questionTemplates.map(async data => {
+        let entity: QuestionTemplate;
+        if (isQuestionTemplatePatchData(data)) {
+          entity = await getRepository(QuestionTemplate).findOneOrFail(
+            data.id,
+            {
+              where: { scriptTemplate }
+            }
+          );
+        } else {
+          entity = new QuestionTemplate();
+        }
+        entity.scriptTemplate = scriptTemplate;
+        Object.assign(entity, pick(data, "name", "marks"));
+        await validateOrReject(entity);
+        return entity;
+      })
+    );
+
+    await getRepository(QuestionTemplate).save(entities);
 
     const data = await scriptTemplate.getData();
     response.status(200).json(data);
