@@ -1,6 +1,6 @@
 import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull } from "typeorm";
+import { getRepository, IsNull, Not } from "typeorm";
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -129,9 +129,7 @@ export async function undiscard(request: Request, response: Response) {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const userId = payload.id;
     const paperUserId = Number(request.params.id);
-    const paperUser = await getRepository(PaperUser).findOne(paperUserId, {
-      where: { discardedAt: IsNull() }
-    });
+    const paperUser = await getRepository(PaperUser).findOne(paperUserId);
     if (!paperUser) {
       response.sendStatus(404);
       return;

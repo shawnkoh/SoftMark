@@ -53,14 +53,13 @@ export class Question extends Discardable {
     scriptId: this.scriptId,
     pageQuestionsCount: this.pageQuestions
       ? this.pageQuestions.length
-      : (await getRepository(PageQuestion).find({ questionId: this.id }))
-          .length,
+      : await getRepository(PageQuestion).count({ questionId: this.id }),
     marksCount: this.marks
       ? this.marks.length
-      : (await getRepository(Mark).find({ questionId: this.id })).length,
+      : await getRepository(Mark).count({ questionId: this.id }),
     bookmarksCount: this.bookmarks
       ? this.bookmarks.length
-      : (await getRepository(Bookmark).find({ questionId: this.id })).length
+      : await getRepository(Bookmark).count({ questionId: this.id })
   });
 
   getData = async (): Promise<QuestionData> => ({
