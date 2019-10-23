@@ -17,6 +17,10 @@ export interface PaperUserPostData {
   role: PaperUserRole;
 }
 
+export type PaperUserPatchData = Partial<{
+  role: PaperUserRole;
+}>;
+
 export interface PaperUserListData extends DiscardableData {
   user: UserData;
   role: PaperUserRole;
