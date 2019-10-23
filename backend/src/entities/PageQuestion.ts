@@ -20,13 +20,6 @@ export class PageQuestion extends Discardable {
   @ManyToOne(type => Question, question => question.pageQuestions)
   question?: Question;
 
-  retrieveFromRepostitory = async (): Promise<void> => {
-    this.page = await getRepository(Page).findOneOrFail(this.pageId);
-    this.question = await getRepository(Question).findOneOrFail(
-      this.questionId
-    );
-  };
-
   getListData = async (): Promise<PageQuestionListData> => {
     return {
       ...this.getBase(),

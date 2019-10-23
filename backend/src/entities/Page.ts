@@ -21,16 +21,6 @@ export class Page extends Discardable {
   @OneToMany(type => Annotation, annotation => annotation.page)
   annotations?: Annotation[];
 
-  retrieveFromRepostitory = async (): Promise<void> => {
-    this.script = await getRepository(Script).findOneOrFail(this.scriptId);
-    this.pageQuestions = await getRepository(PageQuestion).find({
-      pageId: this.id
-    });
-    this.annotations = await getRepository(Annotation).find({
-      pageId: this.id
-    });
-  };
-
   getListData = async (): Promise<PageListData> => {
     this.script = await getRepository(Script).findOneOrFail(this.scriptId);
     this.pageQuestions = await getRepository(PageQuestion).find({
