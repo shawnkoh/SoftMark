@@ -21,6 +21,21 @@ export class QuestionTemplate extends Discardable {
   scriptTemplate?: ScriptTemplate;
 
   @Column()
+  parentQuestionTemplateId!: number;
+
+  @ManyToOne(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.childQuestionTemplates
+  )
+  parentQuestionTemplate?: QuestionTemplate;
+
+  @OneToMany(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.parentQuestionTemplate
+  )
+  childQuestionTemplates?: QuestionTemplate[];
+
+  @Column()
   @IsNotEmpty()
   @IsString()
   name!: string;
