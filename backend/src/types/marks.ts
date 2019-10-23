@@ -1,4 +1,6 @@
 import { DiscardableData } from "./entities";
+import { QuestionListData } from "./questions";
+import { PaperUserListData } from "./paperUsers";
 
 export interface MarkPostData {
   paperUserId: number;
@@ -14,4 +16,7 @@ export interface MarkListData extends DiscardableData {
   score: number;
 }
 
-export interface MarkData extends MarkListData {}
+export interface MarkData extends MarkListData {
+  question: QuestionListData;
+  paperUser: PaperUserListData;
+}

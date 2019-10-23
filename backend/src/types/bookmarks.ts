@@ -1,4 +1,5 @@
-import { DiscardableData } from "./entities";
+import { QuestionListData } from "./questions";
+import { PaperUserListData } from "./paperUsers";
 
 export interface BookmarkPostData {
   paperUserId: number;
@@ -9,4 +10,7 @@ export interface BookmarkListData {
   paperUserId: number;
 }
 
-export interface BookmarkData extends BookmarkListData {}
+export interface BookmarkData extends BookmarkListData {
+  question: QuestionListData;
+  paperUser: PaperUserListData;
+}

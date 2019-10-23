@@ -6,7 +6,10 @@ import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { BookmarkPostData } from "../types/bookmarks";
-import { allowedToCreateNewBookmark, allowedBookmarker } from "../utils/bookmarks";
+import {
+  allowedToCreateNewBookmark,
+  allowedBookmarker
+} from "../utils/bookmarks";
 
 export async function create(request: Request, response: Response) {
   try {
