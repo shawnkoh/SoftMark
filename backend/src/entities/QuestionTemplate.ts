@@ -20,6 +20,21 @@ export class QuestionTemplate extends Discardable {
   )
   scriptTemplate?: ScriptTemplate;
 
+  @Column({ nullable: true })
+  parentQuestionTemplateId!: number | null;
+
+  @ManyToOne(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.childQuestionTemplates
+  )
+  parentQuestionTemplate?: QuestionTemplate | null;
+
+  @OneToMany(
+    type => QuestionTemplate,
+    questionTemplate => questionTemplate.parentQuestionTemplate
+  )
+  childQuestionTemplates?: QuestionTemplate[];
+
   @Column()
   @IsNotEmpty()
   @IsString()
@@ -39,6 +54,7 @@ export class QuestionTemplate extends Discardable {
   getListData = (): QuestionTemplateListData => ({
     ...this.getBase(),
     name: this.name,
-    marks: this.marks
+    marks: this.marks,
+    parentQuestionTemplateId: this.parentQuestionTemplateId
   });
 }

@@ -27,3 +27,15 @@ export const allowedPaperUser = async (
   }
   return { paper, paperUser };
 };
+
+export const allowedOrFail = async (
+  userId: number,
+  paperId: number | string,
+  role?: PaperUserRole
+): Promise<{ paper: Paper; paperUser: PaperUser }> => {
+  const allowed = await allowedPaperUser(userId, paperId, role);
+  if (!allowed) {
+    throw new Error("User is not allowed to access this resource");
+  }
+  return allowed;
+};
