@@ -20,13 +20,6 @@ export class Annotation extends Discardable {
   @ManyToOne(type => PaperUser, paperUser => paperUser.annotations)
   paperUser?: PaperUser;
 
-  retrieveFromRepostitory = async (): Promise<void> => {
-    this.page = await getRepository(Page).findOneOrFail(this.pageId);
-    this.paperUser = await getRepository(PaperUser).findOneOrFail(
-      this.paperUserId
-    );
-  };
-
   getListData = async (): Promise<AnnotationListData> => {
     return {
       ...this.getBase(),

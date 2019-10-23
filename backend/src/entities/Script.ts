@@ -28,32 +28,30 @@ export class Script extends Discardable {
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
 
-  getListData = async (): Promise<ScriptListData> => {
-    this.pages = await getRepository(Page).find({ scriptId: this.id });
-    this.questions = await getRepository(Question).find({ scriptId: this.id });
-
-    return {
-      ...this.getBase(),
-      paperUserId: this.paperUserId,
-      paperId: this.paperId,
-      pagesCount: this.pages.length,
-      questionsCount: this.questions.length
-    };
-  };
+  getListData = async (): Promise<ScriptListData> => ({
+    ...this.getBase(),
+    paperUserId: this.paperUserId,
+    paperId: this.paperId,
+    pagesCount: this.pages
+      ? this.pages.length
+      : await getRepository(Page).count({ scriptId: this.id }),
+    questionsCount: this.questions
+      ? this.questions.length
+      : await getRepository(Question).count({ scriptId: this.id })
+  });
 
   getData = async (): Promise<ScriptData> => {
-    this.pages = await getRepository(Page).find({ scriptId: this.id });
-    this.questions = await getRepository(Question).find({ scriptId: this.id });
+    const pages =
+      this.pages || (await getRepository(Page).find({ scriptId: this.id }));
+    const questions =
+      this.questions ||
+      (await getRepository(Question).find({ scriptId: this.id }));
 
     return {
-      ...this.getBase(),
-      paperUserId: this.paperUserId,
-      paperId: this.paperId,
-      pagesCount: this.pages.length,
-      pages: await Promise.all(this.pages.map(page => page.getData())),
-      questionsCount: this.questions.length,
+      ...(await this.getListData()),
+      pages: await Promise.all(pages.map(page => page.getListData())),
       questions: await Promise.all(
-        this.questions.map(question => question.getData())
+        questions.map(question => question.getListData())
       )
     };
   };

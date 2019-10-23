@@ -20,15 +20,6 @@ export class Bookmark extends Base {
   @ManyToOne(type => PaperUser, paperUser => paperUser.bookmarks)
   paperUser?: PaperUser;
 
-  retrieveFromRepostitory = async (): Promise<void> => {
-    this.question = await getRepository(Question).findOneOrFail(
-      this.questionId
-    );
-    this.paperUser = await getRepository(PaperUser).findOneOrFail(
-      this.paperUserId
-    );
-  };
-
   getListData = async (): Promise<BookmarkListData> => ({
     ...this.getBase(),
     questionId: this.questionId,
