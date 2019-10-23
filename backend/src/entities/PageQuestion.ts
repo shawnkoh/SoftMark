@@ -35,7 +35,7 @@ export class PageQuestion extends Discardable {
     };
   };
 
-  getData = async (): Promise<QuestionData> => {
+  getData = async (): Promise<PageQuestionData> => {
     this.page = await getRepository(Page).findOneOrFail(this.pageId);
     this.question = await getRepository(Question).findOneOrFail(
       this.questionId
