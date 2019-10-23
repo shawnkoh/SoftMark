@@ -21,42 +21,33 @@ export class Page extends Discardable {
   @OneToMany(type => Annotation, annotation => annotation.page)
   annotations?: Annotation[];
 
-  getListData = async (): Promise<PageListData> => {
-    this.script = await getRepository(Script).findOneOrFail(this.scriptId);
-    this.pageQuestions = await getRepository(PageQuestion).find({
-      pageId: this.id
-    });
-    this.annotations = await getRepository(Annotation).find({
-      pageId: this.id
-    });
-
-    return {
-      ...this.getBase(),
-      scriptId: this.scriptId,
-      pageQuestionsCount: this.pageQuestions.length,
-      annotationsCount: this.annotations.length
-    };
-  };
+  getListData = async (): Promise<PageListData> => ({
+    ...this.getBase(),
+    scriptId: this.scriptId,
+    pageQuestionsCount: this.pageQuestions
+      ? this.pageQuestions.length
+      : await getRepository(PageQuestion).count({ pageId: this.id }),
+    annotationsCount: this.annotations
+      ? this.annotations.length
+      : await getRepository(Annotation).count({ pageId: this.id })
+  });
 
   getData = async (): Promise<PageData> => {
-    this.script = await getRepository(Script).findOneOrFail(this.scriptId);
-    this.pageQuestions = await getRepository(PageQuestion).find({
-      pageId: this.id
-    });
-    this.annotations = await getRepository(Annotation).find({
-      pageId: this.id
-    });
+    const pageQuestions =
+      this.pageQuestions ||
+      (await getRepository(PageQuestion).find({ pageId: this.id }));
+    const annotations =
+      this.annotations ||
+      (await getRepository(Annotation).find({ pageId: this.id }));
 
     return {
-      ...this.getBase(),
+      ...(await this.getListData()),
       scriptId: this.scriptId,
-      pageQuestionsCount: this.pageQuestions.length,
       pageQuestions: await Promise.all(
-        this.pageQuestions.map(pageQuestion => pageQuestion.getListData())
+        pageQuestions.map(pageQuestion => pageQuestion.getListData())
       ),
-      annotationsCount: this.annotations.length,
       annotations: await Promise.all(
-        this.annotations.map(annotation => annotation.getListData())
+        annotations.map(pageQuestion => pageQuestion.getListData())
       )
     };
   };
