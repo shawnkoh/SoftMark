@@ -16,7 +16,9 @@ export async function create(request: Request, response: Response) {
     Object.assign(user, pick(request.body, "email", "password", "name"));
     await validateOrReject(user);
 
-    user.password = hashSync(user.password!);
+    if (user.password) {
+      user.password = hashSync(user.password!);
+    }
     await getRepository(User).save(user);
 
     sendVerificationEmail(user);
