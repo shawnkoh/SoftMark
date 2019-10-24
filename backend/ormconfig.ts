@@ -8,6 +8,7 @@ switch (process.env.NODE_ENV) {
     require("dotenv").config({ path: ".env.test" });
     break;
   case "production":
+    require("dotenv").config({ path: ".env" });
     break;
 }
 
