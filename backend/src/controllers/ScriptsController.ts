@@ -6,7 +6,7 @@ import { PaperUser } from "../entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
 import { Script } from "../entities/Script";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedPaperUser, allowedOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -76,21 +76,43 @@ export async function index(request: Request, response: Response) {
 }
 
 export async function show(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const scriptId = request.params.id;
+  let script: Script;
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const scriptId = request.params.id;
-    const script = await getRepository(Script).findOneOrFail(scriptId, {
-      where: { discardedAt: Not(IsNull()) }
+    script = await getRepository(Script).findOneOrFail(scriptId, {
+      where: { discardedAt: IsNull() },
+      relations: [
+        "paperUser",
+        "pages",
+        "pages.annotations",
+        "questions",
+        "questions.bookmarks",
+        "questions.comments",
+        "questions.marks",
+        "questions.questionTemplate"
+      ]
     });
-    const allowed = await allowedPaperUser(userId, script.paperUserId);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
+    const { paperUser } = await allowedOrFail(userId, script.paperId);
+    if (
+      paperUser.role === PaperUserRole.Student &&
+      script.paperUserId !== paperUser.id
+    ) {
+      throw new Error(
+        "Student cannot access a script that doesnt belong to him"
+      );
     }
+  } catch (error) {
+    console.error(error);
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
     const data = await script.getData();
     response.status(200).json(data);
-  } catch {
+  } catch (error) {
     response.sendStatus(400);
   }
 }
