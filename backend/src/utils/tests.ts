@@ -75,9 +75,9 @@ export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {
   users.push(student.user);
   paperUsers.push(student);
 
-  await getRepository(User).insert(users);
-  await getRepository(Paper).insert(paper);
-  await getRepository(PaperUser).insert(paperUsers);
+  await getRepository(User).save(users);
+  await getRepository(Paper).save(paper);
+  await getRepository(PaperUser).save(paperUsers);
 
   return new Fixtures(paper, owner, marker, student);
 }
