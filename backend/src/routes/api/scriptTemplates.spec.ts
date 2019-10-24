@@ -1,32 +1,20 @@
 import * as request from "supertest";
 import { ApiServer } from "../../server";
-import {
-  synchronize,
-  loadFixtures,
-  getToken,
-  getPasswordlessToken,
-  getAuthorizationToken
-} from "../../utils/tests";
+import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { getRepository } from "typeorm";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
 
 let server: ApiServer;
-let ownerAccessToken: string;
-let markerAccessToken: string;
-let studentAccessToken: string;
+let fixtures: Fixtures;
+let scriptTemplate: ScriptTemplate;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
   await synchronize(server);
-  await loadFixtures(server);
-  ownerAccessToken = (await getToken(server, "owner@u.nus.edu", "setMeUp?"))
-    .accessToken;
-  markerAccessToken = (await getToken(server, "marker@u.nus.edu", "setMeUp?"))
-    .accessToken;
-  studentAccessToken = await getStudentAccessToken();
+  fixtures = await loadFixtures(server);
 
-  const scriptTemplate = new ScriptTemplate();
+  scriptTemplate = new ScriptTemplate();
   scriptTemplate.paperId = 1;
 
   const questionTemplates: QuestionTemplate[] = [];
@@ -56,39 +44,27 @@ afterAll(async () => {
   await server.close();
 });
 
-const getStudentAccessToken = async () => {
-  const authorizationToken = await getAuthorizationToken(
-    server,
-    "student@u.nus.edu"
-  );
-  const { accessToken } = await getPasswordlessToken(
-    server,
-    authorizationToken
-  );
-  return accessToken;
-};
-
 describe("PATCH script_templates/:id", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${ownerAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
   });
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${markerAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${studentAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
@@ -97,24 +73,24 @@ describe("PATCH script_templates/:id", () => {
 describe("DELETE script_templates/:id", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
-      .delete("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${ownerAccessToken}`)
+      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
   });
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .delete("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${markerAccessToken}`)
+      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .delete("/v1/script_templates/1")
-      .set("Authorization", `Bearer ${studentAccessToken}`)
+      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
@@ -123,24 +99,24 @@ describe("DELETE script_templates/:id", () => {
 describe("PATCH script_templates/:id/undiscard", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1/undiscard")
-      .set("Authorization", `Bearer ${ownerAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
   });
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1/undiscard")
-      .set("Authorization", `Bearer ${markerAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch("/v1/script_templates/1/undiscard")
-      .set("Authorization", `Bearer ${studentAccessToken}`)
+      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });

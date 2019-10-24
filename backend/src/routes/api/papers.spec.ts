@@ -1,83 +1,56 @@
 import * as request from "supertest";
 import { PaperUserRole } from "../../types/paperUsers";
-import {
-  synchronize,
-  loadFixtures,
-  getToken,
-  getPasswordlessToken,
-  getAuthorizationToken
-} from "../../utils/tests";
+import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ApiServer } from "../../server";
 
 let server: ApiServer;
-let ownerAccessToken: string;
-let markerAccessToken: string;
-let studentAccessToken: string;
+let fixtures: Fixtures;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
   await synchronize(server);
-  await loadFixtures(server);
-  ownerAccessToken =
-    "Bearer " +
-    (await getToken(server, "owner@u.nus.edu", "setMeUp?")).accessToken;
-  markerAccessToken =
-    "Bearer " +
-    (await getToken(server, "marker@u.nus.edu", "setMeUp?")).accessToken;
-  studentAccessToken = "Bearer " + (await getStudentAccessToken());
+  fixtures = await loadFixtures(server);
 });
 
 afterAll(async () => {
   await server.close();
 });
 
-const getStudentAccessToken = async () => {
-  const authorizationToken = await getAuthorizationToken(
-    server,
-    "student@u.nus.edu"
-  );
-  const { accessToken } = await getPasswordlessToken(
-    server,
-    authorizationToken
-  );
-  return accessToken;
-};
-
 describe("POST papers/:id/users", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const validResponse = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(validResponse.status).not.toEqual(404);
 
     const rejectResponse = await request(server.server)
       .post("/v1/papers/2/users")
-      .set("Authorization", ownerAccessToken)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(rejectResponse.status).toEqual(404);
   });
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", markerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", studentAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should allow a Paper's Owner to create another Owner", async () => {
     const response = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send({
         email: "owner2@u.nus.edu",
         role: PaperUserRole.Owner
@@ -87,8 +60,8 @@ describe("POST papers/:id/users", () => {
 
   it("should allow a Paper's Owner to create another Marker", async () => {
     const response = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send({
         email: "marker2@u.nus.edu",
         role: PaperUserRole.Marker
@@ -98,8 +71,8 @@ describe("POST papers/:id/users", () => {
 
   it("should allow a Paper's Owner to create another Student", async () => {
     const response = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send({
         email: "student2@u.nus.edu",
         role: PaperUserRole.Student
@@ -109,8 +82,8 @@ describe("POST papers/:id/users", () => {
 
   it("should not allow creating a duplicate PaperUser", async () => {
     const markerResponse = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send({
         email: "duplicate@u.nus.edu",
         role: PaperUserRole.Marker
@@ -118,8 +91,8 @@ describe("POST papers/:id/users", () => {
     expect(markerResponse.status).toEqual(201);
 
     const studentResponse = await request(server.server)
-      .post("/v1/papers/1/users")
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/users`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send({
         email: "duplicate@u.nus.edu",
         role: PaperUserRole.Student
@@ -133,24 +106,24 @@ describe("POST papers/:id/users", () => {
 describe("POST papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/papers/1/scripts`)
-      .set("Authorization", ownerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
   });
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/papers/1/scripts`)
-      .set("Authorization", markerAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/papers/1/scripts`)
-      .set("Authorization", studentAccessToken)
+      .post(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
@@ -159,24 +132,24 @@ describe("POST papers/:id/scripts", () => {
 describe("GET papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/papers/1/scripts`)
-      .set("Authorization", ownerAccessToken)
+      .get(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
   });
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/papers/1/scripts`)
-      .set("Authorization", markerAccessToken)
+      .get(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
 
   it("should allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/papers/1/scripts`)
-      .set("Authorization", studentAccessToken)
+      .get(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
   });
