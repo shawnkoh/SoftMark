@@ -14,48 +14,72 @@ export async function synchronize(apiServer: ApiServer) {
   await apiServer.connection.synchronize(true);
 }
 
-export async function loadFixtures(apiServer: ApiServer) {
+export class Fixtures {
+  public paper: Paper;
+  public owner: PaperUser;
+  public ownerAccessToken: string;
+  public marker: PaperUser;
+  public markerAccessToken: string;
+  public student: PaperUser;
+  public studentAccessToken: string;
+
+  constructor(
+    paper: Paper,
+    owner: PaperUser,
+    marker: PaperUser,
+    student: PaperUser
+  ) {
+    this.paper = paper;
+    this.owner = owner;
+    this.ownerAccessToken =
+      "Bearer " + owner.user!.createAuthenticationTokens().accessToken;
+    this.marker = marker;
+    this.markerAccessToken =
+      "Bearer " + marker.user!.createAuthenticationTokens().accessToken;
+    this.student = student;
+    this.studentAccessToken =
+      "Bearer " + student.user!.createAuthenticationTokens().accessToken;
+  }
+}
+
+export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {
   const paper = new Paper();
   paper.name = "CS1010 Midterms";
 
+  const paperUsers: PaperUser[] = [];
   const users: User[] = [];
 
-  const owner = new User();
-  owner.email = "owner@u.nus.edu";
-  owner.password = hashSync("setMeUp?");
-  users.push(owner);
+  const owner = new PaperUser();
+  owner.paper = paper;
+  owner.user = new User();
+  owner.user.email = "owner@u.nus.edu";
+  owner.user.password = hashSync("setMeUp?");
+  owner.role = PaperUserRole.Owner;
+  users.push(owner.user);
+  paperUsers.push(owner);
 
-  const marker = new User();
-  marker.email = "marker@u.nus.edu";
-  marker.password = hashSync("setMeUp?");
-  users.push(marker);
+  const marker = new PaperUser();
+  marker.paper = paper;
+  marker.user = new User();
+  marker.user.email = "marker@u.nus.edu";
+  marker.user.password = hashSync("setMeUp?");
+  marker.role = PaperUserRole.Marker;
+  users.push(marker.user);
+  paperUsers.push(marker);
 
-  const student = new User();
-  student.email = "student@u.nus.edu";
-  users.push(student);
-
-  const paperUsers: PaperUser[] = [];
-  let paperUser = new PaperUser();
-  paperUser.paper = paper;
-  paperUser.user = owner;
-  paperUser.role = PaperUserRole.Owner;
-  paperUsers.push(paperUser);
-
-  paperUser = new PaperUser();
-  paperUser.paper = paper;
-  paperUser.user = marker;
-  paperUser.role = PaperUserRole.Marker;
-  paperUsers.push(paperUser);
-
-  paperUser = new PaperUser();
-  paperUser.paper = paper;
-  paperUser.user = student;
-  paperUser.role = PaperUserRole.Student;
-  paperUsers.push(paperUser);
+  const student = new PaperUser();
+  student.paper = paper;
+  student.user = new User();
+  student.user.email = "student@u.nus.edu";
+  student.role = PaperUserRole.Student;
+  users.push(student.user);
+  paperUsers.push(student);
 
   await getRepository(User).insert(users);
   await getRepository(Paper).insert(paper);
   await getRepository(PaperUser).insert(paperUsers);
+
+  return new Fixtures(paper, owner, marker, student);
 }
 
 export async function getToken(
