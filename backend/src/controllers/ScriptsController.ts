@@ -104,7 +104,6 @@ export async function show(request: Request, response: Response) {
       );
     }
   } catch (error) {
-    console.error(error);
     response.sendStatus(404);
     return;
   }
