@@ -2,7 +2,7 @@ import { hashSync, compareSync } from "bcryptjs";
 import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository } from "typeorm";
+import { getRepository, IsNull } from "typeorm";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import {
@@ -28,6 +28,32 @@ export async function create(request: Request, response: Response) {
       ...user.createAuthenticationTokens()
     };
     response.status(201).json(data);
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}
+
+export async function show(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = Number(request.params.id);
+  let user: User;
+  try {
+    if (payload.id !== userId) {
+      throw new Error(
+        "A user is not allowed to access the data of another User"
+      );
+    }
+    user = await getRepository(User).findOneOrFail(userId, {
+      where: { discardedAt: IsNull() }
+    });
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    const data = user.getData();
+    response.status(200).json(data);
   } catch (error) {
     response.sendStatus(400);
   }
