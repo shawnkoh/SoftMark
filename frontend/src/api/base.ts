@@ -19,7 +19,7 @@ class BaseAPI {
   setAuthorizationToken(token: string) {
     this.getClient().defaults.headers.common[
       "Authorization"
-    ] = `bearer ${token}`;
+    ] = `Bearer ${token}`;
   }
 
   protected getClient(): AxiosInstance {

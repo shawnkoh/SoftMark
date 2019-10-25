@@ -10,14 +10,7 @@ type Props = RouteComponentProps;
 const MainLayout: React.FC<Props> = props => {
   const dispatch = useDispatch();
 
-  return (
-    <div>
-      <Header />
-      This is the main page!!!
-      <div>{props.children}</div>
-      Add a side bar
-    </div>
-  );
+  return <div>{props.children}</div>;
 };
 
 export default withRouter(MainLayout);

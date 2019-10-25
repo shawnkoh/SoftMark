@@ -6,26 +6,28 @@ import { AxiosResponse } from "axios";
 import { Button, Grid, Typography } from "@material-ui/core";
 import LoadingIcon from "../../../../components/icons/LoadingIcon";
 import AddButton from "../../../../components/buttons/AddButton";
-import Header from "../headers/PaperIndexHeader";
-import { PaperListData } from "backend/src/types/papers";
-import AddPaperModal from "../modals/AddPaperModal";
+import Header from "../headers/PaperViewHeader";
+import { PaperData } from "backend/src/types/papers";
+import AddMarkerModal from "../modals/AddMarkerModal";
 
 type Props = RouteComponentProps;
 
-const PaperIndex: React.FC<Props> = props => {
+const PaperView: React.FC<Props> = ({ match: { params } }) => {
+  const paper_id = +(params as { paper_id: string }).paper_id;
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
-  const [papers, setPapers] = useState<PaperListData[]>([]);
-  const [isOpenAddPaperDialog, setOpenAddPaperDialog] = useState(false);
-  const toggleOpenAddPaperDialog = () =>
-    setOpenAddPaperDialog(!isOpenAddPaperDialog);
+  const [paper, setPaper] = useState<PaperData | null>(null);
+  const [isOpenAddMarkerDialog, setOpenAddMarkerDialog] = useState(false);
+  const toggleOpenAddMarkerDialog = () =>
+    setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
 
   useEffect(() => {
     api.papers
-      .getPapers()
+      .getPaper(paper_id)
       .then(resp => {
-        setPapers(resp.data);
+        console.log(resp);
+        setPaper(resp.data);
       })
       .finally(() => setIsLoading(false));
   }, [refreshFlag]);
@@ -34,9 +36,15 @@ const PaperIndex: React.FC<Props> = props => {
     return <LoadingIcon />;
   }
 
+  if (!paper) {
+    return <>The paper does not exist</>;
+  }
+
+  const { paperUsers } = paper;
+
   return (
     <div>
-      <Header />
+      <Header paper={paper} title={"Team"} />
       <div>
         <Grid
           container
@@ -45,25 +53,22 @@ const PaperIndex: React.FC<Props> = props => {
           alignItems="center"
           spacing={2}
         >
-          {papers.map(paper => {
+          {paperUsers.map(paperUser => {
             return (
-              <Grid
-                key={1}
-                item
-                xs={12}
-                onClick={() => {
-                  props.history.push(`/papers/${paper.id}`);
-                }}
-              >
-                {paper.name} create component here
+              <Grid key={1} item xs={12} onClick={() => {}}>
+                {paperUser.user.email}
               </Grid>
             );
           })}
           <Grid item xs={12}>
-            <AddButton text={"Add Paper"} onClick={toggleOpenAddPaperDialog} />
-            <AddPaperModal
-              visible={isOpenAddPaperDialog}
-              toggleVisibility={toggleOpenAddPaperDialog}
+            <AddButton
+              text={"Add marker"}
+              onClick={toggleOpenAddMarkerDialog}
+            />
+            <AddMarkerModal
+              paperId={paper_id}
+              visible={isOpenAddMarkerDialog}
+              toggleVisibility={toggleOpenAddMarkerDialog}
               toggleRefresh={toggleRefreshFlag}
             />
           </Grid>
@@ -73,4 +78,4 @@ const PaperIndex: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(PaperIndex);
+export default withRouter(PaperView);

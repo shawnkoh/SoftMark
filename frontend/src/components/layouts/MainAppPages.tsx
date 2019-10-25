@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import MainLayout from "./MainLayout";
 import PaperIndex from "../../modules/papers/components/pages/PaperIndex";
+import PaperView from "../../modules/papers/components/pages/PaperView";
 import api from "../../api";
 import { setCurrentUser, setCurrentToken } from "../../modules/session/actions";
 import { useEffect, useState } from "react";
@@ -17,11 +18,12 @@ import LoadingIcon from "../icons/LoadingIcon";
 type Props = RouteComponentProps;
 const MainAppPages: React.FC<Props> = props => {
   // Generic routes
-
   const paperIndexRoute = <Route exact path="/papers" component={PaperIndex} />;
-
-  /* const settingsRoute = (
-    <Route exact path="/profile" component={SetttingsPage} />
+  const paperViewRoute = (
+    <Route exact path="/papers/:paper_id" component={PaperView} />
+  );
+  /* const questionAllocationRoute = (
+    <Route exact path="/papers/:paper_id/question_allocation" component={PaperView} />
   );*/
 
   const dispatch = useDispatch();
@@ -52,7 +54,10 @@ const MainAppPages: React.FC<Props> = props => {
   } else {
     return (
       <MainLayout>
-        <Switch>{paperIndexRoute}</Switch>
+        <Switch>
+          {paperIndexRoute}
+          {paperViewRoute}
+        </Switch>
       </MainLayout>
     );
   }
