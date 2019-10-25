@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsOptional } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, Unique } from "typeorm";
 import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
@@ -40,10 +40,10 @@ export class QuestionTemplate extends Discardable {
   @IsString()
   name!: string;
 
-  @Column()
-  @IsNotEmpty()
+  @Column({ type: "integer", nullable: true })
+  @IsOptional()
   @IsNumber()
-  marks!: number;
+  score!: number | null;
 
   @OneToMany(type => Question, question => question.questionTemplate)
   questions?: Question[];
@@ -54,7 +54,7 @@ export class QuestionTemplate extends Discardable {
   getListData = (): QuestionTemplateListData => ({
     ...this.getBase(),
     name: this.name,
-    marks: this.marks,
+    score: this.score,
     parentQuestionTemplateId: this.parentQuestionTemplateId
   });
 }
