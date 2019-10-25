@@ -17,6 +17,15 @@ import { UserData } from "../types/users";
 export class User extends Discardable {
   entityName = "User";
 
+  constructor();
+  constructor(email: string);
+  constructor(email?: string) {
+    super();
+    if (email) {
+      this.email = email;
+    }
+  }
+
   @Column({ unique: true })
   @IsNotEmpty()
   @IsEmail()
