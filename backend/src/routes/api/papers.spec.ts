@@ -134,7 +134,7 @@ describe("POST /papers/:id/script_templates", () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
       .set("Authorization", fixtures.ownerAccessToken)
-      .send(fixtures.scriptTemplateData);
+      .send(fixtures.scriptTemplatePostData);
     expect(response.status).toEqual(201);
   });
 
@@ -142,7 +142,7 @@ describe("POST /papers/:id/script_templates", () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
       .set("Authorization", fixtures.ownerAccessToken)
-      .send(fixtures.scriptTemplateData);
+      .send(fixtures.scriptTemplatePostData);
     expect(response.status).toEqual(400);
   });
 });
@@ -170,6 +170,14 @@ describe("POST /papers/:id/scripts", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
+  });
+
+  it("should create a Script", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptPostData);
+    expect(response.status).toEqual(201);
   });
 });
 
