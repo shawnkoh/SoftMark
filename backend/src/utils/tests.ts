@@ -1,11 +1,13 @@
-import ApiServer from "../server";
+import { hashSync } from "bcryptjs";
+import supertest = require("supertest");
 import { getRepository } from "typeorm";
+
 import { User } from "../entities/User";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
+import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
-import { hashSync } from "bcryptjs";
-import supertest = require("supertest");
+import { ScriptTemplatePostData } from "../types/scriptTemplates";
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {
@@ -15,6 +17,7 @@ export async function synchronize(apiServer: ApiServer) {
 }
 
 export class Fixtures {
+  // Instantiated
   public paper: Paper;
   public owner: PaperUser;
   public ownerAccessToken: string;
@@ -22,6 +25,9 @@ export class Fixtures {
   public markerAccessToken: string;
   public student: PaperUser;
   public studentAccessToken: string;
+
+  // Not instantiated
+  public scriptTemplateData: ScriptTemplatePostData;
 
   constructor(
     paper: Paper,
@@ -39,6 +45,33 @@ export class Fixtures {
     this.student = student;
     this.studentAccessToken =
       "Bearer " + student.user!.createAuthenticationTokens().accessToken;
+
+    this.scriptTemplateData = {
+      questionTemplates: [
+        {
+          name: "1",
+          score: null
+        },
+        {
+          name: "1a",
+          parentName: "1",
+          score: 2
+        },
+        {
+          name: "1b",
+          parentName: "1",
+          score: 3
+        },
+        {
+          name: "2",
+          score: 3
+        },
+        {
+          name: "3",
+          score: 5
+        }
+      ]
+    };
   }
 }
 
