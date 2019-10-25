@@ -26,7 +26,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     api.papers
       .getPaper(paper_id)
       .then(resp => {
-        console.log(resp);
         setPaper(resp.data);
       })
       .finally(() => setIsLoading(false));

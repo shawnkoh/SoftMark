@@ -5,7 +5,11 @@ import {
   PaperData,
   PaperPostData
 } from "backend/src/types/papers";
-import { PaperUserData, PaperUserPostData } from "backend/src/types/paperUsers";
+import {
+  PaperUserListData,
+  PaperUserData,
+  PaperUserPostData
+} from "../types/paperUsers";
 
 class PapersAPI extends BaseAPI {
   createPaper(paperPostData: PaperPostData): Promise<AxiosResponse<PaperData>> {

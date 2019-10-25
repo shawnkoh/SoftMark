@@ -4,7 +4,7 @@ import {
   PaperUserListData,
   PaperUserData,
   PaperUserPostData
-} from "backend/src/types/paperUsers";
+} from "../types/paperUsers";
 
 class PaperUsersAPI extends BaseAPI {
   private getUrl() {
