@@ -1,4 +1,4 @@
-import { PaperUserRole } from "backend/src/types/paperUsers";
+import { PaperUserRole } from "../types/paperUsers";
 
 export interface OptionsType<V = number | string> {
   value: V;
