@@ -17,27 +17,26 @@ beforeAll(async () => {
   scriptTemplate = new ScriptTemplate();
   scriptTemplate.paperId = 1;
 
-  const questionTemplates: QuestionTemplate[] = [];
-  let questionTemplate = new QuestionTemplate();
-  questionTemplate.scriptTemplate = scriptTemplate;
-  questionTemplate.name = "1a";
-  questionTemplate.marks = 2;
-  questionTemplates.push(questionTemplate);
-
-  questionTemplate = new QuestionTemplate();
-  questionTemplate.scriptTemplate = scriptTemplate;
-  questionTemplate.name = "1b";
-  questionTemplate.marks = 3;
-  questionTemplates.push(questionTemplate);
-
-  questionTemplate = new QuestionTemplate();
-  questionTemplate.scriptTemplate = scriptTemplate;
-  questionTemplate.name = "2";
-  questionTemplate.marks = 6;
-  questionTemplates.push(questionTemplate);
+  const q1 = new QuestionTemplate();
+  q1.scriptTemplate = scriptTemplate;
+  q1.name = "1";
+  const q1a = new QuestionTemplate();
+  q1a.scriptTemplate = scriptTemplate;
+  q1a.name = "1a";
+  q1a.parentQuestionTemplate = q1;
+  q1a.score = 1.5;
+  const q1b = new QuestionTemplate();
+  q1b.scriptTemplate = scriptTemplate;
+  q1b.name = "1b";
+  q1b.parentQuestionTemplate = q1;
+  q1b.score = 1.5;
+  const q2 = new QuestionTemplate();
+  q2.scriptTemplate = scriptTemplate;
+  q2.name = "2";
+  q2.score = 6;
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
-  await getRepository(QuestionTemplate).save(questionTemplates);
+  await getRepository(QuestionTemplate).save([q1, q1a, q1b, q2]);
 });
 
 afterAll(async () => {
