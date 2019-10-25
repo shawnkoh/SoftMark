@@ -3,7 +3,6 @@ import { ApiServer } from "../../server";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { getRepository } from "typeorm";
-import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { QuestionTemplatePostData } from "../../types/questionTemplates";
 
 let server: ApiServer;
@@ -17,27 +16,7 @@ beforeAll(async () => {
 
   scriptTemplate = new ScriptTemplate();
   scriptTemplate.paperId = 1;
-
-  const q1 = new QuestionTemplate();
-  q1.scriptTemplate = scriptTemplate;
-  q1.name = "1";
-  const q1a = new QuestionTemplate();
-  q1a.scriptTemplate = scriptTemplate;
-  q1a.name = "1a";
-  q1a.parentQuestionTemplate = q1;
-  q1a.score = 1.5;
-  const q1b = new QuestionTemplate();
-  q1b.scriptTemplate = scriptTemplate;
-  q1b.name = "1b";
-  q1b.parentQuestionTemplate = q1;
-  q1b.score = 1.5;
-  const q2 = new QuestionTemplate();
-  q2.scriptTemplate = scriptTemplate;
-  q2.name = "2";
-  q2.score = 6;
-
   await getRepository(ScriptTemplate).save(scriptTemplate);
-  await getRepository(QuestionTemplate).save([q1, q1a, q1b, q2]);
 });
 
 afterAll(async () => {
