@@ -42,14 +42,14 @@ export class PageTemplate extends Discardable {
         pageQuestionTemplate.questionTemplate!.getListData()
       );
     } else {
-      questionTemplates = await getRepository(QuestionTemplate)
+      questionTemplates = (await getRepository(QuestionTemplate)
         .createQueryBuilder("questionTemplate")
         .leftJoin(
-          "questionTemplate.pageQuestionTemplate",
-          "pageQuestionTemplate"
+          "questionTemplate.pageQuestionTemplates",
+          "pageQuestionTemplates"
         )
-        .leftJoin("pageQuestionTemplate.pageTemplate", "pageTemplate")
-        .getMany();
+        .leftJoin("pageQuestionTemplates.pageTemplate", "pageTemplate")
+        .getMany()).map(questionTemplate => questionTemplate.getListData());
     }
 
     return {

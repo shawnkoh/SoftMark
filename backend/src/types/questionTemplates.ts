@@ -7,9 +7,7 @@ export interface QuestionTemplatePostData {
   score: number | null;
 }
 
-export type QuestionTemplatePatchData = { id: number } & Partial<
-  QuestionTemplatePostData
->;
+export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;
 
 export function isQuestionTemplatePostData(
   data: any
