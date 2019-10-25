@@ -16,7 +16,7 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("POST papers/:id/users", () => {
+describe("POST /papers/:id/users", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const validResponse = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/users`)
@@ -103,7 +103,7 @@ describe("POST papers/:id/users", () => {
   // it("should create a new user if email does not exist", async () => {});
 });
 
-describe("POST papers/:id/script_templates", () => {
+describe("POST /papers/:id/script_templates", () => {
   // Roles
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
@@ -147,7 +147,7 @@ describe("POST papers/:id/script_templates", () => {
   });
 });
 
-describe("POST papers/:id/scripts", () => {
+describe("POST /papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/scripts`)
@@ -173,7 +173,7 @@ describe("POST papers/:id/scripts", () => {
   });
 });
 
-describe("GET papers/:id/scripts", () => {
+describe("GET /papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .get(`/v1/papers/${fixtures.paper.id}/scripts`)

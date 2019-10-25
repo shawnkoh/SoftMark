@@ -37,7 +37,7 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("GET scripts/:id", () => {
+describe("GET /scripts/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .get(`/v1/scripts/${script1.id}`)
@@ -69,7 +69,7 @@ describe("GET scripts/:id", () => {
   });
 });
 
-describe("DELETE scripts/:id", () => {
+describe("DELETE /scripts/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .delete(`/v1/scripts/${script1.id}`)
@@ -95,7 +95,7 @@ describe("DELETE scripts/:id", () => {
   });
 });
 
-describe("PATCH scripts/:id/undiscard", () => {
+describe("PATCH /scripts/:id/undiscard", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .patch(`/v1/scripts/${script1.id}/undiscard`)

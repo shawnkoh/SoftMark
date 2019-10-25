@@ -43,7 +43,7 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("PATCH script_templates/:id", () => {
+describe("PATCH /script_templates/:id", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
       .patch(`/v1/script_templates/${scriptTemplate.id}`)
@@ -69,7 +69,7 @@ describe("PATCH script_templates/:id", () => {
   });
 });
 
-describe("DELETE script_templates/:id", () => {
+describe("DELETE /script_templates/:id", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
       .delete(`/v1/script_templates/${scriptTemplate.id}`)
@@ -95,7 +95,7 @@ describe("DELETE script_templates/:id", () => {
   });
 });
 
-describe("PATCH script_templates/:id/undiscard", () => {
+describe("PATCH /script_templates/:id/undiscard", () => {
   it("should allow a user to access this route if he is the Owner of the paper", async () => {
     const response = await request(server.server)
       .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
