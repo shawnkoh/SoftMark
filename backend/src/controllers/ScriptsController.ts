@@ -8,6 +8,7 @@ import { Script } from "../entities/Script";
 import { User } from "../entities/User";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
+import { ScriptListData } from "../types/scripts";
 import { allowedPaperUser, allowedOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
@@ -65,27 +66,30 @@ export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const userId = payload.id;
   const paperId = Number(request.params.id);
+  let paper: Paper;
+  let paperUser: PaperUser;
   try {
-    const paper = await getRepository(Paper).findOneOrFail(paperId, {
-      where: { discardedAt: Not(IsNull()) }
-    });
-    const paperUser = await getRepository(PaperUser).findOneOrFail({
-      paperId: paperId,
-      userId: userId,
-      discardedAt: IsNull()
-    });
-    const allowed = await allowedPaperUser(userId, paperUser.id);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+    ({ paper, paperUser } = await allowedOrFail(
+      userId,
+      paperId,
+      PaperUserRole.Student
+    ));
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
-    const scripts = await getRepository(Script).find({
-      paperId: paperId
-    });
+  try {
+    const scripts = await getRepository(Script).find(
+      paperUser.role === PaperUserRole.Student
+        ? { paper, paperUser }
+        : { paper }
+    );
 
-    const data = await Promise.all(scripts.map(script => script.getData()));
-    response.status(200).json(data);
+    const data: ScriptListData[] = await Promise.all(
+      scripts.map(script => script.getListData())
+    );
+    response.status(200).json({ scripts: data });
   } catch {
     response.sendStatus(400);
   }
