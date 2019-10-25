@@ -20,6 +20,9 @@ export async function synchronize(apiServer: ApiServer) {
 }
 
 export class Fixtures {
+  // Other
+  faker: Faker.FakerStatic;
+
   // Instantiated
   public paper: Paper;
   public owner: PaperUser;
@@ -39,6 +42,7 @@ export class Fixtures {
     marker: PaperUser,
     student: PaperUser
   ) {
+    this.faker = faker;
     this.paper = paper;
     this.owner = owner;
     this.ownerAccessToken =
