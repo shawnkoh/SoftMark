@@ -1,11 +1,16 @@
-import ApiServer from "../server";
+import { hashSync } from "bcryptjs";
+import supertest = require("supertest");
 import { getRepository } from "typeorm";
+import faker = require("faker");
+faker.seed(127);
+
 import { User } from "../entities/User";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
+import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
-import { hashSync } from "bcryptjs";
-import supertest = require("supertest");
+import { ScriptTemplatePostData } from "../types/scriptTemplates";
+import { ScriptPostData } from "../types/scripts";
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {
@@ -15,6 +20,10 @@ export async function synchronize(apiServer: ApiServer) {
 }
 
 export class Fixtures {
+  // Other
+  faker: Faker.FakerStatic;
+
+  // Instantiated
   public paper: Paper;
   public owner: PaperUser;
   public ownerAccessToken: string;
@@ -23,12 +32,17 @@ export class Fixtures {
   public student: PaperUser;
   public studentAccessToken: string;
 
+  // Not instantiated
+  public scriptTemplatePostData: ScriptTemplatePostData;
+  public scriptPostData: ScriptPostData;
+
   constructor(
     paper: Paper,
     owner: PaperUser,
     marker: PaperUser,
     student: PaperUser
   ) {
+    this.faker = faker;
     this.paper = paper;
     this.owner = owner;
     this.ownerAccessToken =
@@ -39,6 +53,37 @@ export class Fixtures {
     this.student = student;
     this.studentAccessToken =
       "Bearer " + student.user!.createAuthenticationTokens().accessToken;
+
+    this.scriptTemplatePostData = {
+      questionTemplates: [
+        {
+          name: "1",
+          score: null
+        },
+        {
+          name: "1a",
+          parentName: "1",
+          score: 2
+        },
+        {
+          name: "1b",
+          parentName: "1",
+          score: 3
+        },
+        {
+          name: "2",
+          score: 3
+        },
+        {
+          name: "3",
+          score: 5
+        }
+      ]
+    };
+
+    this.scriptPostData = {
+      email: faker.internet.email()
+    };
   }
 }
 

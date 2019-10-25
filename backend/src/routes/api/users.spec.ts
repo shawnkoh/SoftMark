@@ -15,7 +15,7 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("GET users/self", () => {
+describe("GET /users/self", () => {
   it("should allow a User to get his own data", async () => {
     const response = await request(server.server)
       .get("/v1/users/self")
@@ -25,7 +25,7 @@ describe("GET users/self", () => {
   });
 });
 
-describe("PATCH users/self", () => {
+describe("PATCH /users/self", () => {
   it("should allow a User to edit his own data", async () => {
     const response = await request(server.server)
       .patch("/v1/users/self")

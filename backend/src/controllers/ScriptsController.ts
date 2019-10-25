@@ -1,75 +1,95 @@
 import { Request, Response } from "express";
 import { validateOrReject } from "class-validator";
-import { getRepository, IsNull, Not } from "typeorm";
+import { getRepository, IsNull, Not, getManager } from "typeorm";
+
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { PaperUserRole } from "../types/paperUsers";
 import { Script } from "../entities/Script";
+import { User } from "../entities/User";
+import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
+import { ScriptListData } from "../types/scripts";
 import { allowedPaperUser, allowedOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const paperId = Number(request.params.id);
+  const { email } = request.body;
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const paperId = Number(request.params.id);
-    const paper = await getRepository(Paper).findOneOrFail(paperId, {
-      where: { discardedAt: Not(IsNull()) }
-    });
-    const paperUser = await getRepository(PaperUser).findOneOrFail({
-      paperId: paperId,
-      userId: userId,
-      discardedAt: IsNull()
-    });
-    const allowed = await allowedPaperUser(
-      userId,
-      paperUser.id,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
+    await allowedOrFail(requesterId, paperId, PaperUserRole.Owner);
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    let student = await getRepository(User).findOne({ where: { email } });
+    let paperUser: PaperUser | undefined;
+    if (student) {
+      paperUser = await getRepository(PaperUser).findOne({
+        where: { paperId, user: student }
+      });
+    } else {
+      student = new User();
+      student.email = email;
+      await validateOrReject(student);
+    }
+
+    if (!paperUser) {
+      paperUser = new PaperUser();
+      paperUser.paperId = paperId;
+      paperUser.user = student;
+      paperUser.role = PaperUserRole.Student;
+      await validateOrReject(paperUser);
     }
 
     const script = new Script();
-    script.paper = paper;
+    script.paperId = paperId;
     script.paperUser = paperUser;
     await validateOrReject(script);
 
-    await getRepository(Script).save(script);
+    await getManager().transaction(async manager => {
+      await manager.save(student);
+      await manager.save(paperUser);
+      await manager.save(script);
+    });
 
     const data = await script.getData();
-    response.status(200).json(data);
+    response.status(201).json(data);
   } catch {
     response.sendStatus(400);
   }
 }
 
 export async function index(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const paperId = Number(request.params.id);
+  let paper: Paper;
+  let paperUser: PaperUser;
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const paperId = Number(request.params.id);
-    const paper = await getRepository(Paper).findOneOrFail(paperId, {
-      where: { discardedAt: Not(IsNull()) }
-    });
-    const paperUser = await getRepository(PaperUser).findOneOrFail({
-      paperId: paperId,
-      userId: userId,
-      discardedAt: IsNull()
-    });
-    const allowed = await allowedPaperUser(userId, paperUser.id);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+    ({ paper, paperUser } = await allowedOrFail(
+      userId,
+      paperId,
+      PaperUserRole.Student
+    ));
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
-    const scripts = await getRepository(Script).find({
-      paperId: paperId
-    });
+  try {
+    const scripts = await getRepository(Script).find(
+      paperUser.role === PaperUserRole.Student
+        ? { paper, paperUser }
+        : { paper }
+    );
 
-    const data = await Promise.all(scripts.map(script => script.getData()));
-    response.status(200).json(data);
+    const data: ScriptListData[] = await Promise.all(
+      scripts.map(script => script.getListData())
+    );
+    response.status(200).json({ scripts: data });
   } catch {
     response.sendStatus(400);
   }
@@ -117,10 +137,10 @@ export async function show(request: Request, response: Response) {
 }
 
 export async function discard(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const scriptId = request.params.id;
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const scriptId = request.params.id;
     const script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: IsNull() }
     });
@@ -145,10 +165,10 @@ export async function discard(request: Request, response: Response) {
 }
 
 export async function undiscard(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const scriptId = request.params.id;
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const scriptId = request.params.id;
     let script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: Not(IsNull()) }
     });

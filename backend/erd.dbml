@@ -54,9 +54,10 @@ Table page_template {
 Table question_template {
   id int [pk]
   script_template_id int [ref: > script_template.id]
+  parent_question_template_id int [ref: > question_template.id]
   
   name varchar [not null]
-  score int [not null]
+  score double
   
   created_at datetime [not null]
   updated_at datetime [not null]
@@ -75,6 +76,9 @@ Table page_template_question_template {
 
 Table allocation {
   id int [pk]
+  
+  // count int [not null]
+  
   question_template_id int [ref: > question_template.id]
   paper_user_id int [ref: > paper_user.id]
   

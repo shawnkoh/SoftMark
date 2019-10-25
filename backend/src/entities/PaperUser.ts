@@ -27,6 +27,17 @@ import {
 export class PaperUser extends Discardable {
   entityName = "PaperUser";
 
+  constructor();
+  constructor(paper?: Paper, user?: User, role?: PaperUserRole);
+  constructor(paper?: Paper, user?: User, role?: PaperUserRole) {
+    super();
+    this.paper = paper;
+    this.user = user;
+    if (role) {
+      this.role = role;
+    }
+  }
+
   @Column()
   paperId!: number;
 

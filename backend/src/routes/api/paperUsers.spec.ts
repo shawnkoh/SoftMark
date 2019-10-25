@@ -15,7 +15,7 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("PATCH paper_users/:id", () => {
+describe("PATCH /paper_users/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const validResponse = await request(server.server)
       .patch(`/v1/paper_users/${fixtures.marker.id}`)
@@ -41,7 +41,7 @@ describe("PATCH paper_users/:id", () => {
   });
 });
 
-describe("DELETE paper_users/:id", () => {
+describe("DELETE /paper_users/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .delete(`/v1/paper_users/${fixtures.marker.id}`)
@@ -67,7 +67,7 @@ describe("DELETE paper_users/:id", () => {
   });
 });
 
-describe("PATCH paper_users/:id/undiscard", () => {
+describe("PATCH /paper_users/:id/undiscard", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .patch(`/v1/paper_users/${fixtures.marker.id}/undiscard`)

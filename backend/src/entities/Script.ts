@@ -10,6 +10,14 @@ import { ScriptData, ScriptListData } from "../types/scripts";
 export class Script extends Discardable {
   entityName = "Script";
 
+  constructor();
+  constructor(paper?: Paper, paperUser?: PaperUser);
+  constructor(paper?: Paper, paperUser?: PaperUser) {
+    super();
+    this.paper = paper;
+    this.paperUser = paperUser;
+  }
+
   @Column()
   paperUserId!: number;
 

@@ -2,7 +2,8 @@ import { DiscardableData } from "./entities";
 
 export interface QuestionTemplatePostData {
   name: string;
-  marks: number;
+  parentName?: string | null;
+  score: number | null;
 }
 
 export type QuestionTemplatePatchData = { id: number } & Partial<
@@ -23,7 +24,7 @@ export function isQuestionTemplatePatchData(
 
 export interface QuestionTemplateListData extends DiscardableData {
   name: string;
-  marks: number;
+  score: number | null;
   parentQuestionTemplateId: number | null;
 }
 
