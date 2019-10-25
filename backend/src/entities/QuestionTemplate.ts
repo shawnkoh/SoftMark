@@ -5,6 +5,7 @@ import { Discardable } from "./Discardable";
 import { Question } from "./Question";
 import { ScriptTemplate } from "./ScriptTemplate";
 import { QuestionTemplateListData } from "../types/questionTemplates";
+import { PageQuestionTemplate } from "./PageQuestionTemplate";
 
 @Entity()
 @Unique(["scriptTemplate", "name"])
@@ -34,6 +35,12 @@ export class QuestionTemplate extends Discardable {
     questionTemplate => questionTemplate.parentQuestionTemplate
   )
   childQuestionTemplates?: QuestionTemplate[];
+
+  @OneToMany(
+    type => PageQuestionTemplate,
+    pageQuestionTemplate => pageQuestionTemplate.questionTemplate
+  )
+  pageQuestionTemplates?: PageQuestionTemplate[];
 
   @Column()
   @IsNotEmpty()

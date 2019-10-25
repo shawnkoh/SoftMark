@@ -1,4 +1,5 @@
 import { DiscardableData } from "./entities";
+import { PageTemplateListData } from "./pageTemplates";
 
 export interface QuestionTemplatePostData {
   name: string;
@@ -30,4 +31,5 @@ export interface QuestionTemplateListData extends DiscardableData {
 
 export interface QuestionTemplateData extends QuestionTemplateListData {
   childQuestionTemplates: QuestionTemplateListData[];
+  pageTemplates: PageTemplateListData[];
 }

@@ -1,18 +1,17 @@
-import {
-  QuestionTemplatePostData,
-  QuestionTemplateListData,
-  QuestionTemplatePatchData
-} from "./questionTemplates";
 import { DiscardableData } from "./entities";
+import { QuestionTemplateListData } from "./questionTemplates";
+import { PageTemplateListData } from "./pageTemplates";
 
 export interface ScriptTemplatePostData {
-  questionTemplates: QuestionTemplatePostData[];
+  name?: string | null;
+  // pdf: something
 }
 
 export interface ScriptTemplatePatchData {
-  questionTemplates: (QuestionTemplatePostData | QuestionTemplatePatchData)[];
+  name?: string | null;
 }
 
 export interface ScriptTemplateData extends DiscardableData {
+  pageTemplates: PageTemplateListData[];
   questionTemplates: QuestionTemplateListData[];
 }
