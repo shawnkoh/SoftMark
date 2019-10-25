@@ -9,7 +9,7 @@ import { User } from "../entities/User";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { ScriptListData } from "../types/scripts";
-import { allowedPaperUser, allowedOrFail } from "../utils/papers";
+import { allowedOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -144,16 +144,13 @@ export async function discard(request: Request, response: Response) {
     const script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: IsNull() }
     });
-    const allowed = await allowedPaperUser(
-      userId,
-      script.paperUserId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+    await allowedOrFail(userId, script.paperId, PaperUserRole.Owner);
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
+  try {
     await getRepository(Script).update(scriptId, {
       discardedAt: new Date()
     });
@@ -168,27 +165,21 @@ export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const userId = payload.id;
   const scriptId = request.params.id;
+  let script: Script;
   try {
-    let script = await getRepository(Script).findOneOrFail(scriptId, {
+    script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: Not(IsNull()) }
     });
-    const allowed = await allowedPaperUser(
-      userId,
-      script.paperUserId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+    await allowedOrFail(userId, script.paperId, PaperUserRole.Owner);
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
-    await getRepository(Script).update(scriptId, {
-      discardedAt: undefined
-    });
+  try {
+    script.discardedAt = null;
+    await getRepository(Script).save(script);
 
-    script = await getRepository(Script).findOneOrFail(scriptId, {
-      where: { discardedAt: IsNull() }
-    });
     const data = await script.getData();
     response.status(200).json(data);
   } catch (error) {
