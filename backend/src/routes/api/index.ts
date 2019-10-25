@@ -10,7 +10,6 @@ import questions from "./questions";
 import scriptTemplates from "./scriptTemplates";
 import scripts from "./scripts";
 import users from "./users";
-import { Script } from "vm";
 
 const routes = Router();
 

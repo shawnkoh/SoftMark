@@ -6,6 +6,10 @@ export interface UserPostData {
   name: string | null;
 }
 
+export interface UserPatchData {
+  name?: string;
+}
+
 export interface UserListData extends DiscardableData {
   email: string;
   emailVerified: boolean;
