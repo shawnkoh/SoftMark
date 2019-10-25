@@ -136,14 +136,6 @@ describe("POST /papers/:id/script_templates", () => {
   });
 
   // Constraints
-  it("should create a Script Template", async () => {
-    const response = await request(server.server)
-      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
-      .set("Authorization", fixtures.ownerAccessToken)
-      .send(fixtures.scriptTemplatePostData);
-    expect(response.status).toEqual(201);
-  });
-
   it("should not allow a second Script Template", async () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
