@@ -21,14 +21,13 @@ export class ApiServer {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cors());
     app.use(helmet());
-    app.use(morgan("dev"));
+    if (process.env.NODE_ENV !== "test") {
+      console.log("Express server has started on port 3000.");
+      app.use(morgan("dev"));
+    }
     app.use("/", routes);
 
     this.server = app.listen(3000);
-
-    console.log(
-      "Express server has started on port 3000. Open http://localhost:3000/users to see results"
-    );
   }
 
   async close() {
