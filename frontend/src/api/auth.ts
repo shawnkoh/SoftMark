@@ -1,6 +1,5 @@
 import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
-import { UserData } from "backend/src/types/users";
 import { getStorageAccessToken, getStorageRefreshToken } from "../db/selectors";
 
 export interface SignInResponseData {

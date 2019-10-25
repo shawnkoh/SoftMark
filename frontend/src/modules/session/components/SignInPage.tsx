@@ -36,7 +36,7 @@ const SignInPage: React.FC<Props> = props => {
         alignItems="center"
         id="session"
       >
-        <img className="app-logo mb-3" src={appLogo} alt="logo" />
+        <img src={appLogo} alt="logo" />
         <br />
         <Typography component="h1" variant="h5">
           Sign in
