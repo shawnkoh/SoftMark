@@ -54,32 +54,7 @@ export class Fixtures {
     this.studentAccessToken =
       "Bearer " + student.user!.createAuthenticationTokens().accessToken;
 
-    this.scriptTemplatePostData = {
-      questionTemplates: [
-        {
-          name: "1",
-          score: null
-        },
-        {
-          name: "1a",
-          parentName: "1",
-          score: 2
-        },
-        {
-          name: "1b",
-          parentName: "1",
-          score: 3
-        },
-        {
-          name: "2",
-          score: 3
-        },
-        {
-          name: "3",
-          score: 5
-        }
-      ]
-    };
+    this.scriptTemplatePostData = { name: faker.commerce.productName() };
 
     this.scriptPostData = {
       email: faker.internet.email()
