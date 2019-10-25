@@ -40,7 +40,7 @@ export class QuestionTemplate extends Discardable {
   @IsString()
   name!: string;
 
-  @Column({ type: "double", nullable: true })
+  @Column({ type: "double precision", nullable: true })
   @IsOptional()
   @IsNumber()
   score!: number | null;
