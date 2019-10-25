@@ -33,16 +33,11 @@ export async function create(request: Request, response: Response) {
   }
 }
 
-export async function show(request: Request, response: Response) {
+export async function showSelf(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = Number(request.params.id);
+  const userId = Number(payload.id);
   let user: User;
   try {
-    if (payload.id !== userId) {
-      throw new Error(
-        "A user is not allowed to access the data of another User"
-      );
-    }
     user = await getRepository(User).findOneOrFail(userId, {
       where: { discardedAt: IsNull() }
     });
@@ -52,6 +47,30 @@ export async function show(request: Request, response: Response) {
   }
 
   try {
+    const data = user.getData();
+    response.status(200).json(data);
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}
+
+export async function updateSelf(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = Number(payload.id);
+  let user: User;
+  try {
+    user = await getRepository(User).findOneOrFail(userId, {
+      where: { discardedAt: IsNull() }
+    });
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    Object.assign(user, pick(request.body, "name"));
+    await getRepository(User).save(user);
+
     const data = user.getData();
     response.status(200).json(data);
   } catch (error) {

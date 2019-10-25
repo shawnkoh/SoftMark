@@ -15,20 +15,22 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("GET users/:id", () => {
+describe("GET users/self", () => {
   it("should allow a User to get his own data", async () => {
     const response = await request(server.server)
-      .get(`/v1/users/${fixtures.owner.userId}`)
+      .get("/v1/users/self")
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);
   });
+});
 
-  it("should not allow a User to get another User's data", async () => {
+describe("PATCH users/self", () => {
+  it("should allow a User to edit his own data", async () => {
     const response = await request(server.server)
-      .get(`/v1/users/${fixtures.marker.userId}`)
+      .patch("/v1/users/self")
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
-    expect(response.status).toEqual(404);
+    expect(response.status).toEqual(200);
   });
 });

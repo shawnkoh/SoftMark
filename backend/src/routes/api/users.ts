@@ -8,7 +8,8 @@ export const router = Router();
 router.post("/", UsersController.create);
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
-router.get("/:id", UsersController.show);
+router.get("/self", UsersController.showSelf);
+router.patch("/self", UsersController.updateSelf);
 router.patch("/change_password", UsersController.changePassword);
 
 export default router;
