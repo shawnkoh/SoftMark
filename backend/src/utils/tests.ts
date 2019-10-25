@@ -1,6 +1,8 @@
 import { hashSync } from "bcryptjs";
 import supertest = require("supertest");
 import { getRepository } from "typeorm";
+import faker = require("faker");
+faker.seed(127);
 
 import { User } from "../entities/User";
 import { Paper } from "../entities/Paper";
@@ -8,6 +10,7 @@ import { PaperUser } from "../entities/PaperUser";
 import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
 import { ScriptTemplatePostData } from "../types/scriptTemplates";
+import { ScriptPostData } from "../types/scripts";
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {
@@ -27,7 +30,8 @@ export class Fixtures {
   public studentAccessToken: string;
 
   // Not instantiated
-  public scriptTemplateData: ScriptTemplatePostData;
+  public scriptTemplatePostData: ScriptTemplatePostData;
+  public scriptPostData: ScriptPostData;
 
   constructor(
     paper: Paper,
@@ -46,7 +50,7 @@ export class Fixtures {
     this.studentAccessToken =
       "Bearer " + student.user!.createAuthenticationTokens().accessToken;
 
-    this.scriptTemplateData = {
+    this.scriptTemplatePostData = {
       questionTemplates: [
         {
           name: "1",
@@ -71,6 +75,10 @@ export class Fixtures {
           score: 5
         }
       ]
+    };
+
+    this.scriptPostData = {
+      email: faker.internet.email()
     };
   }
 }
