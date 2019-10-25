@@ -61,6 +61,14 @@ This is preferred - its very explicit so you know what exactly is loaded
 
 typeORM documentation doesn’t cover this too well because they only guide you how to use ts without strict mode
 
+# Script Template
+
+Key Assumptions
+
+- An exam paper will always be sorted in ascending order of page number.
+- An exam paper's PageTemplates will not change. They are generated when an Owner uploads the base PDF.
+- Uploading a new Exam Template PDF is not allowed unless the existing Script Template has been discarded. Owner will have to create a new Script Template.
+
 # Test
 
 - Refer to papers.spec.ts for an example

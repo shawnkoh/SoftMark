@@ -37,6 +37,8 @@ Table script_template {
   id int [pk]
   paper_id int [ref: > paper.id]
   
+  name varchar
+  
   created_at datetime [not null]
   updated_at datetime [not null]
   discarded_at datetime [not null]
@@ -64,7 +66,7 @@ Table question_template {
   discarded_at datetime [not null]
 }
 
-Table page_template_question_template {
+Table page_question_template {
   id int [pk]
   page_template_id int [ref: > page_template.id]
   question_template_id int [ref: > question_template.id]
