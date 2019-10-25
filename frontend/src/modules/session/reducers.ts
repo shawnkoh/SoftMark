@@ -1,6 +1,7 @@
 import * as types from "./types";
 import api from "../../api";
 import { access } from "fs";
+import { setStorageAccessToken, setStorageRefreshToken } from "../../db/selectors";
 
 const initialState: types.SessionState = {
   accessToken: null,
@@ -30,7 +31,6 @@ const sessionReducer = (
       };
 
     case types.SET_CURRENT_TOKEN:
-      console.log(action);
       if (
         !action.data ||
         !action.data.accessToken ||
@@ -43,7 +43,8 @@ const sessionReducer = (
       
       state.accessToken = action.data.accessToken;
       state.refreshToken = action.data.refreshToken;
-      //db.setToken(token);
+      setStorageAccessToken(state.accessToken);
+      setStorageRefreshToken(state.refreshToken);
       api.setAuthorizationHeader(state.accessToken);
 
       return {

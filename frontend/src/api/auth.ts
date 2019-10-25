@@ -1,6 +1,7 @@
 import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
 import { UserData } from "backend/src/types/users";
+import { getStorageAccessToken, getStorageRefreshToken } from "../db/selectors";
 
 export interface SignInResponseData {
   accessToken: string | undefined;
@@ -26,7 +27,11 @@ class AuthAPI extends BaseAPI {
   }
 
   silentSignIn(): Promise<AxiosResponse<SignInResponseData>> {
-    return this.getClient().get(`${this.getUrl()}`, { withCredentials: true });
+    const accessToken = getStorageAccessToken();
+    const refreshToken = getStorageRefreshToken();
+    return this.getClient().post(`${this.getUrl()}/token`, null, {
+      headers: { Authorization: `Bearer ${refreshToken}` }
+    });
   }
 
   private getUrl() {
