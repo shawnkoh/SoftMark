@@ -43,7 +43,7 @@ describe("GET /scripts/:id", () => {
       .get(`/v1/scripts/${script1.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
-    expect(response.status).toEqual(200);
+    expect(response.status).not.toEqual(404);
   });
 
   it("should allow a Paper's Marker to access this route", async () => {
@@ -51,21 +51,23 @@ describe("GET /scripts/:id", () => {
       .get(`/v1/scripts/${script1.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
-    expect(response.status).toEqual(200);
+    expect(response.status).not.toEqual(404);
   });
 
   it("should allow a Script's Student to access this route", async () => {
-    const his = await request(server.server)
+    const response = await request(server.server)
       .get(`/v1/scripts/${script1.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
-    expect(his.status).toEqual(200);
+    expect(response.status).not.toEqual(404);
+  });
 
-    const other = await request(server.server)
+  it("should not allow a Student to access another Student's Script", async () => {
+    const response = await request(server.server)
       .get(`/v1/scripts/${script2.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
-    expect(other.status).toEqual(404);
+    expect(response.status).toEqual(404);
   });
 });
 
