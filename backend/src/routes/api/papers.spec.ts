@@ -103,6 +103,50 @@ describe("POST papers/:id/users", () => {
   // it("should create a new user if email does not exist", async () => {});
 });
 
+describe("POST papers/:id/script_templates", () => {
+  // Roles
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should not allow a Paper's Marker to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+
+  it("should not allow a Paper's Student to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+
+  // Constraints
+  it("should create a Script Template", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptTemplateData);
+    expect(response.status).toEqual(201);
+  });
+
+  it("should not allow a second Script Template", async () => {
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptTemplateData);
+    expect(response.status).toEqual(400);
+  });
+});
+
 describe("POST papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
