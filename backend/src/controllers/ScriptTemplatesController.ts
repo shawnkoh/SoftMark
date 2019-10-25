@@ -2,42 +2,74 @@ import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { getRepository, getManager, IsNull } from "typeorm";
 import { pick } from "lodash";
+
 import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { getEntityArray } from "../utils/entities";
-import { allowedPaperUser, allowedOrFail } from "../utils/papers";
-import { ScriptTemplatePatchData } from "../types/scriptTemplates";
+import {
+  ScriptTemplatePatchData,
+  ScriptTemplatePostData
+} from "../types/scriptTemplates";
 import { isQuestionTemplatePatchData } from "../types/questionTemplates";
+import { allowedPaperUser, allowedOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const paperId = request.params.id;
+  const paperId = Number(request.params.id);
+  const postData = pick(
+    request.body,
+    "questionTemplates"
+  ) as ScriptTemplatePostData;
   try {
-    const allowed = await allowedPaperUser(
-      payload.id,
-      paperId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
-    const { paper } = allowed;
+    await allowedOrFail(payload.id, paperId, PaperUserRole.Owner);
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
+  try {
+    const existing = await getRepository(ScriptTemplate).findOne({
+      paperId,
+      discardedAt: IsNull()
+    });
+    if (existing) {
+      throw new Error("Not allowed to have more than one script template");
+    }
     const scriptTemplate = new ScriptTemplate();
-    scriptTemplate.paperId = paper.id;
-    const questionTemplates = await getEntityArray(
-      request.body.questionTemplates,
-      QuestionTemplate,
-      { scriptTemplate }
-    );
+    scriptTemplate.paperId = paperId;
+
+    const children: {
+      questionTemplate: QuestionTemplate;
+      parentName: string;
+    }[] = [];
+
+    const questionTemplates = postData.questionTemplates.map(data => {
+      const questionTemplate = new QuestionTemplate();
+      questionTemplate.scriptTemplate = scriptTemplate;
+      questionTemplate.name = data.name;
+      questionTemplate.score = data.score;
+      if (data.parentName) {
+        children.push({ questionTemplate, parentName: data.parentName });
+      }
+      return questionTemplate;
+    });
+
+    children.forEach(child => {
+      const parent = questionTemplates.find(
+        parent => parent.name === child.parentName
+      );
+      if (!parent) {
+        throw new Error("Parent not found");
+      }
+      child.questionTemplate.parentQuestionTemplate = parent;
+    });
 
     await getManager().transaction(async manager => {
       await manager.save(scriptTemplate);
       await manager.save(questionTemplates);
     });
+
     const data = await scriptTemplate.getData();
     response.status(201).send(data);
   } catch (error) {
