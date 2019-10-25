@@ -145,6 +145,32 @@ describe("POST /papers/:id/script_templates", () => {
   });
 });
 
+describe("GET /papers/:id/script_templates/active", () => {
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/script_templates/active`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Marker to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/script_templates/active`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Student to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/script_templates/active`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+});
+
 describe("POST /papers/:id/scripts", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)

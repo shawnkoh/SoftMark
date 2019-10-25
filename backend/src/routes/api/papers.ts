@@ -19,7 +19,10 @@ router.patch("/:id/undiscard", PapersController.undiscard);
 router.post("/:id/users", PaperUsersController.create);
 
 router.post("/:id/script_templates", ScriptTemplatesController.create);
-router.get("/:id/script_template", ScriptTemplatesController.show);
+router.get(
+  "/:id/script_templates/active",
+  ScriptTemplatesController.showActive
+);
 
 router.post("/:id/scripts", ScriptsController.create);
 router.get("/:id/scripts", ScriptsController.index);

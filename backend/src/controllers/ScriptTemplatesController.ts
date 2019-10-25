@@ -52,22 +52,23 @@ export async function create(request: Request, response: Response) {
   }
 }
 
-export async function show(request: Request, response: Response) {
+export async function showActive(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
+  const allowed = await allowedPaperUser(payload.id, paperId);
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { paper } = allowed;
+
   try {
-    const allowed = await allowedPaperUser(payload.id, paperId);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
-    const { paper, paperUser } = allowed;
-    const scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail({
-      where: { paperId: paper.id, discardedAt: IsNull() }
+    const scriptTemplate = await getRepository(ScriptTemplate).findOne({
+      where: { paper, discardedAt: IsNull() }
     });
 
-    const data = await scriptTemplate.getData();
-    response.status(200).json(data);
+    const data = scriptTemplate ? await scriptTemplate.getData() : null;
+    response.status(200).json({ scriptTemplate: data });
   } catch (error) {
     response.sendStatus(400);
   }
