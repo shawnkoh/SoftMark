@@ -71,6 +71,27 @@ export class QuestionTemplate extends Discardable {
   @OneToMany(type => Allocation, allocation => allocation.questionTemplate)
   allocations?: Allocation[];
 
+  getPageTemplates = async (): Promise<PageTemplateListData[]> => {
+    // Check whether pageTemplates has already been loaded
+    const pageQuestionTemplates = this.pageQuestionTemplates;
+    if (
+      pageQuestionTemplates &&
+      !pageQuestionTemplates.some(
+        pageQuestionTemplate => !pageQuestionTemplate.pageTemplate
+      )
+    ) {
+      return pageQuestionTemplates.map(pageQuestionTemplate =>
+        pageQuestionTemplate.pageTemplate!.getListData()
+      );
+    }
+
+    return (await getRepository(PageTemplate)
+      .createQueryBuilder("pageTemplate")
+      .leftJoin("pageTemplate.pageQuestionTemplates", "pageQuestionTemplates")
+      .leftJoin("pageQuestionTemplates.questionTemplate", "questionTemplate")
+      .getMany()).map(pageTemplate => pageTemplate.getListData());
+  };
+
   getListData = (): QuestionTemplateListData => ({
     ...this.getBase(),
     name: this.name,
@@ -79,25 +100,7 @@ export class QuestionTemplate extends Discardable {
   });
 
   getData = async (): Promise<QuestionTemplateData> => {
-    const pageQuestionTemplates = this.pageQuestionTemplates;
-    let pageTemplates: PageTemplateListData[];
-    if (
-      pageQuestionTemplates &&
-      !pageQuestionTemplates.some(
-        pageQuestionTemplate => !pageQuestionTemplate.pageTemplate
-      )
-    ) {
-      pageTemplates = pageQuestionTemplates.map(pageQuestionTemplate =>
-        pageQuestionTemplate.pageTemplate!.getListData()
-      );
-    } else {
-      pageTemplates = (await getRepository(PageTemplate)
-        .createQueryBuilder("pageTemplate")
-        .leftJoin("pageTemplate.pageQuestionTemplates", "pageQuestionTemplates")
-        .leftJoin("pageQuestionTemplates.questionTemplate", "questionTemplate")
-        .getMany()).map(pageTemplate => pageTemplate.getListData());
-    }
-
+    const pageTemplates = await this.getPageTemplates();
     const childQuestionTemplates = (
       this.childQuestionTemplates ||
       (await getRepository(QuestionTemplate).find({
