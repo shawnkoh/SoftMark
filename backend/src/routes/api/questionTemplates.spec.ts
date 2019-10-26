@@ -125,6 +125,15 @@ describe("DELETE /question_templates/:id", () => {
       .send();
     expect(response.status).toEqual(404);
   });
+
+  it("should delete a Question Template", async () => {
+    const response = await request(server.server)
+      .delete(`/v1/question_templates/${q2.id}`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).toEqual(204);
+    expect(response.body).toEqual({});
+  });
 });
 
 describe("PATCH /question_templates/:id/undiscard", () => {
@@ -150,5 +159,15 @@ describe("PATCH /question_templates/:id/undiscard", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
+  });
+
+  it("should restore a deleted Question Template", async () => {
+    const response = await request(server.server)
+      .patch(`/v1/question_templates/${q2.id}/undiscard`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).toEqual(200);
+    const data = response.body.questionTemplate as QuestionTemplateData;
+    expect(data.discardedAt).toEqual(null);
   });
 });

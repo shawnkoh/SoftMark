@@ -167,7 +167,7 @@ export async function undiscard(request: Request, response: Response) {
     await getRepository(QuestionTemplate).save(questionTemplate);
 
     const data = await questionTemplate.getData();
-    response.status(200).json(data);
+    response.status(200).json({ questionTemplate: data });
   } catch (error) {
     response.sendStatus(400);
   }
