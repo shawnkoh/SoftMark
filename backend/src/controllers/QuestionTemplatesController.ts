@@ -61,6 +61,41 @@ export async function create(request: Request, response: Response) {
   }
 }
 
+export async function show(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const questionTemplateId = request.params.id;
+  let questionTemplate: QuestionTemplate;
+  try {
+    questionTemplate = await getRepository(QuestionTemplate).findOneOrFail(
+      questionTemplateId,
+      {
+        where: { discardedAt: IsNull() },
+        relations: [
+          "scriptTemplate",
+          "pageQuestionTemplates",
+          "pageQuestionTemplates.pageTemplate"
+        ]
+      }
+    );
+    await allowedOrFail(
+      requesterId,
+      questionTemplate.scriptTemplate!.paperId,
+      PaperUserRole.Student
+    );
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    const data = await questionTemplate.getData();
+    response.status(200).json({ questionTemplate: data });
+  } catch (error) {
+    response.sendStatus(500);
+  }
+}
+
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
