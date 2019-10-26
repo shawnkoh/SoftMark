@@ -11,8 +11,9 @@ export interface PageQuestionTemplatePostData {
 }
 
 export interface PageQuestionTemplatePatchData {
-  pageTemplateId?: number;
-  questionTemplateId?: number;
+  // Intentionally require both
+  pageTemplateId: number;
+  questionTemplateId: number;
 }
 
 export interface PageQuestionTemplateListData extends DiscardableData {
@@ -25,12 +26,30 @@ export interface PageQuestionTemplateData extends PageQuestionTemplateListData {
   questionTemplate: QuestionTemplateListData;
 }
 
+export function isPageQuestionTemplatePostData(
+  data: any
+): data is PageQuestionTemplatePostData {
+  return (
+    typeof data.pageTemplateId === "number" &&
+    typeof data.questionTemplateId === "number"
+  );
+}
+
+export function isPageQuestionTemplatePatchData(
+  data: any
+): data is PageQuestionTemplatePatchData {
+  return (
+    typeof data.pageTemplateId === "number" &&
+    typeof data.questionTemplateId === "number"
+  );
+}
+
 export function isPageQuestionTemplateListData(
   data: any
 ): data is PageQuestionTemplateListData {
   return (
     typeof data.pageTemplateId === "number" &&
-    data.questionTemplateId === "number" &&
+    typeof data.questionTemplateId === "number" &&
     isDiscardableData(data)
   );
 }

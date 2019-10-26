@@ -37,8 +37,8 @@ export function isQuestionTemplateListData(
 ): data is QuestionTemplateListData {
   return (
     typeof data.name === "string" &&
-    (data.score === "number" || data.score === null) &&
-    (data.parentQuestionTemplateId === "number" ||
+    (typeof data.score === "number" || data.score === null) &&
+    (typeof data.parentQuestionTemplateId === "number" ||
       data.parentQuestionTemplateId === null) &&
     isDiscardableData(data)
   );

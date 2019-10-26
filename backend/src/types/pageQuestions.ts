@@ -19,7 +19,7 @@ export function isPageQuestionListData(
 ): data is PageQuestionListData {
   return (
     typeof data.pageId === "number" &&
-    data.questionId === "number" &&
+    typeof data.questionId === "number" &&
     isDiscardableData(data)
   );
 }

@@ -4,7 +4,9 @@ import {
 } from "./questionTemplates";
 import { DiscardableData, isDiscardableData } from "./entities";
 
-export interface PageTemplateListData extends DiscardableData {}
+export interface PageTemplateListData extends DiscardableData {
+  scriptTemplateId: number;
+}
 
 export interface PageTemplateData extends PageTemplateListData {
   questionTemplates: QuestionTemplateListData[];
@@ -13,7 +15,7 @@ export interface PageTemplateData extends PageTemplateListData {
 export function isPageTemplateListData(
   data: any
 ): data is PageTemplateListData {
-  return isDiscardableData(data);
+  return typeof data.scriptTemplateId === "number" && isDiscardableData(data);
 }
 
 export function isPageTemplateData(data: any): data is PageTemplateData {
