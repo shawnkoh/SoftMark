@@ -4,6 +4,10 @@ import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { getRepository } from "typeorm";
 import { QuestionTemplatePostData } from "../../types/questionTemplates";
+import {
+  isScriptTemplateData,
+  ScriptTemplatePatchData
+} from "../../types/scriptTemplates";
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -46,6 +50,18 @@ describe("PATCH /script_templates/:id", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
+  });
+
+  it("should return ScriptTemplateData", async () => {
+    const patchData: ScriptTemplatePatchData = {
+      name: "abc"
+    };
+    const response = await request(server.server)
+      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(patchData);
+    expect(response.status).toEqual(200);
+    expect(isScriptTemplateData(response.body.scriptTemplate)).toBe(true);
   });
 });
 

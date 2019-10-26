@@ -8,6 +8,8 @@ import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
 import { ScriptListData } from "../../types/scripts";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+import { ScriptTemplate } from "../../entities/ScriptTemplate";
+import { isScriptTemplateData } from "../../types/scriptTemplates";
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -136,6 +138,20 @@ describe("POST /papers/:id/script_templates", () => {
   });
 
   // Constraints
+  it("should return ScriptTemplateData", async () => {
+    // delete the script template created in an earlier test
+    await getRepository(ScriptTemplate).update(
+      { paperId: fixtures.paper.id },
+      { discardedAt: new Date() }
+    );
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptTemplatePostData);
+    expect(response.status).toEqual(201);
+    expect(isScriptTemplateData(response.body.scriptTemplate)).toBe(true);
+  });
+
   it("should not allow a second Script Template", async () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
@@ -168,6 +184,15 @@ describe("GET /papers/:id/script_templates/active", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
+  });
+
+  it("should return ScriptTemplateData", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/script_templates/active`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).toEqual(200);
+    expect(isScriptTemplateData(response.body.scriptTemplate)).toBe(true);
   });
 });
 

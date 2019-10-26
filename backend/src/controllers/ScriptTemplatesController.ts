@@ -46,7 +46,7 @@ export async function create(request: Request, response: Response) {
     });
 
     const data = await scriptTemplate.getData();
-    response.status(201).send(data);
+    response.status(201).json({ scriptTemplate: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -64,7 +64,8 @@ export async function showActive(request: Request, response: Response) {
 
   try {
     const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-      where: { paper, discardedAt: IsNull() }
+      where: { paper, discardedAt: IsNull() },
+      relations: ["pageTemplates", "questionTemplates"]
     });
 
     const data = scriptTemplate ? await scriptTemplate.getData() : null;
@@ -81,7 +82,8 @@ export async function update(request: Request, response: Response) {
   let scriptTemplate: ScriptTemplate;
   try {
     scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
-      scriptTemplateId
+      scriptTemplateId,
+      { relations: ["pageTemplates", "questionTemplates"] }
     );
     await allowedOrFail(
       payload.id,
@@ -101,7 +103,7 @@ export async function update(request: Request, response: Response) {
     await getRepository(ScriptTemplate).save(scriptTemplate);
 
     const data = await scriptTemplate.getData();
-    response.status(200).json(data);
+    response.status(200).json({ scriptTemplate: data });
   } catch (error) {
     response.sendStatus(400);
   }
