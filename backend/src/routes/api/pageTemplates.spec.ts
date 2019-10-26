@@ -70,6 +70,6 @@ describe("GET /page_templates/:id", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(200);
-    expect(isPageTemplateData(response.body.pageTemplate));
+    expect(isPageTemplateData(response.body.pageTemplate)).toBe(true);
   });
 });
