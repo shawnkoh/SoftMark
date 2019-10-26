@@ -10,6 +10,11 @@ import { QuestionTemplateListData } from "../types/questionTemplates";
 export class PageTemplate extends Discardable {
   entityName = "PageTemplate";
 
+  constructor(scriptTemplate: ScriptTemplate) {
+    super();
+    this.scriptTemplate = scriptTemplate;
+  }
+
   @Column()
   scriptTemplateId!: number;
 

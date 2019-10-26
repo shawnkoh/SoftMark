@@ -25,6 +25,30 @@ import { PageTemplateListData } from "../types/pageTemplates";
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
+  constructor();
+  constructor(
+    scriptTemplate: ScriptTemplate,
+    name: string,
+    score: number | null,
+    parentQuestionTemplate?: QuestionTemplate | null
+  );
+  constructor(
+    scriptTemplate?: ScriptTemplate,
+    name?: string,
+    score?: number | null,
+    parentQuestionTemplate?: QuestionTemplate | null
+  ) {
+    super();
+    this.scriptTemplate = scriptTemplate;
+    if (name) {
+      this.name = name;
+    }
+    if (score) {
+      this.score = score;
+    }
+    this.parentQuestionTemplate = parentQuestionTemplate;
+  }
+
   @Column()
   scriptTemplateId!: number;
 
