@@ -100,8 +100,8 @@ export class QuestionTemplate extends Discardable {
     const pageQuestionTemplates = this.pageQuestionTemplates;
     if (
       pageQuestionTemplates &&
-      !pageQuestionTemplates.some(
-        pageQuestionTemplate => !pageQuestionTemplate.pageTemplate
+      pageQuestionTemplates.every(
+        pageQuestionTemplate => !!pageQuestionTemplate.pageTemplate
       )
     ) {
       return pageQuestionTemplates.map(pageQuestionTemplate =>

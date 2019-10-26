@@ -39,8 +39,8 @@ export class PageTemplate extends Discardable {
     let questionTemplates: QuestionTemplateListData[];
     if (
       pageQuestionTemplates &&
-      !pageQuestionTemplates.some(
-        pageQuestionTemplate => !pageQuestionTemplate.questionTemplate
+      pageQuestionTemplates.every(
+        pageQuestionTemplate => !!pageQuestionTemplate.questionTemplate
       )
     ) {
       questionTemplates = pageQuestionTemplates.map(pageQuestionTemplate =>

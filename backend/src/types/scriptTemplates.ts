@@ -21,11 +21,11 @@ export interface ScriptTemplateData extends DiscardableData {
 
 export function isScriptTemplateData(data: any): data is ScriptTemplateData {
   return (
-    !data.pageTemplates.some(
-      (pageTemplate: any) => !isPageTemplateListData(pageTemplate)
+    data.pageTemplates.every((pageTemplate: any) =>
+      isPageTemplateListData(pageTemplate)
     ) &&
-    !data.questionTemplates.some(
-      (questionTemplate: any) => !isQuestionTemplateListData(questionTemplate)
+    data.questionTemplates.every((questionTemplate: any) =>
+      isQuestionTemplateListData(questionTemplate)
     )
   );
 }
