@@ -26,7 +26,7 @@ export async function create(request: Request, response: Response) {
     await getRepository(PaperUser).save(paperUser);
 
     const data = await paper.getData(paperUser.role);
-    response.status(201).json(data);
+    response.status(201).json({ paper: data });
   } catch (error) {
     console.error(error);
     response.sendStatus(400);
@@ -44,7 +44,7 @@ export async function index(request: Request, response: Response) {
     const data = paperUsers.map(paperUser =>
       paperUser.paper!.getListData(paperUser.role)
     );
-    response.status(200).json(data);
+    response.status(200).json({ paper: data });
   } catch (error) {
     response.sendStatus(400);
     return;
@@ -74,7 +74,7 @@ export async function show(request: Request, response: Response) {
     } else {
       data = await paper.getData(paperUser.role);
     }
-    response.status(200).json(data);
+    response.status(200).json({ paper: data });
   } catch (error) {
     response.sendStatus(400);
     return;
@@ -100,7 +100,7 @@ export async function update(request: Request, response: Response) {
     await getRepository(Paper).save(paper);
 
     const data = await paper.getData(paperUser.role);
-    response.status(200).json(data);
+    response.status(200).json({ paper: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -147,7 +147,7 @@ export async function undiscard(request: Request, response: Response) {
     });
 
     const data = await paper.getData(paperUser.role);
-    response.status(200).json(data);
+    response.status(200).json({ paper: data });
   } catch (error) {
     response.sendStatus(400);
   }

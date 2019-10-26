@@ -161,7 +161,7 @@ export async function undiscard(request: Request, response: Response) {
     });
 
     const data = scriptTemplate.getData();
-    response.status(200).send(data);
+    response.status(200).json({ scriptTemplate: data });
   } catch (error) {
     response.sendStatus(400);
   }

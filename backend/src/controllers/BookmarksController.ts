@@ -38,7 +38,7 @@ export async function create(request: Request, response: Response) {
     await validateOrReject(bookmark);
 
     const data = await bookmark.getData();
-    response.status(201).json(data);
+    response.status(201).json({ bookmark: data });
   } catch (error) {
     response.sendStatus(400);
   }

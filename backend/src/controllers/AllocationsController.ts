@@ -40,7 +40,7 @@ export async function create(request: Request, response: Response) {
     await getRepository(Allocation).save(allocation);
 
     const data = await allocation.getData();
-    response.status(201).json(data);
+    response.status(201).json({ allocation: data });
   } catch (error) {
     response.sendStatus(400);
   }

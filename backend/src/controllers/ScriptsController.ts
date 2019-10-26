@@ -56,7 +56,7 @@ export async function create(request: Request, response: Response) {
     });
 
     const data = await script.getData();
-    response.status(201).json(data);
+    response.status(201).json({ script: data });
   } catch {
     response.sendStatus(400);
   }
@@ -130,7 +130,7 @@ export async function show(request: Request, response: Response) {
 
   try {
     const data = await script.getData();
-    response.status(200).json(data);
+    response.status(200).json({ script: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -181,7 +181,7 @@ export async function undiscard(request: Request, response: Response) {
     await getRepository(Script).save(script);
 
     const data = await script.getData();
-    response.status(200).json(data);
+    response.status(200).json({ script: data });
   } catch (error) {
     response.sendStatus(400);
   }
