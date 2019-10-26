@@ -31,7 +31,8 @@ export class PageTemplate extends Discardable {
   pageQuestionTemplates?: PageQuestionTemplate[];
 
   getListData = (): PageTemplateListData => ({
-    ...this.getBase()
+    ...this.getBase(),
+    scriptTemplateId: this.scriptTemplateId
   });
 
   getData = async (): Promise<PageTemplateData> => {
