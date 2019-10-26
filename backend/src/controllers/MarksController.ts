@@ -55,7 +55,7 @@ export async function create(request: Request, response: Response) {
     await validateOrReject(mark);
 
     const data = await mark.getData();
-    response.status(201).json(data);
+    response.status(201).json({ mark: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -85,7 +85,7 @@ export async function update(request: Request, response: Response) {
     await getRepository(Mark).save(mark);
 
     const data = await mark.getData();
-    response.status(201).json(data);
+    response.status(201).json({ mark: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -132,7 +132,7 @@ export async function undiscard(request: Request, response: Response) {
     });
 
     const data = await mark.getData();
-    response.status(200).json(data);
+    response.status(200).json({ mark: data });
   } catch (error) {
     response.sendStatus(400);
   }

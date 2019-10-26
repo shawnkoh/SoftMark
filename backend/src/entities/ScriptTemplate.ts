@@ -1,8 +1,11 @@
+import { IsOptional, IsString } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+
 import { Discardable } from "./Discardable";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { ScriptTemplateData } from "../types/scriptTemplates";
+import { PageTemplate } from "./PageTemplate";
 
 @Entity()
 export class ScriptTemplate extends Discardable {
@@ -14,11 +17,19 @@ export class ScriptTemplate extends Discardable {
   @ManyToOne(type => Paper, paper => paper.scriptTemplates)
   paper?: Paper;
 
+  @OneToMany(type => PageTemplate, pageTemplate => pageTemplate.scriptTemplate)
+  pageTemplates?: PageTemplate[];
+
   @OneToMany(
     type => QuestionTemplate,
     questionTemplate => questionTemplate.scriptTemplate
   )
   questionTemplates?: QuestionTemplate[];
+
+  @Column({ type: "character varying", nullable: true })
+  @IsOptional()
+  @IsString()
+  name: string | null = null;
 
   getData = async (): Promise<ScriptTemplateData> => {
     const questionTemplates =
@@ -26,8 +37,16 @@ export class ScriptTemplate extends Discardable {
       (await getRepository(QuestionTemplate).find({
         where: { scriptTemplate: this }
       }));
+    const pageTemplates =
+      this.pageTemplates ||
+      (await getRepository(PageTemplate).find({
+        where: { scriptTemplate: this }
+      }));
     return {
       ...this.getBase(),
+      pageTemplates: pageTemplates.map(pageTemplate =>
+        pageTemplate.getListData()
+      ),
       questionTemplates: questionTemplates.map(questionTemplate =>
         questionTemplate.getListData()
       )

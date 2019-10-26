@@ -27,7 +27,7 @@ export async function create(request: Request, response: Response) {
       user: user.getData(),
       ...user.createAuthenticationTokens()
     };
-    response.status(201).json(data);
+    response.status(201).json({ user: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -48,7 +48,7 @@ export async function showSelf(request: Request, response: Response) {
 
   try {
     const data = user.getData();
-    response.status(200).json(data);
+    response.status(200).json({ user: data });
   } catch (error) {
     response.sendStatus(400);
   }
@@ -72,7 +72,7 @@ export async function updateSelf(request: Request, response: Response) {
     await getRepository(User).save(user);
 
     const data = user.getData();
-    response.status(200).json(data);
+    response.status(200).json({ user: data });
   } catch (error) {
     response.sendStatus(400);
   }
