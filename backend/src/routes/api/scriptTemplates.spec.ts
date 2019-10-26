@@ -8,6 +8,13 @@ import {
   isScriptTemplateData,
   ScriptTemplatePatchData
 } from "../../types/scriptTemplates";
+import {
+  PageQuestionTemplatePostData,
+  isPageQuestionTemplateData
+} from "../../types/pageQuestionTemplates";
+import { QuestionTemplate } from "../../entities/QuestionTemplate";
+import { PageTemplate } from "../../entities/PageTemplate";
+import { PageQuestionTemplate } from "../../entities/PageQuestionTemplate";
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -177,4 +184,67 @@ describe("POST /script_templates/:id/question_templates", () => {
       .send(postData);
     expect(response.status).toEqual(201);
   });
+});
+
+describe("POST /script_templates/:id/page_question_templates", () => {
+  describe("roles", () => {
+    it("should allow a Paper's Owner to access this route", async () => {
+      const response = await request(server.server)
+        .post(
+          `/v1/script_templates/${scriptTemplate.id}/page_question_templates`
+        )
+        .set("Authorization", fixtures.ownerAccessToken)
+        .send();
+      expect(response.status).not.toEqual(404);
+    });
+
+    it("should not allow a Paper's Marker to access this route", async () => {
+      const response = await request(server.server)
+        .post(
+          `/v1/script_templates/${scriptTemplate.id}/page_question_templates`
+        )
+        .set("Authorization", fixtures.markerAccessToken)
+        .send();
+      expect(response.status).toEqual(404);
+    });
+
+    it("should not allow a Paper's Student to access this route", async () => {
+      const response = await request(server.server)
+        .post(
+          `/v1/script_templates/${scriptTemplate.id}/page_question_templates`
+        )
+        .set("Authorization", fixtures.studentAccessToken)
+        .send();
+      expect(response.status).toEqual(404);
+    });
+  });
+
+  it("should return PageQuestionTemplateData", async () => {
+    const page1 = new PageTemplate(scriptTemplate);
+    const page2 = new PageTemplate(scriptTemplate);
+    const page3 = new PageTemplate(scriptTemplate);
+    const q1 = new QuestionTemplate(scriptTemplate, "1", null);
+    const q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
+    const q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
+    const q2 = new QuestionTemplate(scriptTemplate, "2", 6);
+
+    await getRepository(PageTemplate).save(page1);
+    await getRepository(QuestionTemplate).save(q1);
+
+    const postData: PageQuestionTemplatePostData = {
+      pageTemplateId: page1.id,
+      questionTemplateId: q1.id
+    };
+    console.log("count", await getRepository(PageQuestionTemplate).count());
+    const response = await request(server.server)
+      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(200);
+    expect(isPageQuestionTemplateData(response.body.pageQuestionTemplate)).toBe(
+      true
+    );
+  });
+
+  it("should not allow duplicate PageQuestionTemplates", async () => {});
 });
