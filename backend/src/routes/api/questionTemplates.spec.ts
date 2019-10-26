@@ -7,7 +7,8 @@ import { ApiServer } from "../../server";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import {
   QuestionTemplatePatchData,
-  QuestionTemplateData
+  QuestionTemplateData,
+  isQuestionTemplateData
 } from "../../types/questionTemplates";
 
 let server: ApiServer;
@@ -56,6 +57,41 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await server.close();
+});
+
+describe("GET /question_templates/:id", () => {
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/question_templates/${q1.id}`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Marker to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/question_templates/${q1.id}`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Student to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/question_templates/${q1.id}`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should return QuestionTemplateData", async () => {
+    const response = await request(server.server)
+      .get(`/v1/question_templates/${q1.id}`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).toEqual(200);
+    expect(isQuestionTemplateData(response.body));
+  });
 });
 
 describe("PATCH /question_templates/:id", () => {
@@ -155,7 +191,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${scriptTemplate.id}/undiscard`)
+      .patch(`/v1/question_templates/${q1.id}/undiscard`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
