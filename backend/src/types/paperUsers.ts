@@ -1,6 +1,6 @@
-import { AllocationListData } from "./allocations";
+import { AllocationListData, isAllocationListData } from "./allocations";
 import { DiscardableData } from "./entities";
-import { UserData } from "./users";
+import { UserData, isUserData } from "./users";
 
 export enum PaperUserRole {
   Owner = "OWNER",
@@ -22,11 +22,23 @@ export type PaperUserPatchData = Partial<{
 }>;
 
 export interface PaperUserListData extends DiscardableData {
-  user: UserData;
+  user: UserData; // intentionally nested
   role: PaperUserRole;
-  allocations: AllocationListData[];
+  allocations: AllocationListData[]; // intentionally nested
   markCount: number;
   bookmarkCount: number;
 }
 
 export interface PaperUserData extends PaperUserListData {}
+
+export function isPaperUserListData(data: any): data is PaperUserListData {
+  return (
+    isUserData(data.user) &&
+    Object.values(PaperUserRole).includes(data.role) &&
+    data.allocations.every((allocation: any) =>
+      isAllocationListData(allocation)
+    ) &&
+    typeof data.markCount === "number" &&
+    typeof data.bookmarkCount === "number"
+  );
+}

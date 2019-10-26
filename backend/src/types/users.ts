@@ -1,4 +1,4 @@
-import { DiscardableData } from "./entities";
+import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface UserPostData {
   email: string;
@@ -17,3 +17,16 @@ export interface UserListData extends DiscardableData {
 }
 
 export interface UserData extends UserListData {}
+
+export function isUserListData(data: any): data is UserListData {
+  return (
+    typeof data.email === "string" &&
+    typeof data.emailVerified === "boolean" &&
+    (typeof data.name === "string" || data.name === null) &&
+    isDiscardableData(data)
+  );
+}
+
+export function isUserData(data: any): data is UserData {
+  return isUserListData(data);
+}

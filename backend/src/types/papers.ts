@@ -1,5 +1,9 @@
-import { PaperUserRole, PaperUserListData } from "./paperUsers";
-import { DiscardableData } from "./entities";
+import {
+  PaperUserRole,
+  PaperUserListData,
+  isPaperUserListData
+} from "./paperUsers";
+import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface PaperPostData {
   name: string;
@@ -12,4 +16,19 @@ export interface PaperListData extends DiscardableData {
 
 export interface PaperData extends PaperListData {
   paperUsers: PaperUserListData[];
+}
+
+export function isPaperListData(data: any): data is PaperListData {
+  return (
+    typeof data.name === "string" &&
+    Object.values(PaperUserRole).includes(data.role) &&
+    isDiscardableData(data)
+  );
+}
+
+export function isPaperData(data: any): data is PaperData {
+  return (
+    data.paperUsers.every((paperUser: any) => isPaperUserListData(paperUser)) &&
+    isPaperListData(data)
+  );
 }

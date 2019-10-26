@@ -9,6 +9,17 @@ export interface QuestionTemplatePostData {
 
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;
 
+export interface QuestionTemplateListData extends DiscardableData {
+  name: string;
+  score: number | null;
+  parentQuestionTemplateId: number | null;
+}
+
+export interface QuestionTemplateData extends QuestionTemplateListData {
+  childQuestionTemplates: QuestionTemplateListData[];
+  pageTemplates: PageTemplateListData[];
+}
+
 export function isQuestionTemplatePostData(
   data: any
 ): data is QuestionTemplatePostData {
@@ -21,12 +32,6 @@ export function isQuestionTemplatePatchData(
   return typeof data.id === "number";
 }
 
-export interface QuestionTemplateListData extends DiscardableData {
-  name: string;
-  score: number | null;
-  parentQuestionTemplateId: number | null;
-}
-
 export function isQuestionTemplateListData(
   data: any
 ): data is QuestionTemplateListData {
@@ -37,11 +42,6 @@ export function isQuestionTemplateListData(
       data.parentQuestionTemplateId === null) &&
     isDiscardableData(data)
   );
-}
-
-export interface QuestionTemplateData extends QuestionTemplateListData {
-  childQuestionTemplates: QuestionTemplateListData[];
-  pageTemplates: PageTemplateListData[];
 }
 
 export function isQuestionTemplateData(

@@ -1,8 +1,8 @@
-import { BookmarkListData } from "./bookmarks";
+import { BookmarkListData, isBookmarkListData } from "./bookmarks";
 import { CommentListData } from "./comments";
-import { DiscardableData } from "./entities";
-import { MarkListData } from "./marks";
-import { PageQuestionListData } from "./pageQuestions";
+import { DiscardableData, isDiscardableData } from "./entities";
+import { MarkListData, isMarkListData } from "./marks";
+import { PageQuestionListData, isPageQuestionListData } from "./pageQuestions";
 
 export interface QuestionPostData {}
 
@@ -18,4 +18,26 @@ export interface QuestionData extends QuestionListData {
   pageQuestions: PageQuestionListData[];
   marks: MarkListData[];
   bookmarks: BookmarkListData[];
+}
+
+export function isQuestionListData(data: any): data is QuestionListData {
+  return (
+    typeof data.questionTemplateId === "number" &&
+    typeof data.scriptId === "number" &&
+    typeof data.pageQuestionsCount === "number" &&
+    typeof data.marksCount === "number" &&
+    typeof data.bookmarksCount === "number" &&
+    isDiscardableData(data)
+  );
+}
+
+export function isQuestionData(data: any): data is QuestionData {
+  return (
+    data.pageQuestions.every((pageQuestion: any) =>
+      isPageQuestionListData(pageQuestion)
+    ) &&
+    data.marks.every((mark: any) => isMarkListData(mark)) &&
+    data.bookmarks.every((bookmark: any) => isBookmarkListData(bookmark)) &&
+    isQuestionListData(data)
+  );
 }
