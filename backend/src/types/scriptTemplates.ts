@@ -1,6 +1,9 @@
 import { DiscardableData } from "./entities";
-import { QuestionTemplateListData } from "./questionTemplates";
-import { PageTemplateListData } from "./pageTemplates";
+import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
+import {
+  QuestionTemplateListData,
+  isQuestionTemplateListData
+} from "./questionTemplates";
 
 export interface ScriptTemplatePostData {
   name?: string | null;
@@ -14,4 +17,15 @@ export interface ScriptTemplatePatchData {
 export interface ScriptTemplateData extends DiscardableData {
   pageTemplates: PageTemplateListData[];
   questionTemplates: QuestionTemplateListData[];
+}
+
+export function isScriptTemplateData(data: any): data is ScriptTemplateData {
+  return (
+    !data.pageTemplates.some(
+      (pageTemplate: any) => !isPageTemplateListData(pageTemplate)
+    ) &&
+    !data.questionTemplates.some(
+      (questionTemplate: any) => !isQuestionTemplateListData(questionTemplate)
+    )
+  );
 }

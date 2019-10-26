@@ -1,4 +1,4 @@
-import { DiscardableData } from "./entities";
+import { DiscardableData, isDiscardableData } from "./entities";
 import { PageTemplateListData } from "./pageTemplates";
 
 export interface QuestionTemplatePostData {
@@ -25,6 +25,18 @@ export interface QuestionTemplateListData extends DiscardableData {
   name: string;
   score: number | null;
   parentQuestionTemplateId: number | null;
+}
+
+export function isQuestionTemplateListData(
+  data: any
+): data is QuestionTemplateListData {
+  return (
+    typeof data.name === "string" &&
+    (data.score === "number" || data.score === null) &&
+    (data.parentQuestionTemplateId === "number" ||
+      data.parentQuestionTemplateId === null) &&
+    isDiscardableData(data)
+  );
 }
 
 export interface QuestionTemplateData extends QuestionTemplateListData {
