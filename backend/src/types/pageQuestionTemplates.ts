@@ -39,8 +39,8 @@ export function isPageQuestionTemplateData(
   data: any
 ): data is PageQuestionTemplateData {
   return (
-    isPageTemplateListData(data.page) &&
-    isQuestionTemplateListData(data.question) &&
+    isPageTemplateListData(data.pageTemplate) &&
+    isQuestionTemplateListData(data.questionTemplate) &&
     isPageQuestionTemplateListData(data)
   );
 }
