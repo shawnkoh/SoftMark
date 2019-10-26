@@ -8,6 +8,7 @@ import {
 import MainLayout from "./MainLayout";
 import PaperIndex from "../../modules/papers/components/pages/PaperIndex";
 import PaperView from "../../modules/papers/components/pages/PaperView";
+import ScriptView from "../../modules/scripts/components/pages/ScriptView";
 import api from "../../api";
 import { setCurrentUser, setCurrentToken } from "../../modules/session/actions";
 import { useEffect, useState } from "react";
@@ -22,9 +23,9 @@ const MainAppPages: React.FC<Props> = props => {
   const paperViewRoute = (
     <Route exact path="/papers/:paper_id" component={PaperView} />
   );
-  /* const questionAllocationRoute = (
-    <Route exact path="/papers/:paper_id/question_allocation" component={PaperView} />
-  );*/
+  const scriptViewRoute = (
+    <Route exact path="/scripts/:script_id" component={ScriptView} />
+  );
 
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +58,7 @@ const MainAppPages: React.FC<Props> = props => {
         <Switch>
           {paperIndexRoute}
           {paperViewRoute}
+          {scriptViewRoute}
         </Switch>
       </MainLayout>
     );

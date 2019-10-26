@@ -4,10 +4,7 @@ import api from "../../../../api";
 import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import SimpleForm, { FormMetadataType } from "../forms/SimpleForm";
 import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
-import {
-  PaperUserRole,
-  PaperUserPostData
-} from "../../../../types/paperUsers";
+import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
 
 interface OwnProps {
   paperId: number;
