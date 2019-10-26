@@ -10,6 +10,7 @@ export interface QuestionTemplatePostData {
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;
 
 export interface QuestionTemplateListData extends DiscardableData {
+  scriptTemplateId: number;
   name: string;
   score: number | null;
   parentQuestionTemplateId: number | null;
@@ -36,6 +37,7 @@ export function isQuestionTemplateListData(
   data: any
 ): data is QuestionTemplateListData {
   return (
+    typeof data.scriptTemplateId === "number" &&
     typeof data.name === "string" &&
     (typeof data.score === "number" || data.score === null) &&
     (typeof data.parentQuestionTemplateId === "number" ||
