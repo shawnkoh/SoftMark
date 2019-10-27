@@ -13,6 +13,12 @@ import {
 export class PageQuestionTemplate extends Discardable {
   entityName = "PageQuestionTemplate";
 
+  constructor(pageTemplate: PageTemplate, questionTemplate: QuestionTemplate) {
+    super();
+    this.pageTemplate = pageTemplate;
+    this.questionTemplate = questionTemplate;
+  }
+
   @Column()
   pageTemplateId!: number;
 

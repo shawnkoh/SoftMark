@@ -61,8 +61,10 @@ export async function create(request: Request, response: Response) {
         "No active QuestionTemplate found in the Script Template"
       );
     }
-    const pageQuestionTemplate = new PageQuestionTemplate();
-    Object.assign(pageQuestionTemplate, pageTemplate, questionTemplate);
+    const pageQuestionTemplate = new PageQuestionTemplate(
+      pageTemplate,
+      questionTemplate
+    );
     await validateOrReject(pageQuestionTemplate);
 
     await getManager().transaction(async manager => {

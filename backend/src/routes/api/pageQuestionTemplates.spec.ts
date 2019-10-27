@@ -24,9 +24,7 @@ const q1 = new QuestionTemplate(scriptTemplate, "1", null);
 const q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
 const q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
 const q2 = new QuestionTemplate(scriptTemplate, "2", 6);
-const pageQuestionTemplate = new PageQuestionTemplate();
-pageQuestionTemplate.pageTemplate = page1;
-pageQuestionTemplate.questionTemplate = q1;
+const pageQuestionTemplate = new PageQuestionTemplate(page1, q1);
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
