@@ -118,6 +118,7 @@ export class QuestionTemplate extends Discardable {
 
   getListData = (): QuestionTemplateListData => ({
     ...this.getBase(),
+    scriptTemplateId: this.scriptTemplateId,
     name: this.name,
     score: this.score,
     parentQuestionTemplateId: this.parentQuestionTemplateId

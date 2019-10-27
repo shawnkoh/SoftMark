@@ -90,7 +90,7 @@ describe("GET /question_templates/:id", () => {
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(200);
-    expect(isQuestionTemplateData(response.body.questionTemplate));
+    expect(isQuestionTemplateData(response.body.questionTemplate)).toBe(true);
   });
 });
 

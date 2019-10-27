@@ -1,11 +1,23 @@
-import { Entity, ManyToOne, Column } from "typeorm";
+import { Entity, ManyToOne, Column, Unique, getRepository } from "typeorm";
+
 import { Discardable } from "./Discardable";
 import { PageTemplate } from "./PageTemplate";
 import { QuestionTemplate } from "./QuestionTemplate";
+import {
+  PageQuestionTemplateListData,
+  PageQuestionTemplateData
+} from "../types/pageQuestionTemplates";
 
 @Entity()
+@Unique(["pageTemplate", "questionTemplate"])
 export class PageQuestionTemplate extends Discardable {
   entityName = "PageQuestionTemplate";
+
+  constructor(pageTemplate: PageTemplate, questionTemplate: QuestionTemplate) {
+    super();
+    this.pageTemplate = pageTemplate;
+    this.questionTemplate = questionTemplate;
+  }
 
   @Column()
   pageTemplateId!: number;
@@ -24,4 +36,26 @@ export class PageQuestionTemplate extends Discardable {
     questionTemplate => questionTemplate.pageQuestionTemplates
   )
   questionTemplate?: QuestionTemplate;
+
+  getListData = (): PageQuestionTemplateListData => ({
+    ...this.getBase(),
+    pageTemplateId: this.pageTemplateId,
+    questionTemplateId: this.questionTemplateId
+  });
+
+  getData = async (): Promise<PageQuestionTemplateData> => {
+    const pageTemplate =
+      this.pageTemplate ||
+      (await getRepository(PageTemplate).findOneOrFail(this.pageTemplateId));
+    const questionTemplate =
+      this.questionTemplate ||
+      (await getRepository(QuestionTemplate).findOneOrFail(
+        this.questionTemplateId
+      ));
+    return {
+      ...this.getListData(),
+      pageTemplate: pageTemplate.getListData(),
+      questionTemplate: questionTemplate.getListData()
+    };
+  };
 }
