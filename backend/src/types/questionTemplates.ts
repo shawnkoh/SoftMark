@@ -50,8 +50,12 @@ export function isQuestionTemplateData(
   data: any
 ): data is QuestionTemplateData {
   return (
-    isQuestionTemplateListData(data.childQuestionTemplates) &&
-    isPageTemplateListData(data.pageTemplates) &&
+    data.childQuestionTemplates.every((child: any) =>
+      isQuestionTemplateListData(child)
+    ) &&
+    data.pageTemplates.every((pageTemplate: any) =>
+      isPageTemplateListData(pageTemplate)
+    ) &&
     isQuestionTemplateListData(data)
   );
 }
