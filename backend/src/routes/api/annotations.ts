@@ -6,6 +6,7 @@ import { BearerTokenType } from "../../types/tokens";
 export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
+router.patch("/:id", AnnotationsController.update);
 router.delete("/:id", AnnotationsController.destroy);
 
 export default router;

@@ -6,6 +6,10 @@ export interface AnnotationPostData {
   layer: string;
 }
 
+export interface AnnotationPatchData {
+  layer: string;
+}
+
 export interface AnnotationListData extends BaseData {
   pageId: number;
   paperUserId: number;

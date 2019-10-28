@@ -49,9 +49,7 @@ export class Annotation extends Base {
 
     return {
       ...this.getListData(),
-      pageId: this.pageId,
       page: await page.getListData(),
-      paperUserId: paperUser.id,
       paperUser: await paperUser.getListData()
     };
   };

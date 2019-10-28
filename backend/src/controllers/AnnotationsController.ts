@@ -8,7 +8,7 @@ import { PaperUser } from "../entities/PaperUser";
 import { Page } from "../entities/Page";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserRole } from "../types/paperUsers";
-import { AnnotationPostData } from "../types/annotations";
+import { AnnotationPostData, AnnotationPatchData } from "../types/annotations";
 import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
@@ -40,6 +40,37 @@ export async function create(request: Request, response: Response) {
 
     const data = await annotation.getData();
     response.status(201).json({ annotation: data });
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}
+
+export async function update(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterUserId = payload.id;
+  const annotationId = Number(request.params.id);
+  const patchData: AnnotationPatchData = pick(request.body, "layer");
+  let annotation: Annotation;
+  try {
+    annotation = await getRepository(Annotation).findOneOrFail(annotationId, {
+      relations: ["page", "paperUser"]
+    });
+    const author = annotation.paperUser!;
+    if (author.userId !== requesterUserId) {
+      throw new Error("Requester is not the author of the annotation");
+    }
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    annotation.layer = patchData.layer;
+    await validateOrReject(annotation);
+    await getRepository(Annotation).save(annotation);
+
+    const data = await annotation.getData();
+    response.status(200).json({ annotation: data });
   } catch (error) {
     response.sendStatus(400);
   }
