@@ -8,6 +8,12 @@ import { Discardable } from "./Discardable";
 export class Annotation extends Discardable {
   entityName = "Annotation";
 
+  constructor(page?: Page, paperUser?: PaperUser) {
+    super();
+    this.page = page;
+    this.paperUser = paperUser;
+  }
+
   @Column()
   pageId!: number;
 
