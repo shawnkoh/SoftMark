@@ -56,8 +56,10 @@ export class Fixtures {
 
     this.scriptTemplatePostData = { name: faker.commerce.productName() };
 
+    // TODO: Mock imageUrls correctly
     this.scriptPostData = {
-      email: faker.internet.email()
+      email: faker.internet.email(),
+      imageUrls: ["page1ImageStub", "page2ImageStub", "page3ImageStub"]
     };
   }
 }

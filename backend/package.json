@@ -48,6 +48,7 @@
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "start:remote": "set debug=* && ts-node-dev --respawn --transpileOnly -r dotenv/config ./src/index.ts dotenv_config_path='.env'",
     "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test:circleci": "cross-env NODE_ENV=circleci jest --runInBand"
   }
 }

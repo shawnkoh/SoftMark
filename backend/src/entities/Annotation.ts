@@ -1,12 +1,20 @@
 import { Entity, ManyToOne, Column, getRepository } from "typeorm";
-import { PaperUser } from "./PaperUser";
+
+import { Base } from "./Base";
 import { Page } from "./Page";
+import { PaperUser } from "./PaperUser";
 import { AnnotationListData, AnnotationData } from "../types/annotations";
-import { Discardable } from "./Discardable";
 
 @Entity()
-export class Annotation extends Discardable {
+export class Annotation extends Base {
   entityName = "Annotation";
+
+  constructor(page: Page, paperUser: PaperUser, layer: string) {
+    super();
+    this.page = page;
+    this.paperUser = paperUser;
+    this.layer = layer;
+  }
 
   @Column()
   pageId!: number;
@@ -20,26 +28,29 @@ export class Annotation extends Discardable {
   @ManyToOne(type => PaperUser, paperUser => paperUser.annotations)
   paperUser?: PaperUser;
 
-  getListData = async (): Promise<AnnotationListData> => {
+  @Column({ type: "jsonb" })
+  layer: string;
+
+  getListData = (): AnnotationListData => {
     return {
       ...this.getBase(),
       pageId: this.pageId,
-      paperUserId: this.paperUserId
+      paperUserId: this.paperUserId,
+      layer: this.layer
     };
   };
 
   getData = async (): Promise<AnnotationData> => {
-    this.page = await getRepository(Page).findOneOrFail(this.pageId);
-    this.paperUser = await getRepository(PaperUser).findOneOrFail(
-      this.paperUserId
-    );
+    const page =
+      this.page || (await getRepository(Page).findOneOrFail(this.pageId));
+    const paperUser =
+      this.paperUser ||
+      (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
 
     return {
-      ...this.getBase(),
-      pageId: this.pageId,
-      page: await this.page.getListData(),
-      paperUserId: this.paperUserId,
-      paperUser: await this.paperUser.getListData()
+      ...this.getListData(),
+      page: await page.getListData(),
+      paperUser: await paperUser.getListData()
     };
   };
 }

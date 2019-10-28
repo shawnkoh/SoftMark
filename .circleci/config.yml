@@ -8,9 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:12.12.0
-      - image: postgres:11-alpine
-        ports:
-          - 54320:5432
+      - image: circleci/postgres:11-alpine
         environment:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: pass
@@ -41,4 +39,4 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: cd backend && yarn test
+      - run: cd backend && yarn test:circleci
