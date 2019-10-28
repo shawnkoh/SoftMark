@@ -4,6 +4,7 @@ import { PageListData, isPageListData } from "./pages";
 
 export interface ScriptPostData {
   email: string;
+  imageUrls: string[];
 }
 
 export interface ScriptListData extends DiscardableData {
@@ -11,6 +12,8 @@ export interface ScriptListData extends DiscardableData {
   paperId: number;
   pagesCount: number;
   questionsCount: number;
+  imageUrls: string[];
+  imageUrlCount: number;
 }
 
 export interface ScriptData extends ScriptListData {

@@ -17,8 +17,8 @@ export class ApiServer {
     this.connection = await createConnection(ormconfig);
 
     const app = express();
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json({ limit: '10mb' }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
     app.use(cors());
     app.use(helmet());
     if (process.env.NODE_ENV !== "test") {

@@ -11,11 +11,12 @@ export class Script extends Discardable {
   entityName = "Script";
 
   constructor();
-  constructor(paper?: Paper, paperUser?: PaperUser);
-  constructor(paper?: Paper, paperUser?: PaperUser) {
+  constructor(paper?: Paper, paperUser?: PaperUser, imageUrls?: string[]);
+  constructor(paper?: Paper, paperUser?: PaperUser, imageUrls?: string[]) {
     super();
     this.paper = paper;
     this.paperUser = paperUser;
+    this.imageUrls = imageUrls;
   }
 
   @Column()
@@ -30,6 +31,9 @@ export class Script extends Discardable {
   @ManyToOne(type => Paper, paper => paper.paperUsers)
   paper?: Paper;
 
+  @Column({ type: 'character varying', array: true, nullable: true })
+  imageUrls?: string[];
+
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
 
@@ -40,6 +44,8 @@ export class Script extends Discardable {
     ...this.getBase(),
     paperUserId: this.paperUserId,
     paperId: this.paperId,
+    imageUrlCount: this.imageUrls ? this.imageUrls.length : 0,
+    imageUrls: this.imageUrls ? this.imageUrls : [],
     pagesCount: this.pages
       ? this.pages.length
       : await getRepository(Page).count({ scriptId: this.id }),

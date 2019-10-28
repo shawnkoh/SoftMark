@@ -1,9 +1,17 @@
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { useSelector } from "react-redux";
+import { makeStyles } from "@material-ui/core/styles";
 import { Toolbar, AppBar, Typography, Grid, Button } from "@material-ui/core";
-import { Person } from "@material-ui/icons";
 import { PaperData } from "backend/src/types/papers";
+import { drawerWidth } from "../sidebars/Sidebar";
+
+const useStyles = makeStyles(theme => ({
+  appBar: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth
+  }
+}));
 
 interface OwnProps {
   paper: PaperData;
@@ -13,26 +21,20 @@ interface OwnProps {
 type Props = RouteComponentProps & OwnProps;
 
 const Header: React.FC<Props> = props => {
+  const classes = useStyles();
   const { paper, title } = props;
   const { name } = paper;
 
   return (
-    <AppBar position="sticky" color="primary" elevation={1}>
+    <AppBar position="fixed" color="secondary" className={classes.appBar}>
       <Toolbar>
-        <Typography color="secondary" variant="h5">
+        <Typography color="primary" variant="h5">
           {name}
         </Typography>
-      </Toolbar>
-      <Toolbar>
-        <Typography color="secondary" variant="h6">
-          {title}
+        <br />
+        <Typography color="primary" variant="h6">
+          Things to do stub
         </Typography>
-        <Button
-          color="secondary"
-          onClick={() => props.history.push("/portfolio")}
-        >
-          <Person />
-        </Button>
       </Toolbar>
     </AppBar>
   );

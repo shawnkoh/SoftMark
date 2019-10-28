@@ -15,7 +15,7 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const { email } = request.body;
+  const { email, imageUrls } = request.body;
   try {
     await allowedOrFail(requesterId, paperId, PaperUserRole.Owner);
   } catch (error) {
@@ -47,6 +47,7 @@ export async function create(request: Request, response: Response) {
     const script = new Script();
     script.paperId = paperId;
     script.paperUser = paperUser;
+    script.imageUrls = imageUrls;
     await validateOrReject(script);
 
     await getManager().transaction(async manager => {
