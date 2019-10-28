@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import allocations from "./allocations";
+import annotations from "./annotations";
 import auth from "./auth";
 import bookmarks from "./bookmarks";
 import marks from "./marks";
@@ -17,6 +18,7 @@ import users from "./users";
 const routes = Router();
 
 routes.use("/allocations", allocations);
+routes.use("/annotations", annotations);
 routes.use("/auth", auth);
 routes.use("/bookmarks", bookmarks);
 routes.use("/marks", marks);
