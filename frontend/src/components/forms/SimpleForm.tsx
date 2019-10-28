@@ -14,7 +14,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
 import TickIcon from "@material-ui/icons/CheckCircle";
 
-import { OptionsType } from "../../../../utils/options";
+import { OptionsType } from "../../utils/options";
 
 const useStyles = makeStyles(() => ({
   root: {

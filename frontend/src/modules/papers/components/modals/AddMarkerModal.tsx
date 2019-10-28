@@ -2,7 +2,9 @@ import React from "react";
 import * as Yup from "yup";
 import api from "../../../../api";
 import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
-import SimpleForm, { FormMetadataType } from "../forms/SimpleForm";
+import SimpleForm, {
+  FormMetadataType
+} from "../../../../components/forms/SimpleForm";
 import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
 import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Toolbar, AppBar, Typography, Grid, Button } from "@material-ui/core";
+import { Toolbar, AppBar, Typography } from "@material-ui/core";
 import { PaperData } from "backend/src/types/papers";
 import { drawerWidth } from "../sidebars/Sidebar";
 

@@ -19,3 +19,10 @@ export function setCurrentToken(
     data
   };
 }
+
+export function logOut(): types.LOG_OUT_ACTION {
+  return {
+    type: types.LOG_OUT,
+    data: null
+  };
+}
