@@ -6,6 +6,6 @@ import { BearerTokenType } from "../../types/tokens";
 export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
-router.delete("/:id", AllocationsController.discard);
+router.delete("/:id", AllocationsController.destroy);
 
 export default router;

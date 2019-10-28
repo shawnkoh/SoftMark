@@ -13,6 +13,6 @@ router.patch("/:id", QuestionTemplatesController.update);
 router.delete("/:id", QuestionTemplatesController.discard);
 router.patch("/:id/undiscard", QuestionTemplatesController.undiscard);
 
-router.post("/:id/allocation", AllocationsController.create);
+router.post("/:id/allocations", AllocationsController.create);
 
 export default router;

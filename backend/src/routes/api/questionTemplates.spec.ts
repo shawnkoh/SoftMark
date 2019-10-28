@@ -10,6 +10,11 @@ import {
   QuestionTemplateData,
   isQuestionTemplateData
 } from "../../types/questionTemplates";
+import {
+  AllocationData,
+  isAllocationData,
+  AllocationPostData
+} from "../../types/allocations";
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -21,32 +26,18 @@ let q2: QuestionTemplate;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
+});
+
+beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
-
   scriptTemplate = new ScriptTemplate();
   scriptTemplate.paperId = 1;
 
-  q1 = new QuestionTemplate();
-  q1.scriptTemplate = scriptTemplate;
-  q1.name = "1";
-
-  q1a = new QuestionTemplate();
-  q1a.scriptTemplate = scriptTemplate;
-  q1a.name = "1a";
-  q1a.parentQuestionTemplate = q1;
-  q1a.score = 1.5;
-
-  q1b = new QuestionTemplate();
-  q1b.scriptTemplate = scriptTemplate;
-  q1b.name = "1b";
-  q1b.parentQuestionTemplate = q1;
-  q1b.score = 1.5;
-
-  q2 = new QuestionTemplate();
-  q2.scriptTemplate = scriptTemplate;
-  q2.name = "2";
-  q2.score = 6;
+  q1 = new QuestionTemplate(scriptTemplate, "1", null);
+  q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
+  q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
+  q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
   await getRepository(QuestionTemplate).save(q1);
@@ -173,6 +164,11 @@ describe("DELETE /question_templates/:id", () => {
 });
 
 describe("PATCH /question_templates/:id/undiscard", () => {
+  beforeEach(async () => {
+    await getRepository(QuestionTemplate).update(q1.id, {
+      discardedAt: new Date()
+    });
+  });
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .patch(`/v1/question_templates/${q1.id}/undiscard`)
@@ -199,11 +195,50 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 
   it("should restore a deleted Question Template", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q2.id}/undiscard`)
+      .patch(`/v1/question_templates/${q1.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);
     const data = response.body.questionTemplate as QuestionTemplateData;
     expect(data.discardedAt).toEqual(null);
+  });
+});
+
+describe("POST /question_templates/:id/allocations", () => {
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should not allow a Marker to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+
+  it("should not allow a Student to access this route", async () => {
+    const response = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+
+  it("should return AllocationData", async () => {
+    const postData: AllocationPostData = {
+      paperUserId: fixtures.marker.id
+    };
+    const response = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(201);
+    const data = response.body.allocation as AllocationData;
+    expect(isAllocationData(data)).toEqual(true);
   });
 });
