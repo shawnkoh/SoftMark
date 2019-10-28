@@ -9,11 +9,27 @@ import { PageListData, PageData } from "../types/pages";
 export class Page extends Discardable {
   entityName = "Page";
 
+  constructor();
+  constructor(script?: Script, imageUrl?: string, pageNo?: number);
+  constructor(script?: Script, imageUrl?: string, pageNo?: number) {
+    super();
+    this.script = script;
+    this.imageUrl = imageUrl;
+    this.pageNo = pageNo;
+  }
+
+
   @Column()
   scriptId!: number;
 
   @ManyToOne(type => Script, script => script.pages)
   script?: Script;
+
+  @Column({ type: 'character varying', nullable: true })
+  imageUrl?: string;
+
+  @Column({ type: 'int', nullable: true })
+  pageNo?: number;
 
   @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.page)
   pageQuestions?: PageQuestion[];
@@ -24,6 +40,8 @@ export class Page extends Discardable {
   getListData = async (): Promise<PageListData> => ({
     ...this.getBase(),
     scriptId: this.scriptId,
+    pageNo: this.pageNo ? this.pageNo : -1,
+    imageUrl: this.imageUrl ? this.imageUrl : "",
     pageQuestionsCount: this.pageQuestions
       ? this.pageQuestions.length
       : await getRepository(PageQuestion).count({ pageId: this.id }),

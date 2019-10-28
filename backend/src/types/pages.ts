@@ -6,8 +6,10 @@ export interface PagePostData {}
 
 export interface PageListData extends DiscardableData {
   scriptId: number;
+  pageNo: number;
   pageQuestionsCount: number;
   annotationsCount: number;
+  imageUrl: string;
 }
 
 export interface PageData extends PageListData {

@@ -5,7 +5,6 @@ import { getDocument } from "pdfjs-dist";
 import { AppState } from "../../../../types/store";
 import api from "../../../../api";
 import LoadingIcon from "../../../../components/icons/LoadingIcon";
-//import Header from "../headers/PaperViewHeader";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 
@@ -15,7 +14,6 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const script_id = +(params as { script_id: string }).script_id;
   const [script, setScript] = useState<ScriptData | null>(null);
   const [pages, setPages] = useState<any[]>([]);
-  //const [file, setFile] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
@@ -25,7 +23,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     api.scripts
       .getScript(script_id)
       .then(resp => {
-        setScript(resp.data);
+        setScript(resp.data.script);
       })
       .finally(() => setIsLoading(false));
   }, [refreshFlag]);
@@ -40,8 +38,8 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
 
   return (
     <div>
-      {script.imageUrls.map((imageUrl, index) => {
-        return <img key={index} src={imageUrl} />;
+      {script.pages.map((page, index) => {
+        return <img key={index} src={page.imageUrl} />;
       })}
     </div>
   );

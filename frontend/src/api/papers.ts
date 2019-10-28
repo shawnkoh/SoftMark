@@ -12,7 +12,7 @@ import {
 } from "../types/paperUsers";
 
 class PapersAPI extends BaseAPI {
-  createPaper(paperPostData: PaperPostData): Promise<AxiosResponse<PaperData>> {
+  createPaper(paperPostData: PaperPostData): Promise<AxiosResponse<{ paper: PaperData }>> {
     return this.getClient().post(`${this.getUrl()}`, paperPostData);
   }
 
@@ -26,11 +26,11 @@ class PapersAPI extends BaseAPI {
     );
   }
 
-  getPapers(): Promise<AxiosResponse<PaperListData[]>> {
+  getPapers(): Promise<AxiosResponse<{ paper: PaperListData[] }>> {
     return this.getClient().get(`${this.getUrl()}`);
   }
 
-  getPaper(id: number): Promise<AxiosResponse<PaperData>> {
+  getPaper(id: number): Promise<AxiosResponse<{ paper: PaperData }>> {
     return this.getClient().get(`${this.getUrl()}/${id}`);
   }
 

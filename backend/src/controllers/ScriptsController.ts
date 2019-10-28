@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { validateOrReject } from "class-validator";
 import { getRepository, IsNull, Not, getManager } from "typeorm";
 
+import { Page } from "../entities/Page";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
@@ -47,13 +48,22 @@ export async function create(request: Request, response: Response) {
     const script = new Script();
     script.paperId = paperId;
     script.paperUser = paperUser;
-    script.imageUrls = imageUrls;
     await validateOrReject(script);
+
+    const pages: Page[] = imageUrls.map((imageUrl: string, index: number) => {
+        const page = new Page();
+        page.script = script;
+        page.imageUrl = imageUrl;
+        page.pageNo = index + 1;
+        validateOrReject(page);
+        return page;
+    });
 
     await getManager().transaction(async manager => {
       await manager.save(student);
       await manager.save(paperUser);
       await manager.save(script);
+      pages.forEach(async page => await manager.save(page));
     });
 
     const data = await script.getData();

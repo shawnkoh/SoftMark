@@ -12,8 +12,6 @@ export interface ScriptListData extends DiscardableData {
   paperId: number;
   pagesCount: number;
   questionsCount: number;
-  imageUrls: string[];
-  imageUrlCount: number;
 }
 
 export interface ScriptData extends ScriptListData {

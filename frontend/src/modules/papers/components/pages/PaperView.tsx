@@ -65,13 +65,14 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     api.papers
       .getPaper(paper_id)
       .then(resp => {
-        setPaper(resp.data);
+        setPaper(resp.data.paper);
       })
       .finally(() => setIsLoading(false));
 
     api.scripts.getScripts(paper_id).then(resp => {
-      setScripts(resp.data);
+      setScripts(resp.data.script);
     });
+    postScript("ooimingsheng@gmail.com", file);
   }, [refreshFlag]);
 
   if (isLoading) {

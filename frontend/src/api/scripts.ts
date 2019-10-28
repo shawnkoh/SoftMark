@@ -11,15 +11,15 @@ class ScriptsAPI extends BaseAPI {
   private createScript(
     id: number,
     scriptPostData: ScriptPostData
-  ): Promise<AxiosResponse<ScriptData>> {
+  ): Promise<AxiosResponse<{ script: ScriptData }>> {
     return this.getClient().post(`/papers/${id}/scripts`, scriptPostData);
   }
 
-  getScripts(id: number): Promise<AxiosResponse<ScriptListData[]>> {
+  getScripts(id: number): Promise<AxiosResponse<{ script: ScriptListData[] }>> {
     return this.getClient().get(`/papers/${id}/scripts`);
   }
 
-  getScript(id: number): Promise<AxiosResponse<ScriptData>> {
+  getScript(id: number): Promise<AxiosResponse<{ script: ScriptData }>> {
     return this.getClient().get(`${this.getUrl()}/${id}`);
   }
 
@@ -27,7 +27,7 @@ class ScriptsAPI extends BaseAPI {
     return this.getClient().delete(`${this.getUrl()}/${id}`);
   }
 
-  undiscardScript(id: number): Promise<AxiosResponse<ScriptData>> {
+  undiscardScript(id: number): Promise<AxiosResponse<{ script: ScriptData }>> {
     return this.getClient().patch(`${this.getUrl()}/${id}/undiscard`);
   }
 

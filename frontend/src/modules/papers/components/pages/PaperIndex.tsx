@@ -25,7 +25,7 @@ const PaperIndex: React.FC<Props> = props => {
     api.papers
       .getPapers()
       .then(resp => {
-        setPapers(resp.data);
+        setPapers(resp.data.paper);
       })
       .finally(() => setIsLoading(false));
   }, [refreshFlag]);
