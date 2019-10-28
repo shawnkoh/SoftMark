@@ -6,7 +6,7 @@ import { Script } from "../../entities/Script";
 import { User } from "../../entities/User";
 import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
-import { ScriptListData } from "../../types/scripts";
+import { ScriptListData, isScriptData, ScriptData } from "../../types/scripts";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { isScriptTemplateData } from "../../types/scriptTemplates";
@@ -221,12 +221,14 @@ describe("POST /papers/:id/scripts", () => {
     expect(response.status).toEqual(404);
   });
 
-  it("should create a Script", async () => {
+  it("should return ScriptData", async () => {
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/scripts`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(fixtures.scriptPostData);
     expect(response.status).toEqual(201);
+    const data: ScriptData = response.body.script;
+    expect(isScriptData(data)).toBe(true);
   });
 });
 

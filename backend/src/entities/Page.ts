@@ -9,15 +9,12 @@ import { PageListData, PageData } from "../types/pages";
 export class Page extends Discardable {
   entityName = "Page";
 
-  constructor();
-  constructor(script?: Script, imageUrl?: string, pageNo?: number);
-  constructor(script?: Script, imageUrl?: string, pageNo?: number) {
+  constructor(script: Script, imageUrl: string, pageNo: number) {
     super();
     this.script = script;
     this.imageUrl = imageUrl;
     this.pageNo = pageNo;
   }
-
 
   @Column()
   scriptId!: number;
@@ -25,11 +22,11 @@ export class Page extends Discardable {
   @ManyToOne(type => Script, script => script.pages)
   script?: Script;
 
-  @Column({ type: 'character varying', nullable: true })
-  imageUrl?: string;
+  @Column({ type: "character varying" })
+  imageUrl!: string;
 
-  @Column({ type: 'int', nullable: true })
-  pageNo?: number;
+  @Column({ type: "int" })
+  pageNo!: number;
 
   @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.page)
   pageQuestions?: PageQuestion[];

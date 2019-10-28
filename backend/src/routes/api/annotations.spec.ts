@@ -22,7 +22,8 @@ beforeEach(async () => {
   fixtures = await loadFixtures(server);
 
   script = new Script(fixtures.paper, fixtures.student);
-  page = new Page(script);
+  // TODO: Mock imageUrl properly
+  page = new Page(script, "imageStub", 1);
   // TODO: Mock layer properly
   const layer = JSON.stringify({ temp: "blah" });
   annotation = new Annotation(page, fixtures.marker, layer);

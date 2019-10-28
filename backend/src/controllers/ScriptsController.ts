@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { validateOrReject } from "class-validator";
+import { pick } from "lodash";
 import { getRepository, IsNull, Not, getManager } from "typeorm";
 
 import { Page } from "../entities/Page";
@@ -16,7 +17,7 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const { email, imageUrls } = request.body;
+  const { email, imageUrls } = pick(request.body, "email", "imageUrls");
   try {
     await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Owner);
   } catch (error) {
@@ -50,25 +51,26 @@ export async function create(request: Request, response: Response) {
     script.paperUser = paperUser;
     await validateOrReject(script);
 
-    const pages: Page[] = imageUrls.map((imageUrl: string, index: number) => {
-        const page = new Page();
-        page.script = script;
-        page.imageUrl = imageUrl;
-        page.pageNo = index + 1;
-        validateOrReject(page);
-        return page;
-    });
+    const pages: Page[] = await Promise.all(
+      imageUrls.map(
+        async (imageUrl: string, index: number): Promise<Page> => {
+          const page = new Page(script, imageUrl, index + 1);
+          await validateOrReject(page);
+          return page;
+        }
+      )
+    );
 
     await getManager().transaction(async manager => {
       await manager.save(student);
       await manager.save(paperUser);
       await manager.save(script);
-      pages.forEach(async page => await manager.save(page));
+      await Promise.all(pages.map(async page => await manager.save(page)));
     });
 
     const data = await script.getData();
     response.status(201).json({ script: data });
-  } catch {
+  } catch (error) {
     response.sendStatus(400);
   }
 }

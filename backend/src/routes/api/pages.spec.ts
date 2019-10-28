@@ -21,7 +21,8 @@ beforeEach(async () => {
   fixtures = await loadFixtures(server);
 
   script = new Script(fixtures.paper, fixtures.student);
-  page = new Page(script);
+  // TODO: Mock imageStub properly
+  page = new Page(script, "imageStub", 1);
 
   await getRepository(Script).save(script);
   await getRepository(Page).save(page);
