@@ -3,16 +3,16 @@ import React, { useEffect, useState } from "react";
 import * as session from "../../modules/session";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
-import { setCurrentUser, setCurrentToken } from "../../modules/session/actions";
+import { setCurrentToken } from "../../modules/session/actions";
 import { Route, RouteComponentProps, withRouter } from "react-router";
 import LoadingIcon from "../icons/LoadingIcon";
-import { set } from "react-ga";
 
 interface AuthenticationPagesProps {
   redirectComponent: React.FC<any> | React.ComponentClass<any>;
 }
 
 type Props = RouteComponentProps & AuthenticationPagesProps;
+
 const AuthenticationPages: React.FC<Props> = props => {
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = useSelector(session.selectors.isLoggedIn);

@@ -26,10 +26,9 @@ const sessionReducer = (
 
       const currentUser = action.data;
       state.user = currentUser;
-      //db.setCurrentUser(currentUser);
 
       return {
-        ...initialState,
+        ...state,
         ...action.data
       };
 
@@ -51,8 +50,19 @@ const sessionReducer = (
       api.setAuthorizationHeader(state.accessToken);
 
       return {
-        ...initialState,
+        ...state,
         ...action.data
+      };
+
+    case types.LOG_OUT:
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.user = null;
+      setStorageAccessToken("");
+      setStorageRefreshToken("");
+
+      return {
+        ...state
       };
 
     default:

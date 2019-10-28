@@ -1,6 +1,6 @@
 import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
-import { UserData } from "backend/src/types/users";
+import { UserData, UserPatchData } from "backend/src/types/users";
 
 class UsersAPI extends BaseAPI {
   createNewUser(
@@ -45,6 +45,16 @@ class UsersAPI extends BaseAPI {
 
   async getUser(id: number): Promise<AxiosResponse<UserData>> {
     return this.getClient().get(`${this.getUrl()}/${id}`);
+  }
+
+  patchOwnUser(
+    userData: UserPatchData
+  ): Promise<AxiosResponse<{ user: UserData }>> {
+    return this.getClient().patch(`${this.getUrl()}/self`, userData);
+  }
+
+  getOwnUser(): Promise<AxiosResponse<{ user: UserData }>> {
+    return this.getClient().get(`${this.getUrl()}/self`);
   }
 
   private getUrl() {

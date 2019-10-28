@@ -12,7 +12,9 @@ import {
 } from "../types/paperUsers";
 
 class PapersAPI extends BaseAPI {
-  createPaper(paperPostData: PaperPostData): Promise<AxiosResponse<{ paper: PaperData }>> {
+  createPaper(
+    paperPostData: PaperPostData
+  ): Promise<AxiosResponse<{ paper: PaperData }>> {
     return this.getClient().post(`${this.getUrl()}`, paperPostData);
   }
 

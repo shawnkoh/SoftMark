@@ -5,7 +5,7 @@ import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { PaperPostData } from "backend/src/types/papers";
 import SimpleForm, {
   FormMetadataType
-} from "../../components/forms/SimpleForm";
+} from "../../../../components/forms/SimpleForm";
 
 interface OwnProps {
   visible: boolean;

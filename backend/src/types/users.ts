@@ -7,7 +7,8 @@ export interface UserPostData {
 }
 
 export interface UserPatchData {
-  name?: string;
+  name: string;
+  email: string;
 }
 
 export interface UserListData extends DiscardableData {

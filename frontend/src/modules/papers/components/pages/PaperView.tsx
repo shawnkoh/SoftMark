@@ -16,7 +16,6 @@ import {
   ScriptData
 } from "backend/src/types/scripts";
 import { drawerWidth } from "../sidebars/Sidebar";
-import file from "./pdf-sample.pdf";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -60,7 +59,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const postScript = (email: string, file) => {
     api.scripts.postScript(paper_id, email, file);
   };
-  
+
   useEffect(() => {
     api.papers
       .getPaper(paper_id)
@@ -72,7 +71,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     api.scripts.getScripts(paper_id).then(resp => {
       setScripts(resp.data.script);
     });
-    postScript("ooimingsheng@gmail.com", file);
   }, [refreshFlag]);
 
   if (isLoading) {
