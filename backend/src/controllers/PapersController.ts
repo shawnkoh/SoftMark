@@ -6,7 +6,7 @@ import { PaperUser } from "../entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
 import { PaperData } from "../types/papers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -54,7 +54,7 @@ export async function index(request: Request, response: Response) {
 export async function show(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       payload.id,
       Number(request.params.id)
     );
@@ -84,7 +84,7 @@ export async function show(request: Request, response: Response) {
 export async function update(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner
@@ -109,7 +109,7 @@ export async function update(request: Request, response: Response) {
 export async function discard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner
@@ -131,7 +131,7 @@ export async function discard(request: Request, response: Response) {
 export async function undiscard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       payload.id,
       Number(request.params.id),
       PaperUserRole.Owner

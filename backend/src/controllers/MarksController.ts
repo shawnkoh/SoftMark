@@ -11,7 +11,7 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedMarker } from "../utils/marks";
 import { MarkPostData, MarkPatchData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   try {

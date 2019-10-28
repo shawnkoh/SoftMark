@@ -7,7 +7,7 @@ import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -20,7 +20,7 @@ export async function create(request: Request, response: Response) {
       paperUserId,
       { where: { discardedAt: IsNull() } }
     );
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner
@@ -59,7 +59,7 @@ export async function discard(request: Request, response: Response) {
       allocation.paperUserId,
       { where: { discardedAt: IsNull() } }
     );
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner

@@ -4,7 +4,7 @@ import { getRepository, IsNull } from "typeorm";
 import { PageTemplate } from "../entities/PageTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedOrFail } from "../utils/papers";
+import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -23,7 +23,7 @@ export async function show(request: Request, response: Response) {
         ]
       }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       requesterId,
       pageTemplate.scriptTemplate!.paperId,
       PaperUserRole.Student
