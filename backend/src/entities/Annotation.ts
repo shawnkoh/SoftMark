@@ -1,12 +1,12 @@
 import { Entity, ManyToOne, Column, getRepository } from "typeorm";
 
-import { Discardable } from "./Discardable";
+import { Base } from "./Base";
 import { Page } from "./Page";
 import { PaperUser } from "./PaperUser";
 import { AnnotationListData, AnnotationData } from "../types/annotations";
 
 @Entity()
-export class Annotation extends Discardable {
+export class Annotation extends Base {
   entityName = "Annotation";
 
   constructor(page: Page, paperUser: PaperUser, layer: string) {
@@ -41,17 +41,18 @@ export class Annotation extends Discardable {
   };
 
   getData = async (): Promise<AnnotationData> => {
-    this.page = await getRepository(Page).findOneOrFail(this.pageId);
-    this.paperUser = await getRepository(PaperUser).findOneOrFail(
-      this.paperUserId
-    );
+    const page =
+      this.page || (await getRepository(Page).findOneOrFail(this.pageId));
+    const paperUser =
+      this.paperUser ||
+      (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
 
     return {
       ...this.getListData(),
       pageId: this.pageId,
-      page: await this.page.getListData(),
-      paperUserId: this.paperUserId,
-      paperUser: await this.paperUser.getListData()
+      page: await page.getListData(),
+      paperUserId: paperUser.id,
+      paperUser: await paperUser.getListData()
     };
   };
 }

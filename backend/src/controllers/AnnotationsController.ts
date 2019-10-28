@@ -36,6 +36,7 @@ export async function create(request: Request, response: Response) {
   try {
     const annotation = new Annotation(page, paperUser, postData.layer);
     await validateOrReject(annotation);
+    await getRepository(Annotation).save(annotation);
 
     const data = await annotation.getData();
     response.status(201).json({ annotation: data });
