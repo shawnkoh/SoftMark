@@ -75,7 +75,7 @@ describe("DELETE /allocations/:id", () => {
   it("should delete the Allocation", async () => {
     const response = await request(server.server)
       .delete(`/v1/allocations/${allocation.id}`)
-      .set("Authorization", fixtures.studentAccessToken)
+      .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(204);
     const deletedAllocation = await getRepository(Allocation).findOne(
