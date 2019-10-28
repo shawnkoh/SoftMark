@@ -3,7 +3,7 @@ import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
 
-export const allowedPaperUser = async (
+export const allowedRequester = async (
   userId: number,
   paperId: number | string,
   role?: PaperUserRole
@@ -28,12 +28,12 @@ export const allowedPaperUser = async (
   return { paper, paperUser };
 };
 
-export const allowedOrFail = async (
+export const allowedRequesterOrFail = async (
   userId: number,
   paperId: number | string,
   role?: PaperUserRole
 ): Promise<{ paper: Paper; paperUser: PaperUser }> => {
-  const allowed = await allowedPaperUser(userId, paperId, role);
+  const allowed = await allowedRequester(userId, paperId, role);
   if (!allowed) {
     throw new Error("User is not allowed to access this resource");
   }

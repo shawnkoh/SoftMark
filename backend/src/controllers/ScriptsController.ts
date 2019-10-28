@@ -9,7 +9,7 @@ import { User } from "../entities/User";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { ScriptListData } from "../types/scripts";
-import { allowedOrFail } from "../utils/papers";
+import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -17,7 +17,7 @@ export async function create(request: Request, response: Response) {
   const paperId = Number(request.params.id);
   const { email, imageUrls } = request.body;
   try {
-    await allowedOrFail(requesterId, paperId, PaperUserRole.Owner);
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Owner);
   } catch (error) {
     response.sendStatus(404);
     return;
@@ -70,7 +70,7 @@ export async function index(request: Request, response: Response) {
   let paper: Paper;
   let paperUser: PaperUser;
   try {
-    ({ paper, paperUser } = await allowedOrFail(
+    ({ paper, paperUser } = await allowedRequesterOrFail(
       userId,
       paperId,
       PaperUserRole.Student
@@ -115,7 +115,7 @@ export async function show(request: Request, response: Response) {
         "questions.questionTemplate"
       ]
     });
-    const { paperUser } = await allowedOrFail(userId, script.paperId);
+    const { paperUser } = await allowedRequesterOrFail(userId, script.paperId);
     if (
       paperUser.role === PaperUserRole.Student &&
       script.paperUserId !== paperUser.id
@@ -145,7 +145,7 @@ export async function discard(request: Request, response: Response) {
     const script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: IsNull() }
     });
-    await allowedOrFail(userId, script.paperId, PaperUserRole.Owner);
+    await allowedRequesterOrFail(userId, script.paperId, PaperUserRole.Owner);
   } catch (error) {
     response.sendStatus(404);
     return;
@@ -171,7 +171,7 @@ export async function undiscard(request: Request, response: Response) {
     script = await getRepository(Script).findOneOrFail(scriptId, {
       where: { discardedAt: Not(IsNull()) }
     });
-    await allowedOrFail(userId, script.paperId, PaperUserRole.Owner);
+    await allowedRequesterOrFail(userId, script.paperId, PaperUserRole.Owner);
   } catch (error) {
     response.sendStatus(404);
     return;

@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Column } from "typeorm";
+import { Entity, ManyToOne, Column, getRepository } from "typeorm";
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
@@ -23,8 +23,9 @@ export class Allocation extends Base {
   @ManyToOne(type => PaperUser, paperUser => paperUser.allocations)
   paperUser?: PaperUser;
 
-  @Column()
-  totalAllocated!: number;
+  // TODO: Not in MVP
+  // @Column()
+  // totalAllocated!: number;
 
   getListData = (): AllocationListData => ({
     ...this.getBase(),
@@ -32,7 +33,19 @@ export class Allocation extends Base {
     paperUserId: this.paperUserId
   });
 
-  getData = (): AllocationData => ({
-    ...this.getListData()
-  });
+  getData = async (): Promise<AllocationData> => {
+    const questionTemplate =
+      this.questionTemplate ||
+      (await getRepository(QuestionTemplate).findOneOrFail(
+        this.questionTemplateId
+      ));
+    const paperUser =
+      this.paperUser ||
+      (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
+    return {
+      ...this.getListData(),
+      questionTemplate: questionTemplate.getListData(),
+      paperUser: await paperUser.getListData()
+    };
+  };
 }

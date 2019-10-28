@@ -10,14 +10,14 @@ import {
   ScriptTemplatePatchData,
   ScriptTemplatePostData
 } from "../types/scriptTemplates";
-import { allowedPaperUser, allowedOrFail } from "../utils/papers";
+import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = Number(request.params.id);
   const postData = pick(request.body, "name") as ScriptTemplatePostData;
   try {
-    await allowedOrFail(payload.id, paperId, PaperUserRole.Owner);
+    await allowedRequesterOrFail(payload.id, paperId, PaperUserRole.Owner);
   } catch (error) {
     response.sendStatus(404);
     return;
@@ -55,7 +55,7 @@ export async function create(request: Request, response: Response) {
 export async function showActive(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
-  const allowed = await allowedPaperUser(payload.id, paperId);
+  const allowed = await allowedRequester(payload.id, paperId);
   if (!allowed) {
     response.sendStatus(404);
     return;
@@ -85,7 +85,7 @@ export async function update(request: Request, response: Response) {
       scriptTemplateId,
       { relations: ["pageTemplates", "questionTemplates"] }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -117,7 +117,7 @@ export async function discard(request: Request, response: Response) {
     scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
       scriptTemplateId
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -145,7 +145,7 @@ export async function undiscard(request: Request, response: Response) {
     scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
       scriptTemplateId
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner

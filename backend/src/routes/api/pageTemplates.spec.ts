@@ -26,13 +26,8 @@ beforeAll(async () => {
   fixtures = await loadFixtures(server);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
-  await getRepository(PageTemplate).save(page1);
-  await getRepository(PageTemplate).save(page2);
-  await getRepository(PageTemplate).save(page3);
-  await getRepository(QuestionTemplate).save(q1);
-  await getRepository(QuestionTemplate).save(q1a);
-  await getRepository(QuestionTemplate).save(q1b);
-  await getRepository(QuestionTemplate).save(q2);
+  await getRepository(PageTemplate).save([page1, page2, page3]);
+  await getRepository(QuestionTemplate).save([q1, q1a, q1b, q2]);
 });
 
 afterAll(async () => {

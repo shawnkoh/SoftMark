@@ -39,7 +39,7 @@ API Design Guidelines
 
 # Permissions
 
-- allowedPaperUser(...) is used to define the permission for the requester accessing the route
+- allowedRequester(...) is used to define the permission for the requester accessing the route
 
 # Entities
 

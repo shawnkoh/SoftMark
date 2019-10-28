@@ -9,14 +9,14 @@ import {
   PaperUserRole,
   PaperUserPatchData
 } from "../types/paperUsers";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedRequester } from "../utils/papers";
 import { sendNewPaperUserEmail } from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const paperId = request.params.id;
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       payload.id,
       paperId,
       PaperUserRole.Owner
@@ -67,7 +67,7 @@ export async function update(request: Request, response: Response) {
       response.sendStatus(404);
       return;
     }
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner
@@ -104,7 +104,7 @@ export async function discard(request: Request, response: Response) {
       response.sendStatus(404);
       return;
     }
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner
@@ -134,7 +134,7 @@ export async function undiscard(request: Request, response: Response) {
       response.sendStatus(404);
       return;
     }
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner

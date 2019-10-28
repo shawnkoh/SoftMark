@@ -11,7 +11,7 @@ import {
 } from "../types/pageQuestionTemplates";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedOrFail } from "../utils/papers";
+import { allowedRequesterOrFail } from "../utils/papers";
 import { PageTemplate } from "../entities/PageTemplate";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
 
@@ -32,7 +32,7 @@ export async function create(request: Request, response: Response) {
         relations: ["pageTemplates", "questionTemplates"]
       }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -94,7 +94,7 @@ export async function update(request: Request, response: Response) {
     });
     scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -142,7 +142,7 @@ export async function discard(request: Request, response: Response) {
     });
     const scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -175,7 +175,7 @@ export async function undiscard(request: Request, response: Response) {
     });
     const scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       payload.id,
       scriptTemplate.paperId,
       PaperUserRole.Owner

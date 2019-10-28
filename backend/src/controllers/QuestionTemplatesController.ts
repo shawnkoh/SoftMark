@@ -11,7 +11,7 @@ import {
   QuestionTemplatePostData,
   QuestionTemplatePatchData
 } from "../types/questionTemplates";
-import { allowedOrFail } from "../utils/papers";
+import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -30,7 +30,7 @@ export async function create(request: Request, response: Response) {
       scriptTemplateId,
       { where: { discardedAt: IsNull() } }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       requesterId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
@@ -78,7 +78,7 @@ export async function show(request: Request, response: Response) {
         ]
       }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       requesterId,
       questionTemplate.scriptTemplate!.paperId,
       PaperUserRole.Student
@@ -113,7 +113,7 @@ export async function update(request: Request, response: Response) {
       questionTemplateId,
       { where: { discardedAt: IsNull() }, relations: ["scriptTemplate"] }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       requesterId,
       questionTemplate.scriptTemplate!.paperId,
       PaperUserRole.Owner
@@ -153,7 +153,7 @@ export async function discard(request: Request, response: Response) {
       where: { discardedAt: IsNull() },
       relations: ["scriptTemplate"]
     });
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       userId,
       questionTemplate.scriptTemplate!.paperId,
       PaperUserRole.Owner
@@ -187,7 +187,7 @@ export async function undiscard(request: Request, response: Response) {
         relations: ["scriptTemplate"]
       }
     );
-    await allowedOrFail(
+    await allowedRequesterOrFail(
       userId,
       questionTemplate.scriptTemplate!.paperId,
       PaperUserRole.Owner

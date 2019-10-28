@@ -28,17 +28,15 @@ const pageQuestionTemplate = new PageQuestionTemplate(page1, q1);
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
+});
+
+beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
-  await getRepository(PageTemplate).save(page1);
-  await getRepository(PageTemplate).save(page2);
-  await getRepository(PageTemplate).save(page3);
-  await getRepository(QuestionTemplate).save(q1);
-  await getRepository(QuestionTemplate).save(q1a);
-  await getRepository(QuestionTemplate).save(q1b);
-  await getRepository(QuestionTemplate).save(q2);
+  await getRepository(PageTemplate).save([page1, page2, page3]);
+  await getRepository(QuestionTemplate).save([q1, q1a, q1b, q2]);
   await getRepository(PageQuestionTemplate).save(pageQuestionTemplate);
 });
 
@@ -94,11 +92,6 @@ describe("DELETE /page_question_templates/:id", () => {
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
-
-    // Reset pageQuestionTemplate.discardedAt so that other tests can continue
-    await getRepository(PageQuestionTemplate).update(pageQuestionTemplate.id, {
-      discardedAt: null
-    });
   });
 
   it("should not allow a Paper's Marker to access this route", async () => {
@@ -131,17 +124,18 @@ describe("DELETE /page_question_templates/:id", () => {
 });
 
 describe("PATCH /page_question_templates/:id/undiscard", () => {
+  beforeEach(async () => {
+    await getRepository(PageQuestionTemplate).update(pageQuestionTemplate.id, {
+      discardedAt: new Date()
+    });
+  });
+
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
       .patch(`/v1/page_question_templates/${pageQuestionTemplate.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
-
-    // Reset pageQuestionTemplate.discardedAt so that other tests can continue
-    await getRepository(PageQuestionTemplate).update(pageQuestionTemplate.id, {
-      discardedAt: new Date()
-    });
   });
 
   it("should not allow a Paper's Marker to access this route", async () => {

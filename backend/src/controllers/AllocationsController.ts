@@ -1,53 +1,64 @@
 import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not } from "typeorm";
+import { pick } from "lodash";
+import { getRepository, IsNull } from "typeorm";
+
 import { Allocation } from "../entities/Allocation";
 import { PaperUser } from "../entities/PaperUser";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedPaperUser } from "../utils/papers";
+import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const questionTemplateId = Number(request.params.id);
+  const postData: AllocationPostData = pick(request.body, "paperUserId");
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const questionTemplateId = Number(request.params.id);
-    const postData: AllocationPostData = request.body;
-    const { paperUserId, totalAllocated } = postData;
+    const questionTemplate = await getRepository(
+      QuestionTemplate
+    ).findOneOrFail(questionTemplateId, {
+      where: { discardedAt: IsNull() },
+      relations: ["scriptTemplate"]
+    });
+    await allowedRequesterOrFail(
+      userId,
+      questionTemplate.scriptTemplate!.paperId,
+      PaperUserRole.Owner
+    );
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    const paperUserId = postData.paperUserId;
     const paperUser = await getRepository(PaperUser).findOneOrFail(
       paperUserId,
       { where: { discardedAt: IsNull() } }
     );
-    const allowed = await allowedPaperUser(
-      userId,
-      paperUser.paperId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
-
-    const allocation = new Allocation();
-    allocation.questionTemplate = await getRepository(
+    const questionTemplate = await getRepository(
       QuestionTemplate
     ).findOneOrFail(questionTemplateId, { where: { discardedAt: IsNull() } });
+
+    const allocation = new Allocation();
     allocation.paperUser = paperUser;
-    allocation.totalAllocated = totalAllocated;
+    allocation.questionTemplate = questionTemplate;
     await validateOrReject(allocation);
     await getRepository(Allocation).save(allocation);
 
     const data = await allocation.getData();
     response.status(201).json({ allocation: data });
   } catch (error) {
+    console.error(error);
     response.sendStatus(400);
   }
 }
 
 // hard delete
-export async function discard(request: Request, response: Response) {
+export async function destroy(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const userId = payload.id;
@@ -59,7 +70,7 @@ export async function discard(request: Request, response: Response) {
       allocation.paperUserId,
       { where: { discardedAt: IsNull() } }
     );
-    const allowed = await allowedPaperUser(
+    const allowed = await allowedRequester(
       userId,
       paperUser.paperId,
       PaperUserRole.Owner

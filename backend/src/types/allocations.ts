@@ -1,9 +1,14 @@
 import { BaseData, isBaseData } from "./entities";
+import {
+  QuestionTemplateListData,
+  isQuestionTemplateListData
+} from "./questionTemplates";
+import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 
 export interface AllocationPostData {
-  questionTemplateId: number;
   paperUserId: number;
-  totalAllocated: number;
+  // TODO: Not in MVP
+  // totalAllocated: number;
 }
 
 export interface AllocationListData extends BaseData {
@@ -11,7 +16,10 @@ export interface AllocationListData extends BaseData {
   paperUserId: number;
 }
 
-export interface AllocationData extends AllocationListData {}
+export interface AllocationData extends AllocationListData {
+  questionTemplate: QuestionTemplateListData;
+  paperUser: PaperUserListData;
+}
 
 export function isAllocationListData(data: any): data is AllocationListData {
   return (
@@ -22,5 +30,9 @@ export function isAllocationListData(data: any): data is AllocationListData {
 }
 
 export function isAllocationData(data: any): data is AllocationData {
-  return isAllocationListData(data);
+  return (
+    isQuestionTemplateListData(data.questionTemplate) &&
+    isPaperUserListData(data.paperUser) &&
+    isAllocationListData(data)
+  );
 }
