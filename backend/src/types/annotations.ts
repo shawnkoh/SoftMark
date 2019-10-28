@@ -2,7 +2,10 @@ import { DiscardableData, isDiscardableData } from "./entities";
 import { PageListData, isPageListData } from "./pages";
 import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 
-export interface AnnotationPostData {}
+export interface AnnotationPostData {
+  pageId: number;
+  paperUserId: number;
+}
 
 export interface AnnotationListData extends DiscardableData {
   pageId: number;
@@ -12,6 +15,12 @@ export interface AnnotationListData extends DiscardableData {
 export interface AnnotationData extends AnnotationListData {
   page: PageListData;
   paperUser: PaperUserListData;
+}
+
+export function isAnnotationPostData(data: any): data is AnnotationPostData {
+  return (
+    typeof data.pageId === "number" && typeof data.paperUserId === "number"
+  );
 }
 
 export function isAnnotationListData(data: any): data is AnnotationListData {
