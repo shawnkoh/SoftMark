@@ -11,12 +11,11 @@ export class Script extends Discardable {
   entityName = "Script";
 
   constructor();
-  constructor(paper?: Paper, paperUser?: PaperUser, imageUrls?: string[]);
-  constructor(paper?: Paper, paperUser?: PaperUser, imageUrls?: string[]) {
+  constructor(paper?: Paper, paperUser?: PaperUser);
+  constructor(paper?: Paper, paperUser?: PaperUser) {
     super();
     this.paper = paper;
     this.paperUser = paperUser;
-    this.imageUrls = imageUrls;
   }
 
   @Column()
@@ -31,9 +30,6 @@ export class Script extends Discardable {
   @ManyToOne(type => Paper, paper => paper.paperUsers)
   paper?: Paper;
 
-  @Column({ type: 'character varying', array: true, nullable: true })
-  imageUrls?: string[];
-
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
 
@@ -44,8 +40,6 @@ export class Script extends Discardable {
     ...this.getBase(),
     paperUserId: this.paperUserId,
     paperId: this.paperId,
-    imageUrlCount: this.imageUrls ? this.imageUrls.length : 0,
-    imageUrls: this.imageUrls ? this.imageUrls : [],
     pagesCount: this.pages
       ? this.pages.length
       : await getRepository(Page).count({ scriptId: this.id }),
@@ -55,8 +49,15 @@ export class Script extends Discardable {
   });
 
   getData = async (): Promise<ScriptData> => {
-    const pages =
-      this.pages || (await getRepository(Page).find({ scriptId: this.id }));
+    if (this.pages) {
+      this.pages.sort((a, b) => {
+        if(!a.pageNo || !b.pageNo) {
+          return 0;
+        }
+        return a.pageNo - b.pageNo;
+      });
+    }
+    const pages = this.pages || (await getRepository(Page).find({ where: { scriptId: this.id }, order: {  pageNo: "ASC" } }));
     const questions =
       this.questions ||
       (await getRepository(Question).find({ scriptId: this.id }));
