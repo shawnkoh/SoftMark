@@ -9,7 +9,7 @@ import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -59,27 +59,25 @@ export async function create(request: Request, response: Response) {
 
 // hard delete
 export async function destroy(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const userId = payload.id;
+  const allocationId = Number(request.params.id);
   try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const allocationId = Number(request.params.id);
     const allocation = await getRepository(Allocation).findOneOrFail(
-      allocationId
+      allocationId,
+      { relations: ["paperUser"] }
     );
-    const paperUser = await getRepository(PaperUser).findOneOrFail(
-      allocation.paperUserId,
-      { where: { discardedAt: IsNull() } }
-    );
-    const allowed = await allowedRequester(
+    await allowedRequesterOrFail(
       userId,
-      paperUser.paperId,
+      allocation.paperUser!.paperId,
       PaperUserRole.Owner
     );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
 
+  try {
     await getRepository(Allocation).delete(allocationId);
     response.sendStatus(204);
   } catch (error) {
