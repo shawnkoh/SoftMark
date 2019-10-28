@@ -33,11 +33,6 @@ const PortfolioButtonAndModal: React.FC<Props> = props => {
     }
   }, [refreshFlag]);
 
-  useEffect(() => {
-    if (!loggedIn) {
-    }
-  }, [loggedIn]);
-
   if (!currentUser) {
     return <div />;
   }
