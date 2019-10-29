@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 
 import Canvas from "./Canvas";
 import { CanvasMode } from "../../../../types/canvas";
-import { AnnotationLine, AnnotationPostData } from "backend/src/types/annotations";
+import {
+  AnnotationLine,
+  AnnotationPostData
+} from "backend/src/types/annotations";
 import api from "../../../../api";
 import { PageData } from "backend/src/types/pages";
 import { response } from "express";
@@ -15,7 +18,6 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Annotater: React.FC<Props> = ({ imageUrl, pageId }) => {
-
   const [isLoading, setIsLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
 
@@ -36,22 +38,24 @@ const Annotater: React.FC<Props> = ({ imageUrl, pageId }) => {
     }
   };
 
-  const [foregroundAnnotation, setForegroundAnnotation] = useState<AnnotationLine[]>([]);
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<
+    AnnotationLine[]
+  >([]);
   const handleForegroundAnnotationChange = (lines: AnnotationLine[]) => {
     setForegroundAnnotation(lines);
-    const annotationPostData : AnnotationPostData = {
+    const annotationPostData: AnnotationPostData = {
       layer: lines
-    }
+    };
     api.annotations.saveAnnotation(pageId, annotationPostData);
-  }
+  };
   useEffect(() => {
-    api.annotations.getOwnAnnotation(pageId).then(res => {
-      console.log(res);
-      console.log(res.data.annotation.layer);
-      setForegroundAnnotation(res.data.annotation.layer);
-    }).finally(() => setIsLoading(false));
+    api.annotations
+      .getOwnAnnotation(pageId)
+      .then(res => {
+        setForegroundAnnotation(res.data.annotation.layer);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
-
 
   const canvas = (
     <Canvas
