@@ -5,11 +5,12 @@ import { CanvasMode } from "../../../../types/canvas";
 
 interface OwnProps {
   imageUrl: string;
+  pageId: number;
 }
 
 type Props = OwnProps;
 
-const Annotater: React.FC<Props> = ({ imageUrl }) => {
+const Annotater: React.FC<Props> = ({ imageUrl, pageId }) => {
   const canvasRef = useRef<any>(null);
 
   const [mode, setMode] = useState(CanvasMode.Pen);
@@ -35,8 +36,9 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
       width={1000}
       height={1250}
       backgroundImageSource={imageUrl}
-      backgroundAnnotations={[
+      backgroundAnnotations={
         [
+          /*[
           {
             points: [10, 10, 20, 20],
             type: "source-over",
@@ -63,8 +65,9 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
             color: "green",
             width: 5
           }
+        ]*/
         ]
-      ]}
+      }
       foregroundAnnotation={[]}
       mode={mode}
       penColor={penColor}
@@ -75,8 +78,6 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
 
   return (
     <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
       <button
         onClick={handlePenClick}
         style={{ color: mode === "pen" ? "red" : undefined }}
