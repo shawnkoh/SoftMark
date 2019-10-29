@@ -33,11 +33,49 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  try {
-    const annotation = new Annotation(page, paperUser, postData.layer);
+  
+
+ try {
+    // handles both cases where annotation for a page and paper user has already been created
+    // or not created yet
+    const storedAnnotation = await getRepository(Annotation).findOne({page, paperUser});
+    if (storedAnnotation) {
+      storedAnnotation.layer = postData.layer;
+    }
+    const annotation = storedAnnotation ? storedAnnotation : new Annotation(page, paperUser, postData.layer);
     await validateOrReject(annotation);
     await getRepository(Annotation).save(annotation);
 
+    const data = await annotation.getData();
+    response.status(201).json({ annotation: data });
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}
+
+export async function show(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterUserId = payload.id;
+  const pageId = request.params.id;
+  let page: Page;
+  let paperUser: PaperUser;
+  try {
+    page = await getRepository(Page).findOneOrFail(pageId, {
+      where: { discardedAt: IsNull() },
+      relations: ["script"]
+    });
+    ({ paperUser } = await allowedRequesterOrFail(
+      requesterUserId,
+      page.script!.paperId,
+      PaperUserRole.Marker
+    ));
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }  
+
+ try {
+    const annotation = await getRepository(Annotation).findOneOrFail({page, paperUser});
     const data = await annotation.getData();
     response.status(201).json({ annotation: data });
   } catch (error) {

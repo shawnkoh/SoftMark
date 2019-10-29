@@ -2,18 +2,27 @@ import { BaseData, isBaseData } from "./entities";
 import { PageListData, isPageListData } from "./pages";
 import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 
+export interface AnnotationLine {
+  points: number[];
+  type: "source-over" | "destination-out";
+  color: string;
+  width: number;
+}
+
+export type Annotation = AnnotationLine[];
+
 export interface AnnotationPostData {
-  layer: string;
+  layer: AnnotationLine[];
 }
 
 export interface AnnotationPatchData {
-  layer: string;
+  layer: AnnotationLine[];
 }
 
 export interface AnnotationListData extends BaseData {
   pageId: number;
   paperUserId: number;
-  layer: string; // TODO: intentionally nested for now - not sure if it should be
+  layer: AnnotationLine[];
 }
 
 export interface AnnotationData extends AnnotationListData {

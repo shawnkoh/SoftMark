@@ -34,7 +34,11 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return (
+      <>
+        <LoadingIcon /> Loading script...
+      </>
+    );
   }
 
   if (!script) {
@@ -44,11 +48,14 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   return (
     <div>
       {script.pages.map((page, index) => {
-        //return <img key={index} src={page.imageUrl} />;
         return (
           <>
             {page.pageNo === viewPageNo && (
-              <Annotater imageUrl={page.imageUrl} pageId={page.id} />
+              <Annotater
+                key={page.id}
+                imageUrl={page.imageUrl}
+                pageId={page.id}
+              />
             )}
           </>
         );
