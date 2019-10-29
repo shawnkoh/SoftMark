@@ -7,6 +7,7 @@ import api from "../../../../api";
 import LoadingIcon from "../../../../components/icons/LoadingIcon";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
+import Annotater from "../annotater/Annotater";
 
 type Props = RouteComponentProps;
 
@@ -39,7 +40,8 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   return (
     <div>
       {script.pages.map((page, index) => {
-        return <img key={index} src={page.imageUrl} />;
+        //return <img key={index} src={page.imageUrl} />;
+        return <Annotater imageUrl={page.imageUrl} />;
       })}
     </div>
   );

@@ -62,30 +62,25 @@ class ScriptsAPI extends BaseAPI {
     file: any,
     callbackScriptData?: React.Dispatch<any>
   ) => {
-    let res: any[] = [];
-    return await fetch(file)
-      .then(data => data.blob())
-      .then(async blob => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          PDFJS.getDocument(String(reader.result)).promise.then(async pdf => {
-            const pages: any = [];
-            for (let i = 0; i < pdf.numPages; i++) {
-              pages.push(this.getPage(i + 1, pdf));
-            }
-            const scriptPostData: ScriptPostData = {
-              email,
-              imageUrls: await Promise.all(pages)
-            };
-            this.createScript(paper_id, scriptPostData).then(res => {
-              if (callbackScriptData) {
-                callbackScriptData(res.data);
-              }
-            });
-          });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      PDFJS.getDocument(String(reader.result)).promise.then(async pdf => {
+        const pages: any = [];
+        for (let i = 0; i < pdf.numPages; i++) {
+          pages.push(this.getPage(i + 1, pdf));
+        }
+        const scriptPostData: ScriptPostData = {
+          email,
+          imageUrls: await Promise.all(pages)
         };
+        this.createScript(paper_id, scriptPostData).then(res => {
+          if (callbackScriptData) {
+            callbackScriptData(res.data);
+          }
+        });
       });
+    };
+    reader.readAsDataURL(file);
   };
 }
 

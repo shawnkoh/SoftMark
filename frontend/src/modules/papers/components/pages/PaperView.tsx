@@ -16,6 +16,7 @@ import {
   ScriptData
 } from "backend/src/types/scripts";
 import { drawerWidth } from "../sidebars/Sidebar";
+import { DropAreaBase } from "material-ui-file-dropzone";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -114,6 +115,22 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
               toggleVisibility={toggleOpenAddMarkerDialog}
               toggleRefresh={toggleRefreshFlag}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <DropAreaBase
+              accept={".pdf"}
+              clickable
+              multiple
+              onSelectFiles={files => {
+                Object.keys(files).forEach(key => {
+                  postScript("ooimingsheng@gmail.com", files[key]);
+                });
+              }}
+            >
+              <Button variant="outlined" fullWidth>
+                Upload
+              </Button>
+            </DropAreaBase>
           </Grid>
         </Grid>
       </main>
