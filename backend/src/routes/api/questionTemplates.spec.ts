@@ -240,4 +240,21 @@ describe("POST /question_templates/:id/allocations", () => {
     const data = response.body.allocation as AllocationData;
     expect(isAllocationData(data)).toEqual(true);
   });
+
+  it("should not allow duplicate allocations", async () => {
+    const postData: AllocationPostData = {
+      paperUserId: fixtures.marker.id
+    };
+    const first = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(first.status).toEqual(201);
+
+    const second = await request(server.server)
+      .post(`/v1/question_templates/${q1.id}/allocations`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(second.status).toEqual(400);
+  });
 });
