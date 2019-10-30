@@ -1,17 +1,20 @@
-import { validateOrReject } from "class-validator";
+import { validateOrReject, validate } from "class-validator";
+import { addMinutes } from "date-fns";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not } from "typeorm";
+import { getRepository, IsNull, Not, Brackets } from "typeorm";
 import { pick } from "lodash";
 
 import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { Question } from "../entities/Question";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { isAllocated } from "../middlewares/canModifyMark";
 import { PaperUserRole } from "../types/paperUsers";
-import { AccessTokenSignedPayload } from "../types/tokens";
 import {
   QuestionTemplatePostData,
   QuestionTemplatePatchData
 } from "../types/questionTemplates";
-import { allowedRequesterOrFail } from "../utils/papers";
+import { AccessTokenSignedPayload } from "../types/tokens";
+import { allowedRequesterOrFail, allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -206,4 +209,77 @@ export async function undiscard(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(400);
   }
+}
+
+export async function markQuestion(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const questionTemplateId = request.params.id;
+  const questionTemplate = await getRepository(QuestionTemplate).findOne(
+    questionTemplateId,
+    {
+      relations: ["scriptTemplate", "allocations"],
+      where: { discardedAt: IsNull() }
+    }
+  );
+  if (!questionTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const paperId = questionTemplate.scriptTemplate!.paperId;
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Marker
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { paper, requester } = allowed;
+
+  if (!(await isAllocated(questionTemplate, requesterId))) {
+    response.sendStatus(404);
+    return;
+  }
+
+  // prettier-ignore
+  const question = await getRepository(Question)
+    .createQueryBuilder("question")
+    .leftJoin("question.marks", "mark")
+    .where("question.discardedAt IS NULL")
+    .andWhere("question.questionTemplateId = :questionTemplateId", {
+      questionTemplateId
+    })
+    .andWhere(
+      new Brackets(qb => {
+        qb.where("question.currentMarker IS NULL")
+        .orWhere("question.currentMarkerId = :id", { id: requester.id })
+        .orWhere("question.currentMarkerUpdatedAt < :date", { date: addMinutes(new Date(), -30) });
+      })
+    )
+    .andWhere(
+      new Brackets(qb => {
+        qb.where("mark IS NULL")
+        .orWhere("mark.discardedAt IS NOT NULL");
+      })
+    )
+    .getOne();
+
+  if (!question) {
+    response.sendStatus(204);
+    return;
+  }
+
+  question.currentMarker = requester;
+  question.currentMarkerUpdatedAt = new Date();
+  const errors = await validate(question);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+  await getRepository(Question).save(question);
+
+  const questionData = await question.getData();
+  response.status(200).json({ question: questionData });
 }

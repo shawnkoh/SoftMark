@@ -1,3 +1,4 @@
+import { IsOptional } from "class-validator";
 import {
   Entity,
   ManyToOne,
@@ -6,11 +7,13 @@ import {
   Unique,
   getRepository
 } from "typeorm";
+
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { PageQuestion } from "./PageQuestion";
+import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
 import { QuestionListData, QuestionData } from "../types/questions";
@@ -41,6 +44,20 @@ export class Question extends Discardable {
   @ManyToOne(type => Script, script => script.questions)
   script?: Script;
 
+  // Flag to prevent other markers from marking at the same time
+  @Column({ nullable: true })
+  currentMarkerId!: number | null;
+
+  @ManyToOne(
+    type => PaperUser,
+    currentMarker => currentMarker.questionsBeingMarked
+  )
+  currentMarker?: PaperUser | null;
+
+  @Column({ type: "timestamp without time zone", nullable: true })
+  @IsOptional()
+  currentMarkerUpdatedAt!: Date | null;
+
   @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.question)
   pageQuestions?: PageQuestion[];
 
@@ -57,6 +74,8 @@ export class Question extends Discardable {
     ...this.getBase(),
     questionTemplateId: this.questionTemplateId,
     scriptId: this.scriptId,
+    currentMarkerId: this.currentMarkerId,
+    currentMarkerUpdatedAt: this.currentMarkerUpdatedAt,
     pageQuestionsCount: this.pageQuestions
       ? this.pageQuestions.length
       : await getRepository(PageQuestion).count({ questionId: this.id }),

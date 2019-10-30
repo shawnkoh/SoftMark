@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-
-import { AccessTokenSignedPayload } from "../types/tokens";
 import { getRepository, IsNull } from "typeorm";
+
+import { Allocation } from "../entities/Allocation";
 import { Mark } from "../entities/Mark";
-import { allowedRequester } from "../utils/papers";
-import { PaperUserRole } from "../types/paperUsers";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { AccessTokenSignedPayload } from "../types/tokens";
+import { PaperUserRole } from "../types/paperUsers";
+import { allowedRequester } from "../utils/papers";
 
 export async function canModifyMark(
   request: Request,
@@ -58,11 +59,13 @@ export async function isAllocated(
   questionTemplate: QuestionTemplate,
   markerId: number
 ) {
-  if (
-    questionTemplate.allocations!.some(
-      allocation => allocation.paperUserId === markerId
-    )
-  ) {
+  const allocations =
+    questionTemplate.allocations ||
+    (await getRepository(Allocation).find({ questionTemplate }));
+  if (!allocations) {
+    return false;
+  }
+  if (allocations.some(allocation => allocation.paperUserId === markerId)) {
     return true;
   }
 

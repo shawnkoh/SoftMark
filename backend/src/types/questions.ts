@@ -9,6 +9,8 @@ export interface QuestionPostData {}
 export interface QuestionListData extends DiscardableData {
   questionTemplateId: number;
   scriptId: number;
+  currentMarkerId: number | null;
+  currentMarkerUpdatedAt: Date | null;
   pageQuestionsCount: number;
   marksCount: number;
   bookmarksCount: number;

@@ -1,10 +1,12 @@
-import { Entity, ManyToOne, Column, getRepository } from "typeorm";
+import { Entity, ManyToOne, Column, getRepository, Unique } from "typeorm";
+
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { AllocationListData, AllocationData } from "../types/allocations";
 
 @Entity()
+@Unique(["paperUser", "questionTemplate"])
 export class Allocation extends Base {
   entityName = "Allocation";
 

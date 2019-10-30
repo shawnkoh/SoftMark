@@ -14,6 +14,7 @@ import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { Paper } from "./Paper";
+import { Question } from "./Question";
 import { Script } from "./Script";
 import { User } from "./User";
 import {
@@ -75,6 +76,9 @@ export class PaperUser extends Discardable {
 
   @OneToMany(type => Script, script => script.paperUser)
   scripts?: Script[];
+
+  @OneToMany(type => Question, question => question.currentMarker)
+  questionsBeingMarked?: Question[];
 
   getListData = async (): Promise<PaperUserListData> => ({
     ...this.getBase(),
