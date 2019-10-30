@@ -1,4 +1,6 @@
 import { Router } from "express";
+
+import * as AllocationsController from "../../controllers/AllocationsController";
 import * as PapersController from "../../controllers/PapersController";
 import * as PaperUsersController from "../../controllers/PaperUsersController";
 import * as ScriptTemplatesController from "../../controllers/ScriptTemplatesController";
@@ -26,5 +28,7 @@ router.get(
 
 router.post("/:id/scripts", ScriptsController.create);
 router.get("/:id/scripts", ScriptsController.index);
+
+router.get("/:id/allocations", AllocationsController.index);
 
 export default router;

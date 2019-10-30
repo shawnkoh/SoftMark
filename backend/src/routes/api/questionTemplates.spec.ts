@@ -31,8 +31,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
-  scriptTemplate = new ScriptTemplate();
-  scriptTemplate.paperId = 1;
+  scriptTemplate = new ScriptTemplate(fixtures.paper);
 
   q1 = new QuestionTemplate(scriptTemplate, "1", null);
   q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);

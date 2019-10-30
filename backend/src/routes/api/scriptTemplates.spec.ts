@@ -30,8 +30,7 @@ beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  scriptTemplate = new ScriptTemplate();
-  scriptTemplate.paperId = 1;
+  scriptTemplate = new ScriptTemplate(fixtures.paper);
   await getRepository(ScriptTemplate).save(scriptTemplate);
 });
 
