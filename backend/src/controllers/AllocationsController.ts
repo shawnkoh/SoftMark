@@ -43,9 +43,7 @@ export async function create(request: Request, response: Response) {
       QuestionTemplate
     ).findOneOrFail(questionTemplateId, { where: { discardedAt: IsNull() } });
 
-    const allocation = new Allocation();
-    allocation.paperUser = paperUser;
-    allocation.questionTemplate = questionTemplate;
+    const allocation = new Allocation(questionTemplate, paperUser);
     await validateOrReject(allocation);
     await getRepository(Allocation).save(allocation);
 

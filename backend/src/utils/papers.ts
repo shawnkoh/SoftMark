@@ -3,37 +3,40 @@ import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
 
+export function allowedRole(role: PaperUserRole, requiredRole: PaperUserRole) {
+  return (
+    role === PaperUserRole.Owner ||
+    requiredRole === PaperUserRole.Student ||
+    (requiredRole === PaperUserRole.Marker && role === PaperUserRole.Marker)
+  );
+}
+
 export const allowedRequester = async (
   userId: number,
   paperId: number | string,
-  role?: PaperUserRole
-): Promise<false | { paper: Paper; paperUser: PaperUser }> => {
+  requiredRole: PaperUserRole
+): Promise<false | { paper: Paper; requester: PaperUser }> => {
   const paper = await getRepository(Paper).findOne(paperId, {
     relations: ["paperUsers"]
   });
   if (!paper) {
     return false;
   }
-  const paperUser = paper.paperUsers!.find(
+  const requester = paper.paperUsers!.find(
     paperUser => paperUser.userId === userId && !paperUser.discardedAt
   );
-  if (
-    !paperUser ||
-    (role === PaperUserRole.Marker &&
-      paperUser.role === PaperUserRole.Student) ||
-    (role === PaperUserRole.Owner && paperUser.role !== PaperUserRole.Owner)
-  ) {
+  if (!requester || !allowedRole(requester.role, requiredRole)) {
     return false;
   }
-  return { paper, paperUser };
+  return { paper, requester };
 };
 
 export const allowedRequesterOrFail = async (
   userId: number,
   paperId: number | string,
-  role?: PaperUserRole
-): Promise<{ paper: Paper; paperUser: PaperUser }> => {
-  const allowed = await allowedRequester(userId, paperId, role);
+  requiredRole: PaperUserRole
+): Promise<{ paper: Paper; requester: PaperUser }> => {
+  const allowed = await allowedRequester(userId, paperId, requiredRole);
   if (!allowed) {
     throw new Error("User is not allowed to access this resource");
   }

@@ -62,6 +62,16 @@ export class Fixtures {
       imageUrls: ["page1ImageStub", "page2ImageStub", "page3ImageStub"]
     };
   }
+
+  public async createPaperUser(role: PaperUserRole, paper?: Paper) {
+    const user = new User(faker.internet.email());
+    const paperUser = new PaperUser(paper || this.paper, user, role);
+    await getRepository(User).save(user);
+    await getRepository(PaperUser).save(paperUser);
+    const accessToken =
+      "Bearer " + user.createAuthenticationTokens().accessToken;
+    return { paperUser, accessToken };
+  }
 }
 
 export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {

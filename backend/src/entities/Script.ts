@@ -10,12 +10,18 @@ import { ScriptData, ScriptListData } from "../types/scripts";
 export class Script extends Discardable {
   entityName = "Script";
 
-  constructor();
-  constructor(paper?: Paper, paperUser?: PaperUser);
-  constructor(paper?: Paper, paperUser?: PaperUser) {
+  constructor(paper: number | Paper, paperUser: number | PaperUser) {
     super();
-    this.paper = paper;
-    this.paperUser = paperUser;
+    if (typeof paper === "number") {
+      this.paperId = paper;
+    } else {
+      this.paper = paper;
+    }
+    if (typeof paperUser === "number") {
+      this.paperUserId = paperUser;
+    } else {
+      this.paperUser = paperUser;
+    }
   }
 
   @Column()
@@ -51,13 +57,18 @@ export class Script extends Discardable {
   getData = async (): Promise<ScriptData> => {
     if (this.pages) {
       this.pages.sort((a, b) => {
-        if(!a.pageNo || !b.pageNo) {
+        if (!a.pageNo || !b.pageNo) {
           return 0;
         }
         return a.pageNo - b.pageNo;
       });
     }
-    const pages = this.pages || (await getRepository(Page).find({ where: { scriptId: this.id }, order: {  pageNo: "ASC" } }));
+    const pages =
+      this.pages ||
+      (await getRepository(Page).find({
+        where: { scriptId: this.id },
+        order: { pageNo: "ASC" }
+      }));
     const questions =
       this.questions ||
       (await getRepository(Question).find({ scriptId: this.id }));

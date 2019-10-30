@@ -8,6 +8,12 @@ import { AllocationListData, AllocationData } from "../types/allocations";
 export class Allocation extends Base {
   entityName = "Allocation";
 
+  constructor(questionTemplate: QuestionTemplate, paperUser: PaperUser) {
+    super();
+    this.questionTemplate = questionTemplate;
+    this.paperUser = paperUser;
+  }
+
   @Column()
   questionTemplateId!: number;
 
