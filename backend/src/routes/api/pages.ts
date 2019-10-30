@@ -7,5 +7,6 @@ export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.post("/:id/annotations", AnnotationsController.create);
+router.get("/:id/annotations/self", AnnotationsController.show);
 
 export default router;

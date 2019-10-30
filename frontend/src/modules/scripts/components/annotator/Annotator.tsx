@@ -1,29 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Canvas from "./Canvas";
-import { CanvasMode, Annotation } from "../../../../types/canvas";
+import { CanvasMode } from "../../../../types/canvas";
+import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
+import api from "../../../../api";
+import { PageData } from "backend/src/types/pages";
 
 interface OwnProps {
+  pageId: number;
   backgroundImageSource: string;
-  backgroundAnnotations: Annotation[];
-  initialForegroundAnnotation: Annotation;
-  onForegroundAnnotationChange: (annotation: Annotation) => void;
 }
 
 type Props = OwnProps;
 
-const Annotater: React.FC<Props> = ({
-  backgroundImageSource,
-  backgroundAnnotations,
-  initialForegroundAnnotation,
-  onForegroundAnnotationChange: foregroundAnnotationChangeCallback
+const Annotator: React.FC<Props> = ({
+  pageId,
+  backgroundImageSource
 }: Props) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [pageData, setPageData] = useState<PageData | null>(null);
+
   const [mode, setMode] = useState(CanvasMode.Pen);
   const [penColor, setPenColor] = useState("#ff0000");
   const [penWidth, setPenWidth] = useState(5);
-  const [foregroundAnnotation, setForegroundAnnotation] = useState(
-    initialForegroundAnnotation
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation>(
+    []
   );
+  const [backgroundAnnotations, setBackgroundAnnotations] = useState<
+    Annotation[]
+  >([[]]);
+
+  useEffect(() => {
+    api.annotations
+      .getOwnAnnotation(pageId)
+      .then(res => {
+        setForegroundAnnotation(res.data.annotation.layer);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  // TODO: get background annotations
 
   const handlePenClick = event => setMode(CanvasMode.Pen);
   const handleEraserClick = event => setMode(CanvasMode.Eraser);
@@ -34,8 +50,15 @@ const Annotater: React.FC<Props> = ({
   const handleClearClick = event => setForegroundAnnotation([]);
   const onForegroundAnnotationChange = (annotation: Annotation) => {
     setForegroundAnnotation(annotation);
-    foregroundAnnotationChangeCallback(annotation);
+    const annotationPostData: AnnotationPostData = {
+      layer: annotation
+    };
+    api.annotations.saveAnnotation(pageId, annotationPostData);
   };
+
+  if (isLoading) {
+    return <div>Loading annotations...</div>;
+  }
 
   return (
     <div>
@@ -81,4 +104,4 @@ const Annotater: React.FC<Props> = ({
   );
 };
 
-export default Annotater;
+export default Annotator;

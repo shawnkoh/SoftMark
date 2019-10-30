@@ -3,13 +3,17 @@ import { Entity, ManyToOne, Column, getRepository } from "typeorm";
 import { Base } from "./Base";
 import { Page } from "./Page";
 import { PaperUser } from "./PaperUser";
-import { AnnotationListData, AnnotationData } from "../types/annotations";
+import {
+  AnnotationLine,
+  AnnotationListData,
+  AnnotationData
+} from "../types/annotations";
 
 @Entity()
 export class Annotation extends Base {
   entityName = "Annotation";
 
-  constructor(page: Page, paperUser: PaperUser, layer: string) {
+  constructor(page: Page, paperUser: PaperUser, layer: AnnotationLine[]) {
     super();
     this.page = page;
     this.paperUser = paperUser;
@@ -29,7 +33,7 @@ export class Annotation extends Base {
   paperUser?: PaperUser;
 
   @Column({ type: "jsonb" })
-  layer: string;
+  layer: AnnotationLine[];
 
   getListData = (): AnnotationListData => {
     return {

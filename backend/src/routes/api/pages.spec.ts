@@ -4,8 +4,21 @@ import { getRepository } from "typeorm";
 import { Page } from "../../entities/Page";
 import { Script } from "../../entities/Script";
 import { ApiServer } from "../../server";
-import { isAnnotationData, AnnotationPostData } from "../../types/annotations";
+import {
+  isAnnotationData,
+  AnnotationPostData,
+  AnnotationLine
+} from "../../types/annotations";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+
+const exampleAnnotation: AnnotationLine[] = [
+  {
+    color: "#ff0000",
+    points: [],
+    type: "source-over",
+    width: 5
+  }
+];
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -60,9 +73,7 @@ describe("POST /pages/:id/annotations", () => {
   it("should return AnnotationData", async () => {
     // TODO: Mock layer properly
     const postData: AnnotationPostData = {
-      layer: JSON.stringify({
-        stub: "temp"
-      })
+      layer: exampleAnnotation
     };
     const response = await request(server.server)
       .post(`/v1/pages/${page.id}/annotations`)
