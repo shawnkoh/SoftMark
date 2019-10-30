@@ -1,17 +1,18 @@
 import * as request from "supertest";
 import { getRepository, getManager } from "typeorm";
 
+import { Allocation } from "../../entities/Allocation";
 import { PaperUser } from "../../entities/PaperUser";
+import { Question } from "../../entities/Question";
+import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { Script } from "../../entities/Script";
+import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { User } from "../../entities/User";
+import { isScriptTemplateData } from "../../types/scriptTemplates";
 import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
 import { ScriptListData, isScriptData, ScriptData } from "../../types/scripts";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
-import { ScriptTemplate } from "../../entities/ScriptTemplate";
-import { isScriptTemplateData } from "../../types/scriptTemplates";
-import { Allocation } from "../../entities/Allocation";
-import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import {
   isAllocationListData,
   AllocationListData
@@ -242,6 +243,27 @@ describe("POST /papers/:id/scripts", () => {
     expect(response.status).toEqual(201);
     const data: ScriptData = response.body.script;
     expect(isScriptData(data)).toBe(true);
+  });
+
+  it("should create Questions based on the ScriptTemplate", async () => {
+    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const q1 = new QuestionTemplate(scriptTemplate, "1", 7);
+    const q2 = new QuestionTemplate(scriptTemplate, "2", null);
+    const q2a = new QuestionTemplate(scriptTemplate, "2a", 3, q2);
+    const q2b = new QuestionTemplate(scriptTemplate, "2b", 2, q2);
+
+    await getRepository(ScriptTemplate).save(scriptTemplate);
+    await getRepository(QuestionTemplate).save([q1, q2, q2a, q2b]);
+
+    const response = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/scripts`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptPostData);
+    expect(response.status).toEqual(201);
+    const data: ScriptData = response.body.script;
+    expect(isScriptData(data)).toBe(true);
+    const count = await getRepository(Question).count({ scriptId: data.id });
+    expect(count).toBe(4);
   });
 });
 
