@@ -8,11 +8,8 @@ import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 import * as Konva from "konva";
 
-import {
-  AnnotationLine,
-  Annotation,
-  CanvasMode
-} from "../../../../types/canvas";
+import { CanvasMode } from "../../../../types/canvas";
+import { AnnotationLine, Annotation } from "backend/src/types/annotations";
 import {
   getDistance,
   getClientPointerRelativeToStage,

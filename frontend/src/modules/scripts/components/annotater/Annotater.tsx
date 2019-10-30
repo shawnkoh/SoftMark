@@ -1,17 +1,27 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import Canvas from "./Canvas";
 import { CanvasMode } from "../../../../types/canvas";
+import {
+  AnnotationLine,
+  AnnotationPostData
+} from "backend/src/types/annotations";
+import api from "../../../../api";
+import { PageData } from "backend/src/types/pages";
+import { response } from "express";
 
 interface OwnProps {
   imageUrl: string;
+  pageId: number;
 }
 
 type Props = OwnProps;
 
-const Annotater: React.FC<Props> = ({ imageUrl }) => {
-  const canvasRef = useRef<any>(null);
+const Annotater: React.FC<Props> = ({ imageUrl, pageId }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [pageData, setPageData] = useState<PageData | null>(null);
 
+  const canvasRef = useRef<any>(null);
   const [mode, setMode] = useState(CanvasMode.Pen);
   const [penColor, setPenColor] = useState("#ff0000");
   const [penWidth, setPenWidth] = useState(5);
@@ -27,7 +37,25 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
       canvasRef.current.clear();
     }
   };
-  const handleForegroundAnnotationChange = console.log;
+
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<
+    AnnotationLine[]
+  >([]);
+  const handleForegroundAnnotationChange = (lines: AnnotationLine[]) => {
+    setForegroundAnnotation(lines);
+    const annotationPostData: AnnotationPostData = {
+      layer: lines
+    };
+    api.annotations.saveAnnotation(pageId, annotationPostData);
+  };
+  useEffect(() => {
+    api.annotations
+      .getOwnAnnotation(pageId)
+      .then(res => {
+        setForegroundAnnotation(res.data.annotation.layer);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const canvas = (
     <Canvas
@@ -35,37 +63,8 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
       width={1000}
       height={1250}
       backgroundImageSource={imageUrl}
-      backgroundAnnotations={[
-        [
-          {
-            points: [10, 10, 20, 20],
-            type: "source-over",
-            color: "blue",
-            width: 5
-          },
-          {
-            points: [30, 30, 40, 40],
-            type: "source-over",
-            color: "blue",
-            width: 3
-          }
-        ],
-        [
-          {
-            points: [50, 50, 60, 60],
-            type: "source-over",
-            color: "green",
-            width: 5
-          },
-          {
-            points: [70, 70, 80, 80],
-            type: "source-over",
-            color: "green",
-            width: 5
-          }
-        ]
-      ]}
-      foregroundAnnotation={[]}
+      backgroundAnnotations={[]}
+      foregroundAnnotation={foregroundAnnotation}
       mode={mode}
       penColor={penColor}
       penWidth={penWidth}
@@ -73,10 +72,12 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
     />
   );
 
+  if (isLoading) {
+    return <div> Loading annotations... </div>;
+  }
+
   return (
     <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
       <button
         onClick={handlePenClick}
         style={{ color: mode === "pen" ? "red" : undefined }}
@@ -110,45 +111,3 @@ const Annotater: React.FC<Props> = ({ imageUrl }) => {
 };
 
 export default Annotater;
-
-/* let canvasProps = {
-    width: 500,
-    height: 500,
-    backgroundImageSource:
-      "https://singaporelearner.com/wp-content/uploads/2013/11/scan0010-724x1024.jpg",
-    backgroundAnnotations: [
-      [
-        {
-          points: [10, 10, 20, 20],
-          type: "source-over",
-          color: "blue",
-          width: 5
-        },
-        {
-          points: [30, 30, 40, 40],
-          type: "source-over",
-          color: "blue",
-          width: 3
-        }
-      ],
-      [
-        {
-          points: [50, 50, 60, 60],
-          type: "source-over",
-          color: "green",
-          width: 5
-        },
-        {
-          points: [70, 70, 80, 80],
-          type: "source-over",
-          color: "green",
-          width: 5
-        }
-      ]
-    ],
-    foregroundAnnotation: [],
-    mode: mode,
-    penColor: penColor,
-    penWidth: penWidth,
-    onForegroundAnnotationChange: handleForegroundAnnotationChange
-  };*/

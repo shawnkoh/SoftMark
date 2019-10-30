@@ -8,13 +8,17 @@ import LoadingIcon from "../../../../components/icons/LoadingIcon";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 import Annotater from "../annotater/Annotater";
+import TogglePageComponent from "../misc/TogglePageComponent";
 
 type Props = RouteComponentProps;
 
 const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const script_id = +(params as { script_id: string }).script_id;
   const [script, setScript] = useState<ScriptData | null>(null);
-  const [pages, setPages] = useState<any[]>([]);
+
+  const [viewPageNo, setViewPageNo] = useState(1);
+  const incrementViewPageNo = () => setViewPageNo(viewPageNo + 1);
+  const decrementViewPageNo = () => setViewPageNo(viewPageNo - 1);
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
@@ -30,7 +34,11 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return (
+      <>
+        <LoadingIcon /> Loading script...
+      </>
+    );
   }
 
   if (!script) {
@@ -40,9 +48,23 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   return (
     <div>
       {script.pages.map((page, index) => {
-        //return <img key={index} src={page.imageUrl} />;
-        return <Annotater imageUrl={page.imageUrl} />;
+        return (
+          <>
+            {page.pageNo === viewPageNo && (
+              <Annotater
+                key={page.id}
+                imageUrl={page.imageUrl}
+                pageId={page.id}
+              />
+            )}
+          </>
+        );
       })}
+      <TogglePageComponent
+        pageNo={viewPageNo}
+        incrementPageNo={incrementViewPageNo}
+        decrementPageNo={decrementViewPageNo}
+      />
     </div>
   );
 };
