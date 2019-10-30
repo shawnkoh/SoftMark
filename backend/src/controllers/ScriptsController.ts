@@ -11,6 +11,8 @@ import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { ScriptListData } from "../types/scripts";
 import { allowedRequester } from "../utils/papers";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { Question } from "../entities/Question";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -63,21 +65,46 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const pages: Page[] = await Promise.all(
-    imageUrls.map(
-      async (imageUrl: string, index: number): Promise<Page> => {
-        const page = new Page(script, imageUrl, index + 1);
-        await validateOrReject(page); // TODO: catch error
-        return page;
-      }
-    )
-  );
+  let pages: Page[];
+  try {
+    pages = await Promise.all(
+      imageUrls.map(
+        async (imageUrl: string, index: number): Promise<Page> => {
+          const page = new Page(script, imageUrl, index + 1);
+          await validateOrReject(page);
+          return page;
+        }
+      )
+    );
+  } catch (error) {
+    response.sendStatus(400);
+    return;
+  }
+
+  // Create questions based on the current script template, if any.
+  const scriptTemplate = await getRepository(ScriptTemplate).findOne({
+    relations: ["questionTemplates"],
+    where: { paperId, discardedAt: IsNull() }
+  });
+
+  let questions: Question[] | undefined;
+  if (scriptTemplate && scriptTemplate.questionTemplates) {
+    questions = scriptTemplate.questionTemplates.map(questionTemplate => {
+      const question = new Question(script, questionTemplate);
+      return question;
+    });
+  }
 
   await getManager().transaction(async manager => {
     await manager.save(student);
     await manager.save(paperUser);
     await manager.save(script);
     await Promise.all(pages.map(async page => await manager.save(page)));
+    if (questions) {
+      await Promise.all(
+        questions.map(async question => await manager.save(question))
+      );
+    }
   });
 
   const data = await script.getData();

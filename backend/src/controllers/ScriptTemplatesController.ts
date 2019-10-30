@@ -1,6 +1,6 @@
-import { validateOrReject } from "class-validator";
+import { validateOrReject, validate } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, getManager } from "typeorm";
+import { getRepository, IsNull } from "typeorm";
 import { pick } from "lodash";
 
 import { ScriptTemplate } from "../entities/ScriptTemplate";
@@ -14,41 +14,40 @@ import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
   const paperId = Number(request.params.id);
   const postData = pick(request.body, "name") as ScriptTemplatePostData;
-  try {
-    await allowedRequesterOrFail(payload.id, paperId, PaperUserRole.Owner);
-  } catch (error) {
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  try {
-    const count = await getRepository(ScriptTemplate).count({
-      paperId,
-      discardedAt: IsNull()
-    });
-    if (count > 0) {
-      throw new Error("Not allowed to have more than one script template");
-    }
-    const scriptTemplate = new ScriptTemplate(paperId);
-    if (postData.name !== undefined) {
-      scriptTemplate.name = postData.name;
-    }
-    await validateOrReject(scriptTemplate);
-
-    // TODO: upload image and generate question templates
-
-    await getManager().transaction(async manager => {
-      // save question templates
-      await manager.save(scriptTemplate);
-    });
-
-    const data = await scriptTemplate.getData();
-    response.status(201).json({ scriptTemplate: data });
-  } catch (error) {
+  const count = await getRepository(ScriptTemplate).count({
+    paperId,
+    discardedAt: IsNull()
+  });
+  if (count > 0) {
     response.sendStatus(400);
+    return;
   }
+  const scriptTemplate = new ScriptTemplate(paperId);
+  if (postData.name !== undefined) {
+    scriptTemplate.name = postData.name;
+  }
+  const errors = await validate(scriptTemplate);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+  await getRepository(ScriptTemplate).save(scriptTemplate);
+
+  const data = await scriptTemplate.getData();
+  response.status(201).json({ scriptTemplate: data });
 }
 
 export async function showActive(request: Request, response: Response) {
