@@ -15,8 +15,7 @@ import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
-const scriptTemplate = new ScriptTemplate();
-scriptTemplate.paperId = 1;
+const scriptTemplate = new ScriptTemplate(1);
 const page1 = new PageTemplate(scriptTemplate);
 const page2 = new PageTemplate(scriptTemplate);
 const page3 = new PageTemplate(scriptTemplate);

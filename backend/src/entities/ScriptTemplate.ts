@@ -11,6 +11,15 @@ import { PageTemplate } from "./PageTemplate";
 export class ScriptTemplate extends Discardable {
   entityName = "ScriptTemplate";
 
+  constructor(paper: Paper | number) {
+    super();
+    if (typeof paper === "number") {
+      this.paperId = paper;
+    } else {
+      this.paper = paper;
+    }
+  }
+
   @Column()
   paperId!: number;
 

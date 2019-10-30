@@ -31,8 +31,7 @@ export async function create(request: Request, response: Response) {
     if (count > 0) {
       throw new Error("Not allowed to have more than one script template");
     }
-    const scriptTemplate = new ScriptTemplate();
-    scriptTemplate.paperId = paperId;
+    const scriptTemplate = new ScriptTemplate(paperId);
     if (postData.name !== undefined) {
       scriptTemplate.name = postData.name;
     }
