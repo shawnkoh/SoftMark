@@ -62,7 +62,7 @@ export class Mark extends Discardable {
   @ManyToOne(type => PaperUser, paperUser => paperUser.marks)
   marker?: PaperUser;
 
-  @Column()
+  @Column({ type: "double precision" })
   @IsNotEmpty()
   @IsNumber()
   @Validate(IsValidScoreConstraint)
