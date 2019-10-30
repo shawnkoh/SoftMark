@@ -60,7 +60,7 @@ afterAll(async () => {
 describe("GET /question_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1Template.id}`)
+      .get(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -68,7 +68,7 @@ describe("GET /question_templates/:id", () => {
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1Template.id}`)
+      .get(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -76,7 +76,7 @@ describe("GET /question_templates/:id", () => {
 
   it("should allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1Template.id}`)
+      .get(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -84,7 +84,7 @@ describe("GET /question_templates/:id", () => {
 
   it("should return QuestionTemplateData", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1Template.id}`)
+      .get(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(200);
@@ -95,7 +95,7 @@ describe("GET /question_templates/:id", () => {
 describe("PATCH /question_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -103,7 +103,7 @@ describe("PATCH /question_templates/:id", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -111,7 +111,7 @@ describe("PATCH /question_templates/:id", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -124,7 +124,7 @@ describe("PATCH /question_templates/:id", () => {
       parentName: q2Template.name
     };
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1aTemplate.id}`)
+      .patch(`${fixtures.api}/question_templates/${q1aTemplate.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(200);
@@ -138,7 +138,7 @@ describe("PATCH /question_templates/:id", () => {
 describe("DELETE /question_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/question_templates/${q1Template.id}`)
+      .delete(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -146,7 +146,7 @@ describe("DELETE /question_templates/:id", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/question_templates/${q1Template.id}`)
+      .delete(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -154,7 +154,7 @@ describe("DELETE /question_templates/:id", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/question_templates/${q1Template.id}`)
+      .delete(`${fixtures.api}/question_templates/${q1Template.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -162,7 +162,7 @@ describe("DELETE /question_templates/:id", () => {
 
   it("should delete a Question Template", async () => {
     const response = await request(server.server)
-      .delete(`/v1/question_templates/${q2Template.id}`)
+      .delete(`${fixtures.api}/question_templates/${q2Template.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(204);
@@ -178,7 +178,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
   });
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}/undiscard`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -186,7 +186,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}/undiscard`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -194,7 +194,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}/undiscard`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}/undiscard`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -202,7 +202,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 
   it("should restore a deleted Question Template", async () => {
     const response = await request(server.server)
-      .patch(`/v1/question_templates/${q1Template.id}/undiscard`)
+      .patch(`${fixtures.api}/question_templates/${q1Template.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);
@@ -214,7 +214,7 @@ describe("PATCH /question_templates/:id/undiscard", () => {
 describe("POST /question_templates/:id/allocations", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -222,7 +222,7 @@ describe("POST /question_templates/:id/allocations", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -230,7 +230,7 @@ describe("POST /question_templates/:id/allocations", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -241,7 +241,7 @@ describe("POST /question_templates/:id/allocations", () => {
       paperUserId: fixtures.marker.id
     };
     const response = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -254,13 +254,13 @@ describe("POST /question_templates/:id/allocations", () => {
       paperUserId: fixtures.marker.id
     };
     const first = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(first.status).toEqual(201);
 
     const second = await request(server.server)
-      .post(`/v1/question_templates/${q1Template.id}/allocations`)
+      .post(`${fixtures.api}/question_templates/${q1Template.id}/allocations`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(second.status).toEqual(400);
@@ -280,7 +280,7 @@ describe("GET /question_templates/:id/mark_question", () => {
 
   it("should allow an allocated Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -288,7 +288,7 @@ describe("GET /question_templates/:id/mark_question", () => {
 
   it("should allow allocation inheritance", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -296,7 +296,7 @@ describe("GET /question_templates/:id/mark_question", () => {
 
   it("should not allow an unallocated Marker to access this route even if he is the owner", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -304,7 +304,7 @@ describe("GET /question_templates/:id/mark_question", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -312,7 +312,7 @@ describe("GET /question_templates/:id/mark_question", () => {
 
   it("should return QuestionData", async () => {
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(200);
@@ -330,14 +330,14 @@ describe("GET /question_templates/:id/mark_question", () => {
     await getRepository(Question).save(question);
 
     const first = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(first.status).toEqual(200);
     const firstData = first.body.question as QuestionData;
 
     const second = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(second.status).toEqual(200);
@@ -361,14 +361,14 @@ describe("GET /question_templates/:id/mark_question", () => {
     await getRepository(Allocation).save(allocation);
 
     const first = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(first.status).toEqual(200);
     const firstData = first.body.question as QuestionData;
 
     const second = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", otherMarker.accessToken)
       .send();
     expect(second.status).toEqual(200);
@@ -392,7 +392,7 @@ describe("GET /question_templates/:id/mark_question", () => {
     await getRepository(Allocation).save(allocation);
 
     const first = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(first.status).toEqual(200);
@@ -405,7 +405,7 @@ describe("GET /question_templates/:id/mark_question", () => {
     await getRepository(Question).save(question);
 
     const second = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", otherMarker.accessToken)
       .send();
     expect(second.status).toEqual(200);
@@ -419,7 +419,7 @@ describe("GET /question_templates/:id/mark_question", () => {
     await getRepository(Mark).save(mark);
 
     const response = await request(server.server)
-      .get(`/v1/question_templates/${q1aTemplate.id}/mark_question`)
+      .get(`${fixtures.api}/question_templates/${q1aTemplate.id}/mark_question`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(204);

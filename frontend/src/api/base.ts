@@ -9,7 +9,10 @@ class BaseAPI {
     const params = { format: "json" };
 
     this.client = axios.create({
-      baseURL: "http://localhost:3000/v1",
+      baseURL:
+        process.env.NODE_ENV === "production"
+          ? "https://api.softmark.io/softmark/v1"
+          : "http://localhost:3001/softmark/v1",
       timeout: 20000,
       headers,
       params

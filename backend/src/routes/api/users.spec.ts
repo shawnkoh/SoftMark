@@ -18,7 +18,7 @@ afterAll(async () => {
 describe("GET /users/self", () => {
   it("should allow a User to get his own data", async () => {
     const response = await request(server.server)
-      .get("/v1/users/self")
+      .get(`${fixtures.api}/users/self`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);
@@ -28,7 +28,7 @@ describe("GET /users/self", () => {
 describe("PATCH /users/self", () => {
   it("should allow a User to edit his own data", async () => {
     const response = await request(server.server)
-      .patch("/v1/users/self")
+      .patch(`${fixtures.api}/users/self`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);

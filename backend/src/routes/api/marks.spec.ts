@@ -72,7 +72,7 @@ afterAll(async () => {
 describe("PATCH /marks/:id", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -80,7 +80,7 @@ describe("PATCH /marks/:id", () => {
 
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -88,7 +88,7 @@ describe("PATCH /marks/:id", () => {
 
   it("should allow an allocated PaperUser to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -100,7 +100,7 @@ describe("PATCH /marks/:id", () => {
     )).accessToken;
 
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -111,7 +111,7 @@ describe("PATCH /marks/:id", () => {
       score: q1Template.score! - 1
     };
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(200);
@@ -124,7 +124,7 @@ describe("PATCH /marks/:id", () => {
       score: q1Template.score! + 0.5
     };
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(400);
@@ -132,7 +132,7 @@ describe("PATCH /marks/:id", () => {
 
   it("should allow allocation inheritance", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q2aMark.id}`)
+      .patch(`${fixtures.api}/marks/${q2aMark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -142,7 +142,7 @@ describe("PATCH /marks/:id", () => {
 describe("DELETE /marks/:id", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/marks/${q1Mark.id}`)
+      .delete(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -150,7 +150,7 @@ describe("DELETE /marks/:id", () => {
 
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/marks/${q1Mark.id}`)
+      .delete(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -158,7 +158,7 @@ describe("DELETE /marks/:id", () => {
 
   it("should allow an allocated PaperUser to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/marks/${q1Mark.id}`)
+      .delete(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -170,7 +170,7 @@ describe("DELETE /marks/:id", () => {
     )).accessToken;
 
     const response = await request(server.server)
-      .delete(`/v1/marks/${q1Mark.id}`)
+      .delete(`${fixtures.api}/marks/${q1Mark.id}`)
       .set("Authorization", markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -178,7 +178,7 @@ describe("DELETE /marks/:id", () => {
 
   it("should allow allocation inheritance", async () => {
     const response = await request(server.server)
-      .delete(`/v1/marks/${q2aMark.id}`)
+      .delete(`${fixtures.api}/marks/${q2aMark.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -188,7 +188,7 @@ describe("DELETE /marks/:id", () => {
 describe("PATCH /marks/:id/undiscard", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}/undiscard`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -200,7 +200,7 @@ describe("PATCH /marks/:id/undiscard", () => {
     )).accessToken;
 
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}/undiscard`)
       .set("Authorization", markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -208,7 +208,7 @@ describe("PATCH /marks/:id/undiscard", () => {
 
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -216,7 +216,7 @@ describe("PATCH /marks/:id/undiscard", () => {
 
   it("should allow an allocated PaperUser to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -224,7 +224,7 @@ describe("PATCH /marks/:id/undiscard", () => {
 
   it("should allow allocation inheritance", async () => {
     const response = await request(server.server)
-      .patch(`/v1/marks/${q2aMark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q2aMark.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -235,7 +235,7 @@ describe("PATCH /marks/:id/undiscard", () => {
       score: q1Template.score! - 1
     };
     const response = await request(server.server)
-      .patch(`/v1/marks/${q1Mark.id}/undiscard`)
+      .patch(`${fixtures.api}/marks/${q1Mark.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(200);

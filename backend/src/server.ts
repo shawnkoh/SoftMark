@@ -13,7 +13,7 @@ export class ApiServer {
   public connection: Connection | null = null;
   public server: Server | null = null;
 
-  async initialize(port: number = 3000) {
+  async initialize(port: number = 3001) {
     this.connection = await createConnection(ormconfig);
 
     const app = express();

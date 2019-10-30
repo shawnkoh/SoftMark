@@ -48,7 +48,7 @@ afterAll(async () => {
 describe("POST /pages/:id/annotations", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/pages/${page.id}/annotations`)
+      .post(`${fixtures.api}/pages/${page.id}/annotations`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -56,7 +56,7 @@ describe("POST /pages/:id/annotations", () => {
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/pages/${page.id}/annotations`)
+      .post(`${fixtures.api}/pages/${page.id}/annotations`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -64,7 +64,7 @@ describe("POST /pages/:id/annotations", () => {
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/pages/${page.id}/annotations`)
+      .post(`${fixtures.api}/pages/${page.id}/annotations`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -76,7 +76,7 @@ describe("POST /pages/:id/annotations", () => {
       layer: exampleAnnotation
     };
     const response = await request(server.server)
-      .post(`/v1/pages/${page.id}/annotations`)
+      .post(`${fixtures.api}/pages/${page.id}/annotations`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);

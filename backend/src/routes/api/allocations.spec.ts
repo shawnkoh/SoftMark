@@ -47,7 +47,7 @@ afterAll(async () => {
 describe("DELETE /allocations/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/allocations/${allocation.id}`)
+      .delete(`${fixtures.api}/allocations/${allocation.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -55,7 +55,7 @@ describe("DELETE /allocations/:id", () => {
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/allocations/${allocation.id}`)
+      .delete(`${fixtures.api}/allocations/${allocation.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -63,7 +63,7 @@ describe("DELETE /allocations/:id", () => {
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/allocations/${allocation.id}`)
+      .delete(`${fixtures.api}/allocations/${allocation.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -71,7 +71,7 @@ describe("DELETE /allocations/:id", () => {
 
   it("should delete the Allocation", async () => {
     const response = await request(server.server)
-      .delete(`/v1/allocations/${allocation.id}`)
+      .delete(`${fixtures.api}/allocations/${allocation.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(204);
