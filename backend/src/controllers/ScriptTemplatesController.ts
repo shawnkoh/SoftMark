@@ -55,7 +55,11 @@ export async function create(request: Request, response: Response) {
 export async function showActive(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
-  const allowed = await allowedRequester(payload.id, paperId);
+  const allowed = await allowedRequester(
+    payload.id,
+    paperId,
+    PaperUserRole.Student
+  );
   if (!allowed) {
     response.sendStatus(404);
     return;

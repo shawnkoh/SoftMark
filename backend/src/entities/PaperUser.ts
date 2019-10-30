@@ -64,7 +64,7 @@ export class PaperUser extends Discardable {
   @OneToMany(type => Annotation, annotation => annotation.paperUser)
   annotations?: Annotation[];
 
-  @OneToMany(type => Mark, mark => mark.paperUser, { eager: true })
+  @OneToMany(type => Mark, mark => mark.marker, { eager: true })
   marks?: Mark[];
 
   @OneToMany(type => Bookmark, bookmark => bookmark.paperUser, { eager: true })

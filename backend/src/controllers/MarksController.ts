@@ -1,139 +1,102 @@
-import { validateOrReject } from "class-validator";
+import { validate } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not } from "typeorm";
-import { Allocation } from "../entities/Allocation";
+import { pick } from "lodash";
+import { getRepository, IsNull } from "typeorm";
+
 import { Mark } from "../entities/Mark";
-import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
-import { QuestionTemplate } from "../entities/QuestionTemplate";
-import { User } from "../entities/User";
-import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedMarker } from "../utils/marks";
+import { isAllocated } from "../middlewares/canModifyMark";
 import { MarkPostData, MarkPatchData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const questionId = Number(request.params.id);
-    const postData: MarkPostData = request.body;
-    const { paperUserId } = postData;
-    const paperUser = await getRepository(PaperUser).findOneOrFail(
-      paperUserId,
-      { where: { discardedAt: IsNull() } }
-    );
-    const question = await getRepository(Question).findOneOrFail(questionId, {
-      where: { discardedAt: IsNull() }
-    });
-    const questionTemplateId = question.questionTemplateId;
-    const questionTemplate = await getRepository(
-      QuestionTemplate
-    ).findOneOrFail(questionTemplateId, { where: { discardedAt: IsNull() } });
-    const allocation = await getRepository(Allocation).findOneOrFail({
-      questionTemplateId,
-      paperUserId
-    });
-    if (!allocation) {
-      response.sendStatus(404);
-      return;
-    }
-
-    // TODO: pick an unmarked question and allocate it to paperUser if allocation with paperUser
-    // exists and there is still cap
-    /* const unMarkedQuestionsOfQuestionTemplate = await getRepository(Question)
-      .createQueryBuilder("question")
-      .leftJoinAndSelect("question.marks", "mark")
-      .where("mark is null")
-      .getOne();*/
-
-    const mark = new Mark();
-    mark.paperUser = paperUser;
-    mark.question = question;
-    mark.score = 0;
-    await validateOrReject(mark);
-
-    const data = await mark.getData();
-    response.status(201).json({ mark: data });
-  } catch (error) {
-    response.sendStatus(400);
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterUserId = payload.id;
+  const questionId = request.params.id;
+  const postData: MarkPostData = pick(request.body, "score");
+  const question = await getRepository(Question).findOne(questionId, {
+    where: { discardedAt: IsNull() },
+    relations: ["script", "questionTemplate", "questionTemplate.allocations"]
+  });
+  if (!question) {
+    response.sendStatus(404);
+    return;
   }
+  const paperId = question.script!.paperId;
+  const questionTemplate = question.questionTemplate!;
+  const allowed = await allowedRequester(
+    requesterUserId,
+    paperId,
+    PaperUserRole.Marker
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { requester } = allowed;
+  if (
+    requester.role === PaperUserRole.Marker &&
+    !(await isAllocated(questionTemplate, requester.id))
+  ) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const mark = new Mark(question, requester, postData.score);
+  const errors = await validate(mark);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+  await getRepository(Mark).save(mark);
+
+  const data = await mark.getData();
+  response.status(201).json({ mark: data });
 }
 
 export async function update(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const markId = Number(request.params.id);
-    const allowed = await allowedMarker(userId, markId);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
-    const postData: Partial<MarkPatchData> = request.body;
-    const { score } = postData;
+  const mark = response.locals.mark;
+  const patchData: MarkPatchData = pick(request.body, "score");
 
-    const mark = await getRepository(Mark).findOneOrFail(markId, {
-      where: { discardedAt: IsNull() }
-    });
-
-    if (score) {
-      mark.score = score;
-    }
-    await validateOrReject(mark);
-    await getRepository(Mark).save(mark);
-
-    const data = await mark.getData();
-    response.status(201).json({ mark: data });
-  } catch (error) {
+  mark.score = patchData.score;
+  const errors = await validate(mark);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(Mark).save(mark);
+
+  const data = await mark.getData();
+  response.status(200).json({ mark: data });
 }
 
 export async function discard(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const markId = Number(request.params.id);
-    const allowed = await allowedMarker(userId, markId);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+  const mark: Mark = response.locals.mark;
 
-    await getRepository(Mark).update(markId, {
-      discardedAt: new Date()
-    });
-
-    response.sendStatus(204);
-  } catch (error) {
+  mark.discardedAt = new Date();
+  const errors = await validate(mark);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(Mark).save(mark);
+
+  response.sendStatus(204);
 }
 
 export async function undiscard(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const markId = Number(request.params.id);
-    const allowed = await allowedMarker(userId, markId);
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
+  const mark: Mark = response.locals.mark;
 
-    await getRepository(Mark).update(markId, {
-      discardedAt: undefined
-    });
-
-    const mark = await getRepository(Mark).findOneOrFail(markId, {
-      where: { discardedAt: Not(IsNull()) }
-    });
-
-    const data = await mark.getData();
-    response.status(200).json({ mark: data });
-  } catch (error) {
+  mark.discardedAt = null;
+  const errors = await validate(mark);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(Mark).save(mark);
+
+  const data = await mark.getData();
+  response.status(200).json({ mark: data });
 }
