@@ -1,3 +1,4 @@
+import { IsNotEmpty } from "class-validator";
 import { Entity, ManyToOne, Column, getRepository } from "typeorm";
 
 import { Base } from "./Base";
@@ -33,6 +34,7 @@ export class Annotation extends Base {
   paperUser?: PaperUser;
 
   @Column({ type: "jsonb" })
+  @IsNotEmpty()
   layer: AnnotationLine[];
 
   getListData = (): AnnotationListData => {

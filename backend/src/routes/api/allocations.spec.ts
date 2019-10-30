@@ -31,9 +31,7 @@ beforeEach(async () => {
   q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
   q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 
-  allocation = new Allocation();
-  allocation.paperUser = fixtures.marker;
-  allocation.questionTemplate = q1;
+  allocation = new Allocation(q1, fixtures.marker);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
   await getRepository(QuestionTemplate).save(q1);

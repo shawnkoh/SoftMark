@@ -1,13 +1,54 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+  ValidatorConstraint,
+  Validate
+} from "class-validator";
 import { Entity, ManyToOne, Column, getRepository } from "typeorm";
+
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { MarkData, MarkListData } from "../types/marks";
+import { QuestionTemplate } from "./QuestionTemplate";
+
+@ValidatorConstraint({ name: "IsValidScore", async: true })
+class IsValidScoreConstraint implements ValidatorConstraintInterface {
+  async validate(score: number, args: ValidationArguments) {
+    const questionId = (args.object as any)["questionId"];
+    const question: Question =
+      (args.object as any)["question"] ||
+      (await getRepository(Question).findOneOrFail(questionId, {
+        relations: ["questionTemplate"]
+      }));
+    const questionTemplate =
+      question.questionTemplate ||
+      (await getRepository(QuestionTemplate).findOneOrFail(
+        question.questionTemplateId
+      ));
+    if (!questionTemplate.score || score > questionTemplate.score) {
+      return false;
+    }
+    return true;
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return "Invalid score";
+  }
+}
 
 @Entity()
 export class Mark extends Discardable {
   entityName = "Mark";
+
+  constructor(question: Question, marker: PaperUser, score: number) {
+    super();
+    this.question = question;
+    this.marker = marker;
+    this.score = score;
+  }
 
   @Column()
   questionId!: number;
@@ -16,25 +57,27 @@ export class Mark extends Discardable {
   question?: Question;
 
   @Column()
-  paperUserId!: number;
+  markerId!: number;
 
   @ManyToOne(type => PaperUser, paperUser => paperUser.marks)
-  paperUser?: PaperUser;
+  marker?: PaperUser;
 
   @Column()
   @IsNotEmpty()
   @IsNumber()
-  score!: number;
+  @Validate(IsValidScoreConstraint)
+  score: number;
 
-  @Column()
-  @IsNotEmpty()
-  @IsNumber()
-  timeSpent!: number;
+  // TODO: Not in MVP
+  // @Column()
+  // @IsNotEmpty()
+  // @IsNumber()
+  // timeSpent!: number;
 
-  getListData = async (): Promise<MarkListData> => ({
+  getListData = (): MarkListData => ({
     ...this.getBase(),
     questionId: this.questionId,
-    paperUserId: this.paperUserId,
+    markerId: this.markerId,
     score: this.score
   });
 
@@ -42,16 +85,11 @@ export class Mark extends Discardable {
     this.question = await getRepository(Question).findOneOrFail(
       this.questionId
     );
-    this.paperUser = await getRepository(PaperUser).findOneOrFail(
-      this.paperUserId
-    );
+    this.marker = await getRepository(PaperUser).findOneOrFail(this.markerId);
     return {
-      ...this.getBase(),
-      questionId: this.questionId,
+      ...this.getListData(),
       question: await this.question.getListData(),
-      paperUserId: this.paperUserId,
-      paperUser: await this.paperUser.getListData(),
-      score: this.score
+      marker: await this.marker.getListData()
     };
   };
 }

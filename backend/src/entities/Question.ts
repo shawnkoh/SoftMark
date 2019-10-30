@@ -20,6 +20,12 @@ import { QuestionListData, QuestionData } from "../types/questions";
 export class Question extends Discardable {
   entityName = "Question";
 
+  constructor(script: Script, questionTemplate: QuestionTemplate) {
+    super();
+    this.script = script;
+    this.questionTemplate = questionTemplate;
+  }
+
   @Column()
   questionTemplateId!: number;
 

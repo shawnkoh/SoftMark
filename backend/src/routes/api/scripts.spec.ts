@@ -1,11 +1,10 @@
 import * as request from "supertest";
 import { getRepository } from "typeorm";
-import { ApiServer } from "../../server";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
-import { PaperUser } from "../../entities/PaperUser";
+
 import { Script } from "../../entities/Script";
-import { User } from "../../entities/User";
+import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
+import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -17,19 +16,11 @@ beforeAll(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  script1 = new Script();
-  script1.paper = fixtures.paper;
-  script1.paperUser = fixtures.student;
-
-  script2 = new Script();
-  script2.paper = fixtures.paper;
-  script2.paperUser = new PaperUser();
-  script2.paperUser.paper = fixtures.paper;
-  script2.paperUser.role = PaperUserRole.Student;
-  script2.paperUser.user = new User();
-  script2.paperUser.user.email = "badaboum@gmail.com";
-  await getRepository(User).save(script2.paperUser.user);
-  await getRepository(PaperUser).save(script2.paperUser);
+  script1 = new Script(fixtures.paper, fixtures.student);
+  script2 = new Script(
+    fixtures.paper,
+    (await fixtures.createPaperUser(PaperUserRole.Student)).paperUser
+  );
   await getRepository(Script).save([script1, script2]);
 });
 
