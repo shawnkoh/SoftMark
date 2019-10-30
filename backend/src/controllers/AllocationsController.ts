@@ -9,7 +9,7 @@ import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedRequesterOrFail } from "../utils/papers";
+import { allowedRequesterOrFail, allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -50,9 +50,31 @@ export async function create(request: Request, response: Response) {
     const data = await allocation.getData();
     response.status(201).json({ allocation: data });
   } catch (error) {
-    console.error(error);
     response.sendStatus(400);
   }
+}
+
+export async function index(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const paperId = request.params.id;
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Marker
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { paper } = allowed;
+
+  const allocations = await getRepository(Allocation).find({
+    where: { paper }
+  });
+
+  const data = allocations.map(allocation => allocation.getListData());
+  response.status(200).json({ allocations: data });
 }
 
 // hard delete

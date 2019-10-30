@@ -1,5 +1,5 @@
 import * as request from "supertest";
-import { getRepository } from "typeorm";
+import { getRepository, getManager } from "typeorm";
 
 import { PaperUser } from "../../entities/PaperUser";
 import { Script } from "../../entities/Script";
@@ -10,12 +10,21 @@ import { ScriptListData, isScriptData, ScriptData } from "../../types/scripts";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { isScriptTemplateData } from "../../types/scriptTemplates";
+import { Allocation } from "../../entities/Allocation";
+import { QuestionTemplate } from "../../entities/QuestionTemplate";
+import {
+  isAllocationListData,
+  AllocationListData
+} from "../../types/allocations";
 
 let server: ApiServer;
 let fixtures: Fixtures;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
+});
+
+beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 });
@@ -139,11 +148,6 @@ describe("POST /papers/:id/script_templates", () => {
 
   // Constraints
   it("should return ScriptTemplateData", async () => {
-    // delete the script template created in an earlier test
-    await getRepository(ScriptTemplate).update(
-      { paperId: fixtures.paper.id },
-      { discardedAt: new Date() }
-    );
     const response = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
       .set("Authorization", fixtures.ownerAccessToken)
@@ -153,11 +157,17 @@ describe("POST /papers/:id/script_templates", () => {
   });
 
   it("should not allow a second Script Template", async () => {
-    const response = await request(server.server)
+    const first = await request(server.server)
       .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(fixtures.scriptTemplatePostData);
-    expect(response.status).toEqual(400);
+    expect(first.status).toEqual(201);
+
+    const second = await request(server.server)
+      .post(`/v1/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptTemplatePostData);
+    expect(second.status).toEqual(400);
   });
 });
 
@@ -187,6 +197,9 @@ describe("GET /papers/:id/script_templates/active", () => {
   });
 
   it("should return ScriptTemplateData", async () => {
+    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    await getRepository(ScriptTemplate).save(scriptTemplate);
+
     const response = await request(server.server)
       .get(`/v1/papers/${fixtures.paper.id}/script_templates/active`)
       .set("Authorization", fixtures.ownerAccessToken)
@@ -306,5 +319,58 @@ describe("GET /papers/:id/scripts", () => {
     expect(response.status).toEqual(200);
     const data = response.body.scripts as ScriptListData[];
     expect(data.length).toEqual(count);
+  });
+});
+
+describe("GET /papers/:id/allocations", () => {
+  beforeEach(async () => {
+    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const q1Template = new QuestionTemplate(scriptTemplate, "1", 5);
+    const q2Template = new QuestionTemplate(scriptTemplate, "2", null);
+    const q2aTemplate = new QuestionTemplate(scriptTemplate, "2a", 5);
+    const q2bTemplate = new QuestionTemplate(scriptTemplate, "2b", 5);
+    const q1Allocation = new Allocation(q1Template, fixtures.marker);
+    const q2Allocation = new Allocation(q2Template, fixtures.marker);
+    await getManager().transaction(async manager => {
+      await manager.save(scriptTemplate);
+      await manager.save([q1Template, q2Template, q2aTemplate, q2bTemplate]);
+      await manager.save([q1Allocation, q2Allocation]);
+    });
+  });
+
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/allocations`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Marker to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/allocations`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should not allow a Paper's Student to access this route", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/allocations`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+
+  it("should return AllocationListData[]", async () => {
+    const response = await request(server.server)
+      .get(`/v1/papers/${fixtures.paper.id}/allocations`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).toEqual(200);
+    const data = response.body.allocations as AllocationListData[];
+    expect(data.every(allocation => isAllocationListData(allocation))).toBe(
+      true
+    );
   });
 });
