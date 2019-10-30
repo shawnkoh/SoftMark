@@ -52,7 +52,7 @@ export class Question extends Discardable {
     type => PaperUser,
     currentMarker => currentMarker.questionsBeingMarked
   )
-  currentMarker?: PaperUser;
+  currentMarker?: PaperUser | null;
 
   @Column({ type: "timestamp without time zone", nullable: true })
   @IsOptional()
@@ -74,6 +74,8 @@ export class Question extends Discardable {
     ...this.getBase(),
     questionTemplateId: this.questionTemplateId,
     scriptId: this.scriptId,
+    currentMarkerId: this.currentMarkerId,
+    currentMarkerUpdatedAt: this.currentMarkerUpdatedAt,
     pageQuestionsCount: this.pageQuestions
       ? this.pageQuestions.length
       : await getRepository(PageQuestion).count({ questionId: this.id }),
