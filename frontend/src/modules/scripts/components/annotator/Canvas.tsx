@@ -1,28 +1,22 @@
-import React, {
-  useReducer,
-  useRef,
-  useImperativeHandle,
-  forwardRef
-} from "react";
+import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
-import * as Konva from "konva";
 
 import {
   AnnotationLine,
   Annotation,
   CanvasMode
 } from "../../../../types/canvas";
+
 import {
   getDistance,
   getClientPointerRelativeToStage,
   getRelativePointerPosition
 } from "../../../../utils/canvas";
 
-import UrlImage from "./ImageUrl";
+import UrlImage from "./UrlImage";
 
 interface CanvasProps {
-  ref: any;
   width: number;
   height: number;
   backgroundImageSource: string;
@@ -35,7 +29,7 @@ interface CanvasProps {
 }
 
 enum CanvasActionType {
-  Clear = "clear",
+  ReplaceForegroundAnnotation = "replaceForegroundAnnotation",
   BeginLine = "beginLine",
   ContinueLine = "continueLine",
   EndLine = "endLine",
@@ -51,7 +45,7 @@ interface Point {
 }
 
 type CanvasAction =
-  | { type: CanvasActionType.Clear }
+  | { type: CanvasActionType.ReplaceForegroundAnnotation; payload: Annotation }
   | { type: CanvasActionType.BeginLine }
   | { type: CanvasActionType.ContinueLine; payload: Point }
   | { type: CanvasActionType.EndLine }
@@ -72,8 +66,86 @@ interface CanvasState {
   draggable: boolean;
 }
 
+const createCanvasStateReducer = ({
+  penColor,
+  penWidth,
+  onForegroundAnnotationChange
+}: Pick<
+  CanvasProps,
+  "penColor" | "penWidth" | "onForegroundAnnotationChange"
+>) => (state: CanvasState, action: CanvasAction): CanvasState => {
+  let nextState = state;
+  let hasForegroundAnnotationChanged = false;
+  switch (action.type) {
+    case CanvasActionType.ReplaceForegroundAnnotation:
+      nextState = produce(state, draftState => {
+        draftState.lines = action.payload;
+      });
+      hasForegroundAnnotationChanged = true;
+      break;
+    case CanvasActionType.BeginLine:
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = true;
+        draftState.lines.push({
+          points: [],
+          type: "source-over",
+          color: penColor,
+          width: penWidth
+        });
+      });
+      break;
+    case CanvasActionType.ContinueLine:
+      if (state.isDrawing) {
+        nextState = produce(state, draftState => {
+          draftState.lines[draftState.lines.length - 1].points.push(
+            action.payload.x,
+            action.payload.y
+          );
+        });
+      }
+      break;
+    case CanvasActionType.EndLine:
+      if (state.isDrawing) {
+        hasForegroundAnnotationChanged = true;
+      }
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = false;
+      });
+      break;
+    case CanvasActionType.ClickLine:
+      nextState = produce(state, draftState => {
+        draftState.lines.splice(action.payload, 1);
+      });
+      hasForegroundAnnotationChanged = true;
+      break;
+    case CanvasActionType.Drag:
+      nextState = produce(state, draftState => {
+        draftState.stagePosition = action.payload;
+      });
+      break;
+    case CanvasActionType.PanZoom:
+      nextState = produce(state, draftState => {
+        draftState.stageScale = action.payload.stageScale;
+        draftState.stagePosition = action.payload.stagePosition;
+        draftState.lastDist = action.payload.lastDist;
+      });
+      break;
+    case CanvasActionType.SetDraggable:
+      nextState = {
+        ...state,
+        draggable: action.payload
+      };
+      break;
+    default:
+      nextState = state;
+  }
+  if (hasForegroundAnnotationChanged) {
+    onForegroundAnnotationChange(nextState.lines);
+  }
+  return nextState;
+};
+
 const Canvas: React.FC<CanvasProps> = ({
-  ref,
   width,
   height,
   backgroundImageSource,
@@ -93,91 +165,28 @@ const Canvas: React.FC<CanvasProps> = ({
     draggable: false
   };
 
-  const canvasStateReducer = (
-    state: CanvasState,
-    action: CanvasAction
-  ): CanvasState => {
-    let nextState = state;
-    let hasForegroundAnnotationChanged = false;
-    switch (action.type) {
-      case CanvasActionType.Clear:
-        nextState = produce(state, draftState => {
-          draftState.lines = [];
-        });
-        hasForegroundAnnotationChanged = true;
-        break;
-      case CanvasActionType.BeginLine:
-        nextState = produce(state, draftState => {
-          draftState.isDrawing = true;
-          draftState.lines.push({
-            points: [],
-            type: "source-over",
-            color: penColor,
-            width: penWidth
-          });
-        });
-        break;
-      case CanvasActionType.ContinueLine:
-        if (state.isDrawing) {
-          nextState = produce(state, draftState => {
-            draftState.lines[draftState.lines.length - 1].points.push(
-              action.payload.x,
-              action.payload.y
-            );
-          });
-        }
-        break;
-      case CanvasActionType.EndLine:
-        if (state.isDrawing) {
-          hasForegroundAnnotationChanged = true;
-        }
-        nextState = produce(state, draftState => {
-          draftState.isDrawing = false;
-        });
-        break;
-      case CanvasActionType.ClickLine:
-        nextState = produce(state, draftState => {
-          draftState.lines.splice(action.payload, 1);
-        });
-        hasForegroundAnnotationChanged = true;
-        break;
-      case CanvasActionType.Drag:
-        nextState = produce(state, draftState => {
-          draftState.stagePosition = action.payload;
-        });
-        break;
-      case CanvasActionType.PanZoom:
-        nextState = produce(state, draftState => {
-          draftState.stageScale = action.payload.stageScale;
-          draftState.stagePosition = action.payload.stagePosition;
-          draftState.lastDist = action.payload.lastDist;
-        });
-        break;
-      case CanvasActionType.SetDraggable:
-        nextState = {
-          ...state,
-          draggable: action.payload
-        };
-        break;
-      default:
-        nextState = state;
-    }
-    if (hasForegroundAnnotationChanged) {
-      onForegroundAnnotationChange(nextState.lines);
-    }
-    return nextState;
-  };
+  const memoizedCanvasStateReducer = useCallback(
+    createCanvasStateReducer({
+      penColor,
+      penWidth,
+      onForegroundAnnotationChange
+    }),
+    [penColor, penWidth, onForegroundAnnotationChange]
+  );
 
   const [canvasState, dispatch] = useReducer(
-    canvasStateReducer,
+    memoizedCanvasStateReducer,
     initialCanvasState
   );
 
-  useImperativeHandle(ref, () => ({
-    clear: () => {
-      dispatch({ type: CanvasActionType.Clear });
+  useEffect(() => {
+    if (foregroundAnnotation !== canvasState.lines) {
+      dispatch({
+        type: CanvasActionType.ReplaceForegroundAnnotation,
+        payload: foregroundAnnotation
+      });
     }
-  }));
+  }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
 
   const stageRef = useRef<any>(null);
 
@@ -432,4 +441,4 @@ const Canvas: React.FC<CanvasProps> = ({
   );
 };
 
-export default forwardRef(Canvas);
+export default Canvas;

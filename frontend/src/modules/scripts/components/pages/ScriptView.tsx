@@ -7,7 +7,7 @@ import api from "../../../../api";
 import LoadingIcon from "../../../../components/icons/LoadingIcon";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
-import Annotater from "../annotater/Annotater";
+import Annotater from "../annotator/Annotator";
 
 type Props = RouteComponentProps;
 
@@ -40,8 +40,15 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   return (
     <div>
       {script.pages.map((page, index) => {
-        //return <img key={index} src={page.imageUrl} />;
-        return <Annotater imageUrl={page.imageUrl} />;
+        return (
+          <Annotater
+            key={index}
+            backgroundImageSource={page.imageUrl}
+            backgroundAnnotations={[[]]} // TODO: get other users' annotations from backend
+            initialForegroundAnnotation={[]} // TODO: get this user's annotation from backend
+            onForegroundAnnotationChange={console.log} // TODO: save this user's annotation to backend
+          />
+        );
       })}
     </div>
   );
