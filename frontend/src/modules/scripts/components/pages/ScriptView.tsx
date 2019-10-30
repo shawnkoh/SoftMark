@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Document, Page } from "react-pdf";
 import { getDocument } from "pdfjs-dist";
@@ -7,7 +7,7 @@ import api from "../../../../api";
 import LoadingIcon from "../../../../components/icons/LoadingIcon";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
-import Annotater from "../annotater/Annotater";
+import Annotator from "../annotator/Annotator";
 import TogglePageComponent from "../misc/TogglePageComponent";
 
 type Props = RouteComponentProps;
@@ -35,29 +35,30 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
 
   if (isLoading) {
     return (
-      <>
-        <LoadingIcon /> Loading script...
-      </>
+      <Fragment>
+        <LoadingIcon />
+        Loading script...
+      </Fragment>
     );
   }
 
   if (!script) {
-    return <>The script does not exist</>;
+    return <Fragment>The script does not exist</Fragment>;
   }
 
   return (
     <div>
       {script.pages.map((page, index) => {
         return (
-          <>
+          <Fragment>
             {page.pageNo === viewPageNo && (
-              <Annotater
+              <Annotator
                 key={page.id}
-                imageUrl={page.imageUrl}
                 pageId={page.id}
+                backgroundImageSource={page.imageUrl}
               />
             )}
-          </>
+          </Fragment>
         );
       })}
       <TogglePageComponent

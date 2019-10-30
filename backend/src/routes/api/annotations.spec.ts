@@ -10,15 +10,17 @@ import {
   isAnnotationData,
   AnnotationPatchData,
   AnnotationData,
-  AnnotationLine,
+  AnnotationLine
 } from "../../types/annotations";
 
-const exampleAnnotation: AnnotationLine[] = [{
-  color: "#ff0000",
-  points: [],
-  type: "source-over",
-  width: 5,
-}];
+const exampleAnnotation: AnnotationLine[] = [
+  {
+    color: "#ff0000",
+    points: [],
+    type: "source-over",
+    width: 5
+  }
+];
 
 let server: ApiServer;
 let fixtures: Fixtures;
@@ -86,7 +88,7 @@ describe("PATCH /annotations/:id", () => {
       .send(patchData);
     expect(response.status).toEqual(200);
     const data: AnnotationData = response.body.annotation;
-    expect(isAnnotationData(data)).toBe(true);  
+    expect(isAnnotationData(data)).toBe(true);
     //expect(data.layer).toBe(patchData.layer); not sure how array equality is being handled but i suspect its by pointers
   });
 });

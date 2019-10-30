@@ -4,15 +4,21 @@ import { getRepository } from "typeorm";
 import { Page } from "../../entities/Page";
 import { Script } from "../../entities/Script";
 import { ApiServer } from "../../server";
-import { isAnnotationData, AnnotationPostData, AnnotationLine } from "../../types/annotations";
+import {
+  isAnnotationData,
+  AnnotationPostData,
+  AnnotationLine
+} from "../../types/annotations";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 
-const exampleAnnotation: AnnotationLine[] = [{
-  color: "#ff0000",
-  points: [],
-  type: "source-over",
-  width: 5,
-}];
+const exampleAnnotation: AnnotationLine[] = [
+  {
+    color: "#ff0000",
+    points: [],
+    type: "source-over",
+    width: 5
+  }
+];
 
 let server: ApiServer;
 let fixtures: Fixtures;
