@@ -17,10 +17,7 @@ import {
 } from "backend/src/types/scripts";
 import { drawerWidth } from "../sidebars/Sidebar";
 import { DropAreaBase } from "material-ui-file-dropzone";
-<<<<<<< HEAD
-=======
 import BottomNav from "../footers/BottomNav";
->>>>>>> master
 
 const useStyles = makeStyles(theme => ({
   root: {
