@@ -1,11 +1,27 @@
 import React from "react";
 import * as Yup from "yup";
 import api from "../../../../api";
-import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Divider,
+  Typography
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import { PaperPostData } from "backend/src/types/papers";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
+import FadedDivider from "../dividers/FadedDivider";
+
+const useStyles = makeStyles(() => ({
+  dialogTitle: {
+    paddingTop: 20,
+    paddingBottom: 10,
+    paddingLeft: 30
+  }
+}));
 
 interface OwnProps {
   visible: boolean;
@@ -20,12 +36,14 @@ const AddPaperModal: React.FC<Props> = ({
   toggleVisibility,
   toggleRefresh
 }) => {
+  const classes = useStyles();
+
   const values: PaperPostData = {
     name: ""
   };
 
   const formMetadata: FormMetadataType<PaperPostData> = {
-    name: { label: "Name", required: true, options: null, xs: 10, sm: 10 }
+    name: { label: "Name", required: true, options: null, xs: 12, sm: 12 }
   };
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required")
@@ -33,8 +51,11 @@ const AddPaperModal: React.FC<Props> = ({
 
   return (
     <Dialog open={visible} onBackdropClick={toggleVisibility} fullWidth>
-      <DialogTitle>Add new paper</DialogTitle>
       <DialogContent>
+        <Typography variant="h4" className={classes.dialogTitle}>
+          Add new paper
+        </Typography>
+        <FadedDivider />
         <SimpleForm
           initialValues={values}
           formMetadata={formMetadata}
