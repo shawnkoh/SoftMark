@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getRepository } from "typeorm";
 
 import { Annotation } from "../../entities/Annotation";
@@ -55,7 +55,7 @@ afterAll(async () => {
 describe("PATCH /annotations/:id", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/annotations/${annotation.id}`)
+      .patch(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -63,7 +63,7 @@ describe("PATCH /annotations/:id", () => {
 
   it("should allow the author of the annotation to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/annotations/${annotation.id}`)
+      .patch(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -71,7 +71,7 @@ describe("PATCH /annotations/:id", () => {
 
   it("should not allow anyone who is not the author of the annotation to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/annotations/${annotation.id}`)
+      .patch(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -83,7 +83,7 @@ describe("PATCH /annotations/:id", () => {
       layer: exampleAnnotation
     };
     const response = await request(server.server)
-      .patch(`/v1/annotations/${annotation.id}`)
+      .patch(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(200);
@@ -96,7 +96,7 @@ describe("PATCH /annotations/:id", () => {
 describe("DELETE /annotations/:id", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/annotations/${annotation.id}`)
+      .delete(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -104,7 +104,7 @@ describe("DELETE /annotations/:id", () => {
 
   it("should allow the author of the annotation to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/annotations/${annotation.id}`)
+      .delete(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -112,7 +112,7 @@ describe("DELETE /annotations/:id", () => {
 
   it("should not allow anyone who is not the author of the annotation to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/annotations/${annotation.id}`)
+      .delete(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -120,7 +120,7 @@ describe("DELETE /annotations/:id", () => {
 
   it("should hard delete the Annotation", async () => {
     const response = await request(server.server)
-      .delete(`/v1/annotations/${annotation.id}`)
+      .delete(`${fixtures.api}/annotations/${annotation.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(204);

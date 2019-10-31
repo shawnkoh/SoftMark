@@ -1,9 +1,9 @@
-import * as bodyParser from "body-parser";
-import * as cors from "cors";
-import * as express from "express";
-import * as helmet from "helmet";
 import { Server } from "http";
-import * as morgan from "morgan";
+import bodyParser from "body-parser";
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
+import morgan from "morgan";
 import "reflect-metadata";
 import { createConnection, Connection } from "typeorm";
 import routes from "./routes";
@@ -13,7 +13,7 @@ export class ApiServer {
   public connection: Connection | null = null;
   public server: Server | null = null;
 
-  async initialize(port: number = 3000) {
+  async initialize(port: number = 3001) {
     this.connection = await createConnection(ormconfig);
 
     const app = express();

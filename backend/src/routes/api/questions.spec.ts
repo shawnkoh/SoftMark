@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getRepository } from "typeorm";
 
 import { Allocation } from "../../entities/Allocation";
@@ -63,7 +63,7 @@ afterAll(async () => {
 describe("POST /questions/:id/marks", () => {
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/questions/${q1.id}/marks`)
+      .post(`${fixtures.api}/questions/${q1.id}/marks`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -71,7 +71,7 @@ describe("POST /questions/:id/marks", () => {
 
   it("should allow an allocated PaperUser to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/questions/${q1.id}/marks`)
+      .post(`${fixtures.api}/questions/${q1.id}/marks`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -82,7 +82,7 @@ describe("POST /questions/:id/marks", () => {
       PaperUserRole.Marker
     );
     const response = await request(server.server)
-      .post(`/v1/questions/${q1.id}/marks`)
+      .post(`${fixtures.api}/questions/${q1.id}/marks`)
       .set("Authorization", accessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -93,7 +93,7 @@ describe("POST /questions/:id/marks", () => {
       score: q1Template.score! - 1
     };
     const response = await request(server.server)
-      .post(`/v1/questions/${q1.id}/marks`)
+      .post(`${fixtures.api}/questions/${q1.id}/marks`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -106,7 +106,7 @@ describe("POST /questions/:id/marks", () => {
       score: q1Template.score! + 0.5
     };
     const response = await request(server.server)
-      .post(`/v1/questions/${q1.id}/marks`)
+      .post(`${fixtures.api}/questions/${q1.id}/marks`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(postData);
     expect(response.status).toEqual(400);
@@ -117,7 +117,7 @@ describe("POST /questions/:id/marks", () => {
       score: 7
     };
     const response = await request(server.server)
-      .post(`/v1/questions/${q2.id}/marks`)
+      .post(`${fixtures.api}/questions/${q2.id}/marks`)
       .set("Authorization", fixtures.markerAccessToken)
       .send(postData);
     expect(response.status).toEqual(400);
@@ -125,7 +125,7 @@ describe("POST /questions/:id/marks", () => {
 
   it("should allow allocation inheritance", async () => {
     const response = await request(server.server)
-      .post(`/v1/questions/${q2a.id}/marks`)
+      .post(`${fixtures.api}/questions/${q2a.id}/marks`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
