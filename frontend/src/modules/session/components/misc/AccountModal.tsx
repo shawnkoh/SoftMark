@@ -15,7 +15,7 @@ import { UserPatchData } from "backend/src/types/users";
 
 type Props = RouteComponentProps;
 
-const PortfolioButtonAndModal: React.FC<Props> = props => {
+const AccountModal: React.FC<Props> = props => {
   const dispatch = useDispatch();
   const loggedIn = useSelector(isLoggedIn);
   const currentUser = useSelector(getCurrentUser);
@@ -82,11 +82,9 @@ const PortfolioButtonAndModal: React.FC<Props> = props => {
           </Button>
         </DialogContent>
       </Dialog>
-      <Button color="secondary" onClick={toggleVisibility}>
-        <Person />
-      </Button>
+      {props.children(toggleVisibility)}
     </>
   );
 };
 
-export default withRouter(PortfolioButtonAndModal);
+export default withRouter(AccountModal);

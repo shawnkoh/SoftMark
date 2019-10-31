@@ -4,7 +4,7 @@ import Header from "./Header";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import api from "../../api";
-import { setCurrentUser, setCurrentToken } from "../../modules/session/actions";
+import { setCurrentUser, setCurrentToken } from "../session/actions";
 
 type Props = RouteComponentProps;
 const MainLayout: React.FC<Props> = props => {

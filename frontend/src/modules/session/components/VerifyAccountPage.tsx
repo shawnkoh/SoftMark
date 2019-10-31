@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import api from "../../../api";
-import useSnackbar from "../../../components/snackbar/useSnackbar";
 import ReactGA from "react-ga";
-import LoadingIcon from "../../../components/icons/LoadingIcon";
+import api from "../../../api";
+
+import useSnackbar from "../../../components/snackbar/useSnackbar";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const queryString = require("query-string");
 
@@ -35,7 +36,7 @@ const VerifyAccountPage: React.FC<Props> = props => {
       });
   }, [props.history, params, snackbar]);
 
-  return <LoadingIcon />;
+  return <LoadingSpinner />;
 };
 
 export default VerifyAccountPage;

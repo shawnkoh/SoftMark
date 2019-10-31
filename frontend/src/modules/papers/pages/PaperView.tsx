@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { PDFtoIMG } from "react-pdf-to-image";
-import api from "../../../../api";
+import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, CssBaseline, Grid, Typography } from "@material-ui/core";
-import LoadingIcon from "../../../../components/icons/LoadingIcon";
-import AddButton from "../../../../components/buttons/AddButton";
-import Header from "../headers/PaperViewHeader";
-import SideBar from "../sidebars/Sidebar";
-import AddMarkerModal from "../modals/AddMarkerModal";
+import { Add } from "@material-ui/icons";
+import Header from "../components/headers/PaperViewHeader";
+import SideBar from "../components/sidebars/Sidebar";
+import AddMarkerModal from "../components/modals/AddMarkerModal";
 import { PaperData } from "backend/src/types/papers";
 import {
   ScriptPostData,
   ScriptListData,
   ScriptData
 } from "backend/src/types/scripts";
-import { drawerWidth } from "../sidebars/Sidebar";
+import { drawerWidth } from "../components/sidebars/Sidebar";
 import { DropAreaBase } from "material-ui-file-dropzone";
-import BottomNav from "../footers/BottomNav";
+import BottomNav from "../components/footers/BottomNav";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -76,7 +76,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return <LoadingSpinner />;
   }
 
   if (!paper) {
@@ -106,10 +106,15 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             );
           })}
           <Grid item xs={12}>
-            <AddButton
-              text={"Add marker"}
+            <Button
               onClick={toggleOpenAddMarkerDialog}
-            />
+              variant="outlined"
+              color="primary"
+              size="large"
+              startIcon={<Add />}
+            >
+              Add Marker
+            </Button>
             <AddMarkerModal
               paperId={paper_id}
               visible={isOpenAddMarkerDialog}
