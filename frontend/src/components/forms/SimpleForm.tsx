@@ -2,19 +2,20 @@ import { Formik, FormikProps, FieldArray, Field } from "formik";
 import * as React from "react";
 import { ObjectSchema } from "yup";
 import {
-  Card,
+  Button,
+  Fab,
   Grid,
   IconButton,
   MenuItem,
   TextField,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import CancelIcon from "@material-ui/icons/Cancel";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
-import TickIcon from "@material-ui/icons/CheckCircle";
 
 import { OptionsType } from "../../utils/options";
+import ThemedButton from "../buttons/ThemedButton";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,6 +30,9 @@ const useStyles = makeStyles(() => ({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center"
+  },
+  textField: {
+    background: "#B0E0E6" //change color to change textfield fill
   }
 }));
 
@@ -95,6 +99,8 @@ interface OwnProps<T extends object> {
   // The function to be called when the submit button is pressed.
   // The function should resolve to a boolean that determines if the form is to be reset.
   onSubmit: (newValues: T) => Promise<boolean>;
+  // whether to included reset button
+  includeReset?: boolean;
 }
 
 type Props<T extends object> = OwnProps<T>;
@@ -108,14 +114,15 @@ const SimpleForm: React.FC<Props<any>> = ({
   formMetadata,
   validationSchema,
   onCancel,
-  onSubmit
+  onSubmit,
+  includeReset
 }) => {
   const classes = useStyles();
 
   const formKeys = Object.keys(formMetadata);
 
   return (
-    <Card className={classes.root}>
+    <div className={classes.root}>
       <Grid
         container
         direction="column"
@@ -169,106 +176,110 @@ const SimpleForm: React.FC<Props<any>> = ({
 
             return (
               <form onSubmit={handleSubmit}>
-                <Grid container spacing={0}>
-                  <Grid item xs={11}>
-                    <Grid container spacing={2}>
-                      {// Form fields
-                      formKeys.map(key => {
-                        const fields = formMetadata[key];
-                        return (
-                          <Grid
-                            item
-                            key={key}
-                            xs={fields.xs}
-                            sm={fields.sm}
-                            md={fields.md}
-                            lg={fields.lg}
-                            xl={fields.xl}
-                          >
-                            {fields.customInput ? (
-                              fields.customInput(key, FormProps)
-                            ) : values[key] instanceof Array &&
-                              !!fields.formikFieldArrayFunction ? (
-                              <FieldArray name={key}>
-                                {fields.formikFieldArrayFunction(
-                                  values[key],
-                                  FormProps
-                                )}
-                              </FieldArray>
-                            ) : (
-                              <TextField
-                                id={key}
-                                name={key}
-                                helperText={touched[key] ? errors[key] : ""}
-                                error={touched[key] && Boolean(errors[key])}
-                                label={fields.label}
-                                value={values && values[key] ? values[key] : ""}
-                                onChange={change.bind(null, key)}
-                                fullWidth
-                                multiline={fields.multiline}
-                                rows={fields.multiline ? "4" : undefined}
-                                variant={
-                                  (!fields.multiline
-                                    ? "standard"
-                                    : "outlined") as any
-                                }
-                                margin="dense"
-                                disabled={isSubmitting || fields.disabled}
-                                // Select is true if options are not null
-                                select={!!fields.options}
-                                required={fields.required}
-                              >
-                                {!fields.options
-                                  ? null
-                                  : fields.options.map((option: any) => (
-                                      <MenuItem
-                                        key={option.value}
-                                        value={option.value}
-                                      >
-                                        {option.label}
-                                      </MenuItem>
-                                    ))}
-                              </TextField>
+                <Grid container spacing={2}>
+                  {// Form fields
+                  formKeys.map(key => {
+                    const fields = formMetadata[key];
+                    return (
+                      <Grid
+                        item
+                        key={key}
+                        xs={fields.xs}
+                        sm={fields.sm}
+                        md={fields.md}
+                        lg={fields.lg}
+                        xl={fields.xl}
+                      >
+                        {fields.customInput ? (
+                          fields.customInput(key, FormProps)
+                        ) : values[key] instanceof Array &&
+                          !!fields.formikFieldArrayFunction ? (
+                          <FieldArray name={key}>
+                            {fields.formikFieldArrayFunction(
+                              values[key],
+                              FormProps
                             )}
-                          </Grid>
-                        );
-                      })}
-                    </Grid>
-                  </Grid>
+                          </FieldArray>
+                        ) : (
+                          <TextField
+                            id={key}
+                            name={key}
+                            className={classes.textField}
+                            helperText={touched[key] ? errors[key] : ""}
+                            error={touched[key] && Boolean(errors[key])}
+                            label={fields.label}
+                            value={values && values[key] ? values[key] : ""}
+                            onChange={change.bind(null, key)}
+                            fullWidth
+                            multiline={fields.multiline}
+                            rows={fields.multiline ? "4" : undefined}
+                            variant={
+                              (!fields.multiline ? "filled" : "outlined") as any
+                            }
+                            margin="dense"
+                            disabled={isSubmitting || fields.disabled}
+                            // Select is true if options are not null
+                            select={!!fields.options}
+                            required={fields.required}
+                          >
+                            {!fields.options
+                              ? null
+                              : fields.options.map((option: any) => (
+                                  <MenuItem
+                                    key={option.value}
+                                    value={option.value}
+                                  >
+                                    {option.label}
+                                  </MenuItem>
+                                ))}
+                          </TextField>
+                        )}
+                      </Grid>
+                    );
+                  })}
                   {/* Form buttons */}
-                  <Grid item xs={1}>
-                    <div className={classes.buttons}>
-                      <Tooltip title="Cancel">
-                        <IconButton onClick={onCancel} size="medium">
-                          <CancelIcon color="error" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Save">
-                        <div>
-                          <IconButton
-                            type="submit"
-                            disabled={!isValid || isSubmitting}
-                            size="medium"
-                            color="primary"
-                          >
-                            <TickIcon />
-                          </IconButton>
-                        </div>
-                      </Tooltip>
-                      <Tooltip title="Reset">
-                        <div>
-                          <IconButton
-                            type="button"
-                            onClick={handleReset}
-                            disabled={!dirty || isSubmitting}
-                            size="medium"
-                            color="primary"
-                          >
-                            <ResetIcon />
-                          </IconButton>
-                        </div>
-                      </Tooltip>
-                    </div>
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    spacing={0}
+                    direction="row"
+                    justify="flex-end"
+                  >
+                    {includeReset && (
+                      <Grid item>
+                        <Tooltip title="Reset">
+                          <div>
+                            <IconButton
+                              type="button"
+                              onClick={handleReset}
+                              disabled={!dirty || isSubmitting}
+                              size="medium"
+                              color="primary"
+                            >
+                              <ResetIcon />
+                            </IconButton>
+                          </div>
+                        </Tooltip>
+                      </Grid>
+                    )}
+                    <Grid item>
+                      <ThemedButton onClick={onCancel} text="Discard" />
+                    </Grid>
+                    <Grid item style={{ paddingLeft: 20 }}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        style={{ borderRadius: 25 }}
+                        disabled={!isValid || isSubmitting}
+                        size="medium"
+                        color="primary"
+                      >
+                        <Typography variant="h5" align="center">
+                          SUBMIT
+                        </Typography>
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </form>
@@ -276,7 +287,7 @@ const SimpleForm: React.FC<Props<any>> = ({
           }}
         </Formik>
       </Grid>
-    </Card>
+    </div>
   );
 };
 
