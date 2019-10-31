@@ -11,8 +11,7 @@ import { allowedRequester } from "../utils/papers";
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
 
-  const paper = new Paper();
-  paper.name = request.body.name;
+  const paper = new Paper(request.body.name);
   const paperErrors = await validate(paper);
   if (paperErrors.length > 0) {
     response.sendStatus(400);

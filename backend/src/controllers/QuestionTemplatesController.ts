@@ -1,12 +1,13 @@
 import { validateOrReject, validate } from "class-validator";
 import { addMinutes } from "date-fns";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not, Brackets } from "typeorm";
+import { getRepository, IsNull, Not, Brackets, getManager } from "typeorm";
 import { pick } from "lodash";
 
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { Question } from "../entities/Question";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { Script } from "../entities/Script";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { isAllocated } from "../middlewares/canModifyMark";
 import { PaperUserRole } from "../types/paperUsers";
 import {
@@ -27,41 +28,55 @@ export async function create(request: Request, response: Response) {
     "score"
   ) as QuestionTemplatePostData;
 
-  let scriptTemplate: ScriptTemplate;
-  try {
-    scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
-      scriptTemplateId,
-      { where: { discardedAt: IsNull() } }
-    );
-    await allowedRequesterOrFail(
-      requesterId,
-      scriptTemplate.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+  const scriptTemplate = await getRepository(ScriptTemplate).findOne(
+    scriptTemplateId,
+    { where: { discardedAt: IsNull() } }
+  );
+  if (!scriptTemplate) {
     response.sendStatus(404);
     return;
   }
-
-  try {
-    const questionTemplate = new QuestionTemplate();
-    questionTemplate.scriptTemplate = scriptTemplate;
-    if (postData.parentName) {
-      const parent = await getRepository(QuestionTemplate).findOneOrFail({
-        where: { name: postData.parentName }
-      });
-      questionTemplate.parentQuestionTemplate = parent;
-    }
-    Object.assign(questionTemplate, postData);
-    await validateOrReject(questionTemplate);
-
-    await getRepository(QuestionTemplate).save(questionTemplate);
-
-    const data = await questionTemplate.getData();
-    response.status(201).json({ questionTemplate: data });
-  } catch (error) {
-    response.sendStatus(400);
+  const allowed = await allowedRequester(
+    requesterId,
+    scriptTemplate.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
   }
+  const { paper } = allowed;
+
+  const questionTemplate = new QuestionTemplate(
+    scriptTemplate,
+    postData.name,
+    postData.score
+  );
+  if (postData.parentName) {
+    const parent = await getRepository(QuestionTemplate).findOneOrFail({
+      where: { name: postData.parentName }
+    });
+    questionTemplate.parentQuestionTemplate = parent;
+  }
+  const errors = await validate(questionTemplate);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+
+  // create Question for all the Paper's Scripts
+  const scripts = await getRepository(Script).find({ paper });
+  const questions = scripts.map(
+    script => new Question(script, questionTemplate)
+  );
+
+  await getManager().transaction(async manager => {
+    await manager.save(questionTemplate);
+    await manager.save(questions);
+  });
+
+  const data = await questionTemplate.getData();
+  response.status(201).json({ questionTemplate: data });
 }
 
 export async function show(request: Request, response: Response) {
