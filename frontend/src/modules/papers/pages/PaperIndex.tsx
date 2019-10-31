@@ -6,7 +6,6 @@ import { PaperListData } from "backend/src/types/papers";
 import api from "../../../api";
 
 import {
-  CssBaseline,
   Container,
   Grid,
   Typography,
@@ -20,6 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Header from "../components/headers/PaperIndexHeader";
 import AddPaperModal from "../components/modals/AddPaperModal";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import { RoundedButton } from "../../../components/buttons/StyledButtons";
 
 const useStyles = makeStyles(theme => ({
   grid: {
@@ -31,9 +31,6 @@ const useStyles = makeStyles(theme => ({
   },
   cardItem: {
     margin: theme.spacing(2)
-  },
-  cardButton: {
-    borderRadius: 24
   }
 }));
 
@@ -64,7 +61,6 @@ const PaperIndex: React.FC<Props> = props => {
 
   return (
     <>
-      <CssBaseline />
       <Header />
       <main>
         <Container fixed maxWidth="md">
@@ -82,17 +78,17 @@ const PaperIndex: React.FC<Props> = props => {
                     <Typography variant="body1" className={classes.cardItem}>
                       {true ? "Set up completed" : "Set up is incomplete"}
                     </Typography>
-                    <Button
+                    <RoundedButton
                       onClick={() => {
                         props.history.push(`/papers/${paper.id}`);
                       }}
                       size="small"
                       variant="contained"
                       color="primary"
-                      className={clsx(classes.cardItem, classes.cardButton)}
+                      className={classes.cardItem}
                     >
                       Settings
-                    </Button>
+                    </RoundedButton>
                   </Box>
                 </Paper>
               </Grid>
