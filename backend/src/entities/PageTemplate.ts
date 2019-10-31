@@ -1,18 +1,23 @@
 import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+
 import { Discardable } from "./Discardable";
-import { ScriptTemplate } from "./ScriptTemplate";
-import { PageTemplateListData, PageTemplateData } from "../types/PageTemplates";
 import { PageQuestionTemplate } from "./PageQuestionTemplate";
 import { QuestionTemplate } from "./QuestionTemplate";
+import { ScriptTemplate } from "./ScriptTemplate";
+import { PageTemplateListData, PageTemplateData } from "../types/pageTemplates";
 import { QuestionTemplateListData } from "../types/questionTemplates";
 
 @Entity()
 export class PageTemplate extends Discardable {
   entityName = "PageTemplate";
 
-  constructor(scriptTemplate: ScriptTemplate) {
+  constructor(scriptTemplate: ScriptTemplate | number) {
     super();
-    this.scriptTemplate = scriptTemplate;
+    if (typeof scriptTemplate === "number") {
+      this.scriptTemplateId = scriptTemplate;
+    } else {
+      this.scriptTemplate = scriptTemplate;
+    }
   }
 
   @Column()

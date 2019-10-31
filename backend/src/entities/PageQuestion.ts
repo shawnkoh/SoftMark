@@ -1,12 +1,27 @@
 import { Entity, ManyToOne, Column, getRepository } from "typeorm";
+
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
 import { Question } from "./Question";
-import { PageQuestionListData, PageQuestionData } from "../types/PageQuestions";
+import { PageQuestionListData, PageQuestionData } from "../types/pageQuestions";
 
 @Entity()
 export class PageQuestion extends Discardable {
   entityName = "PageQuestion";
+
+  constructor(page: Page | number, question: Question | number) {
+    super();
+    if (typeof page === "number") {
+      this.pageId = page;
+    } else {
+      this.page = page;
+    }
+    if (typeof question === "number") {
+      this.questionId = question;
+    } else {
+      this.question = question;
+    }
+  }
 
   @Column()
   pageId!: number;
