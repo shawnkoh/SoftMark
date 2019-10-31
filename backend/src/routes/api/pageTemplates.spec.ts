@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getRepository } from "typeorm";
 
 import { PageTemplate } from "../../entities/PageTemplate";
@@ -36,7 +36,7 @@ afterAll(async () => {
 describe("GET /page_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/page_templates/${q1.id}`)
+      .get(`${fixtures.api}/page_templates/${q1.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -44,7 +44,7 @@ describe("GET /page_templates/:id", () => {
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/page_templates/${q1.id}`)
+      .get(`${fixtures.api}/page_templates/${q1.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -52,7 +52,7 @@ describe("GET /page_templates/:id", () => {
 
   it("should allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/page_templates/${q1.id}`)
+      .get(`${fixtures.api}/page_templates/${q1.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -60,7 +60,7 @@ describe("GET /page_templates/:id", () => {
 
   it("should return PageTemplateData", async () => {
     const response = await request(server.server)
-      .get(`/v1/page_templates/${q1.id}`)
+      .get(`${fixtures.api}/page_templates/${q1.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(200);

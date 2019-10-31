@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getRepository } from "typeorm";
 
 import { PageQuestionTemplate } from "../../entities/PageQuestionTemplate";
@@ -41,7 +41,7 @@ afterAll(async () => {
 describe("PATCH /script_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -49,7 +49,7 @@ describe("PATCH /script_templates/:id", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -57,7 +57,7 @@ describe("PATCH /script_templates/:id", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -68,7 +68,7 @@ describe("PATCH /script_templates/:id", () => {
       name: "abc"
     };
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(patchData);
     expect(response.status).toEqual(200);
@@ -79,7 +79,7 @@ describe("PATCH /script_templates/:id", () => {
 describe("DELETE /script_templates/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .delete(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -87,7 +87,7 @@ describe("DELETE /script_templates/:id", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .delete(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -95,7 +95,7 @@ describe("DELETE /script_templates/:id", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/script_templates/${scriptTemplate.id}`)
+      .delete(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -105,7 +105,7 @@ describe("DELETE /script_templates/:id", () => {
 describe("PATCH /script_templates/:id/undiscard", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -113,7 +113,7 @@ describe("PATCH /script_templates/:id/undiscard", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -121,7 +121,7 @@ describe("PATCH /script_templates/:id/undiscard", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/script_templates/${scriptTemplate.id}/undiscard`)
+      .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}/undiscard`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -131,7 +131,9 @@ describe("PATCH /script_templates/:id/undiscard", () => {
 describe("POST /script_templates/:id/question_templates", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -139,7 +141,9 @@ describe("POST /script_templates/:id/question_templates", () => {
 
   it("should not allow a Marker to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -147,7 +151,9 @@ describe("POST /script_templates/:id/question_templates", () => {
 
   it("should not allow a Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -159,7 +165,9 @@ describe("POST /script_templates/:id/question_templates", () => {
       score: null
     };
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -171,7 +179,9 @@ describe("POST /script_templates/:id/question_templates", () => {
       score: 5
     };
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -183,7 +193,9 @@ describe("POST /script_templates/:id/question_templates", () => {
       score: 2
     };
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -193,7 +205,9 @@ describe("POST /script_templates/:id/question_templates", () => {
 describe("POST /script_templates/:id/page_question_templates", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/page_question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -201,7 +215,9 @@ describe("POST /script_templates/:id/page_question_templates", () => {
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/page_question_templates`
+      )
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -209,7 +225,9 @@ describe("POST /script_templates/:id/page_question_templates", () => {
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/page_question_templates`
+      )
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -226,7 +244,9 @@ describe("POST /script_templates/:id/page_question_templates", () => {
       questionTemplateId: q1.id
     };
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/page_question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
@@ -248,7 +268,9 @@ describe("POST /script_templates/:id/page_question_templates", () => {
       questionTemplateId: q1.id
     };
     const response = await request(server.server)
-      .post(`/v1/script_templates/${scriptTemplate.id}/page_question_templates`)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/page_question_templates`
+      )
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(400);

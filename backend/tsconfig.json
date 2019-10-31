@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "skipLibCheck": true,
-    "baseUrl": "./",
-    "lib": ["es5", "es6", "es2018"],
-    "target": "es2018",
     "module": "commonjs",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es6",
+    "strict": true,
     "moduleResolution": "node",
-    "outDir": "./build",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*", "src/types/*"]
+    },
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": true,
-    "strict": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["src/**/*"]
 }

@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getRepository } from "typeorm";
 
 import { Script } from "../../entities/Script";
@@ -31,7 +31,7 @@ afterAll(async () => {
 describe("GET /scripts/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -39,7 +39,7 @@ describe("GET /scripts/:id", () => {
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -47,7 +47,7 @@ describe("GET /scripts/:id", () => {
 
   it("should allow a Script's Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`/v1/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -55,7 +55,7 @@ describe("GET /scripts/:id", () => {
 
   it("should not allow a Student to access another Student's Script", async () => {
     const response = await request(server.server)
-      .get(`/v1/scripts/${script2.id}`)
+      .get(`${fixtures.api}/scripts/${script2.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -65,7 +65,7 @@ describe("GET /scripts/:id", () => {
 describe("DELETE /scripts/:id", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/scripts/${script1.id}`)
+      .delete(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(204);
@@ -73,7 +73,7 @@ describe("DELETE /scripts/:id", () => {
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/scripts/${script1.id}`)
+      .delete(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -81,7 +81,7 @@ describe("DELETE /scripts/:id", () => {
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .delete(`/v1/scripts/${script1.id}`)
+      .delete(`${fixtures.api}/scripts/${script1.id}`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -91,7 +91,7 @@ describe("DELETE /scripts/:id", () => {
 describe("PATCH /scripts/:id/undiscard", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/scripts/${script1.id}/undiscard`)
+      .patch(`${fixtures.api}/scripts/${script1.id}/undiscard`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).toEqual(200);
@@ -99,7 +99,7 @@ describe("PATCH /scripts/:id/undiscard", () => {
 
   it("should not allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/scripts/${script1.id}/undiscard`)
+      .patch(`${fixtures.api}/scripts/${script1.id}/undiscard`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).toEqual(404);
@@ -107,7 +107,7 @@ describe("PATCH /scripts/:id/undiscard", () => {
 
   it("should not allow a Paper's Student to access this route", async () => {
     const response = await request(server.server)
-      .patch(`/v1/scripts/${script1.id}/undiscard`)
+      .patch(`${fixtures.api}/scripts/${script1.id}/undiscard`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);

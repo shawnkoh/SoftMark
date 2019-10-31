@@ -1,12 +1,13 @@
-import * as jwt from "jsonwebtoken";
-import * as sendgrid from "@sendgrid/mail";
+import jwt from "jsonwebtoken";
+import sendgrid from "@sendgrid/mail";
 import { MailData } from "@sendgrid/helpers/classes/mail";
-import { User } from "../entities/User";
+
 import { PaperUser } from "../entities/PaperUser";
+import { User } from "../entities/User";
 import { ResetPasswordTokenPayload, BearerTokenType } from "../types/tokens";
 
-const APP_NAME = "cs3216-final-project";
-const APP_URL = "https://nus.reviews";
+const APP_NAME = "SoftMark";
+const APP_URL = "https://softmark.io";
 
 function send(user: User, subject: string, message: string) {
   if (process.env.NODE_ENV !== "production") {
@@ -16,7 +17,7 @@ function send(user: User, subject: string, message: string) {
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
     to: user.email,
-    from: "mail@nus.reviews",
+    from: "mail@softmark.io",
     subject,
     text: message,
     html: message
