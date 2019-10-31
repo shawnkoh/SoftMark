@@ -11,8 +11,8 @@ import SignInPage from "./session/components/SignInPage";
 import ForgotPassword from "./session/components/ForgotPasswordPage";
 import SignUpPage from "./session/components/SignUpPage";
 import SnackbarProvider from "../components/snackbar/SnackbarProvider";
-import MainApplicationPages from "../components/layouts/MainAppPages";
-import AuthenticationPages from "../components/layouts/AuthenticationPages";
+import MainApplicationPages from "./main/MainAppPages";
+import AuthenticationPages from "./main/AuthenticationPages";
 import ResetPassword from "./session/components/ResetPasswordPage";
 import VerifyAccountPage from "./session/components/VerifyAccountPage";
 
@@ -87,22 +87,22 @@ const App: React.FC = () => {
 
   return (
     <Provider store={store}>
-      <MuiThemeProvider theme={theme}>
-        <StylesProvider injectFirst>
-          <SnackbarProvider>
-            <BrowserRouter>
-              <Switch>
-                {loginRoute}
-                {forgotPasswordRoute}
-                {resetPasswordRoute}
-                {signUpRoute}
-                {verifyAccountRoute}
-                {mainAppRoutes}
-              </Switch>
-            </BrowserRouter>
-          </SnackbarProvider>
-        </StylesProvider>
-      </MuiThemeProvider>
+      {/* <MuiThemeProvider theme={theme}> */}
+      <StylesProvider injectFirst>
+        <SnackbarProvider>
+          <BrowserRouter>
+            <Switch>
+              {loginRoute}
+              {forgotPasswordRoute}
+              {resetPasswordRoute}
+              {signUpRoute}
+              {verifyAccountRoute}
+              {mainAppRoutes}
+            </Switch>
+          </BrowserRouter>
+        </SnackbarProvider>
+      </StylesProvider>
+      {/* </MuiThemeProvider> */}
     </Provider>
   );
 };

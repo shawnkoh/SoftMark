@@ -1,14 +1,17 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Document, Page } from "react-pdf";
 import { getDocument } from "pdfjs-dist";
-import { AppState } from "../../../../types/store";
-import api from "../../../../api";
-import LoadingIcon from "../../../../components/icons/LoadingIcon";
+
+import { AppState } from "../../../types/store";
+import api from "../../../api";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
-import Annotator from "../annotator/Annotator";
-import TogglePageComponent from "../misc/TogglePageComponent";
+
+import { CircularProgress } from "@material-ui/core";
+
+import Annotator from "../components/annotator/Annotator";
+import TogglePageComponent from "../components/misc/TogglePageComponent";
 
 type Props = RouteComponentProps;
 
@@ -35,22 +38,22 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
 
   if (isLoading) {
     return (
-      <Fragment>
-        <LoadingIcon />
+      <>
+        <CircularProgress />
         Loading script...
-      </Fragment>
+      </>
     );
   }
 
   if (!script) {
-    return <Fragment>The script does not exist</Fragment>;
+    return <>The script does not exist</>;
   }
 
   return (
     <div>
       {script.pages.map((page, index) => {
         return (
-          <Fragment>
+          <>
             {page.pageNo === viewPageNo && (
               <Annotator
                 key={page.id}
@@ -58,7 +61,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
                 backgroundImageSource={page.imageUrl}
               />
             )}
-          </Fragment>
+          </>
         );
       })}
       <TogglePageComponent
