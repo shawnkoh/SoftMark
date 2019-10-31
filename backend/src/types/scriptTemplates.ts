@@ -6,12 +6,11 @@ import {
 } from "./questionTemplates";
 
 export interface ScriptTemplatePostData {
-  name?: string | null;
-  // pdf: something
+  imageUrls: string[];
 }
 
 export interface ScriptTemplatePatchData {
-  name?: string | null;
+  imageUrls?: string[];
 }
 
 export interface ScriptTemplateData extends DiscardableData {

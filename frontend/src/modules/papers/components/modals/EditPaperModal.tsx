@@ -32,7 +32,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const AddPaperModal: React.FC<Props> = ({
+const EditPaperModal: React.FC<Props> = ({
   paper,
   visible,
   toggleVisibility,
@@ -76,4 +76,4 @@ const AddPaperModal: React.FC<Props> = ({
   );
 };
 
-export default AddPaperModal;
+export default EditPaperModal;

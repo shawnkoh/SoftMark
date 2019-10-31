@@ -9,6 +9,8 @@ export interface PaperPostData {
   name: string;
 }
 
+export type PaperPatchData = PaperPostData;
+
 export interface PaperListData extends DiscardableData {
   name: string;
   role: PaperUserRole;

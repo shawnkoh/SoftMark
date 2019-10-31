@@ -35,11 +35,6 @@ export class ScriptTemplate extends Discardable {
   )
   questionTemplates?: QuestionTemplate[];
 
-  @Column({ type: "character varying", nullable: true })
-  @IsOptional()
-  @IsString()
-  name: string | null = null;
-
   getData = async (): Promise<ScriptTemplateData> => {
     const questionTemplates =
       this.questionTemplates ||
