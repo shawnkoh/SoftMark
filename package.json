@@ -1,5 +1,5 @@
 {
-  "name": "cs3216-final-project",
+  "name": "softmark",
   "private": true,
   "workspaces": [
     "frontend",
