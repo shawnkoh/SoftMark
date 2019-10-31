@@ -3,13 +3,11 @@ import * as React from "react";
 import { ObjectSchema } from "yup";
 import {
   Button,
-  Fab,
   Grid,
   IconButton,
   MenuItem,
   TextField,
-  Tooltip,
-  Typography
+  Tooltip
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
@@ -264,7 +262,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                       </Grid>
                     )}
                     <Grid item>
-                      <ThemedButton onClick={onCancel} text="Discard" />
+                      <ThemedButton onClick={onCancel} label="Discard" />
                     </Grid>
                     <Grid item style={{ paddingLeft: 20 }}>
                       <Button
@@ -275,9 +273,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                         size="medium"
                         color="primary"
                       >
-                        <Typography variant="h5" align="center">
                           SUBMIT
-                        </Typography>
                       </Button>
                     </Grid>
                   </Grid>

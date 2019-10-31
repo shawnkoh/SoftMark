@@ -1,20 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { AxiosResponse } from "axios";
 
 import { PaperListData } from "backend/src/types/papers";
-import { AppState } from "../../../types/store";
 import api from "../../../api";
 
-import { CssBaseline, Button, Grid, Typography } from "@material-ui/core";
+import { Button, Grid, Typography } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
 import Header from "../components/headers/PaperIndexHeader";
 import AddPaperModal from "../components/modals/AddPaperModal";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import ThemedButton from "../../../components/buttons/ThemedButton";
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    textAlign: "center"
+  },
+  centralisedList: {
+    marginTop: 30,
+    display: "inline-block"
+  },
+  content: {
+    marginTop: 64,
+    marginLeft: 100,
+    marginRight: 100,
+    minWidth: 500,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3), // padding between content and top and side bars
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  }
+}));
 
 type Props = RouteComponentProps;
 
 const PaperIndex: React.FC<Props> = props => {
+  const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
@@ -37,38 +60,58 @@ const PaperIndex: React.FC<Props> = props => {
   }
 
   return (
-    <div>
-      <CssBaseline />
+    <>
       <Header />
-      <div>
+      <main className={classes.content}>
         <Grid
           container
           direction="column"
           justify="flex-start"
           alignItems="center"
-          spacing={2}
+          spacing={4}
         >
           {papers.map(paper => {
             return (
               <Grid
-                key={1}
+                key={paper.id}
                 item
                 xs={12}
-                onClick={() => {
-                  props.history.push(`/papers/${paper.id}`);
-                }}
+                container
+                direction="row"
+                justify="space-between"
+                alignItems="flex-start"
               >
-                {paper.name} create component here
+                <Grid item xs={4}>
+                  <Typography variant="h6">
+                    {paper.name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} container direction="row" justify="flex-end">
+                  <Typography variant="body1">
+                    {true ? "Set up completed" : "Set up is incomplete"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={2} container direction="row" justify="flex-end">
+                  <ThemedButton
+                    label="Settings"
+                    size="small"
+                    onClick={() => {
+                      props.history.push(`/papers/${paper.id}`);
+                    }}
+                    filled={true}
+                  />
+                </Grid>
               </Grid>
             );
           })}
-          <Grid item xs={12}>
+          <Grid item xs={12} container direction="row" justify="center">
             <Button
               onClick={toggleOpenAddPaperDialog}
               variant="outlined"
               color="primary"
               size="large"
               startIcon={<Add />}
+              fullWidth
             >
               Add Paper
             </Button>
@@ -79,8 +122,8 @@ const PaperIndex: React.FC<Props> = props => {
             />
           </Grid>
         </Grid>
-      </div>
-    </div>
+      </main>
+    </>
   );
 };
 

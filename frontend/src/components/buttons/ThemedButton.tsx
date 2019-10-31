@@ -11,46 +11,46 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface OwnProps {
-  text: string;
+  label: string;
   onClick: () => void;
   filled?: boolean;
   disabled?: boolean;
+  fullWidth?: boolean;
+  size?: "small" | "medium" | "large";
 }
 
 type Props = OwnProps;
 
 const ThemedButton: React.FC<Props> = ({
-  text,
+  label,
   onClick,
   filled,
-  disabled = false
+  disabled = false,
+  fullWidth = false,
+  size = "medium"
 }) => {
   const classes = useStyles();
 
   return filled ? (
     <Button
       onClick={onClick}
-      size="medium"
+      size={size}
       disabled={disabled}
       variant="contained"
       style={{ borderRadius: 25 }}
       color="primary"
     >
-      <Typography variant="h5" align="center">
-        {text}
-      </Typography>
+        {label}
     </Button>
   ) : (
     <Button
       onClick={onClick}
-      size="medium"
+      size={size}
       style={{ borderRadius: 25 }}
       disabled={disabled}
       color="primary"
     >
-      <Typography color="primary" variant="h5" align="center">
-        {text}
-      </Typography>
+        {label}
     </Button>
   );
 };
