@@ -20,27 +20,24 @@ import BottomNav from "../components/footers/BottomNav";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex"
-  },
-  appBar: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0
-  },
-  drawerPaper: {
-    width: drawerWidth
-  },
-  toolbar: theme.mixins.toolbar,
   content: {
-    flexGrow: 1,
+    marginTop: 20,
+    marginLeft: 100,
+    marginRight: 100,
+    minWidth: 500,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3)
+    padding: theme.spacing(3), // padding between content and top and side bars
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  },
+  divider: {
+    marginTop: 50
   }
 }));
+
+const BULLET_POINT = `\u2022 `;
 
 type Props = RouteComponentProps;
 
@@ -86,11 +83,8 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const { paperUsers } = paper;
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <Header paper={paper} title={"Team"} />
+    <>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         <Grid
           container
           direction="column"
@@ -98,9 +92,47 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           alignItems="center"
           spacing={2}
         >
+          <Grid
+            key={paper.id}
+            item
+            xs={12}
+            onClick={() => {}}
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
+            <Grid item>
+              <Typography variant="h4">{paper.name}</Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Upload documents`}
+                    <br />
+                  </>
+                )}
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Set up template`}
+                    <br />
+                  </>
+                )}
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Allocate questions`}
+                    <br />
+                  </>
+                )}
+              </Typography>
+            </Grid>
+          </Grid>
+          <div className={classes.divider} />
           {paperUsers.map(paperUser => {
             return (
-              <Grid key={1} item xs={12} onClick={() => {}}>
+              <Grid key={paperUser.id} item xs={12} onClick={() => {}}>
                 {paperUser.user.email}
               </Grid>
             );
@@ -139,10 +171,9 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             </DropAreaBase>
           </Grid>
         </Grid>
-
-        <BottomNav />
       </main>
-    </div>
+      <BottomNav />
+    </>
   );
 };
 

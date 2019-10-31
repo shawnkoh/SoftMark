@@ -40,7 +40,7 @@ const ThemedButton: React.FC<Props> = ({
       style={{ borderRadius: 25 }}
       color="primary"
     >
-        {label}
+      {label}
     </Button>
   ) : (
     <Button
@@ -50,7 +50,7 @@ const ThemedButton: React.FC<Props> = ({
       disabled={disabled}
       color="primary"
     >
-        {label}
+      {label}
     </Button>
   );
 };
