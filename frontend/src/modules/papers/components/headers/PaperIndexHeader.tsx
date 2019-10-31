@@ -16,6 +16,10 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
       flexGrow: 1
+    },
+    content: {
+      marginLeft: 100,
+      marginRight: 135
     }
   })
 );
@@ -25,9 +29,9 @@ const Header: React.FC<Props> = props => {
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
-      <Toolbar>
+      <Toolbar className={classes.content}>
         <Typography variant="h6" className={classes.title}>
-          Papers
+          PAPERS
         </Typography>
         <AccountModal>
           {toggleModal => (
@@ -37,6 +41,7 @@ const Header: React.FC<Props> = props => {
               aria-label="Account of current user"
               aria-haspopup="true"
               color="inherit"
+              size="medium"
             >
               <AccountCircle />
             </IconButton>
