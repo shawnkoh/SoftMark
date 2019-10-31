@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { AppState } from "../../../../types/store";
-import api from "../../../../api";
 import { AxiosResponse } from "axios";
-import { Button, Grid, Typography } from "@material-ui/core";
-import LoadingIcon from "../../../../components/icons/LoadingIcon";
-import AddButton from "../../../../components/buttons/AddButton";
-import Header from "../headers/PaperIndexHeader";
+
 import { PaperListData } from "backend/src/types/papers";
-import AddPaperModal from "../modals/AddPaperModal";
+import { AppState } from "../../../types/store";
+import api from "../../../api";
+
+import {
+  CircularProgress,
+  CssBaseline,
+  Button,
+  Grid,
+  Typography
+} from "@material-ui/core";
+import { Add } from "@material-ui/icons";
+import Header from "../components/headers/PaperIndexHeader";
+import AddPaperModal from "../components/modals/AddPaperModal";
 
 type Props = RouteComponentProps;
 
@@ -31,11 +38,12 @@ const PaperIndex: React.FC<Props> = props => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return <CircularProgress />;
   }
 
   return (
     <div>
+      <CssBaseline />
       <Header />
       <div>
         <Grid
@@ -60,7 +68,15 @@ const PaperIndex: React.FC<Props> = props => {
             );
           })}
           <Grid item xs={12}>
-            <AddButton text={"Add Paper"} onClick={toggleOpenAddPaperDialog} />
+            <Button
+              onClick={toggleOpenAddPaperDialog}
+              variant="outlined"
+              color="primary"
+              size="large"
+              startIcon={<Add />}
+            >
+              Add Paper
+            </Button>
             <AddPaperModal
               visible={isOpenAddPaperDialog}
               toggleVisibility={toggleOpenAddPaperDialog}

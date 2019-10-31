@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { Route, RouteComponentProps, withRouter } from "react-router";
 
-import * as session from "../../modules/session";
+import { CircularProgress } from "@material-ui/core";
+
+import * as session from "../session";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
-import { setCurrentToken } from "../../modules/session/actions";
-import { Route, RouteComponentProps, withRouter } from "react-router";
-import LoadingIcon from "../icons/LoadingIcon";
+import { setCurrentToken } from "../session/actions";
 
 interface AuthenticationPagesProps {
   redirectComponent: React.FC<any> | React.ComponentClass<any>;
@@ -36,7 +37,7 @@ const AuthenticationPages: React.FC<Props> = props => {
   }, [dispatch, props.history, isLoggedIn]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return <CircularProgress />;
   }
 
   return (

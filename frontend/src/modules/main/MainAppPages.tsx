@@ -6,15 +6,15 @@ import {
   withRouter
 } from "react-router-dom";
 import MainLayout from "./MainLayout";
-import PaperIndex from "../../modules/papers/components/pages/PaperIndex";
-import PaperView from "../../modules/papers/components/pages/PaperView";
-import ScriptView from "../../modules/scripts/components/pages/ScriptView";
+import PaperIndex from "../papers/pages/PaperIndex";
+import PaperView from "../papers/pages/PaperView";
+import ScriptView from "../scripts/pages/ScriptView";
 import api from "../../api";
-import { setCurrentUser, setCurrentToken } from "../../modules/session/actions";
+import { setCurrentUser, setCurrentToken } from "../session/actions";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import * as session from "../../modules/session";
-import LoadingIcon from "../icons/LoadingIcon";
+import * as session from "../session";
+import { CircularProgress } from "@material-ui/core";
 
 type Props = RouteComponentProps;
 const MainAppPages: React.FC<Props> = props => {
@@ -51,7 +51,7 @@ const MainAppPages: React.FC<Props> = props => {
   }, [dispatch, isLoggedIn]);
 
   if (isLoading) {
-    return <LoadingIcon />;
+    return <CircularProgress />;
   } else {
     return (
       <MainLayout>
