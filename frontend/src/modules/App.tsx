@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import configureStore from "./store";
+import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { StylesProvider } from "@material-ui/styles";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
@@ -90,6 +91,7 @@ const App: React.FC = () => {
       {/* <MuiThemeProvider theme={theme}> */}
       <StylesProvider injectFirst>
         <SnackbarProvider>
+          <CssBaseline />
           <BrowserRouter>
             <Switch>
               {loginRoute}

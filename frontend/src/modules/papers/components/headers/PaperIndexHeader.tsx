@@ -1,5 +1,6 @@
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { CssBaseline, Container } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -17,9 +18,9 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flexGrow: 1
     },
-    content: {
-      marginLeft: 100,
-      marginRight: 135
+    toolbar: {
+      paddingLeft: 0,
+      paddingRight: 0
     }
   })
 );
@@ -29,25 +30,27 @@ const Header: React.FC<Props> = props => {
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
-      <Toolbar className={classes.content}>
-        <Typography variant="h6" className={classes.title}>
-          PAPERS
-        </Typography>
-        <AccountModal>
-          {toggleModal => (
-            <IconButton
-              onClick={toggleModal}
-              edge="end"
-              aria-label="Account of current user"
-              aria-haspopup="true"
-              color="inherit"
-              size="medium"
-            >
-              <AccountCircle />
-            </IconButton>
-          )}
-        </AccountModal>
-      </Toolbar>
+      <Container fixed maxWidth="md">
+        <Toolbar className={classes.toolbar}>
+          <Typography variant="h6" className={classes.title}>
+            Papers
+          </Typography>
+          <AccountModal>
+            {toggleModal => (
+              <IconButton
+                onClick={toggleModal}
+                edge="end"
+                aria-label="Account of current user"
+                aria-haspopup="true"
+                color="inherit"
+                size="medium"
+              >
+                <AccountCircle />
+              </IconButton>
+            )}
+          </AccountModal>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 };
