@@ -1,36 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import clsx from "clsx";
 
 import { PaperListData } from "backend/src/types/papers";
 import api from "../../../api";
 
-import { Button, Grid, Typography } from "@material-ui/core";
+import {
+  CssBaseline,
+  Container,
+  Grid,
+  Typography,
+  Button,
+  Box,
+  Paper
+} from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+
 import Header from "../components/headers/PaperIndexHeader";
 import AddPaperModal from "../components/modals/AddPaperModal";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
-import ThemedButton from "../../../components/buttons/ThemedButton";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    textAlign: "center"
+  grid: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
   },
-  centralisedList: {
-    marginTop: 30,
-    display: "inline-block"
+  cardItemGrow: {
+    flexGrow: 1
   },
-  content: {
-    marginTop: 64,
-    marginLeft: 100,
-    marginRight: 100,
-    minWidth: 500,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3), // padding between content and top and side bars
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+  cardItem: {
+    margin: theme.spacing(2)
+  },
+  cardButton: {
+    borderRadius: 24
   }
 }));
 
@@ -61,67 +64,56 @@ const PaperIndex: React.FC<Props> = props => {
 
   return (
     <>
+      <CssBaseline />
       <Header />
-      <main className={classes.content}>
-        <Grid
-          container
-          direction="column"
-          justify="flex-start"
-          alignItems="center"
-          spacing={4}
-        >
-          {papers.map(paper => {
-            return (
-              <Grid
-                key={paper.id}
-                item
-                xs={12}
-                container
-                direction="row"
-                justify="space-between"
-                alignItems="flex-start"
-              >
-                <Grid item xs={4}>
-                  <Typography variant="h6">
-                    {paper.name}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6} container direction="row" justify="flex-end">
-                  <Typography variant="body1">
-                    {true ? "Set up completed" : "Set up is incomplete"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={2} container direction="row" justify="flex-end">
-                  <ThemedButton
-                    label="Settings"
-                    size="small"
-                    onClick={() => {
-                      props.history.push(`/papers/${paper.id}`);
-                    }}
-                    filled={true}
-                  />
-                </Grid>
+      <main>
+        <Container fixed maxWidth="md">
+          <Grid container spacing={2} className={classes.grid}>
+            {papers.map(paper => (
+              <Grid item xs={12}>
+                <Paper>
+                  <Box display="flex" alignItems="center">
+                    <Typography
+                      variant="h5"
+                      className={clsx(classes.cardItem, classes.cardItemGrow)}
+                    >
+                      {paper.name}
+                    </Typography>
+                    <Typography variant="body1" className={classes.cardItem}>
+                      {true ? "Set up completed" : "Set up is incomplete"}
+                    </Typography>
+                    <Button
+                      onClick={() => {
+                        props.history.push(`/papers/${paper.id}`);
+                      }}
+                      size="small"
+                      variant="contained"
+                      color="primary"
+                      className={clsx(classes.cardItem, classes.cardButton)}
+                    >
+                      Settings
+                    </Button>
+                  </Box>
+                </Paper>
               </Grid>
-            );
-          })}
-          <Grid item xs={12} container direction="row" justify="center">
-            <Button
-              onClick={toggleOpenAddPaperDialog}
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<Add />}
-              fullWidth
-            >
-              Add Paper
-            </Button>
-            <AddPaperModal
-              visible={isOpenAddPaperDialog}
-              toggleVisibility={toggleOpenAddPaperDialog}
-              toggleRefresh={toggleRefreshFlag}
-            />
+            ))}
           </Grid>
-        </Grid>
+          <Button
+            onClick={toggleOpenAddPaperDialog}
+            variant="outlined"
+            color="primary"
+            size="large"
+            startIcon={<Add />}
+            fullWidth
+          >
+            Add Paper
+          </Button>
+          <AddPaperModal
+            visible={isOpenAddPaperDialog}
+            toggleVisibility={toggleOpenAddPaperDialog}
+            toggleRefresh={toggleRefreshFlag}
+          />
+        </Container>
       </main>
     </>
   );
