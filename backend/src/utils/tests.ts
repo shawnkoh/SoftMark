@@ -22,7 +22,7 @@ export async function synchronize(apiServer: ApiServer) {
 export class Fixtures {
   // Other
   faker: Faker.FakerStatic;
-  api = "/softmark/v1";
+  api = "/v1";
 
   // Instantiated
   public paper: Paper;
@@ -122,7 +122,7 @@ export async function getToken(
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const encoded = Buffer.from(`${email}:${password}`).toString("base64");
   const response = await supertest(server.server)
-    .post("/softmark/v1/auth/token")
+    .post("/v1/auth/token")
     .set("Authorization", `Basic ${encoded}`)
     .send();
   return response.body;
@@ -133,7 +133,7 @@ export async function getAuthorizationToken(
   email: string
 ): Promise<string> {
   const response = await supertest(server.server)
-    .post("/softmark/v1/auth/passwordless")
+    .post("/v1/auth/passwordless")
     .send({ email });
   if (response.status !== 201) {
     throw new Error("Mock getAuthorizationToken failed");
@@ -147,7 +147,7 @@ export async function getPasswordlessToken(
   authorizationToken: string
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const response = await supertest(server.server)
-    .post("/softmark/v1/auth/token")
+    .post("/v1/auth/token")
     .set("Authorization", `Bearer ${authorizationToken}`)
     .send();
   return response.body;
