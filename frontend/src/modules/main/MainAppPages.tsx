@@ -14,7 +14,8 @@ import { setCurrentUser, setCurrentToken } from "../session/actions";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as session from "../session";
-import { CircularProgress } from "@material-ui/core";
+
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;
 const MainAppPages: React.FC<Props> = props => {
@@ -51,7 +52,7 @@ const MainAppPages: React.FC<Props> = props => {
   }, [dispatch, isLoggedIn]);
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <LoadingSpinner />;
   } else {
     return (
       <MainLayout>

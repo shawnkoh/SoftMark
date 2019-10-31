@@ -3,13 +3,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { PDFtoIMG } from "react-pdf-to-image";
 import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  CircularProgress,
-  Button,
-  CssBaseline,
-  Grid,
-  Typography
-} from "@material-ui/core";
+import { Button, CssBaseline, Grid, Typography } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import Header from "../components/headers/PaperViewHeader";
 import SideBar from "../components/sidebars/Sidebar";
@@ -23,6 +17,7 @@ import {
 import { drawerWidth } from "../components/sidebars/Sidebar";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import BottomNav from "../components/footers/BottomNav";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -81,7 +76,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <LoadingSpinner />;
   }
 
   if (!paper) {

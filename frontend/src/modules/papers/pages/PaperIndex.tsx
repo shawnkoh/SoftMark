@@ -6,16 +6,11 @@ import { PaperListData } from "backend/src/types/papers";
 import { AppState } from "../../../types/store";
 import api from "../../../api";
 
-import {
-  CircularProgress,
-  CssBaseline,
-  Button,
-  Grid,
-  Typography
-} from "@material-ui/core";
+import { CssBaseline, Button, Grid, Typography } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import Header from "../components/headers/PaperIndexHeader";
 import AddPaperModal from "../components/modals/AddPaperModal";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;
 
@@ -38,7 +33,7 @@ const PaperIndex: React.FC<Props> = props => {
   }, [refreshFlag]);
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <LoadingSpinner />;
   }
 
   return (

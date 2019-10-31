@@ -8,10 +8,9 @@ import api from "../../../api";
 import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 
-import { CircularProgress } from "@material-ui/core";
-
 import Annotator from "../components/annotator/Annotator";
 import TogglePageComponent from "../components/misc/TogglePageComponent";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;
 
@@ -39,7 +38,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   if (isLoading) {
     return (
       <>
-        <CircularProgress />
+        <LoadingSpinner />
         Loading script...
       </>
     );

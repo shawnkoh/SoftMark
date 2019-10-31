@@ -3,8 +3,8 @@ import { RouteComponentProps } from "react-router";
 import ReactGA from "react-ga";
 import api from "../../../api";
 
-import { CircularProgress } from "@material-ui/core";
 import useSnackbar from "../../../components/snackbar/useSnackbar";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const queryString = require("query-string");
 
@@ -36,7 +36,7 @@ const VerifyAccountPage: React.FC<Props> = props => {
       });
   }, [props.history, params, snackbar]);
 
-  return <CircularProgress />;
+  return <LoadingSpinner />;
 };
 
 export default VerifyAccountPage;
