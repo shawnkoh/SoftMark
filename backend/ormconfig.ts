@@ -7,9 +7,6 @@ switch (process.env.NODE_ENV) {
   case "test":
     require("dotenv").config({ path: ".env.test" });
     break;
-  case "production":
-    require("dotenv").config({ path: ".env" });
-    break;
   case "circleci":
     require("dotenv").config({ path: ".env.circleci" });
     break;
