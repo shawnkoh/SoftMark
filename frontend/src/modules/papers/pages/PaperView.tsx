@@ -3,10 +3,14 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { PDFtoIMG } from "react-pdf-to-image";
 import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, CssBaseline, Grid, Typography } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import Header from "../components/headers/PaperViewHeader";
-import SideBar from "../components/sidebars/Sidebar";
+import {
+  Button,
+  Grid,
+  Typography,
+  IconButton
+} from "@material-ui/core";
+import Add from "@material-ui/icons/Add";
+import Edit from "@material-ui/icons/EditOutlined";
 import AddMarkerModal from "../components/modals/AddMarkerModal";
 import { PaperData } from "backend/src/types/papers";
 import {
@@ -14,10 +18,10 @@ import {
   ScriptListData,
   ScriptData
 } from "backend/src/types/scripts";
-import { drawerWidth } from "../components/sidebars/Sidebar";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import BottomNav from "../components/footers/BottomNav";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import EditPaperModal from "../components/modals/EditPaperModal";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -54,6 +58,9 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const [isOpenAddMarkerDialog, setOpenAddMarkerDialog] = useState(false);
   const toggleOpenAddMarkerDialog = () =>
     setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
+  const [isOpenEditPaperDialog, setOpenEditPaperDialog] = useState(false);
+  const toggleOpenEditPaperDialog = () =>
+    setOpenEditPaperDialog(!isOpenEditPaperDialog);
 
   const postScript = (email: string, file) => {
     api.scripts.postScript(paper_id, email, file);
@@ -96,15 +103,29 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             key={paper.id}
             item
             xs={12}
-            onClick={() => {}}
             container
             direction="column"
             justify="flex-start"
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item>
+            <Grid
+              item
+              container
+              direction="row"
+              justify="space-between"
+              alignItems="center"
+            >
               <Typography variant="h4">{paper.name}</Typography>
+              <EditPaperModal
+                paper={paper}
+                visible={isOpenEditPaperDialog}
+                toggleVisibility={toggleOpenEditPaperDialog}
+                toggleRefresh={toggleRefreshFlag}
+              />
+              <IconButton onClick={toggleOpenEditPaperDialog}>
+                <Edit />
+              </IconButton>
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
