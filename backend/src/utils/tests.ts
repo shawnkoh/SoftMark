@@ -1,16 +1,16 @@
 import { hashSync } from "bcryptjs";
-import supertest = require("supertest");
-import { getRepository } from "typeorm";
-import faker = require("faker");
+import faker from "faker";
 faker.seed(127);
+import supertest from "supertest";
+import { getRepository } from "typeorm";
 
 import { User } from "../entities/User";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
-import { ScriptTemplatePostData } from "../types/scriptTemplates";
 import { ScriptPostData } from "../types/scripts";
+import { ScriptTemplatePostData } from "../types/scriptTemplates";
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {

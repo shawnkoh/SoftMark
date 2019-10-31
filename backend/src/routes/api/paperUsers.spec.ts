@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { ApiServer } from "../../server";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 

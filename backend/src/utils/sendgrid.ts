@@ -1,8 +1,9 @@
-import * as jwt from "jsonwebtoken";
-import * as sendgrid from "@sendgrid/mail";
+import jwt from "jsonwebtoken";
+import sendgrid from "@sendgrid/mail";
 import { MailData } from "@sendgrid/helpers/classes/mail";
-import { User } from "../entities/User";
+
 import { PaperUser } from "../entities/PaperUser";
+import { User } from "../entities/User";
 import { ResetPasswordTokenPayload, BearerTokenType } from "../types/tokens";
 
 const APP_NAME = "SoftMark";
