@@ -61,6 +61,12 @@ This is preferred - its very explicit so you know what exactly is loaded
 
 typeORM documentation doesn’t cover this too well because they only guide you how to use ts without strict mode
 
+# Cascade Soft Delete
+
+- When a parent is discarded, its children are NOT discarded.
+- Instead, the children's getListData() will reflect the parent's discardedAt if its parent has been discarded.
+- See: QuestionTemplate.ts
+
 # Script Template
 
 Key Assumptions
