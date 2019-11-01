@@ -71,9 +71,7 @@ describe("PATCH /script_templates/:id", () => {
   });
 
   it("should return ScriptTemplateData", async () => {
-    const patchData: ScriptTemplatePatchData = {
-      name: "abc"
-    };
+    const patchData: ScriptTemplatePatchData = {};
     const response = await request(server.server)
       .patch(`${fixtures.api}/script_templates/${scriptTemplate.id}`)
       .set("Authorization", fixtures.ownerAccessToken)
@@ -298,7 +296,7 @@ describe("POST /script_templates/:id/page_question_templates", () => {
   });
 
   it("should return PageQuestionTemplateData", async () => {
-    const page1 = new PageTemplate(scriptTemplate);
+    const page1 = new PageTemplate(scriptTemplate, "abc", 1);
     const q1 = new QuestionTemplate(scriptTemplate, "1", 5);
     await getRepository(PageTemplate).save(page1);
     await getRepository(QuestionTemplate).save(q1);
@@ -320,7 +318,7 @@ describe("POST /script_templates/:id/page_question_templates", () => {
   });
 
   it("should not allow duplicate PageQuestionTemplates", async () => {
-    const page1 = new PageTemplate(scriptTemplate);
+    const page1 = new PageTemplate(scriptTemplate, "abc", 1);
     const q1 = new QuestionTemplate(scriptTemplate, "1", 5);
     await getRepository(PageTemplate).save(page1);
     await getRepository(QuestionTemplate).save(q1);

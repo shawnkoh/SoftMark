@@ -16,14 +16,14 @@ import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 let server: ApiServer;
 let fixtures: Fixtures;
 const scriptTemplate = new ScriptTemplate(1);
-const page1 = new PageTemplate(scriptTemplate);
-const page2 = new PageTemplate(scriptTemplate);
-const page3 = new PageTemplate(scriptTemplate);
+let page1: PageTemplate;
+let page2: PageTemplate;
+let page3: PageTemplate;
 const q1 = new QuestionTemplate(scriptTemplate, "1", null);
 const q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
 const q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
 const q2 = new QuestionTemplate(scriptTemplate, "2", 6);
-const pageQuestionTemplate = new PageQuestionTemplate(page1, q1);
+let pageQuestionTemplate: PageQuestionTemplate;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
@@ -32,6 +32,11 @@ beforeAll(async () => {
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
+
+  page1 = await fixtures.createPageTemplate(scriptTemplate);
+  page2 = await fixtures.createPageTemplate(scriptTemplate);
+  page3 = await fixtures.createPageTemplate(scriptTemplate);
+  pageQuestionTemplate = new PageQuestionTemplate(page1, q1);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
   await getRepository(PageTemplate).save([page1, page2, page3]);
