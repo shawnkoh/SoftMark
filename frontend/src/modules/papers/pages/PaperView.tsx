@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { PDFtoIMG } from "react-pdf-to-image";
+import { Link, Route, Switch } from "react-router-dom";
 import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, CssBaseline, Grid, Typography } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import Header from "../components/headers/PaperViewHeader";
-import SideBar from "../components/sidebars/Sidebar";
+import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { Button, Grid, Typography, IconButton } from "@material-ui/core";
+import { Check, People, Person, Settings } from "@material-ui/icons";
+import Add from "@material-ui/icons/Add";
 import AddMarkerModal from "../components/modals/AddMarkerModal";
 import { PaperData } from "backend/src/types/papers";
 import {
@@ -14,31 +14,30 @@ import {
   ScriptListData,
   ScriptData
 } from "backend/src/types/scripts";
-import { drawerWidth } from "../components/sidebars/Sidebar";
 import { DropAreaBase } from "material-ui-file-dropzone";
-import BottomNav from "../components/footers/BottomNav";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import SettingsTab from "../tabs/Settings";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex"
+  navBar: {
+    width: "100%",
+    height: "7%",
+    position: "fixed",
+    bottom: 0,
+    backgroundColor: "#2b4980"
   },
-  appBar: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth
+  navIcon: {
+    height: 30,
+    width: 30,
+    color: "#edeff1",
+    backgroundColor: "#2b4980"
   },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0
+  labelOn: {
+    color: "#edeff1"
   },
-  drawerPaper: {
-    width: drawerWidth
-  },
-  toolbar: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3)
+  labelOff: {
+    color: "#2b4980",
+    backgroundColor: "#2b4980"
   }
 }));
 
@@ -48,9 +47,10 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
   const paper_id = +(params as { paper_id: string }).paper_id;
   const [paper, setPaper] = useState<PaperData | null>(null);
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [pages, setPages] = useState<string[]>([]);
+  const [value, setValue] = React.useState("settings");
 
+  //const [scripts, setScripts] = useState<ScriptListData[]>([]);
+  //const [pages, setPages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
@@ -69,10 +69,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         setPaper(resp.data.paper);
       })
       .finally(() => setIsLoading(false));
-
-    api.scripts.getScripts(paper_id).then(resp => {
-      setScripts(resp.data.script);
-    });
   }, [refreshFlag]);
 
   if (isLoading) {
@@ -83,14 +79,96 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     return <>The paper does not exist</>;
   }
 
+  // Generic routes
+  const accountsRoute = (
+    <Route exact path="/papers/:paper_id/account">
+      <div />
+    </Route>
+  );
+  const settingsRoute = (
+    <Route exact path="/papers/:paper_id/settings">
+      <SettingsTab paper={paper} toggleRefresh={toggleRefreshFlag} />
+    </Route>
+  );
+  const gradingRoute = (
+    <Route exact path="/papers/:paper_id/grading">
+      <div />
+    </Route>
+  );
+  const studentsRoute = (
+    <Route exact path="/papers/:paper_id/students">
+      <div />
+    </Route>
+  );
+
+  return (
+    <>
+      <Switch>
+        {accountsRoute}
+        {settingsRoute}
+        {gradingRoute}
+        {studentsRoute}
+      </Switch>
+      <BottomNavigation
+        className={classes.navBar}
+        color="primary"
+        value={value}
+        onChange={(event: any, newValue: string) => {
+          setValue(newValue);
+        }}
+        showLabels
+      >
+        <BottomNavigationAction
+          component={Link}
+          to={`/papers/${paper.id}/account`}
+          value="account"
+          label="Account"
+          classes={{
+            label: value === "account" ? classes.labelOn : classes.labelOff
+          }}
+          icon={<Person className={classes.navIcon} />}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`/papers/${paper.id}/settings`}
+          value="settings"
+          label="Settings"
+          classes={{
+            label: value === "settings" ? classes.labelOn : classes.labelOff
+          }}
+          icon={<Settings className={classes.navIcon} />}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`/papers/${paper.id}/grading`}
+          value="grading"
+          label="Grading"
+          classes={{
+            label: value === "grading" ? classes.labelOn : classes.labelOff
+          }}
+          icon={<Check className={classes.navIcon} />}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`/papers/${paper.id}/students`}
+          value="students"
+          label="Students"
+          classes={{
+            label: value === "students" ? classes.labelOn : classes.labelOff
+          }}
+          icon={<People className={classes.navIcon} />}
+        />
+      </BottomNavigation>
+    </>
+  );
+  /*
+  
+
   const { paperUsers } = paper;
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <Header paper={paper} title={"Team"} />
+    <>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         <Grid
           container
           direction="column"
@@ -98,9 +176,71 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           alignItems="center"
           spacing={2}
         >
+          <Grid
+            key={paper.id}
+            item
+            xs={12}
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
+            <Grid
+              item
+              container
+              direction="row"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Typography variant="h4">{paper.name}</Typography>
+              <EditPaperModal
+                paper={paper}
+                visible={isOpenEditPaperDialog}
+                toggleVisibility={toggleOpenEditPaperDialog}
+                toggleRefresh={toggleRefreshFlag}
+              />
+              <IconButton onClick={toggleOpenEditPaperDialog}>
+                <Edit />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Upload documents`}
+                    <br />
+                  </>
+                )}
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Set up template`}
+                    <br />
+                  </>
+                )}
+                {true && (
+                  <>
+                    {`${BULLET_POINT} Allocate questions`}
+                    <br />
+                  </>
+                )}
+              </Typography>
+            </Grid>
+          </Grid>
+          <div className={classes.divider} />
+          <Grid
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="center"
+            spacing={4}
+          >
+            {rowDetails.map(row => createGridRow(row))}
+          </Grid>
+
           {paperUsers.map(paperUser => {
             return (
-              <Grid key={1} item xs={12} onClick={() => {}}>
+              <Grid key={paperUser.id} item xs={12} onClick={() => {}}>
                 {paperUser.user.email}
               </Grid>
             );
@@ -139,11 +279,10 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             </DropAreaBase>
           </Grid>
         </Grid>
-
-        <BottomNav />
       </main>
-    </div>
-  );
+      <BottomNav />
+    </>
+  );*/
 };
 
 export default withRouter(PaperView);

@@ -6,6 +6,7 @@ import {
   ScriptData,
   ScriptPostData
 } from "backend/src/types/scripts";
+import { getPage } from "../utils/canvas";
 
 class ScriptsAPI extends BaseAPI {
   private createScript(
@@ -35,27 +36,6 @@ class ScriptsAPI extends BaseAPI {
     return "/scripts";
   }
 
-  private getPage = (num: number, pdf) => {
-    return new Promise((resolve, reject) => {
-      pdf.getPage(num).then(page => {
-        const scale = 1.5;
-        const viewport = page.getViewport(scale);
-        const canvas = document.createElement("canvas");
-        const canvasContext = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        page
-          .render({
-            canvasContext,
-            viewport
-          })
-          .promise.then(() => {
-            resolve(canvas.toDataURL("image/jpeg"));
-          });
-      });
-    });
-  };
-
   postScript = async (
     paper_id: number,
     email: string,
@@ -67,7 +47,7 @@ class ScriptsAPI extends BaseAPI {
       PDFJS.getDocument(String(reader.result)).promise.then(async pdf => {
         const pages: any = [];
         for (let i = 0; i < pdf.numPages; i++) {
-          pages.push(this.getPage(i + 1, pdf));
+          pages.push(getPage(i + 1, pdf));
         }
         const scriptPostData: ScriptPostData = {
           email,

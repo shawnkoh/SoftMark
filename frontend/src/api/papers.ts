@@ -3,6 +3,7 @@ import { AxiosResponse } from "axios";
 import {
   PaperListData,
   PaperData,
+  PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
 import {
@@ -16,6 +17,13 @@ class PapersAPI extends BaseAPI {
     paperPostData: PaperPostData
   ): Promise<AxiosResponse<{ paper: PaperData }>> {
     return this.getClient().post(`${this.getUrl()}`, paperPostData);
+  }
+
+  editPaper(
+    id: number,
+    paperPatchData: PaperPatchData
+  ): Promise<AxiosResponse<{ paper: PaperData }>> {
+    return this.getClient().patch(`${this.getUrl()}/${id}`, paperPatchData);
   }
 
   createPaperUser(

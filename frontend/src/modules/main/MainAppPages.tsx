@@ -8,6 +8,7 @@ import {
 import MainLayout from "./MainLayout";
 import PaperIndex from "../papers/pages/PaperIndex";
 import PaperView from "../papers/pages/PaperView";
+import ScriptTemplateView from "../scripts/pages/ScriptTemplateView";
 import ScriptView from "../scripts/pages/ScriptView";
 import api from "../../api";
 import { setCurrentUser, setCurrentToken } from "../session/actions";
@@ -22,10 +23,13 @@ const MainAppPages: React.FC<Props> = props => {
   // Generic routes
   const paperIndexRoute = <Route exact path="/papers" component={PaperIndex} />;
   const paperViewRoute = (
-    <Route exact path="/papers/:paper_id" component={PaperView} />
+    <Route path="/papers/:paper_id" component={PaperView} />
   );
   const scriptViewRoute = (
     <Route exact path="/scripts/:script_id" component={ScriptView} />
+  );
+  const scriptTemplateViewRoute = (
+    <Route exact path="/papers/:paper_id/script_template" component={ScriptTemplateView} />
   );
 
   const dispatch = useDispatch();
@@ -57,6 +61,7 @@ const MainAppPages: React.FC<Props> = props => {
     return (
       <MainLayout>
         <Switch>
+          {scriptTemplateViewRoute}
           {paperIndexRoute}
           {paperViewRoute}
           {scriptViewRoute}

@@ -11,13 +11,15 @@ import { QuestionTemplateListData } from "../types/questionTemplates";
 export class PageTemplate extends Discardable {
   entityName = "PageTemplate";
 
-  constructor(scriptTemplate: ScriptTemplate | number) {
+  constructor(scriptTemplate: ScriptTemplate | number, imageUrl: string, pageNo: number) {
     super();
     if (typeof scriptTemplate === "number") {
       this.scriptTemplateId = scriptTemplate;
     } else {
       this.scriptTemplate = scriptTemplate;
     }
+    this.imageUrl = imageUrl;
+    this.pageNo = pageNo;
   }
 
   @Column()
@@ -29,6 +31,12 @@ export class PageTemplate extends Discardable {
   )
   scriptTemplate?: ScriptTemplate;
 
+  @Column({ type: "character varying" })
+  imageUrl!: string;
+
+  @Column({ type: "int" })
+  pageNo!: number;
+
   @OneToMany(
     type => PageQuestionTemplate,
     pageQuestionTemplate => pageQuestionTemplate.pageTemplate
@@ -37,7 +45,9 @@ export class PageTemplate extends Discardable {
 
   getListData = (): PageTemplateListData => ({
     ...this.getBase(),
-    scriptTemplateId: this.scriptTemplateId
+    scriptTemplateId: this.scriptTemplateId,
+    pageNo: this.pageNo,
+    imageUrl: this.imageUrl
   });
 
   getData = async (): Promise<PageTemplateData> => {

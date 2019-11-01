@@ -19,12 +19,6 @@ class AuthAPI extends BaseAPI {
     });
   }
 
-  logout(): Promise<AxiosResponse> {
-    return this.getClient().delete(`${this.getUrl()}`, {
-      withCredentials: true
-    });
-  }
-
   silentSignIn(): Promise<AxiosResponse<SignInResponseData>> {
     const accessToken = getStorageAccessToken();
     const refreshToken = getStorageRefreshToken();

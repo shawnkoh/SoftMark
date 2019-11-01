@@ -39,8 +39,9 @@ const ThemedButton: React.FC<Props> = ({
       variant="contained"
       style={{ borderRadius: 25 }}
       color="primary"
+      fullWidth={fullWidth}
     >
-        {label}
+      {label}
     </Button>
   ) : (
     <Button
@@ -49,8 +50,9 @@ const ThemedButton: React.FC<Props> = ({
       style={{ borderRadius: 25 }}
       disabled={disabled}
       color="primary"
+      fullWidth={fullWidth}
     >
-        {label}
+      {label}
     </Button>
   );
 };

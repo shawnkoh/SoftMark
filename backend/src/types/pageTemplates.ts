@@ -6,6 +6,8 @@ import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface PageTemplateListData extends DiscardableData {
   scriptTemplateId: number;
+  pageNo: number;
+  imageUrl: string;
 }
 
 export interface PageTemplateData extends PageTemplateListData {

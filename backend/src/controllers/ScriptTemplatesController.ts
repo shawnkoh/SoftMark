@@ -1,8 +1,9 @@
 import { validateOrReject, validate } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull } from "typeorm";
+import { getRepository, IsNull, getManager } from "typeorm";
 import { pick } from "lodash";
 
+import { PageTemplate } from "../entities/PageTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -16,7 +17,7 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const postData = pick(request.body, "name") as ScriptTemplatePostData;
+  const postData = pick(request.body, "imageUrls") as ScriptTemplatePostData;
   const allowed = await allowedRequester(
     requesterId,
     paperId,
@@ -35,15 +36,36 @@ export async function create(request: Request, response: Response) {
     response.sendStatus(400);
     return;
   }
+
   const scriptTemplate = new ScriptTemplate(paperId);
-  if (postData.name !== undefined) {
-    scriptTemplate.name = postData.name;
-  }
   const errors = await validate(scriptTemplate);
   if (errors.length > 0) {
     response.sendStatus(400);
     return;
   }
+  
+  let pageTemplates: PageTemplate[];
+  try {
+    pageTemplates = await Promise.all(
+      postData.imageUrls.map(
+        async (imageUrl: string, index: number): Promise<PageTemplate> => {
+          const pageTemplate = new PageTemplate(scriptTemplate, imageUrl, index + 1);
+          await validateOrReject(pageTemplate);
+          return pageTemplate;
+        }
+      )
+    );
+  } catch (error) {
+    response.sendStatus(400);
+    return;
+  }
+
+
+  await getManager().transaction(async manager => {
+    await manager.save(scriptTemplate);
+    await Promise.all(pageTemplates.map(async pageTemplate => await manager.save(pageTemplate)));
+  });
+
   await getRepository(ScriptTemplate).save(scriptTemplate);
 
   const data = await scriptTemplate.getData();
@@ -98,9 +120,7 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-    if (patchData.name !== undefined) {
-      scriptTemplate.name = patchData.name;
-    }
+
     await validateOrReject(scriptTemplate);
     await getRepository(ScriptTemplate).save(scriptTemplate);
 

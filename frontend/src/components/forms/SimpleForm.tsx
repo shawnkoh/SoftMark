@@ -273,7 +273,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                         size="medium"
                         color="primary"
                       >
-                          SUBMIT
+                        SUBMIT
                       </Button>
                     </Grid>
                   </Grid>
