@@ -52,7 +52,7 @@ export class Allocation extends Base {
       (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
     return {
       ...this.getListData(),
-      questionTemplate: questionTemplate.getListData(),
+      questionTemplate: await questionTemplate.getListData(),
       paperUser: await paperUser.getListData()
     };
   };

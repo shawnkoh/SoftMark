@@ -56,8 +56,10 @@ export class ScriptTemplate extends Discardable {
       pageTemplates: pageTemplates.map(pageTemplate =>
         pageTemplate.getListData()
       ),
-      questionTemplates: questionTemplates.map(questionTemplate =>
-        questionTemplate.getListData()
+      questionTemplates: await Promise.all(
+        questionTemplates.map(
+          async questionTemplate => await questionTemplate.getListData()
+        )
       )
     };
   };
