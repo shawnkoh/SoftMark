@@ -162,68 +162,71 @@ export async function update(request: Request, response: Response) {
 
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const requesterId = payload.id;
   const questionTemplateId = request.params.id;
-  try {
-    const questionTemplate = await getRepository(
-      QuestionTemplate
-    ).findOneOrFail(questionTemplateId, {
+  const questionTemplate = await getRepository(QuestionTemplate).findOne(
+    questionTemplateId,
+    {
       where: { discardedAt: IsNull() },
       relations: ["scriptTemplate"]
-    });
-    await allowedRequesterOrFail(
-      userId,
-      questionTemplate.scriptTemplate!.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+    }
+  );
+  if (!questionTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const allowed = await allowedRequester(
+    requesterId,
+    questionTemplate.scriptTemplate!.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  try {
-    await getRepository(QuestionTemplate).update(questionTemplateId, {
-      discardedAt: new Date()
-    });
+  await getRepository(QuestionTemplate).update(questionTemplateId, {
+    discardedAt: new Date()
+  });
 
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-  }
+  response.sendStatus(204);
 }
 
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const requesterId = payload.id;
   const questionTemplateId = request.params.id;
-  let questionTemplate: QuestionTemplate;
-  try {
-    questionTemplate = await getRepository(QuestionTemplate).findOneOrFail(
-      questionTemplateId,
-      {
-        where: { discardedAt: Not(IsNull()) },
-        relations: ["scriptTemplate"]
-      }
-    );
-    await allowedRequesterOrFail(
-      userId,
-      questionTemplate.scriptTemplate!.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+  const questionTemplate = await getRepository(QuestionTemplate).findOne(
+    questionTemplateId,
+    {
+      where: { discardedAt: Not(IsNull()) },
+      relations: ["scriptTemplate"]
+    }
+  );
+  if (!questionTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const allowed = await allowedRequester(
+    requesterId,
+    questionTemplate.scriptTemplate!.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  try {
-    questionTemplate.discardedAt = null;
-    await getRepository(QuestionTemplate).save(questionTemplate);
-
-    const data = await questionTemplate.getData();
-    response.status(200).json({ questionTemplate: data });
-  } catch (error) {
+  questionTemplate.discardedAt = null;
+  const errors = await validate(questionTemplate);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(QuestionTemplate).save(questionTemplate);
+
+  const data = await questionTemplate.getData();
+  response.status(200).json({ questionTemplate: data });
 }
 
 export async function markQuestion(request: Request, response: Response) {
