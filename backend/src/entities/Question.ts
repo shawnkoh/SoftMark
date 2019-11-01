@@ -70,22 +70,36 @@ export class Question extends Discardable {
   @OneToMany(type => Comment, comment => comment.question)
   comments?: Comment[];
 
-  getListData = async (): Promise<QuestionListData> => ({
-    ...this.getBase(),
-    questionTemplateId: this.questionTemplateId,
-    scriptId: this.scriptId,
-    currentMarkerId: this.currentMarkerId,
-    currentMarkerUpdatedAt: this.currentMarkerUpdatedAt,
-    pageQuestionsCount: this.pageQuestions
-      ? this.pageQuestions.length
-      : await getRepository(PageQuestion).count({ questionId: this.id }),
-    marksCount: this.marks
-      ? this.marks.length
-      : await getRepository(Mark).count({ questionId: this.id }),
-    bookmarksCount: this.bookmarks
-      ? this.bookmarks.length
-      : await getRepository(Bookmark).count({ questionId: this.id })
-  });
+  getListData = async (): Promise<QuestionListData> => {
+    // inherit parent's discarded at - see DEVELOPER.md
+    let discardedAt = this.discardedAt;
+    if (!discardedAt) {
+      const questionTemplate =
+        this.questionTemplate ||
+        (await getRepository(QuestionTemplate).findOneOrFail(
+          this.questionTemplateId
+        ));
+      discardedAt = questionTemplate.discardedAt;
+    }
+
+    return {
+      ...this.getBase(),
+      discardedAt,
+      questionTemplateId: this.questionTemplateId,
+      scriptId: this.scriptId,
+      currentMarkerId: this.currentMarkerId,
+      currentMarkerUpdatedAt: this.currentMarkerUpdatedAt,
+      pageQuestionsCount: this.pageQuestions
+        ? this.pageQuestions.length
+        : await getRepository(PageQuestion).count({ questionId: this.id }),
+      marksCount: this.marks
+        ? this.marks.length
+        : await getRepository(Mark).count({ questionId: this.id }),
+      bookmarksCount: this.bookmarks
+        ? this.bookmarks.length
+        : await getRepository(Bookmark).count({ questionId: this.id })
+    };
+  };
 
   getData = async (): Promise<QuestionData> => ({
     ...(await this.getListData()),

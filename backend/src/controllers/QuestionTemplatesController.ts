@@ -1,12 +1,13 @@
 import { validateOrReject, validate } from "class-validator";
 import { addMinutes } from "date-fns";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not, Brackets } from "typeorm";
+import { getRepository, IsNull, Not, Brackets, getManager } from "typeorm";
 import { pick } from "lodash";
 
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { Question } from "../entities/Question";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { Script } from "../entities/Script";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { isAllocated } from "../middlewares/canModifyMark";
 import { PaperUserRole } from "../types/paperUsers";
 import {
@@ -27,41 +28,55 @@ export async function create(request: Request, response: Response) {
     "score"
   ) as QuestionTemplatePostData;
 
-  let scriptTemplate: ScriptTemplate;
-  try {
-    scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
-      scriptTemplateId,
-      { where: { discardedAt: IsNull() } }
-    );
-    await allowedRequesterOrFail(
-      requesterId,
-      scriptTemplate.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+  const scriptTemplate = await getRepository(ScriptTemplate).findOne(
+    scriptTemplateId,
+    { where: { discardedAt: IsNull() } }
+  );
+  if (!scriptTemplate) {
     response.sendStatus(404);
     return;
   }
-
-  try {
-    const questionTemplate = new QuestionTemplate();
-    questionTemplate.scriptTemplate = scriptTemplate;
-    if (postData.parentName) {
-      const parent = await getRepository(QuestionTemplate).findOneOrFail({
-        where: { name: postData.parentName }
-      });
-      questionTemplate.parentQuestionTemplate = parent;
-    }
-    Object.assign(questionTemplate, postData);
-    await validateOrReject(questionTemplate);
-
-    await getRepository(QuestionTemplate).save(questionTemplate);
-
-    const data = await questionTemplate.getData();
-    response.status(201).json({ questionTemplate: data });
-  } catch (error) {
-    response.sendStatus(400);
+  const allowed = await allowedRequester(
+    requesterId,
+    scriptTemplate.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
   }
+  const { paper } = allowed;
+
+  const questionTemplate = new QuestionTemplate(
+    scriptTemplate,
+    postData.name,
+    postData.score
+  );
+  if (postData.parentName) {
+    const parent = await getRepository(QuestionTemplate).findOneOrFail({
+      where: { name: postData.parentName }
+    });
+    questionTemplate.parentQuestionTemplate = parent;
+  }
+  const errors = await validate(questionTemplate);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+
+  // create Question for all the Paper's Scripts
+  const scripts = await getRepository(Script).find({ paper });
+  const questions = scripts.map(
+    script => new Question(script, questionTemplate)
+  );
+
+  await getManager().transaction(async manager => {
+    await manager.save(questionTemplate);
+    await manager.save(questions);
+  });
+
+  const data = await questionTemplate.getData();
+  response.status(201).json({ questionTemplate: data });
 }
 
 export async function show(request: Request, response: Response) {
@@ -147,68 +162,71 @@ export async function update(request: Request, response: Response) {
 
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const requesterId = payload.id;
   const questionTemplateId = request.params.id;
-  try {
-    const questionTemplate = await getRepository(
-      QuestionTemplate
-    ).findOneOrFail(questionTemplateId, {
+  const questionTemplate = await getRepository(QuestionTemplate).findOne(
+    questionTemplateId,
+    {
       where: { discardedAt: IsNull() },
       relations: ["scriptTemplate"]
-    });
-    await allowedRequesterOrFail(
-      userId,
-      questionTemplate.scriptTemplate!.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+    }
+  );
+  if (!questionTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const allowed = await allowedRequester(
+    requesterId,
+    questionTemplate.scriptTemplate!.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  try {
-    await getRepository(QuestionTemplate).update(questionTemplateId, {
-      discardedAt: new Date()
-    });
+  await getRepository(QuestionTemplate).update(questionTemplateId, {
+    discardedAt: new Date()
+  });
 
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-  }
+  response.sendStatus(204);
 }
 
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const requesterId = payload.id;
   const questionTemplateId = request.params.id;
-  let questionTemplate: QuestionTemplate;
-  try {
-    questionTemplate = await getRepository(QuestionTemplate).findOneOrFail(
-      questionTemplateId,
-      {
-        where: { discardedAt: Not(IsNull()) },
-        relations: ["scriptTemplate"]
-      }
-    );
-    await allowedRequesterOrFail(
-      userId,
-      questionTemplate.scriptTemplate!.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
+  const questionTemplate = await getRepository(QuestionTemplate).findOne(
+    questionTemplateId,
+    {
+      where: { discardedAt: Not(IsNull()) },
+      relations: ["scriptTemplate"]
+    }
+  );
+  if (!questionTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const allowed = await allowedRequester(
+    requesterId,
+    questionTemplate.scriptTemplate!.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  try {
-    questionTemplate.discardedAt = null;
-    await getRepository(QuestionTemplate).save(questionTemplate);
-
-    const data = await questionTemplate.getData();
-    response.status(200).json({ questionTemplate: data });
-  } catch (error) {
+  questionTemplate.discardedAt = null;
+  const errors = await validate(questionTemplate);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(QuestionTemplate).save(questionTemplate);
+
+  const data = await questionTemplate.getData();
+  response.status(200).json({ questionTemplate: data });
 }
 
 export async function markQuestion(request: Request, response: Response) {

@@ -76,8 +76,7 @@ export class Fixtures {
 }
 
 export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {
-  const paper = new Paper();
-  paper.name = "CS1010 Midterms";
+  const paper = new Paper("CS1010 Midterms");
 
   const paperUsers: PaperUser[] = [];
   const users: User[] = [];

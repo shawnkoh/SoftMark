@@ -10,22 +10,29 @@ import {
   PageQuestionTemplatePostData,
   isPageQuestionTemplateData
 } from "../../types/pageQuestionTemplates";
-import { QuestionTemplatePostData } from "../../types/questionTemplates";
+import {
+  QuestionTemplatePostData,
+  isQuestionTemplateData,
+  QuestionTemplateData
+} from "../../types/questionTemplates";
 import {
   isScriptTemplateData,
   ScriptTemplatePatchData
 } from "../../types/scriptTemplates";
 import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+import { Script } from "../../entities/Script";
+import { PaperUserRole } from "../../types/paperUsers";
+import { Question } from "../../entities/Question";
+import { Paper } from "../../entities/Paper";
 
 let server: ApiServer;
-let fixtures: Fixtures;
-let scriptTemplate: ScriptTemplate;
-
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
 });
 
+let fixtures: Fixtures;
+let scriptTemplate: ScriptTemplate;
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
@@ -199,6 +206,63 @@ describe("POST /script_templates/:id/question_templates", () => {
       .set("Authorization", fixtures.ownerAccessToken)
       .send(postData);
     expect(response.status).toEqual(201);
+  });
+
+  it("should return QuestionTemplateData", async () => {
+    const postData: QuestionTemplatePostData = {
+      name: "1",
+      score: 7
+    };
+    const response = await request(server.server)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(201);
+    const data: QuestionTemplateData = response.body.questionTemplate;
+    expect(isQuestionTemplateData(data)).toBe(true);
+  });
+
+  it("should create a Question for all the existing Paper's Scripts", async () => {
+    const paper1Scripts = [];
+    for (let i = 1; i <= 5; i++) {
+      const student = (await fixtures.createPaperUser(PaperUserRole.Student))
+        .paperUser;
+      const script = new Script(fixtures.paper, student);
+      paper1Scripts.push(script);
+    }
+    const paper2 = new Paper("CS1010J");
+    await getRepository(Paper).save(paper2);
+    const paper2Scripts = [];
+    for (let i = 1; i <= 5; i++) {
+      const student = (await fixtures.createPaperUser(
+        PaperUserRole.Student,
+        paper2
+      )).paperUser;
+      const script = new Script(paper2, student);
+      paper2Scripts.push(script);
+    }
+    await getRepository(Script).save(paper1Scripts.concat(paper2Scripts));
+
+    const postData: QuestionTemplatePostData = {
+      name: "1",
+      score: 7
+    };
+    const response = await request(server.server)
+      .post(
+        `${fixtures.api}/script_templates/${scriptTemplate.id}/question_templates`
+      )
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(201);
+    const data: QuestionTemplateData = response.body.questionTemplate;
+
+    const count = await getRepository(Question).count({
+      questionTemplateId: data.id
+    });
+
+    expect(count).toBe(paper1Scripts.length);
   });
 });
 

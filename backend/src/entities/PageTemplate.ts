@@ -49,18 +49,25 @@ export class PageTemplate extends Discardable {
         pageQuestionTemplate => !!pageQuestionTemplate.questionTemplate
       )
     ) {
-      questionTemplates = pageQuestionTemplates.map(pageQuestionTemplate =>
-        pageQuestionTemplate.questionTemplate!.getListData()
+      questionTemplates = await Promise.all(
+        pageQuestionTemplates.map(
+          async pageQuestionTemplate =>
+            await pageQuestionTemplate.questionTemplate!.getListData()
+        )
       );
     } else {
-      questionTemplates = (await getRepository(QuestionTemplate)
-        .createQueryBuilder("questionTemplate")
-        .leftJoin(
-          "questionTemplate.pageQuestionTemplates",
-          "pageQuestionTemplates"
+      questionTemplates = await Promise.all(
+        (await getRepository(QuestionTemplate)
+          .createQueryBuilder("questionTemplate")
+          .leftJoin(
+            "questionTemplate.pageQuestionTemplates",
+            "pageQuestionTemplates"
+          )
+          .leftJoin("pageQuestionTemplates.pageTemplate", "pageTemplate")
+          .getMany()).map(
+          async questionTemplate => await questionTemplate.getListData()
         )
-        .leftJoin("pageQuestionTemplates.pageTemplate", "pageTemplate")
-        .getMany()).map(questionTemplate => questionTemplate.getListData());
+      );
     }
 
     return {
