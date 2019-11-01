@@ -25,17 +25,10 @@ import { PageTemplateListData } from "../types/pageTemplates";
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
-  constructor();
   constructor(
     scriptTemplate: ScriptTemplate,
     name: string,
     score: number | null,
-    parentQuestionTemplate?: QuestionTemplate | null
-  );
-  constructor(
-    scriptTemplate?: ScriptTemplate,
-    name?: string,
-    score?: number | null,
     parentQuestionTemplate?: QuestionTemplate | null
   ) {
     super();
@@ -116,25 +109,41 @@ export class QuestionTemplate extends Discardable {
       .getMany()).map(pageTemplate => pageTemplate.getListData());
   };
 
-  getListData = (): QuestionTemplateListData => ({
-    ...this.getBase(),
-    scriptTemplateId: this.scriptTemplateId,
-    name: this.name,
-    score: this.score,
-    parentQuestionTemplateId: this.parentQuestionTemplateId
-  });
+  getListData = async (): Promise<QuestionTemplateListData> => {
+    // inherit parent's discarded at - see DEVELOPER.md
+    let discardedAt = this.discardedAt;
+    if (!discardedAt) {
+      const scriptTemplate =
+        this.scriptTemplate ||
+        (await getRepository(ScriptTemplate).findOneOrFail(
+          this.scriptTemplateId
+        ));
+      discardedAt = scriptTemplate.discardedAt;
+    }
+
+    return {
+      ...this.getBase(),
+      discardedAt,
+      scriptTemplateId: this.scriptTemplateId,
+      name: this.name,
+      score: this.score,
+      parentQuestionTemplateId: this.parentQuestionTemplateId
+    };
+  };
 
   getData = async (): Promise<QuestionTemplateData> => {
     const pageTemplates = await this.getPageTemplates();
-    const childQuestionTemplates = (
-      this.childQuestionTemplates ||
-      (await getRepository(QuestionTemplate).find({
-        parentQuestionTemplate: this
-      }))
-    ).map(child => child.getListData());
+    const childQuestionTemplates = await Promise.all(
+      (
+        this.childQuestionTemplates ||
+        (await getRepository(QuestionTemplate).find({
+          parentQuestionTemplate: this
+        }))
+      ).map(async child => await child.getListData())
+    );
 
     return {
-      ...this.getListData(),
+      ...(await this.getListData()),
       childQuestionTemplates,
       pageTemplates
     };

@@ -55,7 +55,7 @@ export class PageQuestionTemplate extends Discardable {
     return {
       ...this.getListData(),
       pageTemplate: pageTemplate.getListData(),
-      questionTemplate: questionTemplate.getListData()
+      questionTemplate: await questionTemplate.getListData()
     };
   };
 }
