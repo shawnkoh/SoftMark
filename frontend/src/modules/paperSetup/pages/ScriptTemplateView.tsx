@@ -5,15 +5,18 @@ import { AppState } from "../../../types/store";
 import api from "../../../api";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 
-import Annotator from "../components/annotator/Annotator";
-import TogglePageComponent from "../components/misc/TogglePageComponent";
+import Annotator from "../../scripts/components/annotator/Annotator";
+import TogglePageComponent from "../../scripts/components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;
 
 const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
   const paper_id = +(params as { paper_id: string }).paper_id;
-  const [scriptTemplate, setScriptTemplate] = useState<ScriptTemplateData | null>(null);
+  const [
+    scriptTemplate,
+    setScriptTemplate
+  ] = useState<ScriptTemplateData | null>(null);
 
   const [viewPageNo, setViewPageNo] = useState(1);
   const incrementViewPageNo = () => setViewPageNo(viewPageNo + 1);
@@ -31,17 +34,13 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
         setScriptTemplate(resp.data.scriptTemplate);
       })
       .finally(() => setIsLoading(false));
-
-    /*api.scripts.getScripts(paper_id).then(resp => {
-      setScripts(resp.data.script);
-    });*/
   }, []);
 
   if (isLoading) {
     return (
       <>
         <LoadingSpinner />
-        Loading script...
+        Loading script template...
       </>
     );
   }

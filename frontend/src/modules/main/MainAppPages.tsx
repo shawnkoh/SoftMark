@@ -8,7 +8,8 @@ import {
 import MainLayout from "./MainLayout";
 import PaperIndex from "../papers/pages/PaperIndex";
 import PaperView from "../papers/pages/PaperView";
-import ScriptTemplateView from "../scripts/pages/ScriptTemplateView";
+import QuestionAllocation from "../paperSetup/pages/QuestionAllocation";
+import ScriptTemplateView from "../paperSetup/pages/ScriptTemplateView";
 import ScriptView from "../scripts/pages/ScriptView";
 import api from "../../api";
 import { setCurrentUser, setCurrentToken } from "../session/actions";
@@ -29,7 +30,18 @@ const MainAppPages: React.FC<Props> = props => {
     <Route exact path="/scripts/:script_id" component={ScriptView} />
   );
   const scriptTemplateViewRoute = (
-    <Route exact path="/papers/:paper_id/script_template" component={ScriptTemplateView} />
+    <Route
+      exact
+      path="/papers/:paper_id/script_template"
+      component={ScriptTemplateView}
+    />
+  );
+  const questionAllocationRoute = (
+    <Route
+      exact
+      path="/papers/:paper_id/question_allocation"
+      component={QuestionAllocation}
+    />
   );
 
   const dispatch = useDispatch();
@@ -57,18 +69,18 @@ const MainAppPages: React.FC<Props> = props => {
 
   if (isLoading) {
     return <LoadingSpinner />;
-  } else {
-    return (
-      <MainLayout>
-        <Switch>
-          {scriptTemplateViewRoute}
-          {paperIndexRoute}
-          {paperViewRoute}
-          {scriptViewRoute}
-        </Switch>
-      </MainLayout>
-    );
   }
+  return (
+    <MainLayout>
+      <Switch>
+        {questionAllocationRoute}
+        {scriptTemplateViewRoute}
+        {paperIndexRoute}
+        {paperViewRoute}
+        {scriptViewRoute}
+      </Switch>
+    </MainLayout>
+  );
 };
 
 export default withRouter(MainAppPages);

@@ -4,6 +4,7 @@ import clsx from "clsx";
 
 import { PaperListData } from "backend/src/types/papers";
 import api from "../../../api";
+import { format } from "date-fns";
 
 import {
   Container,
@@ -75,19 +76,25 @@ const PaperIndex: React.FC<Props> = props => {
                     >
                       {paper.name}
                     </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      className={classes.cardItem}
+                    >
+                      created on {format(new Date(paper.createdAt), "d MMM yyyy")}
+                    </Typography>
                     <Typography variant="body1" className={classes.cardItem}>
-                      {true ? "Set up completed" : "Set up is incomplete"}
+                      {false ? "Set up completed" : "Set up is incomplete"}
                     </Typography>
                     <RoundedButton
                       onClick={() => {
-                        props.history.push(`/papers/${paper.id}`);
+                        props.history.push(`/papers/${paper.id}/setup`);
                       }}
                       size="small"
                       variant="contained"
                       color="primary"
                       className={classes.cardItem}
                     >
-                      Settings
+                      View
                     </RoundedButton>
                   </Box>
                 </Paper>

@@ -42,6 +42,7 @@ class ScriptTemplatesAPI extends BaseAPI {
     paper_id: number,
     file: any,
     previousScriptTemplate: ScriptTemplateData | null,
+    onSuccessfulResponse?: () => void,
     callbackScriptData?: React.Dispatch<any>
   ) => {
     const reader = new FileReader();
@@ -59,6 +60,9 @@ class ScriptTemplatesAPI extends BaseAPI {
         }
         this.createScriptTemplate(paper_id, scriptTemplatePostData).then(
           res => {
+            if (onSuccessfulResponse) {
+              onSuccessfulResponse();
+            }
             if (callbackScriptData) {
               callbackScriptData(res.data);
             }
