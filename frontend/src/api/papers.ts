@@ -6,11 +6,7 @@ import {
   PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
-import {
-  PaperUserListData,
-  PaperUserData,
-  PaperUserPostData
-} from "../types/paperUsers";
+import { PaperUserData, PaperUserPostData } from "../types/paperUsers";
 
 class PapersAPI extends BaseAPI {
   createPaper(
@@ -40,7 +36,11 @@ class PapersAPI extends BaseAPI {
     return this.getClient().get(`${this.getUrl()}`);
   }
 
-  getPaper(id: number): Promise<AxiosResponse<{ paper: PaperData }>> {
+  getPaper(
+    id: number
+  ): Promise<
+    AxiosResponse<{ paper: PaperData; currentPaperUser: PaperUserData }>
+  > {
     return this.getClient().get(`${this.getUrl()}/${id}`);
   }
 

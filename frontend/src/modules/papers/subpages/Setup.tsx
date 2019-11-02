@@ -9,6 +9,9 @@ import { PaperData } from "backend/src/types/papers";
 import EditPaperModal from "../components/modals/EditPaperModal";
 import ThemedButton from "../../../components/buttons/ThemedButton";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import { ScriptListData } from "backend/src/types/scripts";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import useSnackbar from "../../../components/snackbar/useSnackbar";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -40,6 +43,7 @@ type Props = OwnProps & RouteComponentProps;
 const SettingsPage: React.FC<Props> = props => {
   const { paper, toggleRefresh } = props;
   const classes = useStyles();
+  const snackbar = useSnackbar();
 
   const [
     scriptTemplate,
@@ -51,6 +55,7 @@ const SettingsPage: React.FC<Props> = props => {
   );
   const refreshScriptTemplate = () =>
     setRefreshScriptTemplateFlag(!refreshScriptTemplateFlag);
+
   useEffect(() => {
     api.scriptTemplates
       .getScriptTemplate(paper.id)
@@ -58,15 +63,29 @@ const SettingsPage: React.FC<Props> = props => {
         setScriptTemplate(resp.data.scriptTemplate);
       })
       .finally(() => setIsLoadingScriptTemplate(false));
-
-    /*api.scripts.getScripts(paper_id).then(resp => {
-      setScripts(resp.data.script);
-    });*/
   }, [refreshScriptTemplateFlag]);
+
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
+  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
+  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
+  const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
+  useEffect(() => {
+    api.scripts.getScripts(paper.id).then(resp => {
+      console.log(resp);
+      setScripts(resp.data.scripts);
+    })
+    .finally(() => setIsLoadingScripts(false));
+  }, [refreshScriptsFlag]);
 
   const [isOpenEditPaperDialog, setOpenEditPaperDialog] = useState(false);
   const toggleOpenEditPaperDialog = () =>
     setOpenEditPaperDialog(!isOpenEditPaperDialog);
+
+  if (isLoadingScriptTemplate) {
+    return <LoadingSpinner loadingMessage="Loading script template..." />;
+  } else if (isLoadingScripts) {
+    return <LoadingSpinner loadingMessage="Loading scripts..." />;
+  }
 
   const createGridRow = ({ title, button }) => (
     <Grid
@@ -91,15 +110,20 @@ const SettingsPage: React.FC<Props> = props => {
       clickable={!isLoadingScriptTemplate}
       single
       onSelectFiles={files => {
-        console.log(files);
         Object.keys(files).forEach(key => {
+          const onSuccessfulResponse = () => {
+            refreshScriptTemplate();
+            snackbar.showMessage(
+              `Script template has been uploaded successfully.`,
+              "Close"
+            );
+          }
           api.scriptTemplates
-            .postScriptTemplate(paper.id, files[key], scriptTemplate)
-            .then(() => refreshScriptTemplate());
+            .postScriptTemplate(paper.id, files[key], scriptTemplate, refreshScriptTemplate)
         });
       }}
     >
-      <Button>Upload</Button>
+      <Button>{scriptTemplate ? "Re-Upload" : "Upload"}</Button>
     </DropAreaBase>
   );
 
@@ -126,12 +150,12 @@ const SettingsPage: React.FC<Props> = props => {
     {
       title: "Question allocation",
       button: (
-        <ThemedButton
-          onClick={() => {}}
-          label="Allocate"
-          filled={true}
-          fullWidth={true}
-        />
+        <Button
+          disabled={isLoadingScriptTemplate || !scriptTemplate}
+          onClick={() => props.history.push(`/papers/${paper.id}/question_allocation`)}
+        >
+          Allocate
+        </Button>
       )
     },
     {
@@ -146,7 +170,7 @@ const SettingsPage: React.FC<Props> = props => {
       )
     },
     {
-      title: "Scripts",
+      title: "Scripts (" + scripts.length + " scripts)",
       button: (
         <ThemedButton
           onClick={() => {}}

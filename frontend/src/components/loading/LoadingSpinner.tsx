@@ -1,9 +1,16 @@
 import React from "react";
 import { CircularProgress } from "@material-ui/core";
 
-const LoadingSpinner: React.FC<any> = () => (
+interface OwnProps {
+  loadingMessage?: string;
+}
+
+type Props = OwnProps;
+
+const LoadingSpinner: React.FC<Props> = ({loadingMessage = ""}) => (
   <div>
     <CircularProgress />
+    {loadingMessage}
   </div>
 );
 

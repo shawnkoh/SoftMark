@@ -9,14 +9,9 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 import Add from "@material-ui/icons/Add";
 import AddMarkerModal from "../components/modals/AddMarkerModal";
 import { PaperData } from "backend/src/types/papers";
-import {
-  ScriptPostData,
-  ScriptListData,
-  ScriptData
-} from "backend/src/types/scripts";
-import { DropAreaBase } from "material-ui-file-dropzone";
+import { PaperUserData } from "../../../types/paperUsers";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
-import SettingsTab from "../tabs/Settings";
+import SetupSubpage from "../subpages/Setup";
 
 const useStyles = makeStyles(theme => ({
   navBar: {
@@ -43,11 +38,20 @@ const useStyles = makeStyles(theme => ({
 
 type Props = RouteComponentProps;
 
+const ACCOUNT = "account";
+const SET_UP = "setup";
+const GRADING = "grading";
+const STUDENTS = "students";
+
 const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
   const paper_id = +(params as { paper_id: string }).paper_id;
   const [paper, setPaper] = useState<PaperData | null>(null);
-  const [value, setValue] = React.useState("settings");
+  const [
+    currentPaperUser,
+    setCurrentPaperUser
+  ] = useState<PaperUserData | null>(null);
+  const [value, setValue] = React.useState(SET_UP);
 
   //const [scripts, setScripts] = useState<ScriptListData[]>([]);
   //const [pages, setPages] = useState<string[]>([]);
@@ -66,7 +70,9 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     api.papers
       .getPaper(paper_id)
       .then(resp => {
-        setPaper(resp.data.paper);
+        const data = resp.data;
+        setCurrentPaperUser(data.currentPaperUser);
+        setPaper(data.paper);
       })
       .finally(() => setIsLoading(false));
   }, [refreshFlag]);
@@ -76,27 +82,35 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   }
 
   if (!paper) {
-    return <>The paper does not exist</>;
+    return <>The paper does not exist.</>;
+  }
+
+  if (!currentPaperUser) {
+    return <>You are not allowed to view this paper.</>;
   }
 
   // Generic routes
+  const accountsRoutePath = `/papers/:paper_id/${ACCOUNT}`;
   const accountsRoute = (
-    <Route exact path="/papers/:paper_id/account">
+    <Route exact path={accountsRoutePath}>
       <div />
     </Route>
   );
-  const settingsRoute = (
-    <Route exact path="/papers/:paper_id/settings">
-      <SettingsTab paper={paper} toggleRefresh={toggleRefreshFlag} />
+  const setupRoutePath = `/papers/:paper_id/${SET_UP}`;
+  const setupRoute = (
+    <Route exact path={setupRoutePath}>
+      <SetupSubpage paper={paper} toggleRefresh={toggleRefreshFlag} />
     </Route>
   );
+  const gradingRoutePath = `/papers/:paper_id/${GRADING}`;
   const gradingRoute = (
-    <Route exact path="/papers/:paper_id/grading">
+    <Route exact path={gradingRoutePath}>
       <div />
     </Route>
   );
+  const studentsRoutePath = `/papers/:paper_id/${STUDENTS}`;
   const studentsRoute = (
-    <Route exact path="/papers/:paper_id/students">
+    <Route exact path={studentsRoutePath}>
       <div />
     </Route>
   );
@@ -105,7 +119,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     <>
       <Switch>
         {accountsRoute}
-        {settingsRoute}
+        {setupRoute}
         {gradingRoute}
         {studentsRoute}
       </Switch>
@@ -120,41 +134,41 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
       >
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper.id}/account`}
-          value="account"
+          to={accountsRoutePath}
+          value={ACCOUNT}
           label="Account"
           classes={{
-            label: value === "account" ? classes.labelOn : classes.labelOff
+            label: value === ACCOUNT ? classes.labelOn : classes.labelOff
           }}
           icon={<Person className={classes.navIcon} />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper.id}/settings`}
-          value="settings"
-          label="Settings"
+          to={setupRoutePath}
+          value={SET_UP}
+          label="Set up"
           classes={{
-            label: value === "settings" ? classes.labelOn : classes.labelOff
+            label: value === SET_UP ? classes.labelOn : classes.labelOff
           }}
           icon={<Settings className={classes.navIcon} />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper.id}/grading`}
-          value="grading"
+          to={gradingRoutePath}
+          value={GRADING}
           label="Grading"
           classes={{
-            label: value === "grading" ? classes.labelOn : classes.labelOff
+            label: value === GRADING ? classes.labelOn : classes.labelOff
           }}
           icon={<Check className={classes.navIcon} />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper.id}/students`}
-          value="students"
+          to={studentsRoutePath}
+          value={STUDENTS}
           label="Students"
           classes={{
-            label: value === "students" ? classes.labelOn : classes.labelOff
+            label: value === STUDENTS ? classes.labelOn : classes.labelOff
           }}
           icon={<People className={classes.navIcon} />}
         />

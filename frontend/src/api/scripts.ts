@@ -16,7 +16,7 @@ class ScriptsAPI extends BaseAPI {
     return this.getClient().post(`/papers/${id}/scripts`, scriptPostData);
   }
 
-  getScripts(id: number): Promise<AxiosResponse<{ script: ScriptListData[] }>> {
+  getScripts(id: number): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
     return this.getClient().get(`/papers/${id}/scripts`);
   }
 

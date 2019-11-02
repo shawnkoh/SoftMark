@@ -83,18 +83,18 @@ const PaperIndex: React.FC<Props> = props => {
                       created on {dateToString(paper.createdAt)}
                     </Typography>
                     <Typography variant="body1" className={classes.cardItem}>
-                      {true ? "Set up completed" : "Set up is incomplete"}
+                      {false ? "Set up completed" : "Set up is incomplete"}
                     </Typography>
                     <RoundedButton
                       onClick={() => {
-                        props.history.push(`/papers/${paper.id}`);
+                        props.history.push(`/papers/${paper.id}/setup`);
                       }}
                       size="small"
                       variant="contained"
                       color="primary"
                       className={classes.cardItem}
                     >
-                      Settings
+                      View
                     </RoundedButton>
                   </Box>
                 </Paper>
