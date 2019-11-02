@@ -10,23 +10,20 @@ import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 const useStyles = makeStyles(theme => ({}));
 
-type Props = RouteComponentProps;
+interface OwnProps {
+  paper: PaperData;
+}
 
-const QuestionAllocation: React.FC<Props> = ({ match: { params } }) => {
+type Props = OwnProps & RouteComponentProps;
+
+const QuestionAllocation: React.FC<Props> = ({ paper, match: { params } }) => {
   const classes = useStyles();
-  const paper_id = +(params as { paper_id: string }).paper_id;
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(true);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
-  const [paper, setPaper] = useState<PaperData | null>(null);
 
   useEffect(() => {
-    api.papers
-      .getPaper(paper_id)
-      .then(resp => {
-        setPaper(resp.data.paper);
-      })
-      .finally(() => setIsLoading(false));
+    setIsLoading(false);
   }, [refreshFlag]);
 
   if (isLoading) {

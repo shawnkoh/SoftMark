@@ -10,13 +10,14 @@ import { PageTemplate } from "./PageTemplate";
 export class ScriptTemplate extends Discardable {
   entityName = "ScriptTemplate";
 
-  constructor(paper: Paper | number) {
+  constructor(paper: Paper | number, sha256: string) {
     super();
     if (typeof paper === "number") {
       this.paperId = paper;
     } else {
       this.paper = paper;
     }
+    this.sha256 = sha256;
   }
 
   @Column()
@@ -24,6 +25,9 @@ export class ScriptTemplate extends Discardable {
 
   @ManyToOne(type => Paper, paper => paper.scriptTemplates)
   paper?: Paper;
+
+  @Column({ type: "character varying" })
+  sha256: string;
 
   @OneToMany(type => PageTemplate, pageTemplate => pageTemplate.scriptTemplate)
   pageTemplates?: PageTemplate[];
@@ -35,6 +39,14 @@ export class ScriptTemplate extends Discardable {
   questionTemplates?: QuestionTemplate[];
 
   getData = async (): Promise<ScriptTemplateData> => {
+    if (this.pageTemplates) {
+      this.pageTemplates.sort((a, b) => {
+        if (!a.pageNo || !b.pageNo) {
+          return 0;
+        }
+        return a.pageNo - b.pageNo;
+      });
+    }
     const questionTemplates =
       this.questionTemplates ||
       (await getRepository(QuestionTemplate).find({
@@ -43,7 +55,8 @@ export class ScriptTemplate extends Discardable {
     const pageTemplates =
       this.pageTemplates ||
       (await getRepository(PageTemplate).find({
-        where: { scriptTemplate: this }
+        where: { scriptTemplate: this },
+        order: { pageNo: "ASC" }
       }));
     return {
       ...this.getBase(),

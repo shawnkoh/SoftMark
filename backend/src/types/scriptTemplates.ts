@@ -6,6 +6,7 @@ import {
 } from "./questionTemplates";
 
 export interface ScriptTemplatePostData {
+  sha256: string;
   imageUrls: string[];
 }
 

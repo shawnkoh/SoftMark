@@ -15,7 +15,8 @@ import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
-const scriptTemplate = new ScriptTemplate(1);
+const sha256 = "sha256";
+const scriptTemplate = new ScriptTemplate(1, sha256);
 let page1: PageTemplate;
 let page2: PageTemplate;
 let page3: PageTemplate;

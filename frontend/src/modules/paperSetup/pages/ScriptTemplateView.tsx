@@ -39,7 +39,6 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
     api.scriptTemplates
       .getScriptTemplate(paper_id)
       .then(resp => {
-        console.log(resp);
         setScriptTemplate(resp.data.scriptTemplate);
       })
       .finally(() => setIsLoading(false));
@@ -71,7 +70,7 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
                 backgroundImageSource={page.imageUrl}
                 penColor={"#ff0000"}
                 penWidth={0}
-                mode={CanvasMode.View}
+                mode={CanvasMode.Eraser}
                 foregroundAnnotation={[]}
                 backgroundAnnotations={[]}
                 onForegroundAnnotationChange={(annotation: Annotation) => {}}

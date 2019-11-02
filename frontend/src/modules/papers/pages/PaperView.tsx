@@ -277,20 +277,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <DropAreaBase
-              accept={".pdf"}
-              clickable
-              multiple
-              onSelectFiles={files => {
-                Object.keys(files).forEach(key => {
-                  postScript("ooimingsheng@gmail.com", files[key]);
-                });
-              }}
-            >
-              <Button variant="outlined" fullWidth>
-                Upload
-              </Button>
-            </DropAreaBase>
+            
           </Grid>
         </Grid>
       </main>

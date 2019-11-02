@@ -204,7 +204,7 @@ describe("GET /papers/:id/script_templates/active", () => {
   });
 
   it("should return ScriptTemplateData", async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     await getRepository(ScriptTemplate).save(scriptTemplate);
 
     const response = await request(server.server)
@@ -254,7 +254,7 @@ describe("POST /papers/:id/scripts", () => {
   });
 
   it("should create Questions based on the ScriptTemplate", async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     const q1 = new QuestionTemplate(scriptTemplate, "1", 7);
     const q2 = new QuestionTemplate(scriptTemplate, "2", null);
     const q2a = new QuestionTemplate(scriptTemplate, "2a", 3, q2);
@@ -362,7 +362,7 @@ describe("GET /papers/:id/scripts", () => {
 
 describe("GET /papers/:id/allocations", () => {
   beforeEach(async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     const q1Template = new QuestionTemplate(scriptTemplate, "1", 5);
     const q2Template = new QuestionTemplate(scriptTemplate, "2", null);
     const q2aTemplate = new QuestionTemplate(scriptTemplate, "2a", 5);

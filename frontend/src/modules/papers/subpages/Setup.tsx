@@ -12,6 +12,7 @@ import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 import useSnackbar from "../../../components/snackbar/useSnackbar";
+import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -40,7 +41,7 @@ interface OwnProps {
 
 type Props = OwnProps & RouteComponentProps;
 
-const SettingsPage: React.FC<Props> = props => {
+const SetupPage: React.FC<Props> = props => {
   const { paper, toggleRefresh } = props;
   const classes = useStyles();
   const snackbar = useSnackbar();
@@ -73,7 +74,6 @@ const SettingsPage: React.FC<Props> = props => {
     api.scripts
       .getScripts(paper.id)
       .then(resp => {
-        console.log(resp);
         setScripts(resp.data.scripts);
       })
       .finally(() => setIsLoadingScripts(false));
@@ -106,46 +106,46 @@ const SettingsPage: React.FC<Props> = props => {
     </Grid>
   );
 
-  const scriptTemplateUploadButton = (
-    <DropAreaBase
-      accept={".pdf"}
-      clickable={!isLoadingScriptTemplate}
-      single
-      onSelectFiles={files => {
-        Object.keys(files).forEach(key => {
-          const onSuccessfulResponse = () => {
-            refreshScriptTemplate();
-            snackbar.showMessage(
-              `Script template has been uploaded successfully.`,
-              "Close"
-            );
-          };
-          api.scriptTemplates.postScriptTemplate(
-            paper.id,
-            files[key],
-            scriptTemplate,
-            onSuccessfulResponse
-          );
-        });
-      }}
-    >
-      <Button>{scriptTemplate ? "Re-Upload" : "Upload"}</Button>
-    </DropAreaBase>
-  );
-
   const rowDetails = [
     {
       title: "Script master copy",
-      button: scriptTemplateUploadButton
+      button: (
+        <DropAreaBase
+          accept={".pdf"}
+          clickable={!isLoadingScriptTemplate}
+          single
+          onSelectFiles={files => {
+            Object.keys(files).forEach(key => {
+              const onSuccessfulResponse = () => {
+                snackbar.showMessage(
+                  `Script template has been uploaded successfully.`,
+                  "Close"
+                );
+              };
+              api.scriptTemplates.postScriptTemplate(
+                paper.id,
+                files[key],
+                scriptTemplate,
+                onSuccessfulResponse,
+                setScriptTemplate
+              );
+            });
+          }}
+        >
+          <Button>{scriptTemplate ? "Re-Upload" : "Upload"}</Button>
+        </DropAreaBase>
+      )
     },
     {
-      title: "Template",
+      title:
+        "Template" +
+        (scriptTemplate ? "" : " (Upload script master copy first)"),
       button: (
         <Button
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() => {
             if (scriptTemplate) {
-              props.history.push(`/papers/${paper.id}/script_template`);
+              props.history.push(`/papers/${paper.id}/set_up/script_template`);
             }
           }}
         >
@@ -154,12 +154,14 @@ const SettingsPage: React.FC<Props> = props => {
       )
     },
     {
-      title: "Question allocation",
+      title:
+        "Question allocation" +
+        (scriptTemplate ? "" : " (Upload script master copy first)"),
       button: (
         <Button
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() =>
-            props.history.push(`/papers/${paper.id}/question_allocation`)
+            props.history.push(`/papers/${paper.id}/set_up/question_allocation`)
           }
         >
           Allocate
@@ -169,34 +171,80 @@ const SettingsPage: React.FC<Props> = props => {
     {
       title: "Student list",
       button: (
-        <ThemedButton
-          onClick={() => {}}
-          label="Upload"
-          filled={true}
-          fullWidth={true}
-        />
+        <DropAreaBase
+          accept={".csv"}
+          clickable={!isLoadingScriptTemplate}
+          single
+          onSelectFiles={files => {
+            Object.keys(files).forEach(key => {
+              const file = files[key];
+              const onSuccessfulResponse = () => {
+                snackbar.showMessage(
+                  `Nominal roll list has been uploaded successfully.`,
+                  "Close"
+                );
+              };
+              // TODO: api to create paperUsers here
+            });
+          }}
+        >
+          <Button>{false ? "Re-Upload" : "Upload"}</Button>
+        </DropAreaBase>
       )
     },
     {
-      title: "Scripts (" + scripts.length + " scripts)",
+      title:
+        "Scripts " +
+        (scriptTemplate
+          ? "(" + scripts.length + " scripts)"
+          : " (Upload script master copy first)"),
       button: (
-        <ThemedButton
-          onClick={() => {}}
-          label="Upload"
-          filled={true}
-          fullWidth={true}
-        />
+        <DropAreaBase
+          accept={".pdf"}
+          clickable
+          multiple
+          onSelectFiles={files => {
+            let scriptUploadCount = 0;
+            Object.keys(files).forEach(key => {
+              const file = files[key];
+              const fileName = file.name.split(".")[0].toUpperCase();
+              const onSuccessfulResponse = () => {
+                refreshScripts();
+                scriptUploadCount++;
+                snackbar.showMessage(
+                  `Script ${fileName} has been uploaded successfully.\n` +
+                    scriptUploadCount +
+                    ` scripts uploaded successfully.`
+                );
+              };
+              api.scripts.postScript(
+                paper.id,
+                fileName,
+                file,
+                onSuccessfulResponse
+              );
+            });
+          }}
+        >
+          <Button variant="outlined" fullWidth>
+            Upload
+          </Button>
+        </DropAreaBase>
       )
     },
     {
-      title: "Document",
+      title:
+        "Mapping of scripts to nominal roll" +
+        (scripts.length === 0 ? " (Upload scripts)" : ""),
       button: (
-        <ThemedButton
-          onClick={() => {}}
-          label="Map"
-          filled={true}
-          fullWidth={true}
-        />
+        <Button
+          disabled={scripts.length === 0}
+          onClick={() =>
+            props.history.push(`/papers/${paper.id}/set_up/script_mapping`)
+          }
+        >
+          View
+        </Button>
       )
     }
   ];
@@ -228,6 +276,9 @@ const SettingsPage: React.FC<Props> = props => {
               justify="space-between"
               alignItems="center"
             >
+              <IconButton onClick={() => props.history.push("/papers")}>
+                <ArrowLeftSharp />
+              </IconButton>
               <Typography variant="h4">{paper.name}</Typography>
               <EditPaperModal
                 paper={paper}
@@ -278,4 +329,4 @@ const SettingsPage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(SettingsPage);
+export default withRouter(SetupPage);

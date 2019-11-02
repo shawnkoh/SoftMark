@@ -17,7 +17,11 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const postData = pick(request.body, "imageUrls") as ScriptTemplatePostData;
+  const { imageUrls, sha256 } = pick(
+    request.body,
+    "imageUrls",
+    "sha256"
+  ) as ScriptTemplatePostData;
   const allowed = await allowedRequester(
     requesterId,
     paperId,
@@ -37,19 +41,38 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const scriptTemplate = new ScriptTemplate(paperId);
+  const storedScriptTemplate = await getRepository(ScriptTemplate).findOne({
+    paperId,
+    sha256
+  });
+  if (storedScriptTemplate) {
+    try {
+      storedScriptTemplate.discardedAt = null;
+      await validateOrReject(storedScriptTemplate);
+      await getRepository(ScriptTemplate).save(storedScriptTemplate);
+      return response
+        .status(200)
+        .json({ scriptTemplate: await storedScriptTemplate.getData() });
+    } catch (error) {}
+  }
+
+  const scriptTemplate = new ScriptTemplate(paperId, sha256);
   const errors = await validate(scriptTemplate);
   if (errors.length > 0) {
     response.sendStatus(400);
     return;
   }
-  
+
   let pageTemplates: PageTemplate[];
   try {
     pageTemplates = await Promise.all(
-      postData.imageUrls.map(
+      imageUrls.map(
         async (imageUrl: string, index: number): Promise<PageTemplate> => {
-          const pageTemplate = new PageTemplate(scriptTemplate, imageUrl, index + 1);
+          const pageTemplate = new PageTemplate(
+            scriptTemplate,
+            imageUrl,
+            index + 1
+          );
           await validateOrReject(pageTemplate);
           return pageTemplate;
         }
@@ -60,10 +83,11 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-
   await getManager().transaction(async manager => {
     await manager.save(scriptTemplate);
-    await Promise.all(pageTemplates.map(async pageTemplate => await manager.save(pageTemplate)));
+    await Promise.all(
+      pageTemplates.map(async pageTemplate => await manager.save(pageTemplate))
+    );
   });
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
@@ -120,7 +144,6 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-
     await validateOrReject(scriptTemplate);
     await getRepository(ScriptTemplate).save(scriptTemplate);
 
