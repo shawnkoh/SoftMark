@@ -4,6 +4,7 @@ import clsx from "clsx";
 
 import { PaperListData } from "backend/src/types/papers";
 import api from "../../../api";
+import { dateToString } from "../../../utils/date";
 
 import {
   Container,
@@ -74,6 +75,12 @@ const PaperIndex: React.FC<Props> = props => {
                       className={clsx(classes.cardItem, classes.cardItemGrow)}
                     >
                       {paper.name}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      className={classes.cardItem}
+                    >
+                      created on {dateToString(paper.createdAt)}
                     </Typography>
                     <Typography variant="body1" className={classes.cardItem}>
                       {true ? "Set up completed" : "Set up is incomplete"}

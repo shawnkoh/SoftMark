@@ -29,7 +29,11 @@ const MainAppPages: React.FC<Props> = props => {
     <Route exact path="/scripts/:script_id" component={ScriptView} />
   );
   const scriptTemplateViewRoute = (
-    <Route exact path="/papers/:paper_id/script_template" component={ScriptTemplateView} />
+    <Route
+      exact
+      path="/papers/:paper_id/script_template"
+      component={ScriptTemplateView}
+    />
   );
 
   const dispatch = useDispatch();

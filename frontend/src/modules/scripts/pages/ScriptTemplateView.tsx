@@ -13,7 +13,10 @@ type Props = RouteComponentProps;
 
 const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
   const paper_id = +(params as { paper_id: string }).paper_id;
-  const [scriptTemplate, setScriptTemplate] = useState<ScriptTemplateData | null>(null);
+  const [
+    scriptTemplate,
+    setScriptTemplate
+  ] = useState<ScriptTemplateData | null>(null);
 
   const [viewPageNo, setViewPageNo] = useState(1);
   const incrementViewPageNo = () => setViewPageNo(viewPageNo + 1);
