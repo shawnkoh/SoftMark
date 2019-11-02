@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { PaperData } from "backend/src/types/papers";
 import api from "../../../api";
-import { dateToString } from "../../../utils/date";
 
 import { makeStyles } from "@material-ui/core/styles";
 
