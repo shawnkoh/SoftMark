@@ -8,9 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Header from "../components/headers/PaperSetupHeader";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
-const useStyles = makeStyles(theme => ({
-
-}));
+const useStyles = makeStyles(theme => ({}));
 
 type Props = RouteComponentProps;
 
@@ -37,10 +35,8 @@ const QuestionAllocation: React.FC<Props> = ({ match: { params } }) => {
 
   return (
     <>
-      <Header paper={paper} title="Question Allocation"/>
-      <main>
-        Question allocation page
-      </main>
+      <Header paper={paper} title="Question Allocation" />
+      <main>Question allocation page</main>
     </>
   );
 };

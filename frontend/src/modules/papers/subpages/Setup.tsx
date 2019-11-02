@@ -70,11 +70,13 @@ const SettingsPage: React.FC<Props> = props => {
   const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
   const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
   useEffect(() => {
-    api.scripts.getScripts(paper.id).then(resp => {
-      console.log(resp);
-      setScripts(resp.data.scripts);
-    })
-    .finally(() => setIsLoadingScripts(false));
+    api.scripts
+      .getScripts(paper.id)
+      .then(resp => {
+        console.log(resp);
+        setScripts(resp.data.scripts);
+      })
+      .finally(() => setIsLoadingScripts(false));
   }, [refreshScriptsFlag]);
 
   const [isOpenEditPaperDialog, setOpenEditPaperDialog] = useState(false);
@@ -117,9 +119,13 @@ const SettingsPage: React.FC<Props> = props => {
               `Script template has been uploaded successfully.`,
               "Close"
             );
-          }
-          api.scriptTemplates
-            .postScriptTemplate(paper.id, files[key], scriptTemplate, refreshScriptTemplate)
+          };
+          api.scriptTemplates.postScriptTemplate(
+            paper.id,
+            files[key],
+            scriptTemplate,
+            onSuccessfulResponse
+          );
         });
       }}
     >
@@ -152,7 +158,9 @@ const SettingsPage: React.FC<Props> = props => {
       button: (
         <Button
           disabled={isLoadingScriptTemplate || !scriptTemplate}
-          onClick={() => props.history.push(`/papers/${paper.id}/question_allocation`)}
+          onClick={() =>
+            props.history.push(`/papers/${paper.id}/question_allocation`)
+          }
         >
           Allocate
         </Button>

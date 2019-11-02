@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
-import { AppState } from "../../../types/store";
 import api from "../../../api";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import { Annotation } from "backend/src/types/annotations";
+import { CanvasMode } from "../../../types/canvas";
 
-import Annotator from "../../scripts/components/annotator/Annotator";
+import Canvas from "../../scripts/components/annotator/Canvas";
 import TogglePageComponent from "../../scripts/components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
@@ -19,8 +20,16 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
   ] = useState<ScriptTemplateData | null>(null);
 
   const [viewPageNo, setViewPageNo] = useState(1);
-  const incrementViewPageNo = () => setViewPageNo(viewPageNo + 1);
-  const decrementViewPageNo = () => setViewPageNo(viewPageNo - 1);
+  const incrementViewPageNo = () => {
+    if (scriptTemplate && scriptTemplate.pageTemplates.length > viewPageNo) {
+      setViewPageNo(viewPageNo + 1);
+    }
+  };
+  const decrementViewPageNo = () => {
+    if (viewPageNo > 1) {
+      setViewPageNo(viewPageNo - 1);
+    }
+  };
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
@@ -55,10 +64,17 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
         return (
           <>
             {page.pageNo === viewPageNo && (
-              <Annotator
+              <Canvas
                 key={page.id}
-                pageId={page.id}
+                width={1000}
+                height={1250}
                 backgroundImageSource={page.imageUrl}
+                penColor={"#ff0000"}
+                penWidth={0}
+                mode={CanvasMode.View}
+                foregroundAnnotation={[]}
+                backgroundAnnotations={[]}
+                onForegroundAnnotationChange={(annotation: Annotation) => {}}
               />
             )}
           </>

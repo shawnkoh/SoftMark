@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { AppBar, Container, Toolbar,  Typography } from "@material-ui/core";
+import { AppBar, Container, Toolbar, Typography } from "@material-ui/core";
 import { PaperData } from "backend/src/types/papers";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -38,9 +38,7 @@ const Header: React.FC<Props> = props => {
           <Typography variant="h6" className={classes.title}>
             {name}
           </Typography>
-          <Typography variant="subtitle1">
-            {title}
-          </Typography>
+          <Typography variant="subtitle1">{title}</Typography>
           <Typography variant="subtitle1">
             {changesSaved ? "Changes saved." : "Saving changes..."}
           </Typography>
