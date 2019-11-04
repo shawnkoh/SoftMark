@@ -1,5 +1,13 @@
-import { IsOptional, IsNotEmpty, IsString } from "class-validator";
-import { Entity, ManyToOne, OneToMany, Column, getRepository } from "typeorm";
+import { IsOptional, IsNotEmpty, IsString, Validate } from "class-validator";
+import {
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Column,
+  getRepository,
+  Unique,
+  IsNull
+} from "typeorm";
 
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
@@ -7,8 +15,12 @@ import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { ScriptData, ScriptListData } from "../types/scripts";
+import IsUniqueFilename from "../constraints/IsUniqueFilename";
+import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 
 @Entity()
+@Unique(["paper", "filename"])
+@Unique(["paper", "sha256"])
 export class Script extends Discardable {
   entityName = "Script";
 
@@ -45,11 +57,13 @@ export class Script extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
+  @Validate(IsUniqueFilename)
   filename: string;
 
   @Column()
   @IsNotEmpty()
   @IsString()
+  @Validate(IsUniqueSha256)
   sha256: string;
 
   @Column({ nullable: true })
