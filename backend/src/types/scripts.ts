@@ -8,7 +8,7 @@ export interface ScriptPostData {
 }
 
 export interface ScriptListData extends DiscardableData {
-  paperUserId: number;
+  studentId: number | null;
   paperId: number;
   pagesCount: number;
   questionsCount: number;
@@ -21,7 +21,7 @@ export interface ScriptData extends ScriptListData {
 
 export function isScriptListData(data: any): data is ScriptListData {
   return (
-    typeof data.paperUserId === "number" &&
+    (typeof data.studentId === "number" || data.studentId === null) &&
     typeof data.paperId === "number" &&
     typeof data.pagesCount === "number" &&
     typeof data.questionsCount === "number" &&

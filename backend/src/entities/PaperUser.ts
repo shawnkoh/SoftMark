@@ -78,7 +78,7 @@ export class PaperUser extends Discardable {
   @OneToMany(type => Comment, comment => comment.paperUser)
   comments?: Comment[];
 
-  @OneToMany(type => Script, script => script.paperUser)
+  @OneToMany(type => Script, script => script.student)
   scripts?: Script[];
 
   @OneToMany(type => Question, question => question.currentMarker)
