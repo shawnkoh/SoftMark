@@ -1,4 +1,3 @@
-import { IsOptional, IsString } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
 
 import { Discardable } from "./Discardable";
