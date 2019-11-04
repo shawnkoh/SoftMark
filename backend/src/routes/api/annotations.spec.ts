@@ -36,7 +36,12 @@ beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  script = new Script(fixtures.paper, fixtures.student);
+  script = new Script(
+    fixtures.paper,
+    "A0185892L.pdf",
+    "stub",
+    fixtures.student
+  );
   // TODO: Mock imageUrl properly
   page = new Page(script, "imageStub", 1);
   // TODO: Mock layer properly

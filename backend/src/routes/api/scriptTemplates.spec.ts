@@ -227,7 +227,12 @@ describe("POST /script_templates/:id/question_templates", () => {
     for (let i = 1; i <= 5; i++) {
       const student = (await fixtures.createPaperUser(PaperUserRole.Student))
         .paperUser;
-      const script = new Script(fixtures.paper, student);
+      const script = new Script(
+        fixtures.paper,
+        "A0185892L.pdf",
+        "stub",
+        student
+      );
       paper1Scripts.push(script);
     }
     const paper2 = new Paper("CS1010J");
@@ -238,7 +243,7 @@ describe("POST /script_templates/:id/question_templates", () => {
         PaperUserRole.Student,
         paper2
       )).paperUser;
-      const script = new Script(paper2, student);
+      const script = new Script(paper2, "A0185892L.pdf", "stub", student);
       paper2Scripts.push(script);
     }
     await getRepository(Script).save(paper1Scripts.concat(paper2Scripts));

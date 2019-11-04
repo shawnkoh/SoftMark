@@ -32,6 +32,9 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
+  // TODO: if there is a script with the same sha256 WITH a student, reject
+  // TODO: if there is a script with the same sha256 WITHOUT a student, update filename AND apply matching algo
+
   const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
   if (errors.length > 0) {
@@ -54,6 +57,8 @@ export async function create(request: Request, response: Response) {
     response.sendStatus(400);
     return;
   }
+
+  // Attempt to match with users
 
   // Create questions based on the current script template, if any.
   const scriptTemplate = await getRepository(ScriptTemplate).findOne({
@@ -117,7 +122,7 @@ export async function show(request: Request, response: Response) {
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() },
     relations: [
-      "paperUser",
+      "student",
       "pages",
       "pages.annotations",
       "questions",

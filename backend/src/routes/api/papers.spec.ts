@@ -276,15 +276,23 @@ describe("POST /papers/:id/scripts", () => {
 });
 
 describe("GET /papers/:id/scripts", () => {
-  beforeAll(async () => {
-    const user = new User(fixtures.faker.internet.email());
-    const student2 = new PaperUser(fixtures.paper, user, PaperUserRole.Student);
+  beforeEach(async () => {
+    const student = new PaperUser(
+      fixtures.paper,
+      new User(fixtures.faker.internet.email()),
+      PaperUserRole.Student
+    );
     const scripts = [
-      new Script(fixtures.paper, fixtures.student),
-      new Script(fixtures.paper, student2)
+      new Script(
+        fixtures.paper,
+        "A0185892L.pdf",
+        "A0185892L",
+        fixtures.student
+      ),
+      new Script(fixtures.paper, "A0123456L.pdf", "A0123456L", student)
     ];
-    await getRepository(User).save(user);
-    await getRepository(PaperUser).save(student2);
+    await getRepository(User).save(student.user!);
+    await getRepository(PaperUser).save(student);
     await getRepository(Script).save(scripts);
   });
 
@@ -340,7 +348,7 @@ describe("GET /papers/:id/scripts", () => {
 
   it("should restrict a Paper's Student to only view his scripts", async () => {
     const count = await getRepository(Script).count({
-      where: { paper: fixtures.paper, paperUser: fixtures.student }
+      where: { paper: fixtures.paper, student: fixtures.student }
     });
     const response = await request(server.server)
       .get(`${fixtures.api}/papers/${fixtures.paper.id}/scripts`)

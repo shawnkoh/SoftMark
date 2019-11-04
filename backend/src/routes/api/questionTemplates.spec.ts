@@ -286,7 +286,12 @@ describe("GET /question_templates/:id/mark_question", () => {
   let question: Question;
   beforeEach(async () => {
     const allocation = new Allocation(q1Template, fixtures.marker);
-    const script = new Script(fixtures.paper, fixtures.student);
+    const script = new Script(
+      fixtures.paper,
+      "A0185892L.pdf",
+      "A0185892L",
+      fixtures.student
+    );
     question = new Question(script, q1aTemplate);
     await getRepository(Allocation).save(allocation);
     await getRepository(Script).save(script);
@@ -338,7 +343,12 @@ describe("GET /question_templates/:id/mark_question", () => {
   it("should allow the same Marker to get the same Question", async () => {
     const student = (await fixtures.createPaperUser(PaperUserRole.Student))
       .paperUser;
-    const script = new Script(fixtures.paper, student);
+    const script = new Script(
+      fixtures.paper,
+      "A1234567L.pdf",
+      "A1234567L",
+      student
+    );
     const question = new Question(script, q1aTemplate);
 
     await getRepository(Script).save(script);
@@ -364,7 +374,12 @@ describe("GET /question_templates/:id/mark_question", () => {
   it("should not allow another marker to get the same question within 30 minutes", async () => {
     const student = (await fixtures.createPaperUser(PaperUserRole.Student))
       .paperUser;
-    const script = new Script(fixtures.paper, student);
+    const script = new Script(
+      fixtures.paper,
+      "A1234567L.pdf",
+      "A1234567L",
+      student
+    );
     const question = new Question(script, q1aTemplate);
 
     const otherMarker = await fixtures.createPaperUser(PaperUserRole.Marker);
@@ -395,7 +410,12 @@ describe("GET /question_templates/:id/mark_question", () => {
   it("should allow another marker to get the same question after 30 minutes", async () => {
     const student = (await fixtures.createPaperUser(PaperUserRole.Student))
       .paperUser;
-    const script = new Script(fixtures.paper, student);
+    const script = new Script(
+      fixtures.paper,
+      "A1234567.pdf",
+      "A1234567",
+      student
+    );
     const question = new Question(script, q1aTemplate);
 
     const otherMarker = await fixtures.createPaperUser(PaperUserRole.Marker);

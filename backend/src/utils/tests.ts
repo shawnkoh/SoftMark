@@ -76,7 +76,8 @@ export class Fixtures {
 
     // TODO: Mock imageUrls correctly
     this.scriptPostData = {
-      email: faker.internet.email(),
+      filename: "A0185892L.pdf",
+      sha256: "stub",
       imageUrls: ["page1ImageStub", "page2ImageStub", "page3ImageStub"]
     };
   }
