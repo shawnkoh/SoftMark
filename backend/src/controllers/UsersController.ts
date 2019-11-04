@@ -12,8 +12,13 @@ import {
 
 export async function create(request: Request, response: Response) {
   try {
-    const user = new User();
-    Object.assign(user, pick(request.body, "email", "password", "name"));
+    const { email, password, name } = pick(
+      request.body,
+      "email",
+      "password",
+      "name"
+    );
+    const user = new User(email, password, name);
     await validateOrReject(user);
 
     if (user.password) {

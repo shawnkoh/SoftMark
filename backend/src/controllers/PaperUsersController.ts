@@ -31,15 +31,11 @@ export async function create(request: Request, response: Response) {
     let user = await getRepository(User).findOne({ email });
     const hasUser = !!user;
     if (!user) {
-      user = new User();
-      user.email = email;
+      user = new User(email);
       await validateOrReject(user);
     }
 
-    const paperUser = new PaperUser();
-    paperUser.paper = paper;
-    paperUser.user = user;
-    paperUser.role = role;
+    const paperUser = new PaperUser(paper, user, role);
     await validateOrReject(paperUser);
 
     if (!hasUser) {

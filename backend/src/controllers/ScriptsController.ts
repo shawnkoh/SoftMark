@@ -36,8 +36,7 @@ export async function create(request: Request, response: Response) {
       where: { paperId, user: student }
     });
   } else {
-    student = new User();
-    student.email = email;
+    student = new User(email);
     await validate(student);
     const errors = await validate(student);
     if (errors.length > 0) {
@@ -47,10 +46,7 @@ export async function create(request: Request, response: Response) {
   }
 
   if (!paperUser) {
-    paperUser = new PaperUser();
-    paperUser.paperId = paperId;
-    paperUser.user = student;
-    paperUser.role = PaperUserRole.Student;
+    paperUser = new PaperUser(paperId, student, PaperUserRole.Student);
     const errors = await validate(paperUser);
     if (errors.length > 0) {
       response.sendStatus(400);

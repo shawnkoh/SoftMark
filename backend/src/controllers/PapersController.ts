@@ -10,7 +10,7 @@ import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-
+  const requesterUserId = payload.id;
   const paper = new Paper(request.body.name);
   const paperErrors = await validate(paper);
   if (paperErrors.length > 0) {
@@ -18,10 +18,7 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const paperUser = new PaperUser();
-  paperUser.paper = paper;
-  paperUser.userId = payload.id;
-  paperUser.role = PaperUserRole.Owner;
+  const paperUser = new PaperUser(paper, requesterUserId, PaperUserRole.Owner);
   const paperUserErrors = await validate(paperUser);
   if (paperUserErrors.length > 0) {
     response.sendStatus(400);
@@ -71,7 +68,9 @@ export async function show(request: Request, response: Response) {
   } else {
     data = await paper.getData(requester.role);
   }
-  response.status(200).json({ paper: data, currentPaperUser: await requester.getData() });
+  response
+    .status(200)
+    .json({ paper: data, currentPaperUser: await requester.getData() });
 }
 
 export async function update(request: Request, response: Response) {
