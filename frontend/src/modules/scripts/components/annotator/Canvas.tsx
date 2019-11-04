@@ -157,7 +157,7 @@ const Canvas: React.FC<CanvasProps> = ({
     lines: foregroundAnnotation,
     isDrawing: false,
     stageScale: 1,
-    stagePosition: { x: 0, y: 0 },
+    stagePosition: { x: 32, y: 32 },
     lastDist: 0,
     draggable: false
   };
