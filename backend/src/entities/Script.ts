@@ -1,4 +1,4 @@
-import { IsOptional } from "class-validator";
+import { IsOptional, IsNotEmpty, IsString } from "class-validator";
 import { Entity, ManyToOne, OneToMany, Column, getRepository } from "typeorm";
 
 import { Discardable } from "./Discardable";
@@ -12,13 +12,20 @@ import { ScriptData, ScriptListData } from "../types/scripts";
 export class Script extends Discardable {
   entityName = "Script";
 
-  constructor(paper: number | Paper, student?: number | PaperUser) {
+  constructor(
+    paper: number | Paper,
+    filename: string,
+    sha256: string,
+    student?: number | PaperUser
+  ) {
     super();
     if (typeof paper === "number") {
       this.paperId = paper;
     } else {
       this.paper = paper;
     }
+    this.filename = filename;
+    this.sha256 = sha256;
     if (!student) {
       this.studentId = null;
       this.student = null;
@@ -29,18 +36,28 @@ export class Script extends Discardable {
     }
   }
 
+  @Column()
+  paperId!: number;
+
+  @ManyToOne(type => Paper, paper => paper.paperUsers)
+  paper?: Paper;
+
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  filename: string;
+
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  sha256: string;
+
   @Column({ nullable: true })
   @IsOptional()
   studentId!: number | null;
 
   @ManyToOne(type => PaperUser, student => student.scripts)
   student?: PaperUser | null;
-
-  @Column()
-  paperId!: number;
-
-  @ManyToOne(type => Paper, paper => paper.paperUsers)
-  paper?: Paper;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -50,8 +67,10 @@ export class Script extends Discardable {
 
   getListData = async (): Promise<ScriptListData> => ({
     ...this.getBase(),
-    studentId: this.studentId,
     paperId: this.paperId,
+    filename: this.filename,
+    sha256: this.sha256,
+    studentId: this.studentId,
     pagesCount: this.pages
       ? this.pages.length
       : await getRepository(Page).count({ scriptId: this.id }),

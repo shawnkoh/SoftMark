@@ -3,13 +3,16 @@ import { QuestionListData, isQuestionListData } from "./questions";
 import { PageListData, isPageListData } from "./pages";
 
 export interface ScriptPostData {
-  email: string;
+  filename: string;
+  sha256: string;
   imageUrls: string[];
 }
 
 export interface ScriptListData extends DiscardableData {
-  studentId: number | null;
   paperId: number;
+  studentId: number | null;
+  filename: string;
+  sha256: string;
   pagesCount: number;
   questionsCount: number;
 }
