@@ -13,6 +13,9 @@ import { ScriptListData } from "backend/src/types/scripts";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 import useSnackbar from "../../../components/snackbar/useSnackbar";
 import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
+import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
+import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
+import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -110,30 +113,13 @@ const SetupPage: React.FC<Props> = props => {
     {
       title: "Script master copy",
       button: (
-        <DropAreaBase
-          accept={".pdf"}
+        <UploadScriptTemplateWrapper
           clickable={!isLoadingScriptTemplate}
-          single
-          onSelectFiles={files => {
-            Object.keys(files).forEach(key => {
-              const onSuccessfulResponse = () => {
-                snackbar.showMessage(
-                  `Script template has been uploaded successfully.`,
-                  "Close"
-                );
-              };
-              api.scriptTemplates.postScriptTemplate(
-                paper.id,
-                files[key],
-                scriptTemplate,
-                onSuccessfulResponse,
-                setScriptTemplate
-              );
-            });
-          }}
+          paperId={paper.id}
+          setScriptTemplate={setScriptTemplate}
         >
           <Button>{scriptTemplate ? "Re-Upload" : "Upload"}</Button>
-        </DropAreaBase>
+        </UploadScriptTemplateWrapper>
       )
     },
     {
@@ -171,25 +157,9 @@ const SetupPage: React.FC<Props> = props => {
     {
       title: "Student list",
       button: (
-        <DropAreaBase
-          accept={".csv"}
-          clickable={!isLoadingScriptTemplate}
-          single
-          onSelectFiles={files => {
-            Object.keys(files).forEach(key => {
-              const file = files[key];
-              const onSuccessfulResponse = () => {
-                snackbar.showMessage(
-                  `Nominal roll list has been uploaded successfully.`,
-                  "Close"
-                );
-              };
-              // TODO: api to create paperUsers here
-            });
-          }}
-        >
-          <Button>{false ? "Re-Upload" : "Upload"}</Button>
-        </DropAreaBase>
+          <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
+            <Button>{false ? "Re-Upload" : "Upload"}</Button>
+          </UploadNominalRollWrapper>
       )
     },
     {
@@ -199,37 +169,12 @@ const SetupPage: React.FC<Props> = props => {
           ? "(" + scripts.length + " scripts)"
           : " (Upload script master copy first)"),
       button: (
-        <DropAreaBase
-          accept={".pdf"}
-          clickable
-          multiple
-          onSelectFiles={files => {
-            let scriptUploadCount = 0;
-            Object.keys(files).forEach(key => {
-              const file = files[key];
-              const fileName = file.name.split(".")[0].toUpperCase();
-              const onSuccessfulResponse = () => {
-                refreshScripts();
-                scriptUploadCount++;
-                snackbar.showMessage(
-                  `Script ${fileName} has been uploaded successfully.\n` +
-                    scriptUploadCount +
-                    ` scripts uploaded successfully.`
-                );
-              };
-              api.scripts.postScript(
-                paper.id,
-                fileName,
-                file,
-                onSuccessfulResponse
-              );
-            });
-          }}
-        >
+        
+        <UploadScriptsWrapper paperId={paper.id} refreshScripts={refreshScripts}>
           <Button variant="outlined" fullWidth>
             Upload
           </Button>
-        </DropAreaBase>
+          </UploadScriptsWrapper>
       )
     },
     {

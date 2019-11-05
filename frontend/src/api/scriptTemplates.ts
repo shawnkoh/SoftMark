@@ -42,7 +42,6 @@ class ScriptTemplatesAPI extends BaseAPI {
   postScriptTemplate = async (
     paper_id: number,
     file: any,
-    previousScriptTemplate: ScriptTemplateData | null,
     onSuccessfulResponse?: () => void,
     callbackScriptData?: React.Dispatch<ScriptTemplateData>
   ) => {
@@ -58,9 +57,6 @@ class ScriptTemplatesAPI extends BaseAPI {
           imageUrls: await Promise.all(pages),
           sha256: sha256(pdfAsString)
         };
-        if (previousScriptTemplate) {
-          await this.discardScript(previousScriptTemplate.id);
-        }
         this.createScriptTemplate(paper_id, scriptTemplatePostData).then(
           res => {
             if (onSuccessfulResponse) {
