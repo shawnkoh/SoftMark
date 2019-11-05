@@ -1,4 +1,3 @@
-import { hashSync } from "bcryptjs";
 import faker from "faker";
 faker.seed(127);
 import supertest from "supertest";
