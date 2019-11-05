@@ -7,6 +7,7 @@ import SimpleForm, {
 } from "../../../../components/forms/SimpleForm";
 import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
 import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
+import useSnackbar from "../../../../components/snackbar/useSnackbar";
 
 interface OwnProps {
   paperId: number;
@@ -23,6 +24,7 @@ const AddMarkerModal: React.FC<Props> = ({
   toggleRefresh,
   paperId
 }) => {
+  const snackbar = useSnackbar();
   const values: PaperUserPostData = {
     email: "",
     role: PaperUserRole.Marker
@@ -55,11 +57,17 @@ const AddMarkerModal: React.FC<Props> = ({
           validationSchema={validationSchema}
           onCancel={toggleVisibility}
           onSubmit={(newValues: PaperUserPostData) =>
-            api.papers.createPaperUser(paperId, newValues).then(resp => {
-              toggleRefresh();
-              toggleVisibility();
-              return false;
-            })
+            api.paperUsers
+              .createPaperUser(paperId, newValues)
+              .then(resp => {
+                toggleRefresh();
+                toggleVisibility();
+                return false;
+              })
+              .catch(() => {
+                snackbar.showMessage(`Marker could not be created.`, "Close");
+                return false;
+              })
           }
         />
       </DialogContent>

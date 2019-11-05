@@ -2,7 +2,8 @@ import { AxiosResponse } from "axios";
 import {
   ScriptListData,
   ScriptData,
-  ScriptPostData
+  ScriptPostData,
+  ScriptPatchData
 } from "backend/src/types/scripts";
 import PDFJS from "pdfjs-dist/webpack";
 import { sha256 } from "js-sha256";
@@ -28,6 +29,13 @@ class ScriptsAPI extends BaseAPI {
     return this.getClient().get(`${this.getUrl()}/${id}`);
   }
 
+  patchScript(
+    id: number,
+    scriptPatchData: ScriptPatchData
+  ): Promise<AxiosResponse<{ script: ScriptData }>> {
+    return this.getClient().patch(`${this.getUrl()}/${id}`, scriptPatchData);
+  }
+
   discardScript(id: number): Promise<AxiosResponse> {
     return this.getClient().delete(`${this.getUrl()}/${id}`);
   }
@@ -43,9 +51,9 @@ class ScriptsAPI extends BaseAPI {
   postScript = async (
     paper_id: number,
     filename: string,
-    file: any,
-    onSuccessfulResponse?: () => void,
-    callbackScriptData?: React.Dispatch<ScriptData>
+    file: File,
+    onSuccess: () => void,
+    onFail: () => void
   ) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -60,12 +68,11 @@ class ScriptsAPI extends BaseAPI {
           sha256: sha256(pdfAsString),
           imageUrls: await Promise.all(pages)
         };
-        this.createScript(paper_id, scriptPostData).then(res => {
-          onSuccessfulResponse && onSuccessfulResponse();
-          if (callbackScriptData) {
-            callbackScriptData(res.data.script);
-          }
-        });
+        this.createScript(paper_id, scriptPostData)
+          .then(res => {
+            onSuccess();
+          })
+          .catch(() => onFail());
       });
     };
     reader.readAsDataURL(file);

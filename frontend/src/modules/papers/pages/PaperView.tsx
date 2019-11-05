@@ -62,10 +62,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const toggleOpenAddMarkerDialog = () =>
     setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
 
-  const postScript = (email: string, file) => {
-    api.scripts.postScript(paper_id, email, file);
-  };
-
   useEffect(() => {
     api.papers
       .getPaper(paper_id)
@@ -134,7 +130,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
       >
         <BottomNavigationAction
           component={Link}
-          to={accountsRoutePath}
+          to={`/papers/${paper_id}/${ACCOUNT}`}
           value={ACCOUNT}
           label="Account"
           classes={{
@@ -144,7 +140,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={setupRoutePath}
+          to={`/papers/${paper_id}/${SET_UP}`}
           value={SET_UP}
           label="Set up"
           classes={{
@@ -154,7 +150,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={gradingRoutePath}
+          to={`/papers/${paper_id}/${GRADING}`}
           value={GRADING}
           label="Grading"
           classes={{
@@ -164,7 +160,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={studentsRoutePath}
+          to={`/papers/${paper_id}/${STUDENTS}`}
           value={STUDENTS}
           label="Students"
           classes={{

@@ -1,7 +1,7 @@
 import { validateOrReject, validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository, IsNull } from "typeorm";
+import { getRepository, IsNull, getManager } from "typeorm";
 
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
@@ -24,23 +24,26 @@ export async function create(request: Request, response: Response) {
       return;
     }
     const { paper } = allowed;
-    const { email, role } = request.body as PaperUserPostData;
+    const { email, role, matriculationNumber, name } = request.body as PaperUserPostData;
 
-    let user = await getRepository(User).findOne({ email });
-    const hasUser = !!user;
-    if (!user) {
-      user = new User(email);
-      await validateOrReject(user);
+    const storedUser = await getRepository(User).findOne({ email });
+    const user = storedUser ? storedUser : new User(email);
+    if (name || name === "") {
+      user.name = name;
     }
+    await validateOrReject(user);
 
     const paperUser = new PaperUser(paper, user, role);
-    await validateOrReject(paperUser);
-
-    if (!hasUser) {
-      await getRepository(User).save(user);
+    if (matriculationNumber) {
+      paperUser.matriculationNumber = matriculationNumber;
     }
-    await getRepository(PaperUser).save(paperUser);
+    await validateOrReject(paperUser); //TODO: need to add uniqueness check to students
 
+    await getManager().transaction(async manager => {
+      await getRepository(User).save(user);
+      await getRepository(PaperUser).save(paperUser);
+    });
+    
     const data = await paperUser.getData();
     sendNewPaperUserEmail(paperUser);
     response.status(201).json({ paperUser: data });

@@ -9,7 +9,7 @@ import { PaperData } from "backend/src/types/papers";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 
 import Annotator from "../components/annotator/Annotator";
-import TogglePageComponent from "../components/misc/TogglePageComponent";
+import TogglePageComponent from "../../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;

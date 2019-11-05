@@ -157,9 +157,9 @@ const SetupPage: React.FC<Props> = props => {
     {
       title: "Student list",
       button: (
-          <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
-            <Button>{false ? "Re-Upload" : "Upload"}</Button>
-          </UploadNominalRollWrapper>
+        <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
+          <Button>{false ? "Re-Upload" : "Upload"}</Button>
+        </UploadNominalRollWrapper>
       )
     },
     {
@@ -169,12 +169,14 @@ const SetupPage: React.FC<Props> = props => {
           ? "(" + scripts.length + " scripts)"
           : " (Upload script master copy first)"),
       button: (
-        
-        <UploadScriptsWrapper paperId={paper.id} refreshScripts={refreshScripts}>
+        <UploadScriptsWrapper
+          paperId={paper.id}
+          refreshScripts={refreshScripts}
+        >
           <Button variant="outlined" fullWidth>
             Upload
           </Button>
-          </UploadScriptsWrapper>
+        </UploadScriptsWrapper>
       )
     },
     {
@@ -237,9 +239,9 @@ const SetupPage: React.FC<Props> = props => {
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
-                {true && (
+                {!scriptTemplate && (
                   <>
-                    {`${BULLET_POINT} Upload documents`}
+                    {`${BULLET_POINT} Upload script template`}
                     <br />
                   </>
                 )}
@@ -252,6 +254,12 @@ const SetupPage: React.FC<Props> = props => {
                 {true && (
                   <>
                     {`${BULLET_POINT} Allocate questions`}
+                    <br />
+                  </>
+                )}
+                {scripts.length === 0 && (
+                  <>
+                    {`${BULLET_POINT} Upload scripts`}
                     <br />
                   </>
                 )}

@@ -1,6 +1,7 @@
 import { DiscardableData, isDiscardableData } from "./entities";
 import { QuestionListData, isQuestionListData } from "./questions";
 import { PageListData, isPageListData } from "./pages";
+import { PaperUserListData } from "./paperUsers";
 
 export interface ScriptPostData {
   filename: string;
@@ -8,9 +9,16 @@ export interface ScriptPostData {
   imageUrls: string[];
 }
 
+export type ScriptPatchData = Partial<{
+  filename: string;
+  hasVerifiedStudent: boolean;
+  studentId: number;
+}>;
+
 export interface ScriptListData extends DiscardableData {
   paperId: number;
-  studentId: number | null;
+  student: PaperUserListData | null;
+  hasVerifiedStudent: boolean;
   filename: string;
   sha256: string;
   pagesCount: number;

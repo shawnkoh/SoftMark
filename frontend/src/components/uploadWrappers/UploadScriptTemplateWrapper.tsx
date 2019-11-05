@@ -15,12 +15,7 @@ type Props = RouteComponentProps & OwnProps;
 
 const UploadScriptTemplateWrapper: React.FC<Props> = props => {
   const snackbar = useSnackbar();
-  const {
-    children,
-    clickable = true,
-    paperId,
-    setScriptTemplate
-  } = props;
+  const { children, clickable = true, paperId, setScriptTemplate } = props;
 
   return (
     <DropAreaBase
@@ -29,16 +24,23 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
       single
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
-          const onSuccessfulResponse = () => {
+          const onSuccess = () => {
             snackbar.showMessage(
               `Script template has been uploaded successfully.`,
+              "Close"
+            );
+          };
+          const onFail = () => {
+            snackbar.showMessage(
+              `Script template has failed to be uploaded.`,
               "Close"
             );
           };
           api.scriptTemplates.postScriptTemplate(
             paperId,
             files[key],
-            onSuccessfulResponse,
+            onSuccess,
+            onFail,
             setScriptTemplate
           );
         });

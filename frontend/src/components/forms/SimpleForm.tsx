@@ -108,7 +108,6 @@ type Props<T extends object> = OwnProps<T>;
  */
 const SimpleForm: React.FC<Props<any>> = ({
   initialValues,
-  avatarMetaData,
   formMetadata,
   validationSchema,
   onCancel,

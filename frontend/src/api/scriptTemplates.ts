@@ -41,8 +41,9 @@ class ScriptTemplatesAPI extends BaseAPI {
 
   postScriptTemplate = async (
     paper_id: number,
-    file: any,
-    onSuccessfulResponse?: () => void,
+    file: File,
+    onSuccess: () => void,
+    onFail: () => void,
     callbackScriptData?: React.Dispatch<ScriptTemplateData>
   ) => {
     const reader = new FileReader();
@@ -57,16 +58,14 @@ class ScriptTemplatesAPI extends BaseAPI {
           imageUrls: await Promise.all(pages),
           sha256: sha256(pdfAsString)
         };
-        this.createScriptTemplate(paper_id, scriptTemplatePostData).then(
-          res => {
-            if (onSuccessfulResponse) {
-              onSuccessfulResponse();
-            }
+        this.createScriptTemplate(paper_id, scriptTemplatePostData)
+          .then(res => {
+            onSuccess();
             if (callbackScriptData) {
               callbackScriptData(res.data.scriptTemplate);
             }
-          }
-        );
+          })
+          .catch(() => onFail());
       });
     };
     reader.readAsDataURL(file);

@@ -14,7 +14,9 @@ import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
+import { User } from "./User";
 import { ScriptData, ScriptListData } from "../types/scripts";
+import { sortByPageNo } from "../utils/sorts";
 import IsUniqueFilename from "../constraints/IsUniqueFilename";
 import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 
@@ -46,6 +48,7 @@ export class Script extends Discardable {
     } else {
       this.student = student;
     }
+    this.hasVerifiedStudent = false;
   }
 
   @Column()
@@ -57,13 +60,13 @@ export class Script extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
-  @Validate(IsUniqueFilename)
+ // @Validate(IsUniqueFilename)
   filename: string;
 
   @Column()
   @IsNotEmpty()
   @IsString()
-  @Validate(IsUniqueSha256)
+ // @Validate(IsUniqueSha256)
   sha256: string;
 
   @Column({ nullable: true })
@@ -73,34 +76,39 @@ export class Script extends Discardable {
   @ManyToOne(type => PaperUser, student => student.scripts)
   student?: PaperUser | null;
 
+  @Column("boolean")
+  @IsNotEmpty()
+  hasVerifiedStudent!: boolean;
+
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
 
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
 
-  getListData = async (): Promise<ScriptListData> => ({
-    ...this.getBase(),
-    paperId: this.paperId,
-    filename: this.filename,
-    sha256: this.sha256,
-    studentId: this.studentId,
-    pagesCount: this.pages
-      ? this.pages.length
-      : await getRepository(Page).count({ scriptId: this.id }),
-    questionsCount: this.questions
-      ? this.questions.length
-      : await getRepository(Question).count({ scriptId: this.id })
-  });
+  getListData = async (): Promise<ScriptListData> => {
+    const paperUser = this.studentId
+      ? await getRepository(PaperUser).findOne(this.studentId)
+      : null;
+    return {
+      ...this.getBase(),
+      paperId: this.paperId,
+      filename: this.filename,
+      sha256: this.sha256,
+      student: paperUser ? await paperUser.getData() : null,
+      hasVerifiedStudent: this.hasVerifiedStudent,
+      pagesCount: this.pages
+        ? this.pages.length
+        : await getRepository(Page).count({ scriptId: this.id }),
+      questionsCount: this.questions
+        ? this.questions.length
+        : await getRepository(Question).count({ scriptId: this.id })
+    };
+  };
 
   getData = async (): Promise<ScriptData> => {
     if (this.pages) {
-      this.pages.sort((a, b) => {
-        if (!a.pageNo || !b.pageNo) {
-          return 0;
-        }
-        return a.pageNo - b.pageNo;
-      });
+      this.pages.sort(sortByPageNo);
     }
     const pages =
       this.pages ||
