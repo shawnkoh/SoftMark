@@ -202,6 +202,22 @@ describe("POST /papers/:id/script_templates", () => {
     expect(activeScriptTemplate.discardedAt).not.toBe(null);
   });
 
+  it("should restore an existing Script Template when there are no active Script Templates and an existing Script Template was uploaded", async () => {
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "script1");
+    scriptTemplate.discardedAt = new Date();
+    await getRepository(ScriptTemplate).save(scriptTemplate);
+    const postData: ScriptTemplatePostData = {
+      imageUrls: ["page1", "page2"],
+      sha256: "script1"
+    };
+
+    const response = await request(server.server)
+      .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(200);
+  });
+
   it("should discard the existing Script Template and create a new one when a new Script Template is uploaded", async () => {
     let existingScriptTemplate = new ScriptTemplate(fixtures.paper, "script1");
     await getRepository(ScriptTemplate).save(existingScriptTemplate);
