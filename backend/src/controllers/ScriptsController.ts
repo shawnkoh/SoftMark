@@ -4,9 +4,7 @@ import { pick } from "lodash";
 import { getRepository, IsNull, Not, getManager } from "typeorm";
 
 import { Page } from "../entities/Page";
-import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
-import { User } from "../entities/User";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { ScriptListData } from "../types/scripts";
@@ -18,7 +16,12 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const { email, imageUrls } = pick(request.body, "email", "imageUrls");
+  const { filename, sha256, imageUrls } = pick(
+    request.body,
+    "filename",
+    "sha256",
+    "imageUrls"
+  );
   const allowed = await allowedRequester(
     requesterId,
     paperId,
@@ -29,36 +32,10 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  let student = await getRepository(User).findOne({ where: { email } });
-  let paperUser: PaperUser | undefined;
-  if (student) {
-    paperUser = await getRepository(PaperUser).findOne({
-      where: { paperId, user: student }
-    });
-  } else {
-    student = new User();
-    student.email = email;
-    await validate(student);
-    const errors = await validate(student);
-    if (errors.length > 0) {
-      response.sendStatus(400);
-      return;
-    }
-  }
+  // TODO: if there is a script with the same sha256 WITH a student, reject
+  // TODO: if there is a script with the same sha256 WITHOUT a student, update filename AND apply matching algo
 
-  if (!paperUser) {
-    paperUser = new PaperUser();
-    paperUser.paperId = paperId;
-    paperUser.user = student;
-    paperUser.role = PaperUserRole.Student;
-    const errors = await validate(paperUser);
-    if (errors.length > 0) {
-      response.sendStatus(400);
-      return;
-    }
-  }
-
-  const script = new Script(paperId, paperUser);
+  const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
   if (errors.length > 0) {
     response.sendStatus(400);
@@ -81,6 +58,8 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
+  // Attempt to match with users
+
   // Create questions based on the current script template, if any.
   const scriptTemplate = await getRepository(ScriptTemplate).findOne({
     relations: ["questionTemplates"],
@@ -96,8 +75,6 @@ export async function create(request: Request, response: Response) {
   }
 
   await getManager().transaction(async manager => {
-    await manager.save(student);
-    await manager.save(paperUser);
     await manager.save(script);
     await Promise.all(pages.map(async page => await manager.save(page)));
     if (questions) {
@@ -128,7 +105,7 @@ export async function index(request: Request, response: Response) {
 
   const scripts = await getRepository(Script).find(
     requester.role === PaperUserRole.Student
-      ? { paper, paperUser: requester }
+      ? { paper, student: requester }
       : { paper }
   );
 
@@ -145,7 +122,7 @@ export async function show(request: Request, response: Response) {
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() },
     relations: [
-      "paperUser",
+      "student",
       "pages",
       "pages.annotations",
       "questions",
@@ -171,7 +148,7 @@ export async function show(request: Request, response: Response) {
   const { requester } = allowed;
   if (
     requester.role === PaperUserRole.Student &&
-    script.paperUserId !== requester.id
+    script.studentId !== requester.id
   ) {
     response.sendStatus(404);
     return;

@@ -1,4 +1,3 @@
-import { hashSync } from "bcryptjs";
 import faker from "faker";
 faker.seed(127);
 import supertest from "supertest";
@@ -76,7 +75,8 @@ export class Fixtures {
 
     // TODO: Mock imageUrls correctly
     this.scriptPostData = {
-      email: faker.internet.email(),
+      filename: "A0185892L.pdf",
+      sha256: "stub",
       imageUrls: ["page1ImageStub", "page2ImageStub", "page3ImageStub"]
     };
   }
@@ -98,30 +98,27 @@ export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {
   const paperUsers: PaperUser[] = [];
   const users: User[] = [];
 
-  const owner = new PaperUser();
-  owner.paper = paper;
-  owner.user = new User();
-  owner.user.email = "owner@u.nus.edu";
-  owner.user.password = hashSync("setMeUp?");
-  owner.role = PaperUserRole.Owner;
-  users.push(owner.user);
+  const owner = new PaperUser(
+    paper,
+    new User("owner@u.nus.edu", "setMeUp?"),
+    PaperUserRole.Owner
+  );
+  users.push(owner.user!);
   paperUsers.push(owner);
-
-  const marker = new PaperUser();
-  marker.paper = paper;
-  marker.user = new User();
-  marker.user.email = "marker@u.nus.edu";
-  marker.user.password = hashSync("setMeUp?");
-  marker.role = PaperUserRole.Marker;
-  users.push(marker.user);
+  const marker = new PaperUser(
+    paper,
+    new User("marker@u.nus.edu", "setMeUp?"),
+    PaperUserRole.Marker
+  );
+  users.push(marker.user!);
   paperUsers.push(marker);
 
-  const student = new PaperUser();
-  student.paper = paper;
-  student.user = new User();
-  student.user.email = "student@u.nus.edu";
-  student.role = PaperUserRole.Student;
-  users.push(student.user);
+  const student = new PaperUser(
+    paper,
+    new User("student@u.nus.edu"),
+    PaperUserRole.Student
+  );
+  users.push(student.user!);
   paperUsers.push(student);
 
   await getRepository(User).save(users);

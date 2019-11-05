@@ -29,17 +29,17 @@ export class QuestionTemplate extends Discardable {
     scriptTemplate: ScriptTemplate,
     name: string,
     score: number | null,
-    parentQuestionTemplate?: QuestionTemplate | null
+    parentQuestionTemplate?: QuestionTemplate | null,
+    topOffset?: number | null,
+    leftOffset?: number | null
   ) {
     super();
     this.scriptTemplate = scriptTemplate;
-    if (name) {
-      this.name = name;
-    }
-    if (score) {
-      this.score = score;
-    }
+    this.name = name;
+    this.score = score || null;
     this.parentQuestionTemplate = parentQuestionTemplate;
+    this.topOffset = topOffset || null;
+    this.leftOffset = leftOffset || null;
   }
 
   @Column()
@@ -60,6 +60,16 @@ export class QuestionTemplate extends Discardable {
   )
   parentQuestionTemplate?: QuestionTemplate | null;
 
+  @Column({ type: "integer", nullable: true })
+  @IsOptional()
+  @IsNumber()
+  topOffset: number | null;
+
+  @Column({ type: "integer", nullable: true })
+  @IsOptional()
+  @IsNumber()
+  leftOffset: number | null;
+
   @OneToMany(
     type => QuestionTemplate,
     questionTemplate => questionTemplate.parentQuestionTemplate
@@ -75,12 +85,12 @@ export class QuestionTemplate extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
-  name!: string;
+  name: string;
 
   @Column({ type: "double precision", nullable: true })
   @IsOptional()
   @IsNumber()
-  score!: number | null;
+  score: number | null;
 
   @OneToMany(type => Question, question => question.questionTemplate)
   questions?: Question[];
@@ -127,7 +137,9 @@ export class QuestionTemplate extends Discardable {
       scriptTemplateId: this.scriptTemplateId,
       name: this.name,
       score: this.score,
-      parentQuestionTemplateId: this.parentQuestionTemplateId
+      parentQuestionTemplateId: this.parentQuestionTemplateId,
+      topOffset: this.topOffset,
+      leftOffset: this.leftOffset
     };
   };
 

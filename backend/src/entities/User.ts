@@ -1,6 +1,8 @@
+import { hashSync } from "bcryptjs";
 import { IsNotEmpty, IsEmail, IsOptional, IsString } from "class-validator";
 import { Column, Entity, OneToMany } from "typeorm";
 import { sign } from "jsonwebtoken";
+
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import {
@@ -17,13 +19,11 @@ import { UserData } from "../types/users";
 export class User extends Discardable {
   entityName = "User";
 
-  constructor();
-  constructor(email: string);
-  constructor(email?: string) {
+  constructor(email: string, password?: string, name?: string) {
     super();
-    if (email) {
-      this.email = email;
-    }
+    this.email = email;
+    this.password = password ? hashSync(password) : null;
+    this.name = name || null;
   }
 
   @Column({ unique: true })

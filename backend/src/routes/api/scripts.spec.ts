@@ -16,9 +16,16 @@ beforeAll(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  script1 = new Script(fixtures.paper, fixtures.student);
+  script1 = new Script(
+    fixtures.paper,
+    "A0185892L.pdf",
+    "stub1",
+    fixtures.student
+  );
   script2 = new Script(
     fixtures.paper,
+    "A0123456L.pdf",
+    "stub2",
     (await fixtures.createPaperUser(PaperUserRole.Student)).paperUser
   );
   await getRepository(Script).save([script1, script2]);

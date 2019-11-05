@@ -167,7 +167,9 @@ describe("POST /script_templates/:id/question_templates", () => {
   it("should allow creating a Question Template with no score and no parent", async () => {
     const postData: QuestionTemplatePostData = {
       name: "1",
-      score: null
+      score: null,
+      topOffset: null,
+      leftOffset: null
     };
     const response = await request(server.server)
       .post(
@@ -181,7 +183,9 @@ describe("POST /script_templates/:id/question_templates", () => {
   it("should allow creating a Question Template with a score and no parent", async () => {
     const postData: QuestionTemplatePostData = {
       name: "2",
-      score: 5
+      score: 5,
+      topOffset: 50,
+      leftOffset: 50
     };
     const response = await request(server.server)
       .post(
@@ -195,7 +199,9 @@ describe("POST /script_templates/:id/question_templates", () => {
   it("should allow creating a Question Template with a score and a parent", async () => {
     const postData: QuestionTemplatePostData = {
       name: "1a",
-      score: 2
+      score: 2,
+      topOffset: 50,
+      leftOffset: 50
     };
     const response = await request(server.server)
       .post(
@@ -209,7 +215,9 @@ describe("POST /script_templates/:id/question_templates", () => {
   it("should return QuestionTemplateData", async () => {
     const postData: QuestionTemplatePostData = {
       name: "1",
-      score: 7
+      score: 7,
+      topOffset: 50,
+      leftOffset: 50
     };
     const response = await request(server.server)
       .post(
@@ -227,25 +235,37 @@ describe("POST /script_templates/:id/question_templates", () => {
     for (let i = 1; i <= 5; i++) {
       const student = (await fixtures.createPaperUser(PaperUserRole.Student))
         .paperUser;
-      const script = new Script(fixtures.paper, student);
+      const script = new Script(
+        fixtures.paper,
+        `SCRIPT${i}.pdf`,
+        `SCRIPT${i}.pdf`,
+        student
+      );
       paper1Scripts.push(script);
     }
     const paper2 = new Paper("CS1010J");
     await getRepository(Paper).save(paper2);
     const paper2Scripts = [];
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 6; i <= 10; i++) {
       const student = (await fixtures.createPaperUser(
         PaperUserRole.Student,
         paper2
       )).paperUser;
-      const script = new Script(paper2, student);
+      const script = new Script(
+        paper2,
+        `SCRIPT${i}.pdf`,
+        `SCRIPT${i}.pdf`,
+        student
+      );
       paper2Scripts.push(script);
     }
     await getRepository(Script).save(paper1Scripts.concat(paper2Scripts));
 
     const postData: QuestionTemplatePostData = {
       name: "1",
-      score: 7
+      score: 7,
+      topOffset: 50,
+      leftOffset: 50
     };
     const response = await request(server.server)
       .post(

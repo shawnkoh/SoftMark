@@ -39,7 +39,12 @@ beforeEach(async () => {
   q1Allocation = new Allocation(q1Template, fixtures.marker);
   q2Allocation = new Allocation(q2Template, fixtures.marker);
 
-  script = new Script(fixtures.paper, fixtures.student);
+  script = new Script(
+    fixtures.paper,
+    "A0185892L.pdf",
+    "stub",
+    fixtures.student
+  );
   q1 = new Question(script, q1Template);
   q2 = new Question(script, q2Template);
   q2a = new Question(script, q2aTemplate);

@@ -28,15 +28,19 @@ import {
 export class PaperUser extends Discardable {
   entityName = "PaperUser";
 
-  constructor();
-  constructor(paper?: Paper, user?: User, role?: PaperUserRole);
-  constructor(paper?: Paper, user?: User, role?: PaperUserRole) {
+  constructor(paper: Paper | number, user: User | number, role: PaperUserRole) {
     super();
-    this.paper = paper;
-    this.user = user;
-    if (role) {
-      this.role = role;
+    if (typeof paper === "number") {
+      this.paperId = paper;
+    } else {
+      this.paper = paper;
     }
+    if (typeof user === "number") {
+      this.userId = user;
+    } else {
+      this.user = user;
+    }
+    this.role = role;
   }
 
   @Column()
@@ -74,7 +78,7 @@ export class PaperUser extends Discardable {
   @OneToMany(type => Comment, comment => comment.paperUser)
   comments?: Comment[];
 
-  @OneToMany(type => Script, script => script.paperUser)
+  @OneToMany(type => Script, script => script.student)
   scripts?: Script[];
 
   @OneToMany(type => Question, question => question.currentMarker)

@@ -3,13 +3,16 @@ import { QuestionListData, isQuestionListData } from "./questions";
 import { PageListData, isPageListData } from "./pages";
 
 export interface ScriptPostData {
-  email: string;
+  filename: string;
+  sha256: string;
   imageUrls: string[];
 }
 
 export interface ScriptListData extends DiscardableData {
-  paperUserId: number;
   paperId: number;
+  studentId: number | null;
+  filename: string;
+  sha256: string;
   pagesCount: number;
   questionsCount: number;
 }
@@ -21,7 +24,7 @@ export interface ScriptData extends ScriptListData {
 
 export function isScriptListData(data: any): data is ScriptListData {
   return (
-    typeof data.paperUserId === "number" &&
+    (typeof data.studentId === "number" || data.studentId === null) &&
     typeof data.paperId === "number" &&
     typeof data.pagesCount === "number" &&
     typeof data.questionsCount === "number" &&

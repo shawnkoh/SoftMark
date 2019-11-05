@@ -1,40 +1,77 @@
-import { Entity, ManyToOne, OneToMany, Column, getRepository } from "typeorm";
+import { IsOptional, IsNotEmpty, IsString, Validate } from "class-validator";
+import {
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Column,
+  getRepository,
+  Unique,
+  IsNull
+} from "typeorm";
+
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { ScriptData, ScriptListData } from "../types/scripts";
+import IsUniqueFilename from "../constraints/IsUniqueFilename";
+import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 
 @Entity()
+@Unique(["paper", "filename"])
+@Unique(["paper", "sha256"])
 export class Script extends Discardable {
   entityName = "Script";
 
-  constructor(paper: number | Paper, paperUser: number | PaperUser) {
+  constructor(
+    paper: number | Paper,
+    filename: string,
+    sha256: string,
+    student?: number | PaperUser
+  ) {
     super();
     if (typeof paper === "number") {
       this.paperId = paper;
     } else {
       this.paper = paper;
     }
-    if (typeof paperUser === "number") {
-      this.paperUserId = paperUser;
+    this.filename = filename;
+    this.sha256 = sha256;
+    if (!student) {
+      this.studentId = null;
+      this.student = null;
+    } else if (typeof student === "number") {
+      this.studentId = student;
     } else {
-      this.paperUser = paperUser;
+      this.student = student;
     }
   }
-
-  @Column()
-  paperUserId!: number;
-
-  @ManyToOne(type => PaperUser, paperUser => paperUser.scripts)
-  paperUser?: PaperUser;
 
   @Column()
   paperId!: number;
 
   @ManyToOne(type => Paper, paper => paper.paperUsers)
   paper?: Paper;
+
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  @Validate(IsUniqueFilename)
+  filename: string;
+
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  @Validate(IsUniqueSha256)
+  sha256: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  studentId!: number | null;
+
+  @ManyToOne(type => PaperUser, student => student.scripts)
+  student?: PaperUser | null;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -44,8 +81,10 @@ export class Script extends Discardable {
 
   getListData = async (): Promise<ScriptListData> => ({
     ...this.getBase(),
-    paperUserId: this.paperUserId,
     paperId: this.paperId,
+    filename: this.filename,
+    sha256: this.sha256,
+    studentId: this.studentId,
     pagesCount: this.pages
       ? this.pages.length
       : await getRepository(Page).count({ scriptId: this.id }),
