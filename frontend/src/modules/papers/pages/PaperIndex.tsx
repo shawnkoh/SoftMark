@@ -3,7 +3,6 @@ import { RouteComponentProps, withRouter } from "react-router";
 import clsx from "clsx";
 
 import { PaperListData } from "backend/src/types/papers";
-import api from "../../../api";
 import { format } from "date-fns";
 
 import {
@@ -19,8 +18,9 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import Header from "../components/headers/PaperIndexHeader";
 import AddPaperModal from "../components/modals/AddPaperModal";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import { RoundedButton } from "../../../components/buttons/StyledButtons";
+import api from "../../../api";
 
 const useStyles = makeStyles(theme => ({
   grid: {

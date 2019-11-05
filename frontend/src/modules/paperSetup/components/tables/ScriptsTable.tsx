@@ -24,7 +24,7 @@ import Clear from "@material-ui/icons/Clear";
 import Delete from "@material-ui/icons/Delete";
 import Edit from "@material-ui/icons/Edit";
 import SearchBar from "../../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import useSnackbar from "../../../../components/snackbar/useSnackbar";
 import ScriptsTableRow from "./ScriptTableRow";
@@ -62,13 +62,14 @@ const ScriptsTable: React.FC<Props> = ({
     setScriptTemplate
   ] = useState<ScriptTemplateData | null>(null);
 
+  const getScriptTemplate = async (paperId: number) => {
+    const data = await api.scriptTemplates.getScriptTemplate(paper.id);
+    setScriptTemplate(data);
+  };
+
   useEffect(() => {
-    api.scriptTemplates
-      .getScriptTemplate(paper.id)
-      .then(resp => {
-        setScriptTemplate(resp.data.scriptTemplate);
-      })
-      .finally(() => setIsLoadingScriptTemplate(false));
+    getScriptTemplate(paper.id);
+    setIsLoadingScriptTemplate(false);
   }, []);
 
   const [searchText, setSearchText] = useState("");
@@ -100,7 +101,8 @@ const ScriptsTable: React.FC<Props> = ({
 
   const filteredScripts = scripts.filter(script => {
     const { filename, student } = script;
-    const studentName = student ? student.user.name : "";
+    const studentName =
+      student && student.user && student.user.name ? student.user.name : "";
     return (
       searchText === "" ||
       filename.includes(searchText) ||

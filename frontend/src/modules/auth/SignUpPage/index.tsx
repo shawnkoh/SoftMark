@@ -10,13 +10,14 @@ import {
   TextField,
   Typography
 } from "@material-ui/core";
-import appLogo from "../../../assets/logo.png";
 import { Formik } from "formik";
-import api from "../../../api";
 import { AxiosError } from "axios";
 import * as Yup from "yup";
 import ReactGA from "react-ga";
+
 import useSnackbar from "../../../components/snackbar/useSnackbar";
+import { createNewUser } from "../../../api/users";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
 
 type Props = RouteComponentProps;
 const SignUpPage: React.FC<Props> = props => {
@@ -31,7 +32,7 @@ const SignUpPage: React.FC<Props> = props => {
         alignItems="center"
         id="session"
       >
-        <img className="app-logo mb-3" src={appLogo} alt="logo" />
+        <SvgSoftmarkLogo />
         <Typography component="h1" variant="h5">
           Register
         </Typography>
@@ -44,8 +45,7 @@ const SignUpPage: React.FC<Props> = props => {
             confirmPassword: ""
           }}
           onSubmit={(values, { setSubmitting }) => {
-            return api.users
-              .createNewUser(values.name, values.email, values.password)
+            return createNewUser(values.name, values.email, values.password)
               .then(resp => {
                 ReactGA.event({
                   category: "User",

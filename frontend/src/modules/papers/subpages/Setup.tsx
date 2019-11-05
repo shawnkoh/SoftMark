@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../../api";
 import { Button, Grid, IconButton, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Edit from "@material-ui/icons/EditOutlined";
@@ -10,12 +9,13 @@ import EditPaperModal from "../components/modals/EditPaperModal";
 import ThemedButton from "../../../components/buttons/ThemedButton";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import useSnackbar from "../../../components/snackbar/useSnackbar";
 import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
+import api from "../../../api";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -60,26 +60,31 @@ const SetupPage: React.FC<Props> = props => {
   const refreshScriptTemplate = () =>
     setRefreshScriptTemplateFlag(!refreshScriptTemplateFlag);
 
+  const getScriptTemplate = async (id: number) => {
+    const data = await api.scriptTemplates.getScriptTemplate(id);
+    setScriptTemplate(data);
+    setIsLoadingScriptTemplate(false);
+  };
+
   useEffect(() => {
-    api.scriptTemplates
-      .getScriptTemplate(paper.id)
-      .then(resp => {
-        setScriptTemplate(resp.data.scriptTemplate);
-      })
-      .finally(() => setIsLoadingScriptTemplate(false));
+    getScriptTemplate(paper.id);
   }, [refreshScriptTemplateFlag]);
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
   const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
   const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
+
+  const getScripts = async (paperId: number) => {
+    const data = await api.scripts.getScripts(paperId);
+    if (data) {
+      setScripts(data);
+    }
+    setIsLoadingScripts(false);
+  };
+
   useEffect(() => {
-    api.scripts
-      .getScripts(paper.id)
-      .then(resp => {
-        setScripts(resp.data.scripts);
-      })
-      .finally(() => setIsLoadingScripts(false));
+    getScripts(paper.id);
   }, [refreshScriptsFlag]);
 
   const [isOpenEditPaperDialog, setOpenEditPaperDialog] = useState(false);
@@ -157,7 +162,10 @@ const SetupPage: React.FC<Props> = props => {
     {
       title: "Student list",
       button: (
-        <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
+        <UploadNominalRollWrapper
+          paperId={paper.id}
+          clickable={!isLoadingScriptTemplate}
+        >
           <Button>{false ? "Re-Upload" : "Upload"}</Button>
         </UploadNominalRollWrapper>
       )
@@ -223,7 +231,7 @@ const SetupPage: React.FC<Props> = props => {
               justify="space-between"
               alignItems="center"
             >
-              <IconButton onClick={() => props.history.push("/papers")}>
+              <IconButton onClick={() => props.history.push("/")}>
                 <ArrowLeftSharp />
               </IconButton>
               <Typography variant="h4">{paper.name}</Typography>

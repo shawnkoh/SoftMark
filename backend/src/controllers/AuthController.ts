@@ -10,30 +10,31 @@ import {
 import { sendPasswordlessLoginEmail } from "../utils/sendgrid";
 
 export async function passwordless(request: Request, response: Response) {
-  try {
-    // Check whether a user has a password. If no password, send passwordless login email
-    let email = request.body.email;
-    if (email) {
-      const user = await getRepository(User)
-        .createQueryBuilder("user")
-        .addSelect("user.password")
-        .where("user.email = :email", { email })
-        .andWhere("user.discardedAt is null")
-        .getOne();
-      if (!user) {
-        throw new Error();
-      }
-
-      if (!user.password) {
-        sendPasswordlessLoginEmail(user);
-        response.status(201).send("Sent passwordless login email");
-      } else {
-        response.status(401).send("User has password");
-      }
-    }
-  } catch (error) {
-    response.sendStatus(404);
+  // Check whether a user has a password. If no password, send passwordless login email
+  const email = request.body.email;
+  if (!email) {
+    response.sendStatus(400);
+    return;
   }
+  const user = await getRepository(User)
+    .createQueryBuilder("user")
+    .addSelect("user.password")
+    .where("user.email = :email", { email })
+    .andWhere("user.discardedAt is null")
+    .getOne();
+
+  if (!user) {
+    response.sendStatus(404);
+    return;
+  }
+
+  if (user.password) {
+    response.status(403).send("User has password");
+    return;
+  }
+
+  sendPasswordlessLoginEmail(user);
+  response.status(201).send("Sent passwordless login email");
 }
 
 export async function token(request: Request, response: Response) {

@@ -1,18 +1,15 @@
 import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import { PaperData } from "backend/src/types/papers";
 import useSnackbar from "../../components/snackbar/useSnackbar";
 
-interface OwnProps {
+interface Props {
   paperId: number;
   clickable?: boolean;
-  refreshStudentList?: () => void;
-  refreshScriptList?: () => void;
+  refreshStudents?: () => void;
+  refreshScripts?: () => void;
 }
-
-type Props = RouteComponentProps & OwnProps;
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
   const snackbar = useSnackbar();
@@ -20,8 +17,8 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
     paperId,
     children,
     clickable = true,
-    refreshStudentList,
-    refreshScriptList
+    refreshStudents,
+    refreshScripts
   } = props;
 
   return (
@@ -33,11 +30,11 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
         Object.keys(files).forEach(key => {
           const file = files[key];
           const onSuccessfulResponse = () => {
-            if (refreshStudentList) {
-              refreshStudentList();
+            if (refreshStudents) {
+              refreshStudents();
             }
-            if (refreshScriptList) {
-              refreshScriptList();
+            if (refreshScripts) {
+              refreshScripts();
             }
             snackbar.showMessage(
               `Nominal roll list has been uploaded successfully.`,
@@ -54,4 +51,4 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(UploadNominalRollWrapper);
+export default UploadNominalRollWrapper;

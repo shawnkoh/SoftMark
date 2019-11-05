@@ -1,16 +1,11 @@
+import { ScriptData } from "backend/src/types/scripts";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Document, Page } from "react-pdf";
-import { getDocument } from "pdfjs-dist";
-
-import { AppState } from "../../../types/store";
-import api from "../../../api";
-import { PaperData } from "backend/src/types/papers";
-import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 
 import Annotator from "../components/annotator/Annotator";
+import api from "../../../api";
 import TogglePageComponent from "../../../components/misc/TogglePageComponent";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 type Props = RouteComponentProps;
 
@@ -26,13 +21,14 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
+  const getScript = async (scriptId: number) => {
+    const data = await api.scripts.getScript(scriptId);
+    setScript(data);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    api.scripts
-      .getScript(script_id)
-      .then(resp => {
-        setScript(resp.data.script);
-      })
-      .finally(() => setIsLoading(false));
+    getScript(script_id);
   }, [refreshFlag]);
 
   if (isLoading) {

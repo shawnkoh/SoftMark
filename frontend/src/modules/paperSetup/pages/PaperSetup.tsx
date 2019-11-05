@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
-import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserData } from "../../../types/paperUsers";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import QuestionAllocation from "./QuestionAllocation";
 import ScriptTemplateView from "./ScriptTemplateView";
 import ScriptMapping from "./ScriptMapping";
+import api from "../../../api";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -27,27 +27,26 @@ const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
+  const getPaper = async (paperId: number) => {
+    const data = await api.papers.getPaper(paperId);
+    if (!data) {
+      return;
+    }
+    setCurrentPaperUser(data.currentPaperUser);
+    setPaper(data.paper);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    api.papers
-      .getPaper(paper_id)
-      .then(resp => {
-        const data = resp.data;
-        setCurrentPaperUser(data.currentPaperUser);
-        setPaper(data.paper);
-      })
-      .finally(() => setIsLoading(false));
+    getPaper(paper_id);
   }, [refreshFlag]);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!paper) {
+  if (!paper || !currentPaperUser) {
     return <>The paper does not exist.</>;
-  }
-
-  if (!currentPaperUser) {
-    return <>You are not allowed to view this paper.</>;
   }
 
   const BASE_URL = "/papers/:paper_id/set_up";

@@ -1,13 +1,13 @@
 import React from "react";
 import * as Yup from "yup";
-import api from "../../../../api";
 import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
 import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
 import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
-import useSnackbar from "../../../../components/snackbar/useSnackbar";
+import { toast } from "react-toastify";
+import api from "../../../../api";
 
 interface OwnProps {
   paperId: number;
@@ -24,7 +24,6 @@ const AddMarkerModal: React.FC<Props> = ({
   toggleRefresh,
   paperId
 }) => {
-  const snackbar = useSnackbar();
   const values: PaperUserPostData = {
     email: "",
     role: PaperUserRole.Marker
@@ -57,7 +56,7 @@ const AddMarkerModal: React.FC<Props> = ({
           validationSchema={validationSchema}
           onCancel={toggleVisibility}
           onSubmit={(newValues: PaperUserPostData) =>
-            api.paperUsers
+            api.papers
               .createPaperUser(paperId, newValues)
               .then(resp => {
                 toggleRefresh();
@@ -65,7 +64,7 @@ const AddMarkerModal: React.FC<Props> = ({
                 return false;
               })
               .catch(() => {
-                snackbar.showMessage(`Marker could not be created.`, "Close");
+                toast.error(`Marker could not be created.`);
                 return false;
               })
           }

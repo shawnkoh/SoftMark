@@ -1,45 +1,46 @@
+import { UserPatchData } from "backend/src/types/users";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ThunkDispatch } from "redux-thunk";
 import { RouteComponentProps, withRouter } from "react-router";
 import * as Yup from "yup";
-import api from "../../../../api";
-import { getCurrentUser, isLoggedIn } from "../../selectors";
-import { setCurrentUser, logOut } from "../../actions";
 import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { Person } from "@material-ui/icons";
+
+import { setUser, logOut } from "../actions";
+import { getUser } from "../selectors";
+import { getOwnUser, patchOwnUser } from "../../../api/users";
 import SimpleForm, {
   FormMetadataType
-} from "../../../../components/forms/SimpleForm";
-import { UserPatchData } from "backend/src/types/users";
+} from "../../../components/forms/SimpleForm";
 
-type Props = RouteComponentProps;
+interface Props extends RouteComponentProps {
+  render: any;
+}
 
 const AccountModal: React.FC<Props> = props => {
   const dispatch = useDispatch();
-  const loggedIn = useSelector(isLoggedIn);
-  const currentUser = useSelector(getCurrentUser);
+  const user = useSelector(getUser);
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
-  useEffect(() => {
-    api.users.getOwnUser().then(res => {
-      dispatch(setCurrentUser(res.data.user));
-    });
-    if (!loggedIn) {
-      props.history.push("/login");
-    }
-  }, [refreshFlag]);
+  // useEffect(() => {
+  //   getOwnUser().then(user => {
+  //     console.log("account modal set user");
+  //     dispatch(setUser(user));
+  //   });
+  //   if (!user) {
+  //     props.history.push("/login");
+  //   }
+  // }, [refreshFlag]);
 
-  if (!currentUser) {
+  if (!user) {
     return <div />;
   }
 
   const values: UserPatchData = {
-    name: currentUser.name,
-    email: currentUser.email
+    email: user.email,
+    name: user.name
   };
 
   const formMetadata: FormMetadataType<UserPatchData> = {
@@ -64,7 +65,7 @@ const AccountModal: React.FC<Props> = props => {
             validationSchema={validationSchema}
             onCancel={toggleVisibility}
             onSubmit={(newValues: UserPatchData) =>
-              api.users.patchOwnUser(newValues).then(resp => {
+              patchOwnUser(newValues).then(resp => {
                 toggleRefreshFlag();
                 toggleVisibility();
                 return false;
@@ -82,7 +83,7 @@ const AccountModal: React.FC<Props> = props => {
           </Button>
         </DialogContent>
       </Dialog>
-      {props.children(toggleVisibility)}
+      {props.render(toggleVisibility)}
     </>
   );
 };

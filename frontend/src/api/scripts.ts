@@ -8,75 +8,79 @@ import {
 import PDFJS from "pdfjs-dist/webpack";
 import { sha256 } from "js-sha256";
 
-import BaseAPI from "./base";
+import client from "./client";
 import { getPage } from "../utils/canvas";
 
-class ScriptsAPI extends BaseAPI {
-  private createScript(
-    id: number,
-    scriptPostData: ScriptPostData
-  ): Promise<AxiosResponse<{ script: ScriptData }>> {
-    return this.getClient().post(`/papers/${id}/scripts`, scriptPostData);
-  }
+const URL = "/scripts";
 
-  getScripts(
-    id: number
-  ): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
-    return this.getClient().get(`/papers/${id}/scripts`);
-  }
-
-  getScript(id: number): Promise<AxiosResponse<{ script: ScriptData }>> {
-    return this.getClient().get(`${this.getUrl()}/${id}`);
-  }
-
-  patchScript(
-    id: number,
-    scriptPatchData: ScriptPatchData
-  ): Promise<AxiosResponse<{ script: ScriptData }>> {
-    return this.getClient().patch(`${this.getUrl()}/${id}`, scriptPatchData);
-  }
-
-  discardScript(id: number): Promise<AxiosResponse> {
-    return this.getClient().delete(`${this.getUrl()}/${id}`);
-  }
-
-  undiscardScript(id: number): Promise<AxiosResponse<{ script: ScriptData }>> {
-    return this.getClient().patch(`${this.getUrl()}/${id}/undiscard`);
-  }
-
-  private getUrl() {
-    return "/scripts";
-  }
-
-  postScript = async (
-    paper_id: number,
-    filename: string,
-    file: File,
-    onSuccess: () => void,
-    onFail: () => void
-  ) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const pdfAsString = String(reader.result);
-      PDFJS.getDocument(pdfAsString).promise.then(async pdf => {
-        const pages: any = [];
-        for (let i = 0; i < pdf.numPages; i++) {
-          pages.push(getPage(i + 1, pdf));
-        }
-        const scriptPostData: ScriptPostData = {
-          filename,
-          sha256: sha256(pdfAsString),
-          imageUrls: await Promise.all(pages)
-        };
-        this.createScript(paper_id, scriptPostData)
-          .then(res => {
-            onSuccess();
-          })
-          .catch(() => onFail());
-      });
-    };
-    reader.readAsDataURL(file);
-  };
+export async function createScript(
+  id: number,
+  scriptPostData: ScriptPostData
+): Promise<AxiosResponse<{ script: ScriptData }>> {
+  return client.post(`/papers/${id}/scripts`, scriptPostData);
 }
 
-export default ScriptsAPI;
+export async function getScript(id: number): Promise<ScriptData | null> {
+  try {
+    const response = await client.get<{ script: ScriptData }>(`${URL}/${id}`);
+    return response.data.script;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function getScripts(id: number): Promise<ScriptListData[] | null> {
+  try {
+    const response = await client.get(`/papers/${id}/scripts`);
+    return response.data.scripts;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function patchScript(
+  id: number,
+  scriptPatchData: ScriptPatchData
+): Promise<AxiosResponse<{ script: ScriptData }>> {
+  return client.patch(`${URL}/${id}`, scriptPatchData);
+}
+
+export async function discardScript(id: number): Promise<AxiosResponse> {
+  return client.delete(`${URL}/${id}`);
+}
+
+export async function undiscardScript(
+  id: number
+): Promise<AxiosResponse<{ script: ScriptData }>> {
+  return client.patch(`${URL}/${id}/undiscard`);
+}
+
+export async function postScript(
+  paper_id: number,
+  filename: string,
+  file: File,
+  onSuccess: () => void,
+  onFail: () => void
+) {
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const pdfAsString = String(reader.result);
+    PDFJS.getDocument(pdfAsString).promise.then(async pdf => {
+      const pages: any = [];
+      for (let i = 0; i < pdf.numPages; i++) {
+        pages.push(getPage(i + 1, pdf));
+      }
+      const scriptPostData: ScriptPostData = {
+        filename,
+        sha256: sha256(pdfAsString),
+        imageUrls: await Promise.all(pages)
+      };
+      createScript(paper_id, scriptPostData)
+        .then(res => {
+          onSuccess();
+        })
+        .catch(() => onFail());
+    });
+  };
+  reader.readAsDataURL(file);
+}

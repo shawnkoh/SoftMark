@@ -107,24 +107,27 @@ const ScriptsTableRow: React.FC<Props> = ({ script, refreshScripts }) => {
         </Grid>
       </TableCell>
       <TableCell>
-        <ViewScriptModal script={script}>
-          {toggleModal => (
+        <ViewScriptModal
+          script={script}
+          render={toggleModal => (
             <Tooltip title={"View script"}>
               <IconButton className={classes.black} onClick={toggleModal}>
                 <View />
               </IconButton>
             </Tooltip>
           )}
-        </ViewScriptModal>
-        <DeleteScriptModal script={script} refreshScripts={refreshScripts}>
-          {toggleModal => (
+        />
+        <DeleteScriptModal
+          script={script}
+          refreshScripts={refreshScripts}
+          render={toggleModal => (
             <Tooltip title={"Delete script"}>
               <IconButton className={classes.red} onClick={toggleModal}>
                 <Delete />
               </IconButton>
             </Tooltip>
           )}
-        </DeleteScriptModal>
+        />
       </TableCell>
     </TableRow>
   );

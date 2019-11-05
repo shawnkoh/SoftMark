@@ -1,9 +1,8 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Formik } from "formik";
-import api from "../../../api";
 import { AxiosError } from "axios";
 import * as Yup from "yup";
+import { Formik } from "formik";
+import React from "react";
+import { RouteComponentProps, withRouter } from "react-router";
 import {
   Button,
   Container,
@@ -14,19 +13,14 @@ import {
   TextField,
   Typography
 } from "@material-ui/core";
-import useSnackbar from "../../../components/snackbar/useSnackbar";
-import appLogo from "../../../assets/logo.png";
-const queryString = require("query-string");
 
-type RouteParams = {
-  code: string;
-  email: string;
-};
+import useSnackbar from "../../../components/snackbar/useSnackbar";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import { requestResetPassword } from "../../../api/users";
 
 type Props = RouteComponentProps;
-const ResetPasswordPage: React.FC<Props> = props => {
+const ForgotPasswordPage: React.FC<Props> = props => {
   const snackbar = useSnackbar();
-  const params: RouteParams = queryString.parse(props.location.search);
 
   return (
     <Container maxWidth="xs">
@@ -37,22 +31,21 @@ const ResetPasswordPage: React.FC<Props> = props => {
         alignItems="center"
         id="session"
       >
-        <img className="app-logo mb-3" src={appLogo} alt="logo" />
+        <SvgSoftmarkLogo />
         <Typography component="h1" variant="h5">
-          Reset Password
+          Reset Password Request
         </Typography>
         <Formik
           validateOnBlur={false}
-          initialValues={{ password: "", confirmPassword: "" }}
-          onSubmit={(values, { setSubmitting }) => {
-            return api.users
-              .resetPassword(params.email, params.code, values.password)
+          initialValues={{ email: "" }}
+          onSubmit={(values, { setSubmitting, resetForm }) => {
+            return requestResetPassword(values.email)
               .then(resp => {
                 snackbar.showMessage(
-                  `Your password has been reset successfully!`,
+                  `A reset link has been sent to ${values.email}`,
                   "Close"
                 );
-                props.history.push("/login");
+                resetForm({ email: "" });
               })
               .catch((error: AxiosError) => {
                 const message = error.response
@@ -65,9 +58,8 @@ const ResetPasswordPage: React.FC<Props> = props => {
               });
           }}
           validationSchema={Yup.object().shape({
-            password: Yup.string().required("Required"),
-            confirmPassword: Yup.string()
-              .oneOf([Yup.ref("password"), null], "Passwords don't match")
+            email: Yup.string()
+              .email()
               .required("Required")
           })}
         >
@@ -87,46 +79,24 @@ const ResetPasswordPage: React.FC<Props> = props => {
                 <FormControl
                   fullWidth
                   margin="dense"
-                  error={touched.password && !!errors.password}
+                  error={touched.email && !!errors.email}
                 >
                   <TextField
                     variant="outlined"
                     required
                     fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    error={touched.password && !!errors.password}
-                    onBlur={handleBlur}
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    error={touched.email && !!errors.email}
+                    value={values.email}
                     onChange={handleChange}
-                    value={values.password}
-                  />
-                  {touched.password && !!errors.password && (
-                    <FormHelperText>{errors.password}</FormHelperText>
-                  )}
-                </FormControl>
-
-                <FormControl
-                  fullWidth
-                  margin="dense"
-                  error={touched.confirmPassword && !!errors.confirmPassword}
-                >
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    type="password"
-                    id="confirmPassword"
-                    error={touched.confirmPassword && !!errors.confirmPassword}
                     onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.confirmPassword}
                   />
-                  {touched.confirmPassword && !!errors.confirmPassword && (
-                    <FormHelperText>{errors.confirmPassword}</FormHelperText>
+                  {touched.email && !!errors.email && (
+                    <FormHelperText>{errors.email}</FormHelperText>
                   )}
                 </FormControl>
                 <Button
@@ -155,4 +125,4 @@ const ResetPasswordPage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(ResetPasswordPage);
+export default withRouter(ForgotPasswordPage);

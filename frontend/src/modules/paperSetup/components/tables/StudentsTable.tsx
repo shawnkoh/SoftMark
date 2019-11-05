@@ -24,7 +24,7 @@ import Cancel from "@material-ui/icons/Cancel";
 import Delete from "@material-ui/icons/Delete";
 import Edit from "@material-ui/icons/Edit";
 import SearchBar from "../../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
 
 const useStyles = makeStyles(theme => ({
@@ -36,11 +36,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface OwnProps {
-  paper: PaperData;
-  students: PaperUserListData[];
+  isLoadingScripts: boolean;
   isLoadingStudents: boolean;
+  paper: PaperData;
   refreshScripts: () => void;
   refreshStudents: () => void;
+  students: PaperUserListData[];
 }
 
 type Props = OwnProps & RouteComponentProps;
@@ -60,13 +61,14 @@ const StudentsTable: React.FC<Props> = ({
     setScriptTemplate
   ] = useState<ScriptTemplateData | null>(null);
 
+  const getScriptTemplate = async (paperId: number) => {
+    const data = await api.scriptTemplates.getScriptTemplate(paperId);
+    setScriptTemplate(data);
+  };
+
   useEffect(() => {
-    api.scriptTemplates
-      .getScriptTemplate(paper.id)
-      .then(resp => {
-        setScriptTemplate(resp.data.scriptTemplate);
-      })
-      .finally(() => setIsLoadingScriptTemplate(false));
+    getScriptTemplate(paper.id);
+    setIsLoadingScriptTemplate(false);
   }, []);
 
   const [searchText, setSearchText] = useState("");
@@ -101,7 +103,7 @@ const StudentsTable: React.FC<Props> = ({
   const filteredStudents = students.filter(student => {
     const { user, matriculationNumber } = student;
     const matricNo = matriculationNumber || "";
-    const studentName = user.name;
+    const studentName = user.name || "";
     return (
       searchText === "" ||
       matricNo.includes(searchText) ||

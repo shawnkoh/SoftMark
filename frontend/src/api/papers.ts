@@ -1,4 +1,3 @@
-import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
 import {
   PaperListData,
@@ -6,37 +5,45 @@ import {
   PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
+
+import client from "./client";
 import { PaperUserData, PaperUserPostData } from "../types/paperUsers";
 
-class PapersAPI extends BaseAPI {
-  createPaper(
-    paperPostData: PaperPostData
-  ): Promise<AxiosResponse<{ paper: PaperData }>> {
-    return this.getClient().post(`${this.getUrl()}`, paperPostData);
-  }
+const URL = "/papers";
 
-  editPaper(
-    id: number,
-    paperPatchData: PaperPatchData
-  ): Promise<AxiosResponse<{ paper: PaperData }>> {
-    return this.getClient().patch(`${this.getUrl()}/${id}`, paperPatchData);
-  }
+export async function createPaper(
+  paperPostData: PaperPostData
+): Promise<AxiosResponse<{ paper: PaperData }>> {
+  return client.post(`${URL}`, paperPostData);
+}
 
-  getPapers(): Promise<AxiosResponse<{ paper: PaperListData[] }>> {
-    return this.getClient().get(`${this.getUrl()}`);
-  }
+export async function getPapers(): Promise<
+  AxiosResponse<{ paper: PaperListData[] }>
+> {
+  return client.get(`${URL}`);
+}
 
-  getPaper(
-    id: number
-  ): Promise<
-    AxiosResponse<{ paper: PaperData; currentPaperUser: PaperUserData }>
-  > {
-    return this.getClient().get(`${this.getUrl()}/${id}`);
-  }
-
-  private getUrl() {
-    return "/papers";
+export async function getPaper(
+  id: number
+): Promise<{ paper: PaperData; currentPaperUser: PaperUserData } | null> {
+  try {
+    const response = await client.get(`${URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    return null;
   }
 }
 
-export default PapersAPI;
+export async function editPaper(
+  id: number,
+  paperPatchData: PaperPatchData
+): Promise<AxiosResponse<{ paper: PaperData }>> {
+  return client.patch(`${URL}/${id}`, paperPatchData);
+}
+
+export async function createPaperUser(
+  id: number,
+  paperUserPostData: PaperUserPostData
+): Promise<AxiosResponse<PaperUserData>> {
+  return client.post(`${URL}/${id}/users`, paperUserPostData);
+}

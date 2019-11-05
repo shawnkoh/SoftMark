@@ -7,10 +7,10 @@ import {
 } from "redux";
 import logger from "redux-logger";
 import thunk from "redux-thunk";
-import sessionReducer from "./session";
+import authReducer from "./auth";
 
 const rootReducer: Reducer<{}> = combineReducers<{}>({
-  session: sessionReducer
+  auth: authReducer
 });
 
 const middlewares: Middleware[] = [thunk];

@@ -1,31 +1,21 @@
-import AnnotationsAPI from "./annotations";
-import AuthAPI from "./auth";
-import PapersAPI from "./papers";
-import PaperUsersAPI from "./paperUsers";
-import ScriptsAPI from "./scripts";
-import ScriptTemplatesAPI from "./scriptTemplates";
-import UsersAPI from "./users";
+import * as annotations from "./annotations";
+import * as auth from "./auth";
+import * as paperUsers from "./paperUsers";
+import * as papers from "./papers";
+import * as scriptTemplates from "./scriptTemplates";
+import * as scripts from "./scripts";
+import * as users from "./users";
 
-class API {
-  annotations = new AnnotationsAPI();
-  auth = new AuthAPI();
-  papers = new PapersAPI();
-  paperUsers = new PaperUsersAPI();
-  scripts = new ScriptsAPI();
-  scriptTemplates = new ScriptTemplatesAPI();
-  users = new UsersAPI();
+const api = {
+  annotations,
+  auth,
+  paperUsers,
+  papers,
+  scriptTemplates,
+  scripts,
+  users
+};
 
-  setAuthorizationHeader(token: string) {
-    this.annotations.setAuthorizationToken(token);
-    this.auth.setAuthorizationToken(token);
-    this.papers.setAuthorizationToken(token);
-    this.paperUsers.setAuthorizationToken(token);
-    this.scripts.setAuthorizationToken(token);
-    this.scriptTemplates.setAuthorizationToken(token);
-    this.users.setAuthorizationToken(token);
-  }
-}
-
-const api = new API();
+Object.freeze(api);
 
 export default api;
