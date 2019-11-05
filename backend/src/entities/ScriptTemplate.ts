@@ -1,12 +1,22 @@
-import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+import { IsNotEmpty, IsString, Validate } from "class-validator";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  getRepository,
+  Unique
+} from "typeorm";
 
 import { Discardable } from "./Discardable";
+import { PageTemplate } from "./PageTemplate";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
+import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 import { ScriptTemplateData } from "../types/scriptTemplates";
-import { PageTemplate } from "./PageTemplate";
 
 @Entity()
+@Unique(["paper", "sha256"])
 export class ScriptTemplate extends Discardable {
   entityName = "ScriptTemplate";
 
@@ -26,7 +36,10 @@ export class ScriptTemplate extends Discardable {
   @ManyToOne(type => Paper, paper => paper.scriptTemplates)
   paper?: Paper;
 
-  @Column({ type: "character varying" })
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  @Validate(IsUniqueSha256)
   sha256: string;
 
   @OneToMany(type => PageTemplate, pageTemplate => pageTemplate.scriptTemplate)
