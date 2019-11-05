@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEnum } from "class-validator";
+import { IsNotEmpty, IsEnum, IsString, IsOptional } from "class-validator";
 import {
   Column,
   Entity,
@@ -28,7 +28,12 @@ import {
 export class PaperUser extends Discardable {
   entityName = "PaperUser";
 
-  constructor(paper: Paper | number, user: User | number, role: PaperUserRole) {
+  constructor(
+    paper: Paper | number,
+    user: User | number,
+    role: PaperUserRole,
+    matriculationNumber?: number | null
+  ) {
     super();
     if (typeof paper === "number") {
       this.paperId = paper;
@@ -41,6 +46,7 @@ export class PaperUser extends Discardable {
       this.user = user;
     }
     this.role = role;
+    this.matriculationNumber = matriculationNumber || null;
   }
 
   @Column()
@@ -62,6 +68,11 @@ export class PaperUser extends Discardable {
   @IsNotEmpty()
   @IsEnum(PaperUserRole)
   role!: PaperUserRole;
+
+  @Column({ type: "integer", nullable: true })
+  @IsOptional()
+  @IsString()
+  matriculationNumber: number | null;
 
   @OneToMany(type => Allocation, allocation => allocation.paperUser)
   allocations?: Allocation[];
@@ -90,6 +101,7 @@ export class PaperUser extends Discardable {
       ? this.user.getData()
       : (await getRepository(User).findOneOrFail(this.userId)).getData(),
     role: this.role,
+    matriculationNumber: this.matriculationNumber,
     allocations:
       this.allocations ||
       (await getRepository(Allocation).find({
