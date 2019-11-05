@@ -37,7 +37,7 @@ beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  scriptTemplate = new ScriptTemplate(fixtures.paper,sha256);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
   await getRepository(ScriptTemplate).save(scriptTemplate);
 });
 

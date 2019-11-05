@@ -9,22 +9,22 @@ import { Allocation } from "../../entities/Allocation";
 
 let server: ApiServer;
 let fixtures: Fixtures;
+beforeAll(async () => {
+  server = new ApiServer();
+  await server.initialize();
+});
+
 let scriptTemplate: ScriptTemplate;
 let q1: QuestionTemplate;
 let q1a: QuestionTemplate;
 let q1b: QuestionTemplate;
 let q2: QuestionTemplate;
 let allocation: Allocation;
-beforeAll(async () => {
-  server = new ApiServer();
-  await server.initialize();
-});
-
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
-  scriptTemplate = new ScriptTemplate(1);
 
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
   q1 = new QuestionTemplate(scriptTemplate, "1", null);
   q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
   q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);

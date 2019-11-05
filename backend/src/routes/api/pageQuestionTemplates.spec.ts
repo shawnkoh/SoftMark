@@ -15,28 +15,32 @@ import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
-const sha256 = "sha256";
-const scriptTemplate = new ScriptTemplate(1, sha256);
-let page1: PageTemplate;
-let page2: PageTemplate;
-let page3: PageTemplate;
-const q1 = new QuestionTemplate(scriptTemplate, "1", null);
-const q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
-const q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
-const q2 = new QuestionTemplate(scriptTemplate, "2", 6);
-let pageQuestionTemplate: PageQuestionTemplate;
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
 });
 
+let scriptTemplate: ScriptTemplate;
+let page1: PageTemplate;
+let page2: PageTemplate;
+let page3: PageTemplate;
+let q1: QuestionTemplate;
+let q1a: QuestionTemplate;
+let q1b: QuestionTemplate;
+let q2: QuestionTemplate;
+let pageQuestionTemplate: PageQuestionTemplate;
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  page1 = await fixtures.createPageTemplate(scriptTemplate);
-  page2 = await fixtures.createPageTemplate(scriptTemplate);
-  page3 = await fixtures.createPageTemplate(scriptTemplate);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
+  page1 = new PageTemplate(scriptTemplate, "page1", 1);
+  page2 = new PageTemplate(scriptTemplate, "page2", 2);
+  page3 = new PageTemplate(scriptTemplate, "page3", 3);
+  q1 = new QuestionTemplate(scriptTemplate, "1", null);
+  q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
+  q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
+  q2 = new QuestionTemplate(scriptTemplate, "2", 6);
   pageQuestionTemplate = new PageQuestionTemplate(page1, q1);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);

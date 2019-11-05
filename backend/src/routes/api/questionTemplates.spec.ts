@@ -36,12 +36,10 @@ let q1Template: QuestionTemplate;
 let q1aTemplate: QuestionTemplate;
 let q1bTemplate: QuestionTemplate;
 let q2Template: QuestionTemplate;
-const sha256 = "sha256";
-const fileName = "new filename";
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
-  scriptTemplate = new ScriptTemplate(fixtures.paper, sha256);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
 
   q1Template = new QuestionTemplate(scriptTemplate, "1", null);
   q1aTemplate = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1Template);

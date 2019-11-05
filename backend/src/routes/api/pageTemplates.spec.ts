@@ -5,29 +5,36 @@ import { PageTemplate } from "../../entities/PageTemplate";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { isPageTemplateData } from "../../types/pageTemplates";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
-const sha256 = "sha256";
-const scriptTemplate = new ScriptTemplate(1, sha256);
-let page1: PageTemplate;
-let page2: PageTemplate;
-let page3: PageTemplate;
-const q1 = new QuestionTemplate(scriptTemplate, "1", null);
-const q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
-const q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
-const q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 beforeAll(async () => {
   server = new ApiServer();
   await server.initialize();
+});
+
+let scriptTemplate: ScriptTemplate;
+let page1: PageTemplate;
+let page2: PageTemplate;
+let page3: PageTemplate;
+let q1: QuestionTemplate;
+let q1a: QuestionTemplate;
+let q1b: QuestionTemplate;
+let q2: QuestionTemplate;
+beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  page1 = await fixtures.createPageTemplate(scriptTemplate);
-  page2 = await fixtures.createPageTemplate(scriptTemplate);
-  page3 = await fixtures.createPageTemplate(scriptTemplate);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
+  page1 = new PageTemplate(scriptTemplate, "page1", 1);
+  page2 = new PageTemplate(scriptTemplate, "page2", 2);
+  page3 = new PageTemplate(scriptTemplate, "page3", 3);
+  q1 = new QuestionTemplate(scriptTemplate, "1", null);
+  q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1);
+  q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1);
+  q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
   await getRepository(PageTemplate).save([page1, page2, page3]);
