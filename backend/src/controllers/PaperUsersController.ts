@@ -1,14 +1,12 @@
-import { validateOrReject } from "class-validator";
+import { validateOrReject, validate } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not } from "typeorm";
+import { pick } from "lodash";
+import { getRepository, IsNull } from "typeorm";
+
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import {
-  PaperUserPostData,
-  PaperUserRole,
-  PaperUserPatchData
-} from "../types/paperUsers";
+import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
 import { allowedRequester } from "../utils/papers";
 import { sendNewPaperUserEmail } from "../utils/sendgrid";
 
@@ -52,40 +50,36 @@ export async function create(request: Request, response: Response) {
 }
 
 export async function update(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
-    const paperUserId = Number(request.params.id);
-    const paperUser = await getRepository(PaperUser).findOne(paperUserId, {
-      where: { discardedAt: IsNull() }
-    });
-    if (!paperUser) {
-      response.sendStatus(404);
-      return;
-    }
-    const allowed = await allowedRequester(
-      userId,
-      paperUser.paperId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      response.sendStatus(404);
-      return;
-    }
-
-    const patchData = request.body as PaperUserPatchData;
-    if (patchData.role) {
-      paperUser.role = patchData.role;
-    }
-
-    await validateOrReject(paperUser);
-    await getRepository(PaperUser).save(paperUser);
-
-    const data = await paperUser.getData();
-    response.status(201).json({ paperUser: data });
-  } catch (error) {
-    response.sendStatus(400);
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const paperUserId = request.params.id;
+  const paperUser = await getRepository(PaperUser).findOne(paperUserId, {
+    where: { discardedAt: IsNull() }
+  });
+  if (!paperUser) {
+    response.sendStatus(404);
+    return;
   }
+  const allowed = await allowedRequester(
+    requesterId,
+    paperUser.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  Object.assign(paperUser, pick(request.body, "role", "matriculationNumber"));
+  const errors = await validate(paperUser);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+  await getRepository(PaperUser).save(paperUser);
+
+  const data = await paperUser.getData();
+  response.status(201).json({ paperUser: data });
 }
 
 export async function discard(request: Request, response: Response) {

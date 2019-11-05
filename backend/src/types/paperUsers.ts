@@ -19,11 +19,13 @@ export interface PaperUserPostData {
 
 export type PaperUserPatchData = Partial<{
   role: PaperUserRole;
+  matriculationNumber: number | null;
 }>;
 
 export interface PaperUserListData extends DiscardableData {
   user: UserData; // intentionally nested
   role: PaperUserRole;
+  matriculationNumber: number | null;
   allocations: AllocationListData[]; // intentionally nested
   markCount: number;
   bookmarkCount: number;
@@ -35,6 +37,8 @@ export function isPaperUserListData(data: any): data is PaperUserListData {
   return (
     isUserData(data.user) &&
     Object.values(PaperUserRole).includes(data.role) &&
+    (typeof data.matriculationNumber === "number" ||
+      data.matriculationNumber === null) &&
     data.allocations.every((allocation: any) =>
       isAllocationListData(allocation)
     ) &&
