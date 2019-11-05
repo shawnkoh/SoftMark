@@ -48,21 +48,17 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  if (activeScriptTemplate && existingScriptTemplate) {
-    activeScriptTemplate.discardedAt = new Date();
-    existingScriptTemplate.discardedAt = null;
-    await getRepository(ScriptTemplate).save([
-      activeScriptTemplate,
-      existingScriptTemplate
-    ]);
-    const data = await existingScriptTemplate.getData();
-    response.status(200).json({ scriptTemplate: data });
-    return;
-  }
-
   if (activeScriptTemplate) {
     activeScriptTemplate.discardedAt = new Date();
     await getRepository(ScriptTemplate).save(activeScriptTemplate);
+  }
+
+  if (existingScriptTemplate) {
+    existingScriptTemplate.discardedAt = null;
+    await getRepository(ScriptTemplate).save(existingScriptTemplate);
+    const data = await existingScriptTemplate.getData();
+    response.status(200).json({ scriptTemplate: data });
+    return;
   }
 
   const scriptTemplate = new ScriptTemplate(paperId, sha256);
