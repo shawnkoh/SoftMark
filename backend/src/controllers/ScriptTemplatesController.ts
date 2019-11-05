@@ -6,11 +6,8 @@ import { pick } from "lodash";
 import { PageTemplate } from "../entities/PageTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
+import { ScriptTemplatePostData } from "../types/scriptTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import {
-  ScriptTemplatePatchData,
-  ScriptTemplatePostData
-} from "../types/scriptTemplates";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
@@ -32,28 +29,40 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const count = await getRepository(ScriptTemplate).count({
+  const activeScriptTemplate = await getRepository(ScriptTemplate).findOne({
     paperId,
     discardedAt: IsNull()
   });
-  if (count > 0) {
-    response.sendStatus(400);
-    return;
-  }
 
-  const storedScriptTemplate = await getRepository(ScriptTemplate).findOne({
+  const existingScriptTemplate = await getRepository(ScriptTemplate).findOne({
     paperId,
     sha256
   });
-  if (storedScriptTemplate) {
-    try {
-      storedScriptTemplate.discardedAt = null;
-      await validateOrReject(storedScriptTemplate);
-      await getRepository(ScriptTemplate).save(storedScriptTemplate);
-      return response
-        .status(200)
-        .json({ scriptTemplate: await storedScriptTemplate.getData() });
-    } catch (error) {}
+
+  if (
+    activeScriptTemplate &&
+    existingScriptTemplate &&
+    activeScriptTemplate.id === existingScriptTemplate.id
+  ) {
+    response.sendStatus(204);
+    return;
+  }
+
+  if (activeScriptTemplate && existingScriptTemplate) {
+    activeScriptTemplate.discardedAt = new Date();
+    existingScriptTemplate.discardedAt = null;
+    await getRepository(ScriptTemplate).save([
+      activeScriptTemplate,
+      existingScriptTemplate
+    ]);
+    const data = await existingScriptTemplate.getData();
+    response.status(200).json({ scriptTemplate: data });
+    return;
+  }
+
+  if (activeScriptTemplate) {
+    activeScriptTemplate.discardedAt = new Date();
+    await getRepository(ScriptTemplate).save(activeScriptTemplate);
   }
 
   const scriptTemplate = new ScriptTemplate(paperId, sha256);
@@ -123,37 +132,6 @@ export async function showActive(request: Request, response: Response) {
   }
 }
 
-export async function update(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const scriptTemplateId = Number(request.params.id);
-  const patchData = pick(request.body, "name") as ScriptTemplatePatchData;
-  let scriptTemplate: ScriptTemplate;
-  try {
-    scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
-      scriptTemplateId,
-      { relations: ["pageTemplates", "questionTemplates"] }
-    );
-    await allowedRequesterOrFail(
-      payload.id,
-      scriptTemplate.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
-    response.sendStatus(404);
-    return;
-  }
-
-  try {
-    await validateOrReject(scriptTemplate);
-    await getRepository(ScriptTemplate).save(scriptTemplate);
-
-    const data = await scriptTemplate.getData();
-    response.status(200).json({ scriptTemplate: data });
-  } catch (error) {
-    response.sendStatus(400);
-  }
-}
-
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const scriptTemplateId = Number(request.params.id);
@@ -182,6 +160,7 @@ export async function discard(request: Request, response: Response) {
   }
 }
 
+// TODO: Discard the other script templates
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const scriptTemplateId = Number(request.params.id);

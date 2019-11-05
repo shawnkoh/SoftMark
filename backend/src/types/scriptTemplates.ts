@@ -10,10 +10,6 @@ export interface ScriptTemplatePostData {
   imageUrls: string[];
 }
 
-export interface ScriptTemplatePatchData {
-  imageUrls?: string[];
-}
-
 export interface ScriptTemplateData extends DiscardableData {
   pageTemplates: PageTemplateListData[];
   questionTemplates: QuestionTemplateListData[];
