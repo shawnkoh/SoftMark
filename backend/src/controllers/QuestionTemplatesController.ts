@@ -53,9 +53,13 @@ export async function create(request: Request, response: Response) {
     postData.score
   );
   if (postData.parentName) {
-    const parent = await getRepository(QuestionTemplate).findOneOrFail({
-      where: { name: postData.parentName }
+    const parent = await getRepository(QuestionTemplate).findOne({
+      where: { paper, name: postData.parentName }
     });
+    if (!parent) {
+      response.sendStatus(400);
+      return;
+    }
     questionTemplate.parentQuestionTemplate = parent;
   }
   const errors = await validate(questionTemplate);

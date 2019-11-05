@@ -39,7 +39,7 @@ let q2Template: QuestionTemplate;
 beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
-  scriptTemplate = new ScriptTemplate(fixtures.paper);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
 
   q1Template = new QuestionTemplate(scriptTemplate, "1", null);
   q1aTemplate = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1Template);

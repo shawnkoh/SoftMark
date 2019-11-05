@@ -10,8 +10,6 @@ import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
 import { ScriptPostData } from "../types/scripts";
 import { ScriptTemplatePostData } from "../types/scriptTemplates";
-import { PageTemplate } from "../entities/PageTemplate";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {
@@ -38,11 +36,6 @@ export class Fixtures {
   public scriptTemplatePostData: ScriptTemplatePostData;
   public scriptPostData: ScriptPostData;
 
-  public createScriptTemplate: (paper: Paper) => ScriptTemplate;
-  public createPageTemplate: (
-    scriptTemplate: ScriptTemplate
-  ) => Promise<PageTemplate>;
-
   constructor(
     paper: Paper,
     owner: PaperUser,
@@ -61,16 +54,9 @@ export class Fixtures {
     this.studentAccessToken =
       "Bearer " + student.user!.createAuthenticationTokens().accessToken;
 
-    this.scriptTemplatePostData = { imageUrls: ["abc", "def"] };
-
-    this.createScriptTemplate = (paper: Paper = this.paper) => {
-      return new ScriptTemplate(paper);
-    };
-
-    this.createPageTemplate = async (scriptTemplate: ScriptTemplate) => {
-      const count = await getRepository(ScriptTemplate).count(scriptTemplate);
-      const imageUrl = "abc"; // TODO
-      return new PageTemplate(scriptTemplate, imageUrl, count + 1);
+    this.scriptTemplatePostData = {
+      sha256: "stub",
+      imageUrls: ["abc", "def"]
     };
 
     // TODO: Mock imageUrls correctly

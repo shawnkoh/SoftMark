@@ -6,11 +6,8 @@ import {
 } from "./questionTemplates";
 
 export interface ScriptTemplatePostData {
+  sha256: string;
   imageUrls: string[];
-}
-
-export interface ScriptTemplatePatchData {
-  imageUrls?: string[];
 }
 
 export interface ScriptTemplateData extends DiscardableData {

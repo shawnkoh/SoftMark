@@ -36,7 +36,7 @@ beforeEach(async () => {
   await synchronize(server);
   fixtures = await loadFixtures(server);
 
-  scriptTemplate = new ScriptTemplate(fixtures.paper);
+  scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
   q1Template = new QuestionTemplate(scriptTemplate, "1", 10);
   q2Template = new QuestionTemplate(scriptTemplate, "2", null);
   q2aTemplate = new QuestionTemplate(scriptTemplate, "2a", 7, q2Template);

@@ -6,18 +6,19 @@ import { pick } from "lodash";
 import { PageTemplate } from "../entities/PageTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
+import { ScriptTemplatePostData } from "../types/scriptTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import {
-  ScriptTemplatePatchData,
-  ScriptTemplatePostData
-} from "../types/scriptTemplates";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
   const paperId = Number(request.params.id);
-  const postData = pick(request.body, "imageUrls") as ScriptTemplatePostData;
+  const { imageUrls, sha256 } = pick(
+    request.body,
+    "imageUrls",
+    "sha256"
+  ) as ScriptTemplatePostData;
   const allowed = await allowedRequester(
     requesterId,
     paperId,
@@ -28,28 +29,59 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const count = await getRepository(ScriptTemplate).count({
+  const activeScriptTemplate = await getRepository(ScriptTemplate).findOne({
     paperId,
     discardedAt: IsNull()
   });
-  if (count > 0) {
-    response.sendStatus(400);
+
+  const existingScriptTemplate = await getRepository(ScriptTemplate).findOne({
+    paperId,
+    sha256
+  });
+
+  if (
+    activeScriptTemplate &&
+    existingScriptTemplate &&
+    activeScriptTemplate.id === existingScriptTemplate.id
+  ) {
+    response.sendStatus(204);
     return;
   }
 
-  const scriptTemplate = new ScriptTemplate(paperId);
+  if (activeScriptTemplate && existingScriptTemplate) {
+    activeScriptTemplate.discardedAt = new Date();
+    existingScriptTemplate.discardedAt = null;
+    await getRepository(ScriptTemplate).save([
+      activeScriptTemplate,
+      existingScriptTemplate
+    ]);
+    const data = await existingScriptTemplate.getData();
+    response.status(200).json({ scriptTemplate: data });
+    return;
+  }
+
+  if (activeScriptTemplate) {
+    activeScriptTemplate.discardedAt = new Date();
+    await getRepository(ScriptTemplate).save(activeScriptTemplate);
+  }
+
+  const scriptTemplate = new ScriptTemplate(paperId, sha256);
   const errors = await validate(scriptTemplate);
   if (errors.length > 0) {
     response.sendStatus(400);
     return;
   }
-  
+
   let pageTemplates: PageTemplate[];
   try {
     pageTemplates = await Promise.all(
-      postData.imageUrls.map(
+      imageUrls.map(
         async (imageUrl: string, index: number): Promise<PageTemplate> => {
-          const pageTemplate = new PageTemplate(scriptTemplate, imageUrl, index + 1);
+          const pageTemplate = new PageTemplate(
+            scriptTemplate,
+            imageUrl,
+            index + 1
+          );
           await validateOrReject(pageTemplate);
           return pageTemplate;
         }
@@ -60,10 +92,11 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-
   await getManager().transaction(async manager => {
     await manager.save(scriptTemplate);
-    await Promise.all(pageTemplates.map(async pageTemplate => await manager.save(pageTemplate)));
+    await Promise.all(
+      pageTemplates.map(async pageTemplate => await manager.save(pageTemplate))
+    );
   });
 
   await getRepository(ScriptTemplate).save(scriptTemplate);
@@ -99,38 +132,6 @@ export async function showActive(request: Request, response: Response) {
   }
 }
 
-export async function update(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const scriptTemplateId = Number(request.params.id);
-  const patchData = pick(request.body, "name") as ScriptTemplatePatchData;
-  let scriptTemplate: ScriptTemplate;
-  try {
-    scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
-      scriptTemplateId,
-      { relations: ["pageTemplates", "questionTemplates"] }
-    );
-    await allowedRequesterOrFail(
-      payload.id,
-      scriptTemplate.paperId,
-      PaperUserRole.Owner
-    );
-  } catch (error) {
-    response.sendStatus(404);
-    return;
-  }
-
-  try {
-
-    await validateOrReject(scriptTemplate);
-    await getRepository(ScriptTemplate).save(scriptTemplate);
-
-    const data = await scriptTemplate.getData();
-    response.status(200).json({ scriptTemplate: data });
-  } catch (error) {
-    response.sendStatus(400);
-  }
-}
-
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const scriptTemplateId = Number(request.params.id);
@@ -159,6 +160,7 @@ export async function discard(request: Request, response: Response) {
   }
 }
 
+// TODO: Discard the other script templates
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const scriptTemplateId = Number(request.params.id);

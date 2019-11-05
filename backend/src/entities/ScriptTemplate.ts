@@ -1,22 +1,33 @@
-import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
+import { IsNotEmpty, IsString, Validate } from "class-validator";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  getRepository,
+  Unique
+} from "typeorm";
 
 import { Discardable } from "./Discardable";
+import { PageTemplate } from "./PageTemplate";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
+import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 import { ScriptTemplateData } from "../types/scriptTemplates";
-import { PageTemplate } from "./PageTemplate";
 
 @Entity()
+@Unique(["paper", "sha256"])
 export class ScriptTemplate extends Discardable {
   entityName = "ScriptTemplate";
 
-  constructor(paper: Paper | number) {
+  constructor(paper: Paper | number, sha256: string) {
     super();
     if (typeof paper === "number") {
       this.paperId = paper;
     } else {
       this.paper = paper;
     }
+    this.sha256 = sha256;
   }
 
   @Column()
@@ -24,6 +35,12 @@ export class ScriptTemplate extends Discardable {
 
   @ManyToOne(type => Paper, paper => paper.scriptTemplates)
   paper?: Paper;
+
+  @Column()
+  @IsNotEmpty()
+  @IsString()
+  @Validate(IsUniqueSha256)
+  sha256: string;
 
   @OneToMany(type => PageTemplate, pageTemplate => pageTemplate.scriptTemplate)
   pageTemplates?: PageTemplate[];
@@ -35,6 +52,14 @@ export class ScriptTemplate extends Discardable {
   questionTemplates?: QuestionTemplate[];
 
   getData = async (): Promise<ScriptTemplateData> => {
+    if (this.pageTemplates) {
+      this.pageTemplates.sort((a, b) => {
+        if (!a.pageNo || !b.pageNo) {
+          return 0;
+        }
+        return a.pageNo - b.pageNo;
+      });
+    }
     const questionTemplates =
       this.questionTemplates ||
       (await getRepository(QuestionTemplate).find({
@@ -43,7 +68,8 @@ export class ScriptTemplate extends Discardable {
     const pageTemplates =
       this.pageTemplates ||
       (await getRepository(PageTemplate).find({
-        where: { scriptTemplate: this }
+        where: { scriptTemplate: this },
+        order: { pageNo: "ASC" }
       }));
     return {
       ...this.getBase(),

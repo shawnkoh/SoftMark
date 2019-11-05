@@ -1,6 +1,7 @@
 import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
 import PDFJS from "pdfjs-dist/webpack";
+import { sha256 } from "js-sha256";
 import {
   ScriptTemplateData,
   ScriptTemplatePostData
@@ -43,17 +44,19 @@ class ScriptTemplatesAPI extends BaseAPI {
     file: any,
     previousScriptTemplate: ScriptTemplateData | null,
     onSuccessfulResponse?: () => void,
-    callbackScriptData?: React.Dispatch<any>
+    callbackScriptData?: React.Dispatch<ScriptTemplateData>
   ) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      PDFJS.getDocument(String(reader.result)).promise.then(async pdf => {
+      const pdfAsString = String(reader.result);
+      PDFJS.getDocument(pdfAsString).promise.then(async pdf => {
         const pages: any = [];
         for (let i = 0; i < pdf.numPages; i++) {
           pages.push(getPage(i + 1, pdf));
         }
         const scriptTemplatePostData: ScriptTemplatePostData = {
-          imageUrls: await Promise.all(pages)
+          imageUrls: await Promise.all(pages),
+          sha256: sha256(pdfAsString)
         };
         if (previousScriptTemplate) {
           await this.discardScript(previousScriptTemplate.id);
@@ -64,7 +67,7 @@ class ScriptTemplatesAPI extends BaseAPI {
               onSuccessfulResponse();
             }
             if (callbackScriptData) {
-              callbackScriptData(res.data);
+              callbackScriptData(res.data.scriptTemplate);
             }
           }
         );

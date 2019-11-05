@@ -80,7 +80,8 @@ const PaperIndex: React.FC<Props> = props => {
                       variant="subtitle2"
                       className={classes.cardItem}
                     >
-                      created on {format(new Date(paper.createdAt), "d MMM yyyy")}
+                      created on{" "}
+                      {format(new Date(paper.createdAt), "d MMM yyyy")}
                     </Typography>
                     <Typography variant="body1" className={classes.cardItem}>
                       {false ? "Set up completed" : "Set up is incomplete"}

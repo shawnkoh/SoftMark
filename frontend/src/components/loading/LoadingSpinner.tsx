@@ -7,7 +7,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const LoadingSpinner: React.FC<Props> = ({loadingMessage = ""}) => (
+const LoadingSpinner: React.FC<Props> = ({ loadingMessage = "" }) => (
   <div>
     <CircularProgress />
     {loadingMessage}

@@ -11,7 +11,11 @@ import { QuestionTemplateListData } from "../types/questionTemplates";
 export class PageTemplate extends Discardable {
   entityName = "PageTemplate";
 
-  constructor(scriptTemplate: ScriptTemplate | number, imageUrl: string, pageNo: number) {
+  constructor(
+    scriptTemplate: ScriptTemplate | number,
+    imageUrl: string,
+    pageNo: number
+  ) {
     super();
     if (typeof scriptTemplate === "number") {
       this.scriptTemplateId = scriptTemplate;

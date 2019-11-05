@@ -8,7 +8,10 @@ import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { User } from "../../entities/User";
-import { isScriptTemplateData } from "../../types/scriptTemplates";
+import {
+  isScriptTemplateData,
+  ScriptTemplatePostData
+} from "../../types/scriptTemplates";
 import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
 import { ScriptListData, isScriptData, ScriptData } from "../../types/scripts";
@@ -147,7 +150,6 @@ describe("POST /papers/:id/script_templates", () => {
     expect(response.status).toEqual(404);
   });
 
-  // Constraints
   it("should return ScriptTemplateData", async () => {
     const response = await request(server.server)
       .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
@@ -157,18 +159,84 @@ describe("POST /papers/:id/script_templates", () => {
     expect(isScriptTemplateData(response.body.scriptTemplate)).toBe(true);
   });
 
-  it("should not allow a second Script Template", async () => {
-    const first = await request(server.server)
-      .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
-      .set("Authorization", fixtures.ownerAccessToken)
-      .send(fixtures.scriptTemplatePostData);
-    expect(first.status).toEqual(201);
+  it("should create a new Script Template when there is none", async () => {
+    const count = await getRepository(ScriptTemplate).count({
+      paper: fixtures.paper
+    });
+    expect(count).toBe(0);
 
-    const second = await request(server.server)
+    const response = await request(server.server)
       .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send(fixtures.scriptTemplatePostData);
-    expect(second.status).toEqual(400);
+    expect(response.status).toEqual(201);
+  });
+
+  it("should discard the active Script Template and restore the existing Script Template when an existing one is uploaded", async () => {
+    let existingScriptTemplate = new ScriptTemplate(fixtures.paper, "script1");
+    existingScriptTemplate.discardedAt = new Date();
+    let activeScriptTemplate = new ScriptTemplate(fixtures.paper, "script2");
+    await getRepository(ScriptTemplate).save([
+      existingScriptTemplate,
+      activeScriptTemplate
+    ]);
+
+    const postData: ScriptTemplatePostData = {
+      imageUrls: ["page1", "page2"],
+      sha256: "script1"
+    };
+
+    const response = await request(server.server)
+      .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(200);
+
+    existingScriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
+      existingScriptTemplate.id
+    );
+    activeScriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
+      activeScriptTemplate.id
+    );
+    expect(existingScriptTemplate.discardedAt).toBe(null);
+    expect(activeScriptTemplate.discardedAt).not.toBe(null);
+  });
+
+  it("should discard the existing Script Template and create a new one when a new Script Template is uploaded", async () => {
+    let existingScriptTemplate = new ScriptTemplate(fixtures.paper, "script1");
+    await getRepository(ScriptTemplate).save(existingScriptTemplate);
+
+    const response = await request(server.server)
+      .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(fixtures.scriptTemplatePostData);
+    expect(response.status).toEqual(201);
+
+    existingScriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
+      existingScriptTemplate.id
+    );
+    expect(existingScriptTemplate.discardedAt).not.toBe(null);
+  });
+
+  it("should not do anything if the user uploads the same Script Template as the active one", async () => {
+    let existingScriptTemplate = new ScriptTemplate(fixtures.paper, "script1");
+    await getRepository(ScriptTemplate).save(existingScriptTemplate);
+
+    const postData: ScriptTemplatePostData = {
+      imageUrls: ["page1", "page2", "page3"],
+      sha256: "script1"
+    };
+
+    const response = await request(server.server)
+      .post(`${fixtures.api}/papers/${fixtures.paper.id}/script_templates`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send(postData);
+    expect(response.status).toEqual(204);
+
+    existingScriptTemplate = await getRepository(ScriptTemplate).findOneOrFail(
+      existingScriptTemplate.id
+    );
+    expect(existingScriptTemplate.discardedAt).toBe(null);
   });
 });
 
@@ -204,7 +272,7 @@ describe("GET /papers/:id/script_templates/active", () => {
   });
 
   it("should return ScriptTemplateData", async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     await getRepository(ScriptTemplate).save(scriptTemplate);
 
     const response = await request(server.server)
@@ -254,7 +322,7 @@ describe("POST /papers/:id/scripts", () => {
   });
 
   it("should create Questions based on the ScriptTemplate", async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     const q1 = new QuestionTemplate(scriptTemplate, "1", 7);
     const q2 = new QuestionTemplate(scriptTemplate, "2", null);
     const q2a = new QuestionTemplate(scriptTemplate, "2a", 3, q2);
@@ -362,7 +430,7 @@ describe("GET /papers/:id/scripts", () => {
 
 describe("GET /papers/:id/allocations", () => {
   beforeEach(async () => {
-    const scriptTemplate = new ScriptTemplate(fixtures.paper);
+    const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     const q1Template = new QuestionTemplate(scriptTemplate, "1", 5);
     const q2Template = new QuestionTemplate(scriptTemplate, "2", null);
     const q2aTemplate = new QuestionTemplate(scriptTemplate, "2a", 5);

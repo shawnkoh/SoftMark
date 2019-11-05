@@ -7,9 +7,8 @@ import {
 } from "react-router-dom";
 import MainLayout from "./MainLayout";
 import PaperIndex from "../papers/pages/PaperIndex";
+import PaperSetup from "../paperSetup/pages/PaperSetup";
 import PaperView from "../papers/pages/PaperView";
-import QuestionAllocation from "../paperSetup/pages/QuestionAllocation";
-import ScriptTemplateView from "../paperSetup/pages/ScriptTemplateView";
 import ScriptView from "../scripts/pages/ScriptView";
 import api from "../../api";
 import { setCurrentUser, setCurrentToken } from "../session/actions";
@@ -23,25 +22,14 @@ type Props = RouteComponentProps;
 const MainAppPages: React.FC<Props> = props => {
   // Generic routes
   const paperIndexRoute = <Route exact path="/papers" component={PaperIndex} />;
+  const paperSetupRoute = (
+    <Route path="/papers/:paper_id/set_up" component={PaperSetup} />
+  );
   const paperViewRoute = (
     <Route path="/papers/:paper_id" component={PaperView} />
   );
   const scriptViewRoute = (
     <Route exact path="/scripts/:script_id" component={ScriptView} />
-  );
-  const scriptTemplateViewRoute = (
-    <Route
-      exact
-      path="/papers/:paper_id/script_template"
-      component={ScriptTemplateView}
-    />
-  );
-  const questionAllocationRoute = (
-    <Route
-      exact
-      path="/papers/:paper_id/question_allocation"
-      component={QuestionAllocation}
-    />
   );
 
   const dispatch = useDispatch();
@@ -73,9 +61,8 @@ const MainAppPages: React.FC<Props> = props => {
   return (
     <MainLayout>
       <Switch>
-        {questionAllocationRoute}
-        {scriptTemplateViewRoute}
         {paperIndexRoute}
+        {paperSetupRoute}
         {paperViewRoute}
         {scriptViewRoute}
       </Switch>
