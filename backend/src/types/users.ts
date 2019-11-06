@@ -14,7 +14,7 @@ export interface UserPatchData {
 export interface UserListData extends DiscardableData {
   email: string;
   emailVerified: boolean;
-  name: string;
+  name: string | null;
 }
 
 export interface UserData extends UserListData {}

@@ -1,4 +1,4 @@
-import { validateOrReject, validate } from "class-validator";
+import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull, getManager } from "typeorm";
@@ -24,31 +24,44 @@ export async function create(request: Request, response: Response) {
       return;
     }
     const { paper } = allowed;
-    const { email, role, matriculationNumber, name } = request.body as PaperUserPostData;
+    const {
+      email,
+      role,
+      matriculationNumber,
+      name
+    } = request.body as PaperUserPostData;
 
-    const storedUser = await getRepository(User).findOne({ email });
-    const user = storedUser ? storedUser : new User(email);
-    if (name || name === "") {
+    const user =
+      (await getRepository(User).findOne({ email })) || new User(email);
+    if (name) {
       user.name = name;
     }
-    await validateOrReject(user);
+    const userErrors = await validate(user);
+    if (userErrors.length > 0) {
+      return response.sendStatus(400);
+    }
 
     const paperUser = new PaperUser(paper, user, role);
     if (matriculationNumber) {
       paperUser.matriculationNumber = matriculationNumber;
     }
-    await validateOrReject(paperUser); //TODO: need to add uniqueness check to students
+
+    const errors = await validate(paperUser);
+    if (errors.length > 0) {
+      return response.sendStatus(400);
+    }
+    //TODO: need to add uniqueness check to students
 
     await getManager().transaction(async manager => {
       await getRepository(User).save(user);
       await getRepository(PaperUser).save(paperUser);
     });
-    
+
     const data = await paperUser.getData();
     sendNewPaperUserEmail(paperUser);
-    response.status(201).json({ paperUser: data });
+    return response.status(201).json({ paperUser: data });
   } catch (error) {
-    response.sendStatus(400);
+    return response.sendStatus(400);
   }
 }
 

@@ -60,13 +60,13 @@ export class Script extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
- // @Validate(IsUniqueFilename)
+  // @Validate(IsUniqueFilename)
   filename: string;
 
   @Column()
   @IsNotEmpty()
   @IsString()
- // @Validate(IsUniqueSha256)
+  // @Validate(IsUniqueSha256)
   sha256: string;
 
   @Column({ nullable: true })

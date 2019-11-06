@@ -32,7 +32,6 @@ export interface ScriptData extends ScriptListData {
 
 export function isScriptListData(data: any): data is ScriptListData {
   return (
-    (typeof data.studentId === "number" || data.studentId === null) &&
     typeof data.paperId === "number" &&
     typeof data.pagesCount === "number" &&
     typeof data.questionsCount === "number" &&

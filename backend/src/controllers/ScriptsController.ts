@@ -88,7 +88,6 @@ export async function create(request: Request, response: Response) {
   response.status(201).json({ script: data });
 }
 
-
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
@@ -118,7 +117,7 @@ export async function update(request: Request, response: Response) {
   if (hasVerifiedStudent !== undefined) {
     script.hasVerifiedStudent = hasVerifiedStudent;
   }
-  if(studentId !== undefined) {
+  if (studentId !== undefined) {
     script.studentId = studentId;
   }
 
@@ -130,11 +129,10 @@ export async function update(request: Request, response: Response) {
 
   try {
     await getRepository(Script).save(script);
-  }catch (error) {
+  } catch (error) {
     response.sendStatus(400);
     return;
   }
-  
 
   // Attempt to match with users
 
