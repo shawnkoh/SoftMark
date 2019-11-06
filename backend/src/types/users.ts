@@ -3,11 +3,11 @@ import { DiscardableData, isDiscardableData } from "./entities";
 export interface UserPostData {
   email: string;
   password?: string | null;
-  name: string | null;
+  name?: string;
 }
 
 export interface UserPatchData {
-  name: string;
+  name: string | null;
   email: string;
 }
 

@@ -7,7 +7,7 @@ import { Annotation } from "backend/src/types/annotations";
 import { CanvasMode } from "../../../types/canvas";
 
 import Canvas from "../../scripts/components/annotator/Canvas";
-import TogglePageComponent from "../../scripts/components/misc/TogglePageComponent";
+import TogglePageComponent from "../../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 
 type Props = RouteComponentProps;

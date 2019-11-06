@@ -1,6 +1,4 @@
 import React from "react";
-import * as Yup from "yup";
-import api from "../../../../api";
 import { IconButton } from "@material-ui/core";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 

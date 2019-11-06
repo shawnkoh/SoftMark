@@ -15,17 +15,19 @@ export function isPaperUserRole(role: any): role is PaperUserRole {
 export interface PaperUserPostData {
   email: string;
   role: PaperUserRole;
+  name?: string;
+  matriculationNumber?: string;
 }
 
 export type PaperUserPatchData = Partial<{
   role: PaperUserRole;
-  matriculationNumber: number | null;
+  matriculationNumber: string | null;
 }>;
 
 export interface PaperUserListData extends DiscardableData {
   user: UserData; // intentionally nested
   role: PaperUserRole;
-  matriculationNumber: number | null;
+  matriculationNumber: string | null;
   allocations: AllocationListData[]; // intentionally nested
   markCount: number;
   bookmarkCount: number;

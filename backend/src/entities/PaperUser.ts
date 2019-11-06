@@ -32,7 +32,7 @@ export class PaperUser extends Discardable {
     paper: Paper | number,
     user: User | number,
     role: PaperUserRole,
-    matriculationNumber?: number | null
+    matriculationNumber?: string | null
   ) {
     super();
     if (typeof paper === "number") {
@@ -69,10 +69,10 @@ export class PaperUser extends Discardable {
   @IsEnum(PaperUserRole)
   role!: PaperUserRole;
 
-  @Column({ type: "integer", nullable: true })
+  @Column({ type: "varchar", nullable: true })
   @IsOptional()
   @IsString()
-  matriculationNumber: number | null;
+  matriculationNumber: string | null;
 
   @OneToMany(type => Allocation, allocation => allocation.paperUser)
   allocations?: Allocation[];

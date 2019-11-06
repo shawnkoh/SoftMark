@@ -43,8 +43,8 @@ const AccountModal: React.FC<Props> = props => {
   };
 
   const formMetadata: FormMetadataType<UserPatchData> = {
-    name: { label: "Name", required: true, options: null, xs: 10, sm: 10 },
-    email: { label: "Email", required: true, options: null, xs: 10, sm: 10 }
+    name: { label: "Name", required: true, options: null, xs: 12, sm: 12 },
+    email: { label: "Email", required: true, options: null, xs: 12, sm: 12 }
   };
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -55,7 +55,7 @@ const AccountModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth>
+      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
         <DialogTitle>Account</DialogTitle>
         <DialogContent>
           <SimpleForm

@@ -1,7 +1,7 @@
-import { validateOrReject, validate } from "class-validator";
+import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository, IsNull } from "typeorm";
+import { getRepository, IsNull, getManager } from "typeorm";
 
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
@@ -24,28 +24,44 @@ export async function create(request: Request, response: Response) {
       return;
     }
     const { paper } = allowed;
-    const { email, role } = request.body as PaperUserPostData;
+    const {
+      email,
+      role,
+      matriculationNumber,
+      name
+    } = request.body as PaperUserPostData;
 
-    let user = await getRepository(User).findOne({ email });
-    const hasUser = !!user;
-    if (!user) {
-      user = new User(email);
-      await validateOrReject(user);
+    const user =
+      (await getRepository(User).findOne({ email })) || new User(email);
+    if (name) {
+      user.name = name;
+    }
+    const userErrors = await validate(user);
+    if (userErrors.length > 0) {
+      return response.sendStatus(400);
     }
 
     const paperUser = new PaperUser(paper, user, role);
-    await validateOrReject(paperUser);
-
-    if (!hasUser) {
-      await getRepository(User).save(user);
+    if (matriculationNumber) {
+      paperUser.matriculationNumber = matriculationNumber;
     }
-    await getRepository(PaperUser).save(paperUser);
+
+    const errors = await validate(paperUser);
+    if (errors.length > 0) {
+      return response.sendStatus(400);
+    }
+    //TODO: need to add uniqueness check to students
+
+    await getManager().transaction(async manager => {
+      await getRepository(User).save(user);
+      await getRepository(PaperUser).save(paperUser);
+    });
 
     const data = await paperUser.getData();
     sendNewPaperUserEmail(paperUser);
-    response.status(201).json({ paperUser: data });
+    return response.status(201).json({ paperUser: data });
   } catch (error) {
-    response.sendStatus(400);
+    return response.sendStatus(400);
   }
 }
 

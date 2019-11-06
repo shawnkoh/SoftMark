@@ -12,6 +12,7 @@ import { Discardable } from "./Discardable";
 import { PageTemplate } from "./PageTemplate";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
+import { sortByPageNo } from "../utils/sorts";
 import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 import { ScriptTemplateData } from "../types/scriptTemplates";
 
@@ -53,12 +54,7 @@ export class ScriptTemplate extends Discardable {
 
   getData = async (): Promise<ScriptTemplateData> => {
     if (this.pageTemplates) {
-      this.pageTemplates.sort((a, b) => {
-        if (!a.pageNo || !b.pageNo) {
-          return 0;
-        }
-        return a.pageNo - b.pageNo;
-      });
+      this.pageTemplates.sort(sortByPageNo);
     }
     const questionTemplates =
       this.questionTemplates ||

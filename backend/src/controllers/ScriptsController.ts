@@ -88,6 +88,58 @@ export async function create(request: Request, response: Response) {
   response.status(201).json({ script: data });
 }
 
+export async function update(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const scriptId = Number(request.params.id);
+  const script = await getRepository(Script).findOneOrFail(scriptId);
+
+  const allowed = await allowedRequester(
+    requesterId,
+    script.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const { filename, hasVerifiedStudent, studentId } = pick(
+    request.body,
+    "filename",
+    "hasVerifiedStudent",
+    "studentId"
+  );
+
+  if (filename) {
+    script.filename = filename;
+  }
+  if (hasVerifiedStudent !== undefined) {
+    script.hasVerifiedStudent = hasVerifiedStudent;
+  }
+  if (studentId !== undefined) {
+    script.studentId = studentId;
+  }
+
+  const errors = await validate(script);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+
+  try {
+    await getRepository(Script).save(script);
+  } catch (error) {
+    response.sendStatus(400);
+    return;
+  }
+
+  // Attempt to match with users
+
+  const data = await script.getData();
+  response.status(201).json({ script: data });
+}
+
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const userId = payload.id;
@@ -105,8 +157,8 @@ export async function index(request: Request, response: Response) {
 
   const scripts = await getRepository(Script).find(
     requester.role === PaperUserRole.Student
-      ? { paper, student: requester }
-      : { paper }
+      ? { paper, student: requester, discardedAt: IsNull() }
+      : { paper, discardedAt: IsNull() }
   );
 
   const data: ScriptListData[] = await Promise.all(

@@ -9,5 +9,6 @@ router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.get("/:id", ScriptsController.show);
 router.delete("/:id", ScriptsController.discard);
 router.patch("/:id/undiscard", ScriptsController.undiscard);
+router.patch("/:id", ScriptsController.update);
 
 export default router;

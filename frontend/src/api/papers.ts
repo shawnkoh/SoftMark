@@ -22,16 +22,6 @@ class PapersAPI extends BaseAPI {
     return this.getClient().patch(`${this.getUrl()}/${id}`, paperPatchData);
   }
 
-  createPaperUser(
-    id: number,
-    paperUserPostData: PaperUserPostData
-  ): Promise<AxiosResponse<PaperUserData>> {
-    return this.getClient().post(
-      `${this.getUrl()}/${id}/users`,
-      paperUserPostData
-    );
-  }
-
   getPapers(): Promise<AxiosResponse<{ paper: PaperListData[] }>> {
     return this.getClient().get(`${this.getUrl()}`);
   }
