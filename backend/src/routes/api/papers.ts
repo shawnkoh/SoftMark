@@ -22,7 +22,6 @@ router.patch("/:id", PapersController.update);
 router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
 
-
 router.post("/:id/script_templates", ScriptTemplatesController.create);
 router.get(
   "/:id/script_templates/active",

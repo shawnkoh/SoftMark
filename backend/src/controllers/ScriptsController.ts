@@ -136,7 +136,9 @@ export async function update(request: Request, response: Response) {
     script.hasVerifiedStudent = hasVerifiedStudent;
   }
   if (studentId !== undefined) {
-    script.student = studentId ? await getRepository(PaperUser).findOne(studentId) : null;
+    script.student = studentId
+      ? await getRepository(PaperUser).findOne(studentId)
+      : null;
   }
 
   const errors = await validate(script);
@@ -168,22 +170,29 @@ export async function match(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  const scripts = await getRepository(Script).find({ paperId, discardedAt: IsNull() });
-  const paperUsers = await getRepository(PaperUser).find({ paperId, role: PaperUserRole.Student, discardedAt: IsNull() })
+  const scripts = await getRepository(Script).find({
+    paperId,
+    discardedAt: IsNull()
+  });
+  const paperUsers = await getRepository(PaperUser).find({
+    paperId,
+    role: PaperUserRole.Student,
+    discardedAt: IsNull()
+  });
 
   /** Matching algorithm start */
   const paperUsersMap: Map<string, PaperUser> = new Map();
   const boundedPaperUsersMap: Map<number | null, boolean> = new Map();
-  for(let i = 0; i < paperUsers.length; i++) {
+  for (let i = 0; i < paperUsers.length; i++) {
     const paperUser = paperUsers[i];
     const matriculationNumber = paperUser.matriculationNumber;
-    if(matriculationNumber){
+    if (matriculationNumber) {
       paperUsersMap.set(matriculationNumber, paperUser);
     }
   }
 
   // Unbind unverified associations
-  for(let i = 0; i < scripts.length; i++) {
+  for (let i = 0; i < scripts.length; i++) {
     const script = scripts[i];
     if (script.hasVerifiedStudent && script.studentId) {
       boundedPaperUsersMap.set(script.studentId, true);
@@ -191,25 +200,29 @@ export async function match(request: Request, response: Response) {
   }
 
   // Bind unmatched students with scripts with same filename
-  for(let i = 0; i < scripts.length; i++) {
+  for (let i = 0; i < scripts.length; i++) {
     const script = scripts[i];
     const student = paperUsersMap.get(script.filename);
-    const isBoundedStudent = student ? boundedPaperUsersMap.get(student.id) : false;
-    if(!script.hasVerifiedStudent && student && !isBoundedStudent){
-        script.student = await getRepository(PaperUser).findOne(student.id);
+    const isBoundedStudent = student
+      ? boundedPaperUsersMap.get(student.id)
+      : false;
+    if (!script.hasVerifiedStudent && student && !isBoundedStudent) {
+      script.student = await getRepository(PaperUser).findOne(student.id);
     } else if (!script.hasVerifiedStudent) {
-        script.student = null;
+      script.student = null;
     } else if (script.studentId) {
-        script.student = await getRepository(PaperUser).findOne(script.studentId);
+      script.student = await getRepository(PaperUser).findOne(script.studentId);
     }
   }
 
   /** Matching algorithm end */
 
   await getManager().transaction(async manager => {
-    await Promise.all(scripts.map(async script => {
-      await manager.save(script);
-    }));
+    await Promise.all(
+      scripts.map(async script => {
+        await manager.save(script);
+      })
+    );
   });
 
   const data: ScriptListData[] = await Promise.all(

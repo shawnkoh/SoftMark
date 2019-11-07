@@ -120,7 +120,7 @@ export async function update(request: Request, response: Response) {
   }
 
   Object.assign(paperUser, pick(request.body, "role", "matriculationNumber"));
-  if(paperUser.matriculationNumber){
+  if (paperUser.matriculationNumber) {
     paperUser.matriculationNumber = paperUser.matriculationNumber.toUpperCase();
   }
   const errors = await validate(paperUser);

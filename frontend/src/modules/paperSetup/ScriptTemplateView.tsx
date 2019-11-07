@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+
+import api from "../../api";
 import { Annotation } from "backend/src/types/annotations";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import { CanvasMode } from "../../types/canvas";
 
-import Canvas from "../../scripts/components/annotator/Canvas";
-import api from "../../../api";
-import TogglePageComponent from "../../../components/misc/TogglePageComponent";
-import LoadingSpinner from "../../../components/LoadingSpinner";
-import { CanvasMode } from "../../../types/canvas";
+import TogglePageComponent from "../../components/misc/TogglePageComponent";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import Canvas from "../scripts/components/Canvas";
 
 type Props = RouteComponentProps;
 
@@ -70,7 +71,7 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
                 backgroundImageSource={page.imageUrl}
                 penColor={"#ff0000"}
                 penWidth={0}
-                mode={CanvasMode.Eraser}
+                mode={CanvasMode.View}
                 foregroundAnnotation={[]}
                 backgroundAnnotations={[]}
                 onForegroundAnnotationChange={(annotation: Annotation) => {}}

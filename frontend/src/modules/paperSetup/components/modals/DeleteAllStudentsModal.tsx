@@ -9,7 +9,7 @@ import {
   Grid
 } from "@material-ui/core";
 import { PaperUserListData } from "../../../../types/paperUsers";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import ThemedButton from "../../../../components/buttons/ThemedButton";
 
 interface OwnProps {
@@ -68,7 +68,7 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
           </Grid>
         </DialogContent>
       </Dialog>
-      <ThemedButton label="Clear" filled onClick={toggleVisibility} />      
+      <ThemedButton label="Clear" filled onClick={toggleVisibility} />
     </>
   );
 };

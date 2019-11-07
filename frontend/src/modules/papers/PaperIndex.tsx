@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import clsx from "clsx";
-
-import { PaperListData } from "backend/src/types/papers";
 import { format } from "date-fns";
+
+import api from "../../api";
+import { PaperListData } from "backend/src/types/papers";
 
 import {
   Container,
@@ -16,11 +17,10 @@ import {
 import { Add } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 
-import Header from "../components/headers/PaperIndexHeader";
-import AddPaperModal from "../components/modals/AddPaperModal";
-import LoadingSpinner from "../../../components/LoadingSpinner";
-import { RoundedButton } from "../../../components/buttons/StyledButtons";
-import api from "../../../api";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { RoundedButton } from "../../components/buttons/StyledButtons";
+import Header from "./components/headers/PaperIndexHeader";
+import AddPaperModal from "./components/modals/AddPaperModal";
 
 const useStyles = makeStyles(theme => ({
   grid: {

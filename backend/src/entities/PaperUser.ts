@@ -46,7 +46,9 @@ export class PaperUser extends Discardable {
       this.user = user;
     }
     this.role = role;
-    this.matriculationNumber = matriculationNumber ? matriculationNumber.toUpperCase() : null;
+    this.matriculationNumber = matriculationNumber
+      ? matriculationNumber.toUpperCase()
+      : null;
   }
 
   @Column()

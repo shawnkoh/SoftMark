@@ -11,8 +11,7 @@ import {
 } from "@material-ui/core";
 import Clear from "@material-ui/icons/Clear";
 import { PaperUserListData } from "../../../../types/paperUsers";
-import {toast} from "react-toastify";
-
+import { toast } from "react-toastify";
 
 interface OwnProps {
   student: PaperUserListData;
@@ -55,9 +54,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
                       }
                     })
                     .catch(errors => {
-                      toast.error(
-                        `Student ${name} could not be deleted.`
-                      );
+                      toast.error(`Student ${name} could not be deleted.`);
                     });
                   toggleVisibility();
                 }}
@@ -69,10 +66,10 @@ const DeleteStudentModal: React.FC<Props> = props => {
         </DialogContent>
       </Dialog>
       <IconButton onClick={toggleVisibility}>
-              <Clear />
-            </IconButton>
+        <Clear />
+      </IconButton>
     </>
   );
 };
 
-export default DeleteStudentModal;;
+export default DeleteStudentModal;

@@ -74,7 +74,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
     api.scripts
       .getScripts(paper.id)
       .then(resp => {
-        if(resp !== null){
+        if (resp !== null) {
           setScripts(resp);
         }
       })

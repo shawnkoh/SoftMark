@@ -22,7 +22,7 @@ import View from "@material-ui/icons/Search";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles(() => ({
   green: {

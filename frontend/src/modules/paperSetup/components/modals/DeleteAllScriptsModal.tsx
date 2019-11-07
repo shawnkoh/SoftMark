@@ -9,7 +9,7 @@ import {
   Grid
 } from "@material-ui/core";
 import { ScriptListData } from "backend/src/types/scripts";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import ThemedButton from "../../../../components/buttons/ThemedButton";
 
 interface OwnProps {

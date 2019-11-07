@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-import Canvas from "./Canvas";
-import { CanvasMode } from "../../../../types/canvas";
+import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
-import { saveAnnotation, getOwnAnnotation } from "../../../../api/annotations";
+import { CanvasMode } from "../../../types/canvas";
+
+import Canvas from "./Canvas";
 
 interface OwnProps {
   pageId: number;

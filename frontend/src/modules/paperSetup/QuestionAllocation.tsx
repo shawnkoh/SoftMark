@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+
 import { PaperData } from "backend/src/types/papers";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import Header from "../components/headers/PaperSetupHeader";
-import LoadingSpinner from "../../../components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import Header from "./components/headers/PaperSetupHeader";
 
 const useStyles = makeStyles(theme => ({}));
 

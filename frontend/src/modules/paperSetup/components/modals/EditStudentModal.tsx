@@ -16,7 +16,7 @@ import SimpleForm, {
 } from "../../../../components/forms/SimpleForm";
 import { UserPatchData } from "backend/src/types/users";
 import { PaperUserPatchData } from "backend/src/types/paperUsers";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 interface OwnProps {
   student: PaperUserListData;
@@ -78,9 +78,7 @@ const EditStudentModal: React.FC<Props> = props => {
                   return false;
                 })
                 .catch(() => {
-                  toast.error(
-                    "Student could not be updated."
-                  );
+                  toast.error("Student could not be updated.");
                   return false;
                 })
                 .finally(toggleVisibility)

@@ -12,7 +12,7 @@ import { PaperPostData, PaperData } from "backend/src/types/papers";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import FadedDivider from "../dividers/FadedDivider";
+import FadedDivider from "../../../../components/dividers/FadedDivider";
 import { editPaper } from "../../../../api/papers";
 
 const useStyles = makeStyles(() => ({

@@ -1,11 +1,11 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 
-import PaperIndex from "../papers/pages/PaperIndex";
-import PaperView from "../papers/pages/PaperView";
-import ScriptView from "../scripts/pages/ScriptView";
-import NotFoundPage from "../NotFoundPage";
-import PaperSetup from "../paperSetup/pages/PaperSetup";
+import PaperIndex from "./papers/PaperIndex";
+import PaperView from "./papers/PaperView";
+import ScriptView from "./scripts/ScriptView";
+import NotFoundPage from "./main/NotFoundPage";
+import PaperSetup from "./paperSetup/PaperSetup";
 
 const AuthenticatedApp: React.FC = () => {
   return (

@@ -41,7 +41,10 @@ const StudentsTableRow: React.FC<Props> = props => {
       <TableCell>{email}</TableCell>
       <TableCell>
         <EditStudentModal student={student} callbackStudentData={setStudent} />
-        <DeleteStudentModal refreshStudents={refreshStudents} student={student}/>
+        <DeleteStudentModal
+          refreshStudents={refreshStudents}
+          student={student}
+        />
       </TableCell>
     </TableRow>
   );
