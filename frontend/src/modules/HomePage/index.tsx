@@ -1,6 +1,6 @@
 import React from "react";
 
-export const HomePage: React.FC = () => {
+export const HomePage: React.FunctionComponent = () => {
   return <h1>Home</h1>;
 };
 
