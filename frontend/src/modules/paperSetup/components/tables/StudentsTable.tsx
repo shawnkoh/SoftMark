@@ -10,6 +10,7 @@ import { TableColumn } from "../../../../components/tables/TableTypes";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
+  Grid,
   IconButton,
   Table,
   TableHead,
@@ -104,28 +105,44 @@ const StudentsTable: React.FC<Props> = ({
     const { user, matriculationNumber } = student;
     const matricNo = matriculationNumber || "";
     const studentName = user.name || "";
+    const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
-      matricNo.includes(searchText) ||
-      studentName.includes(searchText)
+      matricNo.toLowerCase().includes(searchText) ||
+      studentName.toLowerCase().includes(searchText)
     );
   });
 
   return (
     <>
-      <SearchBar
-        value={""}
-        placeholder="Search..."
-        onChange={str => setSearchText(str)}
-      />
-      <UploadNominalRollWrapper
-        paperId={paper.id}
-        refreshScripts={refreshScripts}
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        spacing={1}
       >
-        <Button variant="outlined" fullWidth>
-          Upload
-        </Button>
-      </UploadNominalRollWrapper>
+        <Grid item>
+          <SearchBar
+            value={""}
+            placeholder="Search..."
+            onChange={str => setSearchText(str)}
+          />
+        </Grid>
+        <Grid item>
+          <UploadNominalRollWrapper
+            paperId={paper.id}
+            refreshScripts={refreshScripts}
+          >
+            <Button variant="outlined" fullWidth>
+              Upload
+            </Button>
+          </UploadNominalRollWrapper>
+        </Grid>
+        <Grid item>
+          <Button variant="outlined">Clear</Button>
+        </Grid>
+      </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>
           <TableHead>

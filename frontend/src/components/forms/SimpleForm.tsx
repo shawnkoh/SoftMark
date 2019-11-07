@@ -261,7 +261,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                       </Grid>
                     )}
                     <Grid item>
-                      <ThemedButton onClick={onCancel} label="Discard" />
+                      <ThemedButton onClick={onCancel} label="Cancel" />
                     </Grid>
                     <Grid item style={{ paddingLeft: 20 }}>
                       <Button

@@ -10,7 +10,7 @@ import { TableColumn } from "../../../../components/tables/TableTypes";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
-  IconButton,
+  Grid,
   Table,
   TableHead,
   TableBody,
@@ -27,6 +27,7 @@ import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import ScriptsTableRow from "./ScriptTableRow";
+import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -99,27 +100,59 @@ const ScriptsTable: React.FC<Props> = ({
 
   const filteredScripts = scripts.filter(script => {
     const { filename, student } = script;
-    const studentName =
-      student && student.user && student.user.name ? student.user.name : "";
+    const studentName = student ? student.user.name : "";
+    const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
-      filename.includes(searchText) ||
-      studentName.includes(searchText)
+      filename.toLowerCase().includes(lowerCaseSearchText) ||
+      studentName.toLowerCase().includes(lowerCaseSearchText)
     );
   });
 
   return (
     <>
-      <SearchBar
-        value={""}
-        placeholder="Search..."
-        onChange={str => setSearchText(str)}
-      />
-      <UploadScriptsWrapper paperId={paper.id} refreshScripts={refreshScripts}>
-        <Button variant="outlined" fullWidth>
-          Upload
-        </Button>
-      </UploadScriptsWrapper>
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        spacing={1}
+      >
+        <Grid item>
+          <SearchBar
+            value={""}
+            placeholder="Search..."
+            onChange={str => setSearchText(str)}
+          />
+        </Grid>
+        <Grid item>
+          <UploadScriptsWrapper
+            paperId={paper.id}
+            refreshScripts={refreshScripts}
+          >
+            <Button variant="outlined" fullWidth>
+              Upload
+            </Button>
+          </UploadScriptsWrapper>
+        </Grid>
+        <Grid item>
+          <DeleteAllScriptsModal
+            scripts={scripts}
+            refreshScripts={refreshScripts}
+          >
+            {toggleModal => (
+              <Button variant="outlined" onClick={toggleModal}>
+                Clear
+              </Button>
+            )}
+          </DeleteAllScriptsModal>
+        </Grid>
+        <Grid item>
+          <Tooltip title="Match students to scripts">
+            <Button variant="outlined">Match</Button>
+          </Tooltip>
+        </Grid>
+      </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>
           <TableHead>

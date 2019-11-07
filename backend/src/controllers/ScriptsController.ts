@@ -11,6 +11,7 @@ import { ScriptListData } from "../types/scripts";
 import { allowedRequester } from "../utils/papers";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { Question } from "../entities/Question";
+import { sortByFilename } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -35,6 +36,24 @@ export async function create(request: Request, response: Response) {
   // TODO: if there is a script with the same sha256 WITH a student, reject
   // TODO: if there is a script with the same sha256 WITHOUT a student, update filename AND apply matching algo
 
+  // Case: if identical script is stored in db
+  const existingScript = await getRepository(Script).findOne({
+    paperId,
+    sha256
+  });
+  if (existingScript) {
+    existingScript.filename = filename;
+    existingScript.discardedAt = null;
+    const errors = await validate(existingScript);
+    if (errors.length > 0) {
+      return response.sendStatus(400);
+    }
+    await getRepository(Script).save(existingScript);
+    const data = await existingScript.getData();
+    return response.status(201).json({ script: data });
+  }
+
+  // Case: new script
   const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
   if (errors.length > 0) {
@@ -155,11 +174,11 @@ export async function index(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  const scripts = await getRepository(Script).find(
+  const scripts = (await getRepository(Script).find(
     requester.role === PaperUserRole.Student
       ? { paper, student: requester, discardedAt: IsNull() }
       : { paper, discardedAt: IsNull() }
-  );
+  ));
 
   const data: ScriptListData[] = await Promise.all(
     scripts.map(script => script.getListData())
@@ -232,7 +251,8 @@ export async function discard(request: Request, response: Response) {
   }
 
   await getRepository(Script).update(scriptId, {
-    discardedAt: new Date()
+    discardedAt: new Date(),
+    hasVerifiedStudent: false
   });
 
   response.sendStatus(204);

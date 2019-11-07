@@ -179,9 +179,7 @@ const SetupPage: React.FC<Props> = props => {
           paperId={paper.id}
           refreshScripts={refreshScripts}
         >
-          <Button variant="outlined" fullWidth>
-            Upload
-          </Button>
+          <Button fullWidth>Upload</Button>
         </UploadScriptsWrapper>
       )
     },
@@ -251,21 +249,9 @@ const SetupPage: React.FC<Props> = props => {
                     <br />
                   </>
                 )}
-                {true && (
+                {scriptTemplate && scripts.length === 0 && (
                   <>
-                    {`${BULLET_POINT} Set up template`}
-                    <br />
-                  </>
-                )}
-                {true && (
-                  <>
-                    {`${BULLET_POINT} Allocate questions`}
-                    <br />
-                  </>
-                )}
-                {scripts.length === 0 && (
-                  <>
-                    {`${BULLET_POINT} Upload scripts`}
+                    {`${BULLET_POINT} Upload scripts!`}
                     <br />
                   </>
                 )}
