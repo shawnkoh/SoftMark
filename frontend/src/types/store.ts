@@ -1,8 +1,8 @@
-import { types as session } from "../modules/session";
+import { types as auth } from "../modules/auth";
 
 /**
  * Describes the overall shape of the application's Redux store state.
  */
 export interface AppState {
-  session: session.SessionState;
+  auth: auth.AuthState;
 }

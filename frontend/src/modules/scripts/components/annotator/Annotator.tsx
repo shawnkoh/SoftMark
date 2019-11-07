@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import Canvas from "./Canvas";
 import { CanvasMode } from "../../../../types/canvas";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
-import api from "../../../../api";
 import { PageData } from "backend/src/types/pages";
+import { saveAnnotation, getOwnAnnotation } from "../../../../api/annotations";
 
 interface OwnProps {
   pageId: number;
@@ -31,8 +31,7 @@ const Annotator: React.FC<Props> = ({
   >([[]]);
 
   useEffect(() => {
-    api.annotations
-      .getOwnAnnotation(pageId)
+    getOwnAnnotation(pageId)
       .then(res => {
         setForegroundAnnotation(res.data.annotation.layer);
       })
@@ -53,7 +52,7 @@ const Annotator: React.FC<Props> = ({
     const annotationPostData: AnnotationPostData = {
       layer: annotation
     };
-    api.annotations.saveAnnotation(pageId, annotationPostData);
+    saveAnnotation(pageId, annotationPostData);
   };
 
   if (isLoading) {

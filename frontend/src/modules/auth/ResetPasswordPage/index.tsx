@@ -1,8 +1,14 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Formik } from "formik";
-import api from "../../../api";
 import { AxiosError } from "axios";
+import { Formik } from "formik";
+import queryString from "query-string";
+import React from "react";
+import {
+  RouteComponentProps,
+  Redirect,
+  useHistory,
+  useLocation
+} from "react-router";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
   Button,
@@ -14,19 +20,21 @@ import {
   TextField,
   Typography
 } from "@material-ui/core";
-import useSnackbar from "../../../components/snackbar/useSnackbar";
-import appLogo from "../../../assets/logo.png";
-const queryString = require("query-string");
 
-type RouteParams = {
-  code: string;
-  email: string;
-};
+import api from "../../../api";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 type Props = RouteComponentProps;
-const ResetPasswordPage: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
-  const params: RouteParams = queryString.parse(props.location.search);
+
+const ResetPasswordPage: React.FC = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const { code, email } = queryString.parse(location.search);
+
+  if (typeof code !== "string" || typeof email !== "string") {
+    return <Redirect to="/" />;
+  }
 
   return (
     <Container maxWidth="xs">
@@ -37,7 +45,7 @@ const ResetPasswordPage: React.FC<Props> = props => {
         alignItems="center"
         id="session"
       >
-        <img className="app-logo mb-3" src={appLogo} alt="logo" />
+        <SvgSoftmarkLogo />
         <Typography component="h1" variant="h5">
           Reset Password
         </Typography>
@@ -46,19 +54,16 @@ const ResetPasswordPage: React.FC<Props> = props => {
           initialValues={{ password: "", confirmPassword: "" }}
           onSubmit={(values, { setSubmitting }) => {
             return api.users
-              .resetPassword(params.email, params.code, values.password)
+              .resetPassword(email, code, values.password)
               .then(resp => {
-                snackbar.showMessage(
-                  `Your password has been reset successfully!`,
-                  "Close"
-                );
-                props.history.push("/login");
+                toast.success(`Your password has been reset successfully!`);
+                history.push("/login");
               })
               .catch((error: AxiosError) => {
                 const message = error.response
                   ? error.response.data.errors.detail
                   : "";
-                snackbar.showMessage(message, "Close");
+                toast.error(message);
               })
               .finally(() => {
                 setSubmitting(false);
@@ -155,4 +160,4 @@ const ResetPasswordPage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(ResetPasswordPage);
+export default ResetPasswordPage;

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps, withRouter, useRouteMatch } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
-import api from "../../../api";
 import { makeStyles } from "@material-ui/core/styles";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { Button, Grid, Typography, IconButton } from "@material-ui/core";
@@ -10,8 +9,9 @@ import Add from "@material-ui/icons/Add";
 import AddMarkerModal from "../components/modals/AddMarkerModal";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserData } from "../../../types/paperUsers";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import SetupSubpage from "../subpages/Setup";
+import api from "../../../api";
 
 const useStyles = makeStyles(theme => ({
   navBar: {
@@ -38,13 +38,15 @@ const useStyles = makeStyles(theme => ({
 
 type Props = RouteComponentProps;
 
-const ACCOUNT = "account";
+const TEAM = "team";
 const SET_UP = "setup";
 const GRADING = "grading";
 const STUDENTS = "students";
 
 const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
+  // https://reacttraining.com/react-router/web/example/nesting
+  const { path, url } = useRouteMatch()!;
   const paper_id = +(params as { paper_id: string }).paper_id;
   const [paper, setPaper] = useState<PaperData | null>(null);
   const [
@@ -52,73 +54,58 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     setCurrentPaperUser
   ] = useState<PaperUserData | null>(null);
   const [value, setValue] = React.useState(SET_UP);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   //const [scripts, setScripts] = useState<ScriptListData[]>([]);
   //const [pages, setPages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
   const [isOpenAddMarkerDialog, setOpenAddMarkerDialog] = useState(false);
   const toggleOpenAddMarkerDialog = () =>
     setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
 
+  const getPaper = async (paper_id: number) => {
+    const data = await api.papers.getPaper(paper_id);
+    if (!data) {
+      return;
+    }
+    setCurrentPaperUser(data.currentPaperUser);
+    setPaper(data.paper);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    api.papers
-      .getPaper(paper_id)
-      .then(resp => {
-        const data = resp.data;
-        setCurrentPaperUser(data.currentPaperUser);
-        setPaper(data.paper);
-      })
-      .finally(() => setIsLoading(false));
+    getPaper(paper_id);
   }, [refreshFlag]);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!paper) {
+  if (!paper || !currentPaperUser) {
     return <>The paper does not exist.</>;
   }
-
-  if (!currentPaperUser) {
-    return <>You are not allowed to view this paper.</>;
-  }
-
-  // Generic routes
-  const accountsRoutePath = `/papers/:paper_id/${ACCOUNT}`;
-  const accountsRoute = (
-    <Route exact path={accountsRoutePath}>
-      <div />
-    </Route>
-  );
-  const setupRoutePath = `/papers/:paper_id/${SET_UP}`;
-  const setupRoute = (
-    <Route exact path={setupRoutePath}>
-      <SetupSubpage paper={paper} toggleRefresh={toggleRefreshFlag} />
-    </Route>
-  );
-  const gradingRoutePath = `/papers/:paper_id/${GRADING}`;
-  const gradingRoute = (
-    <Route exact path={gradingRoutePath}>
-      <div />
-    </Route>
-  );
-  const studentsRoutePath = `/papers/:paper_id/${STUDENTS}`;
-  const studentsRoute = (
-    <Route exact path={studentsRoutePath}>
-      <div />
-    </Route>
-  );
 
   return (
     <>
       <Switch>
-        {accountsRoute}
-        {setupRoute}
-        {gradingRoute}
-        {studentsRoute}
+        <Route exact path={path}>
+          <h3>Exact</h3>
+        </Route>
+        <Route path={`${path}/users`}>
+          <h3>Users</h3>
+        </Route>
+        <Route path={`${path}/setup`}>
+          <SetupSubpage paper={paper} toggleRefresh={toggleRefreshFlag} />
+        </Route>
+        <Route path={`${path}/grading`}>
+          <h3>Grading</h3>
+        </Route>
+        <Route path={`${path}/students`}>
+          <h3>Students</h3>
+        </Route>
       </Switch>
+
       <BottomNavigation
         className={classes.navBar}
         color="primary"
@@ -130,17 +117,17 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
       >
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper_id}/${ACCOUNT}`}
-          value={ACCOUNT}
-          label="Account"
+          to={`${url}/${TEAM}`}
+          value={TEAM}
+          label="Team"
           classes={{
-            label: value === ACCOUNT ? classes.labelOn : classes.labelOff
+            label: value === TEAM ? classes.labelOn : classes.labelOff
           }}
           icon={<Person className={classes.navIcon} />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper_id}/${SET_UP}`}
+          to={`${url}/${SET_UP}`}
           value={SET_UP}
           label="Set up"
           classes={{
@@ -150,7 +137,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper_id}/${GRADING}`}
+          to={`${url}/${GRADING}`}
           value={GRADING}
           label="Grading"
           classes={{
@@ -160,7 +147,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={`/papers/${paper_id}/${STUDENTS}`}
+          to={`${url}/${STUDENTS}`}
           value={STUDENTS}
           label="Students"
           classes={{

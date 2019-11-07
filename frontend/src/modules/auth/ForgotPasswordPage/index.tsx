@@ -1,5 +1,9 @@
+import { AxiosError } from "axios";
+import * as Yup from "yup";
+import { Formik } from "formik";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { toast } from "react-toastify";
 import {
   Button,
   Container,
@@ -10,17 +14,12 @@ import {
   TextField,
   Typography
 } from "@material-ui/core";
-import appLogo from "../../../assets/logo.png";
-import { Formik } from "formik";
-import api from "../../../api";
-import { AxiosError } from "axios";
-import * as Yup from "yup";
-import useSnackbar from "../../../components/snackbar/useSnackbar";
+
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import { requestResetPassword } from "../../../api/users";
 
 type Props = RouteComponentProps;
 const ForgotPasswordPage: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
-
   return (
     <Container maxWidth="xs">
       <Grid
@@ -30,7 +29,7 @@ const ForgotPasswordPage: React.FC<Props> = props => {
         alignItems="center"
         id="session"
       >
-        <img className="app-logo mb-3" src={appLogo} alt="logo" />
+        <SvgSoftmarkLogo />
         <Typography component="h1" variant="h5">
           Reset Password Request
         </Typography>
@@ -38,20 +37,16 @@ const ForgotPasswordPage: React.FC<Props> = props => {
           validateOnBlur={false}
           initialValues={{ email: "" }}
           onSubmit={(values, { setSubmitting, resetForm }) => {
-            return api.users
-              .requestResetPassword(values.email)
+            return requestResetPassword(values.email)
               .then(resp => {
-                snackbar.showMessage(
-                  `A reset link has been sent to ${values.email}`,
-                  "Close"
-                );
+                toast.success(`A reset link has been sent to ${values.email}`);
                 resetForm({ email: "" });
               })
               .catch((error: AxiosError) => {
                 const message = error.response
                   ? error.response.data.errors.detail
                   : "";
-                snackbar.showMessage(message, "Close");
+                toast.error(message);
               })
               .finally(() => {
                 setSubmitting(false);

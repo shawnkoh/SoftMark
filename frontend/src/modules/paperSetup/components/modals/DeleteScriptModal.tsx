@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../../../api";
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import { ScriptListData } from "backend/src/types/scripts";
-import useSnackbar from "../../../../components/snackbar/useSnackbar";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 
-interface OwnProps {
+import api from "../../../../api";
+
+interface Props {
   script: ScriptListData;
-  children: (f: () => void) => React.FC;
+  render: any;
   refreshScripts?: () => void;
 }
 
-type Props = OwnProps;
-
 const DeleteScriptModal: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
-  const { script, children, refreshScripts } = props;
+  const { script, render, refreshScripts } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -36,14 +33,13 @@ const DeleteScriptModal: React.FC<Props> = props => {
                   if (refreshScripts) {
                     refreshScripts();
                   }
-                  snackbar.showMessage(
+                  toast(
                     `Script ${script.filename} has been deleted successfully.`
                   );
                 })
                 .catch(errors => {
-                  snackbar.showMessage(
-                    `Script ${script.filename} could not be deleted.`,
-                    "Close"
+                  toast.error(
+                    `Script ${script.filename} could not be deleted.`
                   );
                 });
             }}
@@ -52,9 +48,9 @@ const DeleteScriptModal: React.FC<Props> = props => {
           </Button>
         </DialogContent>
       </Dialog>
-      {children(toggleVisibility)}
+      {render(toggleVisibility)}
     </>
   );
 };
 
-export default withRouter(DeleteScriptModal);
+export default DeleteScriptModal;

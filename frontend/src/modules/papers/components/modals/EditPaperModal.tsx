@@ -1,6 +1,5 @@
 import React from "react";
 import * as Yup from "yup";
-import api from "../../../../api";
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +13,7 @@ import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
 import FadedDivider from "../dividers/FadedDivider";
+import { editPaper } from "../../../../api/papers";
 
 const useStyles = makeStyles(() => ({
   dialogTitle: {
@@ -64,7 +64,7 @@ const EditPaperModal: React.FC<Props> = ({
           validationSchema={validationSchema}
           onCancel={toggleVisibility}
           onSubmit={(newValues: PaperPostData) =>
-            api.papers.editPaper(paper.id, newValues).then(resp => {
+            editPaper(paper.id, newValues).then(resp => {
               toggleRefresh();
               toggleVisibility();
               return false;

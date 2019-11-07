@@ -1,65 +1,67 @@
-import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
 import { UserData, UserPatchData } from "backend/src/types/users";
 
-class UsersAPI extends BaseAPI {
-  createNewUser(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<AxiosResponse> {
-    return this.getClient().post(`${this.getUrl()}`, {
-      name: name,
-      email: email,
-      password: password
-    });
-  }
+import client from "./client";
 
-  requestResetPassword(email: string): Promise<AxiosResponse> {
-    return this.getClient().post(`${this.getUrl()}/resetverification`, {
-      email: email
-    });
-  }
+const URL = "/users";
 
-  resetPassword(
-    email: string,
-    verificationCode: string,
-    newPassword: string
-  ): Promise<AxiosResponse> {
-    return this.getClient().post(`${this.getUrl()}/reset`, {
-      email: email,
-      verification_code: verificationCode,
-      password: newPassword
-    });
-  }
-
-  verifyAccount(
-    email: string,
-    verificationCode: string
-  ): Promise<AxiosResponse> {
-    return this.getClient().post(`${this.getUrl()}/verify`, {
-      email: email,
-      verification_code: verificationCode
-    });
-  }
-
-  async getUser(id: number): Promise<AxiosResponse<UserData>> {
-    return this.getClient().get(`${this.getUrl()}/${id}`);
-  }
-
-  patchOwnUser(
-    userData: UserPatchData
-  ): Promise<AxiosResponse<{ user: UserData }>> {
-    return this.getClient().patch(`${this.getUrl()}/self`, userData);
-  }
-
-  getOwnUser(): Promise<AxiosResponse<{ user: UserData }>> {
-    return this.getClient().get(`${this.getUrl()}/self`);
-  }
-
-  private getUrl() {
-    return "/users";
-  }
+export async function createNewUser(
+  name: string,
+  email: string,
+  password: string
+): Promise<AxiosResponse> {
+  return client.post(`${URL}`, {
+    name: name,
+    email: email,
+    password: password
+  });
 }
 
-export default UsersAPI;
+export async function requestResetPassword(
+  email: string
+): Promise<AxiosResponse> {
+  return client.post(`${URL}/resetverification`, {
+    email: email
+  });
+}
+
+export async function resetPassword(
+  email: string,
+  verificationCode: string,
+  newPassword: string
+): Promise<AxiosResponse> {
+  return client.post(`${URL}/reset`, {
+    email: email,
+    verification_code: verificationCode,
+    password: newPassword
+  });
+}
+
+export async function verifyAccount(
+  email: string,
+  verificationCode: string
+): Promise<AxiosResponse> {
+  return client.post(`${URL}/verify`, {
+    email: email,
+    verification_code: verificationCode
+  });
+}
+
+export async function getUser(id: number): Promise<AxiosResponse<UserData>> {
+  return client.get(`${URL}/${id}`);
+}
+
+export async function patchOwnUser(
+  userData: UserPatchData
+): Promise<AxiosResponse<{ user: UserData }>> {
+  return client.patch(`${URL}/self`, userData);
+}
+
+export async function getOwnUser(): Promise<UserData | null> {
+  try {
+    const { data } = await client.get<{ user: UserData }>(`${URL}/self`);
+    return data.user;
+  } catch (error) {
+    return null;
+  }
+}

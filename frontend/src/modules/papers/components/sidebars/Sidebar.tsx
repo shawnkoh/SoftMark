@@ -72,6 +72,7 @@ const Sidebar: React.FC<Props> = props => {
           <BottomNavigationAction
             color="primary"
             component={Link}
+            to="/stub"
             value="/portfolio"
             label="Portfolio"
             icon={<Check />}

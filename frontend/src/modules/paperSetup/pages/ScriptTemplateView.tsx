@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../api";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { Annotation } from "backend/src/types/annotations";
-import { CanvasMode } from "../../../types/canvas";
+import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 
 import Canvas from "../../scripts/components/annotator/Canvas";
+import api from "../../../api";
 import TogglePageComponent from "../../../components/misc/TogglePageComponent";
-import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import { CanvasMode } from "../../../types/canvas";
 
 type Props = RouteComponentProps;
 
@@ -35,13 +34,14 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
+  const getScriptTemplate = async (paperId: number) => {
+    const data = await api.scriptTemplates.getScriptTemplate(paperId);
+    setScriptTemplate(data);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    api.scriptTemplates
-      .getScriptTemplate(paper_id)
-      .then(resp => {
-        setScriptTemplate(resp.data.scriptTemplate);
-      })
-      .finally(() => setIsLoading(false));
+    getScriptTemplate(paper_id);
   }, []);
 
   if (isLoading) {

@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+
 import api from "../../../../api";
 import TogglePageComponent from "../../../../components/misc/TogglePageComponent";
 import Canvas from "../../../scripts/components/annotator/Canvas";
 import { CanvasMode } from "../../../../types/canvas";
 import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { ScriptData } from "backend/src/types/scripts";
-import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
+import { ScriptData, ScriptListData } from "backend/src/types/scripts";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
 
 interface OwnProps {
-  script: ScriptData;
-  children: (f: () => void) => React.FC;
+  script: ScriptListData;
+  render: any;
 }
 
 type Props = OwnProps;
 
 const ViewScriptModal: React.FC<Props> = props => {
-  const { script, children } = props;
+  const { script, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -24,13 +24,14 @@ const ViewScriptModal: React.FC<Props> = props => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const getScript = async (scriptId: number) => {
+    const data = await api.scripts.getScript(scriptId);
+    setScriptData(data);
+  };
+
   useEffect(() => {
-    api.scripts
-      .getScript(script.id)
-      .then(resp => {
-        setScriptData(resp.data.script);
-      })
-      .finally(() => setIsLoading(false));
+    getScript(script.id);
+    setIsLoading(false);
   }, []);
 
   console.log(scriptData);
@@ -53,9 +54,9 @@ const ViewScriptModal: React.FC<Props> = props => {
             return <img src={page.imageUrl} />;
           })}
       </Dialog>
-      {children(toggleVisibility)}
+      {render(toggleVisibility)}
     </>
   );
 };
 
-export default withRouter(ViewScriptModal);
+export default ViewScriptModal;

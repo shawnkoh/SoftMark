@@ -1,30 +1,22 @@
-import BaseAPI from "./base";
 import { AxiosResponse } from "axios";
 import {
   AnnotationPostData,
   AnnotationData
 } from "backend/src/types/annotations";
 
-class AnnotationsAPI extends BaseAPI {
-  saveAnnotation(
-    pageId: number,
-    annotationPostData: AnnotationPostData
-  ): Promise<AxiosResponse<{ annotation: AnnotationData }>> {
-    return this.getClient().post(
-      `/pages/${pageId}/annotations`,
-      annotationPostData
-    );
-  }
+import client from "./client";
 
-  getOwnAnnotation(
-    pageId: number
-  ): Promise<AxiosResponse<{ annotation: AnnotationData }>> {
-    return this.getClient().get(`/pages/${pageId}/annotations/self`);
-  }
+const URL = "/annotations";
 
-  private getUrl() {
-    return "/annotations";
-  }
+export async function saveAnnotation(
+  pageId: number,
+  data: AnnotationPostData
+): Promise<AxiosResponse<{ annotation: AnnotationData }>> {
+  return client.post(`/pages/${pageId}/annotations`, data);
 }
 
-export default AnnotationsAPI;
+export async function getOwnAnnotation(
+  pageId: number
+): Promise<AxiosResponse<{ annotation: AnnotationData }>> {
+  return client.get(`/pages/${pageId}/annotations/self`);
+}
