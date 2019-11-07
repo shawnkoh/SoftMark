@@ -242,6 +242,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                     spacing={0}
                     direction="row"
                     justify="flex-end"
+                    alignItems="center"
                   >
                     {includeReset && (
                       <Grid item>
@@ -261,7 +262,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                       </Grid>
                     )}
                     <Grid item>
-                      <ThemedButton onClick={onCancel} label="Discard" />
+                      <ThemedButton onClick={onCancel} label="Cancel" />
                     </Grid>
                     <Grid item style={{ paddingLeft: 20 }}>
                       <Button

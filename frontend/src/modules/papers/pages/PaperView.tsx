@@ -54,12 +54,10 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     setCurrentPaperUser
   ] = useState<PaperUserData | null>(null);
   const [value, setValue] = React.useState(SET_UP);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
 
-  //const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  //const [pages, setPages] = useState<string[]>([]);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshFlag, setRefreshFlag] = useState(0);
+  const toggleRefreshFlag = () => setRefreshFlag(refreshFlag + 1);
   const [isOpenAddMarkerDialog, setOpenAddMarkerDialog] = useState(false);
   const toggleOpenAddMarkerDialog = () =>
     setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
@@ -158,115 +156,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
       </BottomNavigation>
     </>
   );
-  /*
-  
-
-  const { paperUsers } = paper;
-
-  return (
-    <>
-      <main className={classes.content}>
-        <Grid
-          container
-          direction="column"
-          justify="flex-start"
-          alignItems="center"
-          spacing={2}
-        >
-          <Grid
-            key={paper.id}
-            item
-            xs={12}
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="flex-start"
-            spacing={1}
-          >
-            <Grid
-              item
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-            >
-              <Typography variant="h4">{paper.name}</Typography>
-              <EditPaperModal
-                paper={paper}
-                visible={isOpenEditPaperDialog}
-                toggleVisibility={toggleOpenEditPaperDialog}
-                toggleRefresh={toggleRefreshFlag}
-              />
-              <IconButton onClick={toggleOpenEditPaperDialog}>
-                <Edit />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Typography variant="subtitle1">
-                {true && (
-                  <>
-                    {`${BULLET_POINT} Upload documents`}
-                    <br />
-                  </>
-                )}
-                {true && (
-                  <>
-                    {`${BULLET_POINT} Set up template`}
-                    <br />
-                  </>
-                )}
-                {true && (
-                  <>
-                    {`${BULLET_POINT} Allocate questions`}
-                    <br />
-                  </>
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-          <div className={classes.divider} />
-          <Grid
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="center"
-            spacing={4}
-          >
-            {rowDetails.map(row => createGridRow(row))}
-          </Grid>
-
-          {paperUsers.map(paperUser => {
-            return (
-              <Grid key={paperUser.id} item xs={12} onClick={() => {}}>
-                {paperUser.user.email}
-              </Grid>
-            );
-          })}
-          <Grid item xs={12}>
-            <Button
-              onClick={toggleOpenAddMarkerDialog}
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<Add />}
-            >
-              Add Marker
-            </Button>
-            <AddMarkerModal
-              paperId={paper_id}
-              visible={isOpenAddMarkerDialog}
-              toggleVisibility={toggleOpenAddMarkerDialog}
-              toggleRefresh={toggleRefreshFlag}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            
-          </Grid>
-        </Grid>
-      </main>
-      <BottomNav />
-    </>
-  );*/
 };
 
 export default withRouter(PaperView);

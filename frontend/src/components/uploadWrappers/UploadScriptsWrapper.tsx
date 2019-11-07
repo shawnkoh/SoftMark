@@ -26,7 +26,9 @@ const UploadScriptsWrapper: React.FC<Props> = props => {
           const file = files[key];
           const fileName = file.name.split(".")[0].toUpperCase();
           const onSuccess = () => {
-            refreshScripts();
+            setTimeout(() => {
+              refreshScripts();
+            }, 3000);
             scriptUploadCount++;
             toast.success(
               `Script ${fileName} has been uploaded successfully.\n` +

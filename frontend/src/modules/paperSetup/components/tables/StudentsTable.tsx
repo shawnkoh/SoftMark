@@ -10,6 +10,7 @@ import { TableColumn } from "../../../../components/tables/TableTypes";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
+  Grid,
   IconButton,
   Table,
   TableHead,
@@ -20,12 +21,13 @@ import {
   Tooltip,
   Paper
 } from "@material-ui/core";
-import Cancel from "@material-ui/icons/Cancel";
-import Delete from "@material-ui/icons/Delete";
-import Edit from "@material-ui/icons/Edit";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
+import AddStudentModal from "../modals/AddStudentModal";
+import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
+import ThemedButton from "../../../../components/buttons/ThemedButton";
+import StudentsTableRow from "./StudentsTableRow";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -36,47 +38,40 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface OwnProps {
-  isLoadingScripts: boolean;
-  isLoadingStudents: boolean;
   paper: PaperData;
-  refreshScripts: () => void;
-  refreshStudents: () => void;
-  students: PaperUserListData[];
 }
 
 type Props = OwnProps & RouteComponentProps;
 
-const StudentsTable: React.FC<Props> = ({
-  paper,
-  students,
-  refreshScripts,
-  isLoadingScripts
-}) => {
+const StudentsTable: React.FC<Props> = ({ paper }) => {
   const classes = useStyles();
 
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
-
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  const getScriptTemplate = async (paperId: number) => {
-    const data = await api.scriptTemplates.getScriptTemplate(paperId);
-    setScriptTemplate(data);
+  const [students, setStudents] = useState<PaperUserListData[]>([]);
+  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
+  const [refreshStudentsFlag, setRefreshStudentsFlag] = useState(0);
+  const refreshStudents = () => {
+    setTimeout(() => {
+      setRefreshStudentsFlag(refreshStudentsFlag + 1);
+    }, 2000);
   };
-
+  const refreshStudentsAfter = (t: number) => {
+    setTimeout(() => {
+      setRefreshStudentsFlag(refreshStudentsFlag + 1);
+    }, t);
+  };
   useEffect(() => {
-    getScriptTemplate(paper.id);
-    setIsLoadingScriptTemplate(false);
-  }, []);
+    api.paperUsers
+      .getStudents(paper.id)
+      .then(resp => {
+        setStudents(resp.data.paperUsers);
+      })
+      .finally(() => setIsLoadingStudents(false));
+  }, [refreshStudentsFlag]);
 
   const [searchText, setSearchText] = useState("");
 
-  if (isLoadingScriptTemplate) {
-    return <LoadingSpinner loadingMessage={`Loading script template...`} />;
-  } else if (isLoadingScripts) {
-    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
+  if (isLoadingStudents) {
+    return <LoadingSpinner loadingMessage={`Loading students...`} />;
   }
 
   const columns: TableColumn[] = [
@@ -98,34 +93,56 @@ const StudentsTable: React.FC<Props> = ({
     }
   ];
 
-  console.log(students);
-
   const filteredStudents = students.filter(student => {
     const { user, matriculationNumber } = student;
     const matricNo = matriculationNumber || "";
     const studentName = user.name || "";
+    const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
-      matricNo.includes(searchText) ||
-      studentName.includes(searchText)
+      matricNo.toLowerCase().includes(lowerCaseSearchText) ||
+      (studentName && studentName.toLowerCase().includes(lowerCaseSearchText))
     );
   });
 
   return (
     <>
-      <SearchBar
-        value={""}
-        placeholder="Search..."
-        onChange={str => setSearchText(str)}
-      />
-      <UploadNominalRollWrapper
-        paperId={paper.id}
-        refreshScripts={refreshScripts}
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        spacing={1}
       >
-        <Button variant="outlined" fullWidth>
-          Upload
-        </Button>
-      </UploadNominalRollWrapper>
+        <Grid item>
+          <SearchBar
+            value={""}
+            placeholder="Search..."
+            onChange={str => setSearchText(str)}
+          />
+        </Grid>
+        <Grid item>
+          <UploadNominalRollWrapper
+            paperId={paper.id}
+            refreshStudents={refreshStudents}
+            refreshStudentsAfter={refreshStudentsAfter}
+          >
+            <ThemedButton label="Upload" filled />
+          </UploadNominalRollWrapper>
+        </Grid>
+        <Grid item>
+          <DeleteAllStudentsModal
+            students={students}
+            refreshStudents={refreshStudents}
+          />
+        </Grid>
+        <Grid item>
+          <AddStudentModal
+            paperId={paper.id}
+            refreshStudents={refreshStudents}
+          />
+        </Grid>
+      </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>
           <TableHead>
@@ -158,30 +175,12 @@ const StudentsTable: React.FC<Props> = ({
               </TableRow>
             )}
             {filteredStudents.map((student: PaperUserListData) => {
-              const { matriculationNumber, user } = student;
-              const { name, email } = user;
               return (
-                <TableRow>
-                  <TableCell>
-                    {matriculationNumber ? matriculationNumber : ""}
-                  </TableCell>
-                  <TableCell>{name ? name : "-"}</TableCell>
-                  <TableCell>{email}</TableCell>
-                  <TableCell>
-                    <Tooltip title={"Edit student"}>
-                      <IconButton>
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                    <IconButton
-                      onClick={() => {
-                        //api.paperUsers.discardPaperUser()
-                      }}
-                    >
-                      <Cancel />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                <StudentsTableRow
+                  key={student.id}
+                  student={student}
+                  refreshStudents={refreshStudents}
+                />
               );
             })}
           </TableBody>
