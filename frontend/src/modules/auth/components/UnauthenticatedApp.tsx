@@ -44,6 +44,7 @@ const UnauthenticatedApp: React.FC = props => {
 
   return (
     <Switch>
+      <Route exact path="/" component={SignInPage} />
       <Route exact path="/login" component={SignInPage} />
       <Route exact path="/signup" component={SignUpPage} />
       <Route
