@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
-import api from "api";
+import api from "../../api";
 import { ScriptData } from "backend/src/types/scripts";
 
-import TogglePageComponent from "components/misc/TogglePageComponent";
-import LoadingSpinner from "components/LoadingSpinner";
+import TogglePageComponent from "../../components/misc/TogglePageComponent";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import Annotator from "./components/Annotator";
 
 type Props = RouteComponentProps;

@@ -2,7 +2,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router";
 import { Grid, Typography } from "@material-ui/core";
 
-import SvgSoftmarkLogo from "components/svgr/SoftMarkLogo";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
 import SignInForm from "./SignInForm";
 
 type Props = RouteComponentProps;

@@ -15,8 +15,8 @@ import { AxiosError } from "axios";
 import * as Yup from "yup";
 import ReactGA from "react-ga";
 
-import { createNewUser } from "api/users";
-import SvgSoftmarkLogo from "components/svgr/SoftMarkLogo";
+import { createNewUser } from "../../../api/users";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
 import { toast } from "react-toastify";
 
 type Props = RouteComponentProps;

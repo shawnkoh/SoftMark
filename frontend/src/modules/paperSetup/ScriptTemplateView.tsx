@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
-import api from "api";
+import api from "../../api";
 import { Annotation } from "backend/src/types/annotations";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import { CanvasMode } from "types/canvas";
+import { CanvasMode } from "../../types/canvas";
 
-import TogglePageComponent from "components/misc/TogglePageComponent";
-import LoadingSpinner from "components/LoadingSpinner";
+import TogglePageComponent from "../../components/misc/TogglePageComponent";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import Canvas from "../scripts/components/Canvas";
 
 type Props = RouteComponentProps;
