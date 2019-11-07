@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
 
-import api from "api";
+import api from "../../api";
 import { PaperData } from "backend/src/types/papers";
-import { PaperUserData } from "types/paperUsers";
+import { PaperUserData } from "../../types/paperUsers";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import LoadingSpinner from "components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import QuestionAllocation from "./QuestionAllocation";
 import ScriptTemplateView from "./ScriptTemplateView";
 import ScriptMapping from "./ScriptMapping";

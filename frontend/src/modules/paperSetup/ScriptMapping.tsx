@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
-import api from "api";
+import api from "../../api";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserListData } from "backend/src/types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
@@ -9,7 +9,7 @@ import { ScriptListData } from "backend/src/types/scripts";
 import { AppBar, Tab, Tabs } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-import TabPanel from "components/tables/TabPanel";
+import TabPanel from "../../components/tables/TabPanel";
 import ScriptsTable from "./components/tables/ScriptsTable";
 import Header from "./components/headers/PaperSetupHeader";
 import StudentsTable from "./components/tables/StudentsTable";

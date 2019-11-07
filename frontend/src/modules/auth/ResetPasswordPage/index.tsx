@@ -21,9 +21,9 @@ import {
   Typography
 } from "@material-ui/core";
 
-import api from "api";
-import SvgSoftmarkLogo from "components/svgr/SoftMarkLogo";
-import LoadingSpinner from "components/LoadingSpinner";
+import api from "../../../api";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 type Props = RouteComponentProps;
 

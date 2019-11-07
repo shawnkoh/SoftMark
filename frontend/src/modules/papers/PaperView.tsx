@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter, useRouteMatch } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
 
-import api from "api";
+import api from "../../api";
 import { PaperData } from "backend/src/types/papers";
-import { PaperUserData } from "types/paperUsers";
+import { PaperUserData } from "../../types/paperUsers";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { Check, People, Person, Settings } from "@material-ui/icons";
 
-import LoadingSpinner from "components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import AddMarkerModal from "./components/modals/AddMarkerModal";
 import SetupSubpage from "./subpages/Setup";
 

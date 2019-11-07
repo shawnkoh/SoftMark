@@ -7,8 +7,10 @@ import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 
 import { setUser, logOut } from "../actions";
 import { getUser } from "../selectors";
-import { getOwnUser, patchOwnUser } from "api/users";
-import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
+import { getOwnUser, patchOwnUser } from "../../../api/users";
+import SimpleForm, {
+  FormMetadataType
+} from "../../../components/forms/SimpleForm";
 
 interface Props extends RouteComponentProps {
   render: any;

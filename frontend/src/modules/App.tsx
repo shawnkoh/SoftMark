@@ -11,8 +11,8 @@ import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { StylesProvider } from "@material-ui/styles";
 
-import theme from "theme";
-import LoadingSpinner from "components/LoadingSpinner";
+import theme from "../theme";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const store = configureStore();
 toast.configure();
