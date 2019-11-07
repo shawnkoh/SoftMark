@@ -49,13 +49,13 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 - `./modules`: each module is a group of related pages and components.
   - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
 
-## Folder Structure
+### Paths
 
-- `./components`: reusable (presentational or self-contained) components.
-- `./modules`: each module is a group of related pages and components.
-  - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
+You can reference top-level folders in `frontend/src` directly from anywhere.
 
-## Import order style guide
+- e.g. `import api from "api"` instead of `import api from "../../../api`
+
+### Import order style guide
 
 - NPM modules
 - <line break>
