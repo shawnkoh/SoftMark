@@ -1,13 +1,11 @@
 import React from "react";
 import * as Yup from "yup";
 import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
-import SimpleForm, {
-  FormMetadataType
-} from "../../../../components/forms/SimpleForm";
-import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
-import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
+import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
+import { PAPER_USER_ROLE_OPTIONS } from "utils/options";
+import { PaperUserRole, PaperUserPostData } from "types/paperUsers";
 import { toast } from "react-toastify";
-import api from "../../../../api";
+import api from "api";
 
 interface OwnProps {
   paperId: number;

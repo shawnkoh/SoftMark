@@ -42,3 +42,15 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Paths
+
+You can reference top-level folders in `frontend/src` directly from anywhere.
+
+- e.g. `import api from "api"` instead of `import api from "../../../api`
+
+## Folder Structure
+
+- `./components`: reusable (presentational or self-contained) components.
+- `./modules`: each module is a group of related pages and components.
+  - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
