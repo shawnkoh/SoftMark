@@ -5,8 +5,8 @@ import { PaperData } from "backend/src/types/papers";
 
 import { makeStyles } from "@material-ui/core/styles";
 
+import LoadingSpinner from "../../components/LoadingSpinner";
 import Header from "./components/headers/PaperSetupHeader";
-import LoadingSpinner from "components/LoadingSpinner";
 
 const useStyles = makeStyles(theme => ({}));
 

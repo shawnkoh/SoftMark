@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-import { saveAnnotation, getOwnAnnotation } from "api/annotations";
+import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
-import { CanvasMode } from "types/canvas";
+import { CanvasMode } from "../../../types/canvas";
 
 import Canvas from "./Canvas";
 
