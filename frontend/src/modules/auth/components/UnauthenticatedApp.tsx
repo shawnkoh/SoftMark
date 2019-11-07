@@ -3,16 +3,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { Route, Switch } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import api from "api";
-import { getRefreshToken } from "localStorage";
-import { getUser } from "./auth/selectors";
-import { setUser } from "./auth/actions";
-
-import SignInPage from "./auth/SignInPage";
-import SignUpPage from "./auth/SignUpPage";
-import VerifyAccountPage from "./auth/VerifyAccountPage";
-import ResetPasswordPage from "./auth/ResetPasswordPage";
-import NotFoundPage from "./main/NotFoundPage";
+import ResetPasswordPage from "../ResetPasswordPage";
+import SignInPage from "../SignInPage";
+import SignUpPage from "../SignUpPage";
+import VerifyAccountPage from "../VerifyAccountPage";
+import { getUser } from "../selectors";
+import api from "../../../api";
+import { setUser } from "../actions";
+import { getRefreshToken } from "../../../localStorage";
+import NotFoundPage from "../../NotFoundPage";
 
 const UnauthenticatedApp: React.FC = props => {
   const user = useSelector(getUser);

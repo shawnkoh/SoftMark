@@ -2,8 +2,8 @@ import queryString from "query-string";
 import React, { useEffect } from "react";
 import { useHistory, useLocation } from "react-router";
 
-import { verifyAccount } from "api/users";
-import LoadingSpinner from "components/LoadingSpinner";
+import { verifyAccount } from "../../../api/users";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const VerifyAccountPage: React.FC = props => {
   const history = useHistory();

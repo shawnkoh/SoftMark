@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 
 import { setUser } from "../actions";
-import api from "api";
+import api from "../../../api";
 
 const validationSchema = yup.object().shape({
   email: yup

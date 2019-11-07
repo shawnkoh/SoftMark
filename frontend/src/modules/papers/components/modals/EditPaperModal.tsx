@@ -9,9 +9,11 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { PaperPostData, PaperData } from "backend/src/types/papers";
-import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
-import FadedDivider from "components/dividers/FadedDivider";
-import { editPaper } from "api/papers";
+import SimpleForm, {
+  FormMetadataType
+} from "../../../../components/forms/SimpleForm";
+import FadedDivider from "../dividers/FadedDivider";
+import { editPaper } from "../../../../api/papers";
 
 const useStyles = makeStyles(() => ({
   dialogTitle: {

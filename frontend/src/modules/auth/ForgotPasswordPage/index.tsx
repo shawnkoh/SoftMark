@@ -15,8 +15,8 @@ import {
   Typography
 } from "@material-ui/core";
 
-import SvgSoftmarkLogo from "components/svgr/SoftMarkLogo";
-import { requestResetPassword } from "api/users";
+import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import { requestResetPassword } from "../../../api/users";
 
 type Props = RouteComponentProps;
 const ForgotPasswordPage: React.FC<Props> = props => {
