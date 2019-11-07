@@ -26,7 +26,6 @@ import Edit from "@material-ui/icons/Edit";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
-import useSnackbar from "../../../../components/snackbar/useSnackbar";
 import ScriptsTableRow from "./ScriptTableRow";
 
 const useStyles = makeStyles(theme => ({
@@ -53,7 +52,6 @@ const ScriptsTable: React.FC<Props> = ({
   isLoadingScripts
 }) => {
   const classes = useStyles();
-  const snackbar = useSnackbar();
 
   const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
 

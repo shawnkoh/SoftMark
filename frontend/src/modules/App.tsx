@@ -10,7 +10,6 @@ import "react-toastify/dist/ReactToastify.css";
 import configureStore from "./store";
 import { getUser } from "./auth/selectors";
 import theme from "../theme";
-import SnackbarProvider from "../components/snackbar/SnackbarProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useEffect } from "react";
 
@@ -41,12 +40,10 @@ const App: React.FC = () => {
     <Provider store={store}>
       {/* <MuiThemeProvider theme={theme}> */}
       <StylesProvider injectFirst>
-        <SnackbarProvider>
-          <CssBaseline />
-          <BrowserRouter>
-            <ActiveApp />
-          </BrowserRouter>
-        </SnackbarProvider>
+        <CssBaseline />
+        <BrowserRouter>
+          <ActiveApp />
+        </BrowserRouter>
       </StylesProvider>
       {/* </MuiThemeProvider> */}
     </Provider>

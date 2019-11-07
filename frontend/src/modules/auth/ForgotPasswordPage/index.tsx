@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { toast } from "react-toastify";
 import {
   Button,
   Container,
@@ -14,14 +15,11 @@ import {
   Typography
 } from "@material-ui/core";
 
-import useSnackbar from "../../../components/snackbar/useSnackbar";
 import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
 import { requestResetPassword } from "../../../api/users";
 
 type Props = RouteComponentProps;
 const ForgotPasswordPage: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
-
   return (
     <Container maxWidth="xs">
       <Grid
@@ -41,17 +39,14 @@ const ForgotPasswordPage: React.FC<Props> = props => {
           onSubmit={(values, { setSubmitting, resetForm }) => {
             return requestResetPassword(values.email)
               .then(resp => {
-                snackbar.showMessage(
-                  `A reset link has been sent to ${values.email}`,
-                  "Close"
-                );
+                toast.success(`A reset link has been sent to ${values.email}`);
                 resetForm({ email: "" });
               })
               .catch((error: AxiosError) => {
                 const message = error.response
                   ? error.response.data.errors.detail
                   : "";
-                snackbar.showMessage(message, "Close");
+                toast.error(message);
               })
               .finally(() => {
                 setSubmitting(false);

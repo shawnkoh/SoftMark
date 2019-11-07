@@ -8,6 +8,7 @@ import {
   useHistory,
   useLocation
 } from "react-router";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
   Button,
@@ -20,7 +21,6 @@ import {
   Typography
 } from "@material-ui/core";
 
-import useSnackbar from "../../../components/snackbar/useSnackbar";
 import api from "../../../api";
 import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -28,7 +28,6 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 type Props = RouteComponentProps;
 
 const ResetPasswordPage: React.FC = () => {
-  const snackbar = useSnackbar();
   const history = useHistory();
   const location = useLocation();
   const { code, email } = queryString.parse(location.search);
@@ -57,17 +56,14 @@ const ResetPasswordPage: React.FC = () => {
             return api.users
               .resetPassword(email, code, values.password)
               .then(resp => {
-                snackbar.showMessage(
-                  `Your password has been reset successfully!`,
-                  "Close"
-                );
+                toast.success(`Your password has been reset successfully!`);
                 history.push("/login");
               })
               .catch((error: AxiosError) => {
                 const message = error.response
                   ? error.response.data.errors.detail
                   : "";
-                snackbar.showMessage(message, "Close");
+                toast.error(message);
               })
               .finally(() => {
                 setSubmitting(false);

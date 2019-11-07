@@ -18,10 +18,10 @@ const VerifyAccountPage: React.FC = props => {
     //       category: "User",
     //       action: "Account is successfully created and verified"
     //     });
-    //     snackbar.showMessage("You account has been activated!", "Close");
+    //     toast.success("You account has been activated!");
     //   })
     //   .catch(error => {
-    //     snackbar.showMessage("Invalid account verification.", "Close");
+    //     toast.error("Invalid account verification.");
     //   })
     //   .finally(() => {
     //     history.push("/");

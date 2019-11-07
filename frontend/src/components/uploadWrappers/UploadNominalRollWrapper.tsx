@@ -2,7 +2,7 @@ import React from "react";
 import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import { PaperData } from "backend/src/types/papers";
-import useSnackbar from "../../components/snackbar/useSnackbar";
+import { toast } from "react-toastify";
 
 interface Props {
   paperId: number;
@@ -12,7 +12,6 @@ interface Props {
 }
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
   const {
     paperId,
     children,
@@ -36,10 +35,7 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
             if (refreshScripts) {
               refreshScripts();
             }
-            snackbar.showMessage(
-              `Nominal roll list has been uploaded successfully.`,
-              "Close"
-            );
+            toast.success(`Nominal roll list has been uploaded successfully.`);
           };
           // TODO: api to create paperUsers here
           api.paperUsers.postStudents(paperId, file, onSuccessfulResponse);

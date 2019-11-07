@@ -3,7 +3,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import useSnackbar from "../../components/snackbar/useSnackbar";
+import { toast } from "react-toastify";
 
 interface OwnProps {
   paperId: number;
@@ -14,7 +14,6 @@ interface OwnProps {
 type Props = RouteComponentProps & OwnProps;
 
 const UploadScriptTemplateWrapper: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
   const { children, clickable = true, paperId, setScriptTemplate } = props;
 
   return (
@@ -25,16 +24,10 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
           const onSuccess = () => {
-            snackbar.showMessage(
-              `Script template has been uploaded successfully.`,
-              "Close"
-            );
+            toast.success(`Script template has been uploaded successfully.`);
           };
           const onFail = () => {
-            snackbar.showMessage(
-              `Script template has failed to be uploaded.`,
-              "Close"
-            );
+            toast.error(`Script template has failed to be uploaded.`);
           };
           api.scriptTemplates.postScriptTemplate(
             paperId,

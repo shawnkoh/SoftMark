@@ -10,7 +10,6 @@ import ThemedButton from "../../../components/buttons/ThemedButton";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import useSnackbar from "../../../components/snackbar/useSnackbar";
 import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
@@ -47,7 +46,6 @@ type Props = OwnProps & RouteComponentProps;
 const SetupPage: React.FC<Props> = props => {
   const { paper, toggleRefresh } = props;
   const classes = useStyles();
-  const snackbar = useSnackbar();
 
   const [
     scriptTemplate,
