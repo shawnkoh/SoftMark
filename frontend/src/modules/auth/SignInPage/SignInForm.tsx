@@ -1,20 +1,19 @@
+import {
+  Button,
+  Grid,
+  Link,
+  Paper,
+  TextField,
+  Typography
+} from "@material-ui/core";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import {
-  Grid,
-  Button,
-  TextField,
-  Link,
-  Typography,
-  Paper
-} from "@material-ui/core";
-
-import { setUser } from "../actions";
 import api from "../../../api";
+import { setUser } from "../actions";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -119,7 +118,7 @@ const SignInForm = () => {
               {!passwordless && (
                 <>
                   <Grid item>
-                    <Link href="/forgotpassword" variant="body2">
+                    <Link href="/password_reset" variant="body2">
                       Forgot password?
                     </Link>
                   </Grid>

@@ -1,20 +1,20 @@
+import { CssBaseline } from "@material-ui/core";
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch } from "react-router-dom";
 import { toast } from "react-toastify";
-
 import api from "../api";
 import { getRefreshToken } from "../localStorage";
-import { getUser } from "./auth/selectors";
 import { setUser } from "./auth/actions";
-
+import ForgotPasswordPage from "./auth/ForgotPasswordPage";
+import ResetPasswordPage from "./auth/ResetPasswordPage";
+import { getUser } from "./auth/selectors";
 import SignInPage from "./auth/SignInPage";
 import SignUpPage from "./auth/SignUpPage";
 import VerifyAccountPage from "./auth/VerifyAccountPage";
-import ResetPasswordPage from "./auth/ResetPasswordPage";
 import NotFoundPage from "./main/NotFoundPage";
 
-const UnauthenticatedApp: React.FC = props => {
+const UnauthenticatedApp: React.FC = () => {
   const user = useSelector(getUser);
   const dispatch = useDispatch();
 
@@ -44,22 +44,26 @@ const UnauthenticatedApp: React.FC = props => {
   }, [user]);
 
   return (
-    <Switch>
-      <Route exact path="/" component={SignInPage} />
-      <Route exact path="/login" component={SignInPage} />
-      <Route exact path="/signup" component={SignUpPage} />
-      <Route
-        exact
-        path="/auth/password_reset/:token"
-        component={ResetPasswordPage}
-      />
-      <Route
-        exact
-        path="/auth/email_verification/:token"
-        component={VerifyAccountPage}
-      />
-      <Route component={NotFoundPage} />
-    </Switch>
+    <>
+      <CssBaseline />
+      <Switch>
+        <Route exact path="/" component={SignInPage} />
+        <Route exact path="/login" component={SignInPage} />
+        <Route exact path="/signup" component={SignUpPage} />
+        <Route exact path="/password_reset" component={ForgotPasswordPage} />
+        <Route
+          exact
+          path="/auth/password_reset/:token"
+          component={ResetPasswordPage}
+        />
+        <Route
+          exact
+          path="/auth/email_verification/:token"
+          component={VerifyAccountPage}
+        />
+        <Route component={NotFoundPage} />
+      </Switch>
+    </>
   );
 };
 

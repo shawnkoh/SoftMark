@@ -1,14 +1,17 @@
+import { CssBaseline } from "@material-ui/core";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-
+import NotFoundPage from "./main/NotFoundPage";
 import PaperIndex from "./papers/PaperIndex";
 import PaperView from "./papers/PaperView";
-import ScriptView from "./scripts/ScriptView";
-import NotFoundPage from "./main/NotFoundPage";
 import PaperSetup from "./paperSetup/PaperSetup";
+import ScriptView from "./scripts/ScriptView";
+
 
 const AuthenticatedApp: React.FC = () => {
   return (
+    <>
+    <CssBaseline />
     <Switch>
       <Route exact path="/" component={PaperIndex} />
       <Route path="/papers/:paper_id/set_up" component={PaperSetup} />
@@ -18,6 +21,7 @@ const AuthenticatedApp: React.FC = () => {
         <NotFoundPage isAuthenticated />
       </Route>
     </Switch>
+    </>
   );
 };
 
