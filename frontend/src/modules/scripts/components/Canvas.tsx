@@ -2,14 +2,14 @@ import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 
-import { CanvasMode } from "../../../../types/canvas";
+import { CanvasMode } from "types/canvas";
 import { AnnotationLine, Annotation } from "backend/src/types/annotations";
 
 import {
   getDistance,
   getClientPointerRelativeToStage,
   getRelativePointerPosition
-} from "../../../../utils/canvas";
+} from "utils/canvas";
 
 import UrlImage from "./UrlImage";
 
