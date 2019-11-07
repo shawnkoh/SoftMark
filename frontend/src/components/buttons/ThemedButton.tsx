@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
 
 interface OwnProps {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
   filled?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
@@ -23,7 +23,7 @@ type Props = OwnProps;
 
 const ThemedButton: React.FC<Props> = ({
   label,
-  onClick,
+  onClick = () => {},
   filled,
   disabled = false,
   fullWidth = false,

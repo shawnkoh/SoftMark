@@ -22,6 +22,7 @@ import View from "@material-ui/icons/Search";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles(() => ({
   green: {
@@ -45,16 +46,27 @@ interface OwnProps {
 
 type Props = OwnProps & RouteComponentProps;
 
-const ScriptsTableRow: React.FC<Props> = ({ script, refreshScripts }) => {
+const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
-  const { filename, student, hasVerifiedStudent } = script;
+  const { refreshScripts } = props;
+
+  const [script, setScript] = useState(props.script);
 
   const patchScript = newValues => {
-    return api.scripts.patchScript(script.id, newValues).then(resp => {
-      refreshScripts();
-      return false;
-    });
+    newValues.studentId = script.student ? script.student.id : null;
+    return api.scripts
+      .patchScript(script.id, newValues)
+      .then(resp => {
+        setScript(resp.data.script);
+        return false;
+      })
+      .catch(() => {
+        toast.error(`Script ${script.filename} could not be updated!`);
+        return false;
+      });
   };
+
+  const { filename, student, hasVerifiedStudent } = script;
 
   return (
     <TableRow>
@@ -75,7 +87,7 @@ const ScriptsTableRow: React.FC<Props> = ({ script, refreshScripts }) => {
           justify="space-between"
           alignItems="center"
         >
-          {student ? student.user.name : "No match found"}
+          {student ? student.matriculationNumber : "No match found"}
           <Tooltip title={"Change student"}>
             <IconButton>
               <Edit />

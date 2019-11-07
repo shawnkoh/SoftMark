@@ -38,7 +38,7 @@ export class Script extends Discardable {
     } else {
       this.paper = paper;
     }
-    this.filename = filename;
+    this.filename = filename ? filename.toUpperCase() : filename;
     this.sha256 = sha256;
     if (!student) {
       this.studentId = null;

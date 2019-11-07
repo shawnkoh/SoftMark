@@ -19,6 +19,11 @@ export async function createScript(
 ): Promise<AxiosResponse<{ script: ScriptData }>> {
   return client.post(`/papers/${id}/scripts`, scriptPostData);
 }
+export async function matchScriptsToPaperUsers(
+  id: number
+): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
+  return client.patch(`/papers/${id}/scripts/match`);
+}
 
 export async function getScript(id: number): Promise<ScriptData | null> {
   try {

@@ -19,7 +19,7 @@ const DeleteScriptModal: React.FC<Props> = props => {
   return (
     <>
       <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Delete script ${script.filename}`}</DialogTitle>
+        <DialogTitle>{`Delete script "${script.filename}".`}</DialogTitle>
         <DialogContent>
           <Button color="primary" onClick={toggleVisibility}>
             Cancel

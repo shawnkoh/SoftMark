@@ -1,7 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository, IsNull, getManager } from "typeorm";
+import { getRepository, IsNull, Not, getManager } from "typeorm";
 
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
@@ -9,6 +9,7 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
 import { allowedRequester } from "../utils/papers";
 import { sendNewPaperUserEmail } from "../utils/sendgrid";
+import { sortByMatricNo } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -32,7 +33,15 @@ export async function create(request: Request, response: Response) {
     } = request.body as PaperUserPostData;
 
     const user =
-      (await getRepository(User).findOne({ email })) || new User(email);
+      (await getRepository(User).findOne({ email, discardedAt: IsNull() })) ||
+      new User(email);
+    const paperUser =
+      (await getRepository(PaperUser).findOne({
+        user,
+        role,
+        discardedAt: Not(IsNull())
+      })) || new PaperUser(paper, user, role);
+
     if (name) {
       user.name = name;
     }
@@ -41,11 +50,10 @@ export async function create(request: Request, response: Response) {
       return response.sendStatus(400);
     }
 
-    const paperUser = new PaperUser(paper, user, role);
     if (matriculationNumber) {
-      paperUser.matriculationNumber = matriculationNumber;
+      paperUser.matriculationNumber = matriculationNumber.toUpperCase();
     }
-
+    paperUser.discardedAt = null;
     const errors = await validate(paperUser);
     if (errors.length > 0) {
       return response.sendStatus(400);
@@ -58,11 +66,36 @@ export async function create(request: Request, response: Response) {
     });
 
     const data = await paperUser.getData();
-    sendNewPaperUserEmail(paperUser);
+    //sendNewPaperUserEmail(paperUser); to be added later
     return response.status(201).json({ paperUser: data });
   } catch (error) {
     return response.sendStatus(400);
   }
+}
+
+export async function getStudents(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const paperId = Number(request.params.id);
+  const allowed = await allowedRequester(
+    payload.id,
+    paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const students = (await getRepository(PaperUser).find({
+    paperId,
+    role: PaperUserRole.Student,
+    discardedAt: IsNull()
+  })).sort(sortByMatricNo);
+
+  const data = await Promise.all(
+    students.map(async (student: PaperUser) => await student.getListData())
+  );
+  return response.status(200).json({ paperUsers: data });
 }
 
 export async function update(request: Request, response: Response) {
@@ -87,6 +120,9 @@ export async function update(request: Request, response: Response) {
   }
 
   Object.assign(paperUser, pick(request.body, "role", "matriculationNumber"));
+  if (paperUser.matriculationNumber) {
+    paperUser.matriculationNumber = paperUser.matriculationNumber.toUpperCase();
+  }
   const errors = await validate(paperUser);
   if (errors.length > 0) {
     response.sendStatus(400);
@@ -95,6 +131,54 @@ export async function update(request: Request, response: Response) {
   await getRepository(PaperUser).save(paperUser);
 
   const data = await paperUser.getData();
+  response.status(201).json({ paperUser: data });
+}
+
+export async function updateStudent(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.id;
+  const studentId = request.params.id;
+  const student = await getRepository(PaperUser).findOne(studentId, {
+    where: { role: PaperUserRole.Student, discardedAt: IsNull() }
+  });
+  if (!student) {
+    response.sendStatus(404);
+    return;
+  }
+  const allowed = await allowedRequester(
+    requesterId,
+    student.paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const user = await getRepository(User).findOne(student.userId);
+  if (!user) {
+    return response.sendStatus(400);
+  }
+  Object.assign(user, pick(request.body, "name", "email"));
+  const userErrors = await validate(user);
+  if (userErrors.length > 0) {
+    return response.sendStatus(400);
+  }
+
+  Object.assign(student, pick(request.body, "matriculationNumber"));
+  student.user = user;
+  const errors = await validate(student);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+
+  await getManager().transaction(async manager => {
+    await getRepository(User).save(user);
+    await getRepository(PaperUser).save(student);
+  });
+
+  const data = await student.getData();
   response.status(201).json({ paperUser: data });
 }
 

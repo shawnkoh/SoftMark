@@ -34,8 +34,6 @@ const ViewScriptModal: React.FC<Props> = props => {
     setIsLoading(false);
   }, []);
 
-  console.log(scriptData);
-
   return (
     <>
       <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>

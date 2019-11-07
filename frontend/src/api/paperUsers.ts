@@ -1,15 +1,20 @@
 import { AxiosResponse } from "axios";
 
 import client from "./client";
-import { createPaperUser } from "./papers";
-import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
+import {
+  PaperUserPostData,
+  PaperUserRole,
+  PaperUserListData,
+  PaperUserData
+} from "../types/paperUsers";
 
 const URL = "/paper_users";
 
 export async function postStudents(
   paperId: number,
   file: File,
-  onSuccessfulResponse?: () => void
+  onSuccess: (name: string) => void,
+  onFail: (name: string) => void
 ) {
   const reader = new FileReader();
   reader.onloadend = (e: any) => {
@@ -19,13 +24,18 @@ export async function postStudents(
         if (row) {
           var cells = row.split(",");
           if (cells.length >= 3) {
+            const name = cells[1];
             const paperUserPostData: PaperUserPostData = {
               matriculationNumber: cells[0],
-              name: cells[1],
+              name: name,
               email: cells[2],
               role: PaperUserRole.Student
             };
-            return createPaperUser(paperId, paperUserPostData);
+            return createPaperUser(paperId, paperUserPostData)
+              .then(() => {
+                onSuccess(name);
+              })
+              .catch(() => onFail(name));
           }
         }
       })
@@ -36,4 +46,28 @@ export async function postStudents(
     }
   };
   reader.readAsText(file);
+}
+
+export async function createPaperUser(
+  id: number,
+  paperUserPostData: PaperUserPostData
+): Promise<AxiosResponse<{ paperUser: PaperUserData }>> {
+  return client.post(`papers/${id}/users`, paperUserPostData);
+}
+
+export async function getStudents(
+  id: number
+): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
+  return client.get(`papers/${id}/students`);
+}
+
+export async function patchStudent(
+  id: number,
+  data
+): Promise<AxiosResponse<{ paperUser: PaperUserData }>> {
+  return client.patch(`${URL}/${id}/students`, data);
+}
+
+export async function discardPaperUser(id: number): Promise<AxiosResponse> {
+  return client.delete(`${URL}/${id}`);
 }

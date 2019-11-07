@@ -34,26 +34,6 @@ const ScriptMapping: React.FC<Props> = ({ paper, match: { params } }) => {
   const [tabValue, setTabValue] = React.useState(0);
   const handleChange = (event, newValue) => setTabValue(newValue);
 
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
-  const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
-
-  const [students, setStudents] = useState<PaperUserListData[]>([]);
-  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
-  const [refreshStudentsFlag, setRefreshStudentsFlag] = useState(true);
-  const refreshStudents = () => setRefreshStudentsFlag(!refreshStudentsFlag);
-
-  const getScripts = async (paperId: number) => {
-    const data = await api.scripts.getScripts(paperId);
-    setScripts(data || []);
-  };
-
-  useEffect(() => {
-    getScripts(paper.id);
-    setIsLoadingScripts(false);
-  }, [refreshScriptsFlag]);
-
   return (
     <>
       <Header paper={paper} title="Mapping of scripts to nominal roll" />
@@ -68,22 +48,10 @@ const ScriptMapping: React.FC<Props> = ({ paper, match: { params } }) => {
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <ScriptsTable
-            paper={paper}
-            isLoadingScripts={isLoadingScripts}
-            scripts={scripts}
-            refreshScripts={refreshScripts}
-          />
+          <ScriptsTable paper={paper} />
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
-          <StudentsTable
-            paper={paper}
-            students={students}
-            refreshScripts={refreshScripts}
-            refreshStudents={refreshStudents}
-            isLoadingStudents={isLoadingStudents}
-            isLoadingScripts={isLoadingScripts}
-          />
+          <StudentsTable paper={paper} />
         </TabPanel>
       </div>
     </>

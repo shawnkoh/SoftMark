@@ -40,8 +40,8 @@ type Props = RouteComponentProps;
 const PaperIndex: React.FC<Props> = props => {
   const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
+  const [refreshFlag, setRefreshFlag] = useState(0);
+  const toggleRefreshFlag = () => setRefreshFlag(refreshFlag + 1);
   const [papers, setPapers] = useState<PaperListData[]>([]);
   const [isOpenAddPaperDialog, setOpenAddPaperDialog] = useState(false);
   const toggleOpenAddPaperDialog = () =>
@@ -67,7 +67,7 @@ const PaperIndex: React.FC<Props> = props => {
         <Container fixed maxWidth="md">
           <Grid container spacing={2} className={classes.grid}>
             {papers.map(paper => (
-              <Grid item xs={12}>
+              <Grid key={paper.id} item xs={12}>
                 <Paper>
                   <Box display="flex" alignItems="center">
                     <Typography
@@ -82,9 +82,6 @@ const PaperIndex: React.FC<Props> = props => {
                     >
                       created on{" "}
                       {format(new Date(paper.createdAt), "d MMM yyyy")}
-                    </Typography>
-                    <Typography variant="body1" className={classes.cardItem}>
-                      {false ? "Set up completed" : "Set up is incomplete"}
                     </Typography>
                     <RoundedButton
                       onClick={() => {

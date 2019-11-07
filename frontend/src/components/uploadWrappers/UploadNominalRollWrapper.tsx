@@ -7,8 +7,9 @@ import { toast } from "react-toastify";
 interface Props {
   paperId: number;
   clickable?: boolean;
-  refreshStudents?: () => void;
   refreshScripts?: () => void;
+  refreshStudents?: () => void;
+  refreshStudentsAfter?: (t: number) => void;
 }
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
@@ -16,8 +17,9 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
     paperId,
     children,
     clickable = true,
-    refreshStudents,
-    refreshScripts
+    refreshStudentsAfter,
+    refreshScripts,
+    refreshStudents
   } = props;
 
   return (
@@ -28,17 +30,22 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
           const file = files[key];
-          const onSuccessfulResponse = () => {
+          const onSuccess = (name: string) => {
+            if (refreshStudentsAfter) {
+              refreshStudentsAfter(7000);
+            }
             if (refreshStudents) {
               refreshStudents();
             }
             if (refreshScripts) {
               refreshScripts();
             }
-            toast.success(`Nominal roll list has been uploaded successfully.`);
+            toast.success(`Account for student ${name} created successfully.`);
           };
-          // TODO: api to create paperUsers here
-          api.paperUsers.postStudents(paperId, file, onSuccessfulResponse);
+          const onFail = (name: string) => {
+            toast.error(`Account for student ${name} could not be created.`);
+          };
+          api.paperUsers.postStudents(paperId, file, onSuccess, onFail);
         });
       }}
     >

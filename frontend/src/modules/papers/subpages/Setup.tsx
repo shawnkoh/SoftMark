@@ -70,8 +70,6 @@ const SetupPage: React.FC<Props> = props => {
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
-  const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
 
   const getScripts = async (paperId: number) => {
     const data = await api.scripts.getScripts(paperId);
@@ -81,6 +79,12 @@ const SetupPage: React.FC<Props> = props => {
     setIsLoadingScripts(false);
   };
 
+  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
+  const refreshScripts = () => {
+    setTimeout(() => {
+      setRefreshScriptsFlag(refreshScriptsFlag + 1);
+    }, 2000);
+  };
   useEffect(() => {
     getScripts(paper.id);
   }, [refreshScriptsFlag]);
@@ -179,9 +183,7 @@ const SetupPage: React.FC<Props> = props => {
           paperId={paper.id}
           refreshScripts={refreshScripts}
         >
-          <Button variant="outlined" fullWidth>
-            Upload
-          </Button>
+          <Button fullWidth>Upload</Button>
         </UploadScriptsWrapper>
       )
     },
@@ -251,21 +253,9 @@ const SetupPage: React.FC<Props> = props => {
                     <br />
                   </>
                 )}
-                {true && (
+                {scriptTemplate && scripts.length === 0 && (
                   <>
-                    {`${BULLET_POINT} Set up template`}
-                    <br />
-                  </>
-                )}
-                {true && (
-                  <>
-                    {`${BULLET_POINT} Allocate questions`}
-                    <br />
-                  </>
-                )}
-                {scripts.length === 0 && (
-                  <>
-                    {`${BULLET_POINT} Upload scripts`}
+                    {`${BULLET_POINT} Upload scripts!`}
                     <br />
                   </>
                 )}

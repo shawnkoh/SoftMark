@@ -49,7 +49,6 @@ const Header: React.FC<Props> = props => {
           </Typography>
           <Typography variant="subtitle1">{title}</Typography>
         </Toolbar>
-        Log out stub
       </Container>
     </AppBar>
   );
