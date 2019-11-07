@@ -70,8 +70,6 @@ const SetupPage: React.FC<Props> = props => {
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(true);
-  const refreshScripts = () => setRefreshScriptsFlag(!refreshScriptsFlag);
 
   const getScripts = async (paperId: number) => {
     const data = await api.scripts.getScripts(paperId);
@@ -81,6 +79,12 @@ const SetupPage: React.FC<Props> = props => {
     setIsLoadingScripts(false);
   };
 
+  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
+  const refreshScripts = () => {
+    setTimeout(() => {
+      setRefreshScriptsFlag(refreshScriptsFlag + 1);
+    }, 2000);
+  };
   useEffect(() => {
     getScripts(paper.id);
   }, [refreshScriptsFlag]);

@@ -22,7 +22,7 @@ import View from "@material-ui/icons/Search";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
-import useSnackbar from "../../../../components/snackbar/useSnackbar";
+import {toast} from "react-toastify";
 
 const useStyles = makeStyles(() => ({
   green: {
@@ -47,24 +47,21 @@ interface OwnProps {
 type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
-  const snackbar = useSnackbar();
   const classes = useStyles();
   const { refreshScripts } = props;
 
   const [script, setScript] = useState(props.script);
 
   const patchScript = newValues => {
+    newValues.studentId = script.student ? script.student.id : null;
     return api.scripts
       .patchScript(script.id, newValues)
       .then(resp => {
         setScript(resp.data.script);
-        if (refreshScripts) {
-          refreshScripts();
-        }
         return false;
       })
       .catch(() => {
-        snackbar.showMessage(`Script ${script.filename} could not be updated!`);
+        toast.error(`Script ${script.filename} could not be updated!`);
         return false;
       });
   };
@@ -90,7 +87,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
           justify="space-between"
           alignItems="center"
         >
-          {student ? student.user.name : "No match found"}
+          {student ? student.matriculationNumber : "No match found"}
           <Tooltip title={"Change student"}>
             <IconButton>
               <Edit />

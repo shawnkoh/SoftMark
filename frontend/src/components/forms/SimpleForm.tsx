@@ -242,6 +242,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                     spacing={0}
                     direction="row"
                     justify="flex-end"
+                    alignItems="center"
                   >
                     {includeReset && (
                       <Grid item>

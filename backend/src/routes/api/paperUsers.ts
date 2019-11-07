@@ -6,6 +6,7 @@ import { BearerTokenType } from "../../types/tokens";
 export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
+router.patch("/:id/students", PaperUsersController.updateStudent);
 router.patch("/:id", PaperUsersController.update);
 router.delete("/:id", PaperUsersController.discard);
 router.patch("/:id/undiscard", PaperUsersController.undiscard);

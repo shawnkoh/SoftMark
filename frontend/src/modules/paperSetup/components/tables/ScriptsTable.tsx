@@ -20,14 +20,12 @@ import {
   Tooltip,
   Paper
 } from "@material-ui/core";
-import Clear from "@material-ui/icons/Clear";
-import Delete from "@material-ui/icons/Delete";
-import Edit from "@material-ui/icons/Edit";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import ScriptsTableRow from "./ScriptTableRow";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
+import ThemedButton from "../../../../components/buttons/ThemedButton";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -39,19 +37,11 @@ const useStyles = makeStyles(theme => ({
 
 interface OwnProps {
   paper: PaperData;
-  scripts: ScriptListData[];
-  isLoadingScripts: boolean;
-  refreshScripts: () => void;
 }
 
 type Props = OwnProps & RouteComponentProps;
 
-const ScriptsTable: React.FC<Props> = ({
-  paper,
-  scripts,
-  refreshScripts,
-  isLoadingScripts
-}) => {
+const ScriptsTable: React.FC<Props> = ({ paper }) => {
   const classes = useStyles();
 
   const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
@@ -70,6 +60,26 @@ const ScriptsTable: React.FC<Props> = ({
     getScriptTemplate(paper.id);
     setIsLoadingScriptTemplate(false);
   }, []);
+
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
+  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
+  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
+  const refreshScripts = () => {
+    setTimeout(() => {
+      setRefreshScriptsFlag(refreshScriptsFlag + 1);
+    }, 300);
+  };
+
+  useEffect(() => {
+    api.scripts
+      .getScripts(paper.id)
+      .then(resp => {
+        if(resp !== null){
+          setScripts(resp);
+        }
+      })
+      .finally(() => setIsLoadingScripts(false));
+  }, [refreshScriptsFlag]);
 
   const [searchText, setSearchText] = useState("");
 
@@ -100,12 +110,13 @@ const ScriptsTable: React.FC<Props> = ({
 
   const filteredScripts = scripts.filter(script => {
     const { filename, student } = script;
-    const studentName = student ? student.user.name : "";
+    const matriculationNumber =
+      student && student.matriculationNumber ? student.matriculationNumber : "";
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
       filename.toLowerCase().includes(lowerCaseSearchText) ||
-      studentName.toLowerCase().includes(lowerCaseSearchText)
+      matriculationNumber.toLowerCase().includes(lowerCaseSearchText)
     );
   });
 
@@ -130,26 +141,27 @@ const ScriptsTable: React.FC<Props> = ({
             paperId={paper.id}
             refreshScripts={refreshScripts}
           >
-            <Button variant="outlined" fullWidth>
-              Upload
-            </Button>
+            <ThemedButton label="Upload" filled />
           </UploadScriptsWrapper>
         </Grid>
         <Grid item>
           <DeleteAllScriptsModal
             scripts={scripts}
             refreshScripts={refreshScripts}
-          >
-            {toggleModal => (
-              <Button variant="outlined" onClick={toggleModal}>
-                Clear
-              </Button>
-            )}
-          </DeleteAllScriptsModal>
+          />
         </Grid>
         <Grid item>
           <Tooltip title="Match students to scripts">
-            <Button variant="outlined">Match</Button>
+            <ThemedButton
+              label="Match"
+              filled
+              onClick={() => {
+                api.scripts.matchScriptsToPaperUsers(paper.id).then(resp => {
+                  setScripts([]);
+                  refreshScripts();
+                });
+              }}
+            />
           </Tooltip>
         </Grid>
       </Grid>
@@ -186,6 +198,7 @@ const ScriptsTable: React.FC<Props> = ({
             )}
             {filteredScripts.map(script => (
               <ScriptsTableRow
+                key={script.id}
                 script={script}
                 refreshScripts={refreshScripts}
               />

@@ -8,26 +8,26 @@ import {
   DialogTitle,
   Grid
 } from "@material-ui/core";
-import { ScriptListData } from "backend/src/types/scripts";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import {toast} from "react-toastify";
 import ThemedButton from "../../../../components/buttons/ThemedButton";
 
 interface OwnProps {
-  scripts: ScriptListData[];
-  refreshScripts?: () => void;
+  students: PaperUserListData[];
+  refreshStudents?: () => void;
 }
 
 type Props = OwnProps;
 
-const DeleteAllScriptsModal: React.FC<Props> = props => {
-  const { scripts, children, refreshScripts } = props;
+const DeleteAllStudentsModal: React.FC<Props> = props => {
+  const { students, children, refreshStudents } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
   return (
     <>
       <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Delete all scripts.`}</DialogTitle>
+        <DialogTitle>{`Delete all students.`}</DialogTitle>
         <DialogContent>
           <Grid container direction="row" justify="space-between">
             <Grid item>
@@ -41,23 +41,23 @@ const DeleteAllScriptsModal: React.FC<Props> = props => {
                 color="primary"
                 onClick={async () => {
                   await Promise.all(
-                    scripts.map(script => {
-                      api.scripts
-                        .discardScript(script.id)
+                    students.map(student => {
+                      api.paperUsers
+                        .discardPaperUser(student.id)
                         .then(() => {
                           toast.success(
-                            `Script ${script.filename} has been deleted successfully.`
+                            `Student ${student.user.name} has been deleted successfully.`
                           );
                         })
                         .catch(errors => {
                           toast.error(
-                            `Script ${script.filename} could not be deleted.`
+                            `Script ${student.user.name} could not be deleted.`
                           );
                         });
                     })
                   );
-                  if (refreshScripts) {
-                    refreshScripts();
+                  if (refreshStudents) {
+                    refreshStudents();
                   }
                   toggleVisibility();
                 }}
@@ -68,9 +68,9 @@ const DeleteAllScriptsModal: React.FC<Props> = props => {
           </Grid>
         </DialogContent>
       </Dialog>
-      <ThemedButton label="Clear" filled onClick={toggleVisibility} />
+      <ThemedButton label="Clear" filled onClick={toggleVisibility} />      
     </>
   );
 };
 
-export default DeleteAllScriptsModal;
+export default DeleteAllStudentsModal;
