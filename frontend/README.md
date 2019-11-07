@@ -43,14 +43,24 @@ You can learn more in the [Create React App documentation](https://facebook.gith
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
-## Paths
+## Folder Structure
 
-You can reference top-level folders in `frontend/src` directly from anywhere.
-
-- e.g. `import api from "api"` instead of `import api from "../../../api`
+- `./components`: reusable (presentational or self-contained) components.
+- `./modules`: each module is a group of related pages and components.
+  - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
 
 ## Folder Structure
 
 - `./components`: reusable (presentational or self-contained) components.
 - `./modules`: each module is a group of related pages and components.
   - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
+
+## Import order style guide
+
+- NPM modules
+- <line break>
+- Local modules
+- <line break>
+- NPM React components
+- <line break>
+- Local React components
