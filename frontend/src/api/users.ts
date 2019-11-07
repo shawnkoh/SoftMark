@@ -6,15 +6,24 @@ import client from "./client";
 const URL = "/users";
 
 export async function createNewUser(
-  name: string,
   email: string,
-  password: string
-): Promise<AxiosResponse> {
-  return client.post(`${URL}`, {
-    name: name,
-    email: email,
-    password: password
-  });
+  password: string,
+  name: string
+): Promise<{
+  user: UserData;
+  accessToken: string;
+  refreshToken: string;
+} | null> {
+  try {
+    const response = await client.post(`${URL}`, {
+      email,
+      name,
+      password
+    });
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }
 
 export async function requestResetPassword(
