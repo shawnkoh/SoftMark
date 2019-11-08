@@ -1,20 +1,21 @@
+import {
+  Button,
+  Grid,
+  Link,
+  Paper,
+  TextField,
+  Theme,
+  Typography,
+  withStyles
+} from "@material-ui/core";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import {
-  Grid,
-  Button,
-  TextField,
-  Link,
-  Typography,
-  Paper
-} from "@material-ui/core";
-
-import { setUser } from "../actions";
 import api from "../../../api";
+import { setUser } from "../actions";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -23,6 +24,12 @@ const validationSchema = yup.object().shape({
     .required(),
   password: yup.string()
 });
+
+const ThemedTextField = withStyles((theme: Theme) => ({
+  root: {
+    backgroundColor: theme.palette.common.white
+  }
+}))(TextField);
 
 const SignInForm = () => {
   const history = useHistory();
@@ -59,7 +66,6 @@ const SignInForm = () => {
       return;
     }
     dispatch(setUser(user));
-    console.log("signinform push papers");
     history.push("/");
   };
 
@@ -91,17 +97,16 @@ const SignInForm = () => {
         } = props;
 
         return (
-          <form onSubmit={handleSubmit} className="l-form">
+          <form onSubmit={handleSubmit}>
             <Grid
               container
               direction="column"
               justify="center"
-              alignItems="center"
+              alignItems="stretch"
               id="SignInForm"
             >
               <Grid item>
-                <TextField
-                  variant="outlined"
+                <ThemedTextField
                   fullWidth
                   required
                   id="email"
@@ -119,14 +124,13 @@ const SignInForm = () => {
               {!passwordless && (
                 <>
                   <Grid item>
-                    <Link href="/forgotpassword" variant="body2">
+                    <Link href="/password_reset" variant="body2">
                       Forgot password?
                     </Link>
                   </Grid>
 
                   <Grid item>
-                    <TextField
-                      variant="outlined"
+                    <ThemedTextField
                       required
                       fullWidth
                       error={touched.password && !!errors.password}
@@ -149,7 +153,6 @@ const SignInForm = () => {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  className="form-submit-btn"
                   disabled={isSubmitting}
                 >
                   Log In

@@ -6,35 +6,49 @@ import client from "./client";
 const URL = "/users";
 
 export async function createNewUser(
-  name: string,
   email: string,
-  password: string
-): Promise<AxiosResponse> {
-  return client.post(`${URL}`, {
-    name: name,
-    email: email,
-    password: password
-  });
+  password: string,
+  name: string
+): Promise<{
+  user: UserData;
+  accessToken: string;
+  refreshToken: string;
+} | null> {
+  try {
+    const response = await client.post(`${URL}`, {
+      email,
+      name,
+      password
+    });
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }
 
-export async function requestResetPassword(
-  email: string
-): Promise<AxiosResponse> {
-  return client.post(`${URL}/resetverification`, {
-    email: email
-  });
+export async function requestResetPassword(email: string): Promise<boolean> {
+  try {
+    await client.post(`${URL}/request_reset_password`, { email });
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 export async function resetPassword(
-  email: string,
-  verificationCode: string,
-  newPassword: string
-): Promise<AxiosResponse> {
-  return client.post(`${URL}/reset`, {
-    email: email,
-    verification_code: verificationCode,
-    password: newPassword
-  });
+  token: string,
+  password: string
+): Promise<boolean> {
+  try {
+    await client.post(
+      `${URL}/reset_password`,
+      { password },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 export async function verifyAccount(

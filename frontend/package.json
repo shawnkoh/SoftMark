@@ -30,7 +30,6 @@
     "konva": "^4.0.16",
     "match-sorter": "^4.0.2",
     "material-ui-file-dropzone": "^0.1.2",
-    "pretty-quick": "^2.0.0",
     "react": "^16.10.2",
     "react-autosuggest": "^9.4.3",
     "react-dom": "^16.10.2",
