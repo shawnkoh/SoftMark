@@ -43,19 +43,32 @@ const SvgSoftmarkLogo: React.FC<Props> = props => {
 
   if ("height" in props) {
     return (
-      <svg height={props.height} viewBox="0 0 300 48">
+      <svg
+        height={props.height}
+        viewBox="0 0 300 48"
+        preserveAspectRatio="xMidYMin slice"
+      >
         {paths}
       </svg>
     );
   } else if ("width" in props) {
     return (
-      <svg width={props.width} viewBox="0 0 300 48">
+      <svg
+        width={props.width}
+        viewBox="0 0 300 48"
+        preserveAspectRatio="xMidYMin slice"
+      >
         {paths}
       </svg>
     );
   } else {
     return (
-      <svg height="48px" width="300px" viewBox="0 0 300 48">
+      <svg
+        height="48px"
+        width="300px"
+        viewBox="0 0 300 48"
+        preserveAspectRatio="xMidYMin slice"
+      >
         {paths}
       </svg>
     );
