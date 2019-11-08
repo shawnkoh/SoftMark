@@ -37,14 +37,14 @@ const ActiveApp: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      {/* <MuiThemeProvider theme={theme}> */}
-      <StylesProvider injectFirst>
-        <CssBaseline />
-        <BrowserRouter>
-          <ActiveApp />
-        </BrowserRouter>
-      </StylesProvider>
-      {/* </MuiThemeProvider> */}
+      <MuiThemeProvider theme={theme}>
+        <StylesProvider injectFirst>
+          <CssBaseline />
+          <BrowserRouter>
+            <ActiveApp />
+          </BrowserRouter>
+        </StylesProvider>
+      </MuiThemeProvider>
     </Provider>
   );
 };
