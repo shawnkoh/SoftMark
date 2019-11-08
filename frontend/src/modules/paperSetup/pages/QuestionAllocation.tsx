@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { PaperData } from "backend/src/types/papers";
-import api from "../../api";
+import api from "../../../api";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import {
   Drawer,
   Divider,
@@ -21,7 +21,7 @@ import {
   Hidden
 } from "@material-ui/core";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
-import QuestionContainer from "./components/QuestionContainer";
+import QuestionContainer from "../components/QuestionContainer";
 
 import MenuIcon from "@material-ui/icons/Menu";
 import GoBackIcon from "@material-ui/icons/ArrowBackIos";
