@@ -89,11 +89,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
 
   return (
     <>
-      <PaperViewHeader
-        paper={paper}
-        title={value}
-        refreshPaper={refreshPaper}
-      />
+      <PaperViewHeader paper={paper} refreshPaper={refreshPaper} />
       <Switch>
         <Route exact path={path}>
           <h3>Exact</h3>

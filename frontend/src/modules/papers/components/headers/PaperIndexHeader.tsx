@@ -36,7 +36,7 @@ const Header: React.FC<Props> = props => {
 
   return (
     <AppBar position="sticky" color="inherit" elevation={1}>
-      <Container fixed maxWidth="md">
+      <Container fixed>
         <Toolbar className={classes.toolbar}>
           <div className={clsx(classes.logo, classes.grow)}>
             <SvgSoftmarkLogo height="24px" />

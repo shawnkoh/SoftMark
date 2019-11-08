@@ -8,26 +8,28 @@ import {
   Toolbar,
   Typography
 } from "@material-ui/core";
-import Edit from "@material-ui/icons/EditOutlined";
+import EditIcon from "@material-ui/icons/EditOutlined";
+import MenuIcon from "@material-ui/icons/Menu";
 import EditPaperModal from "../modals/EditPaperModal";
 import { PaperData } from "backend/src/types/papers";
-import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    title: {
+    grow: {
       flexGrow: 1
     },
     toolbar: {
       paddingLeft: 0,
       paddingRight: 0
+    },
+    papersButton: {
+      marginRight: theme.spacing(2)
     }
   })
 );
 
 interface OwnProps {
   paper: PaperData;
-  title: string;
   refreshPaper: () => void;
 }
 
@@ -35,25 +37,29 @@ type Props = RouteComponentProps & OwnProps;
 
 const PaperViewHeader: React.FC<Props> = props => {
   const classes = useStyles();
-  const { paper, title, refreshPaper } = props;
+  const { paper, refreshPaper } = props;
   const { name } = paper;
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
-      <Container fixed maxWidth="md">
+      <Container fixed>
         <Toolbar className={classes.toolbar}>
-          <IconButton onClick={() => props.history.push(`/`)}>
-            <ArrowLeftSharp />
+          <IconButton
+            onClick={() => props.history.push(`/`)}
+            color="inherit"
+            className={classes.papersButton}
+          >
+            <MenuIcon />
           </IconButton>
-          <Typography variant="h4" className={classes.title}>
-            PAPER: {name.toUpperCase()}
+          <Typography variant="h5" className={classes.grow}>
+            {name}
           </Typography>
           <EditPaperModal
             paper={paper}
             refreshPaper={refreshPaper}
             render={toggleModal => (
-              <IconButton onClick={toggleModal}>
-                <Edit />
+              <IconButton onClick={toggleModal} color="inherit">
+                <EditIcon />
               </IconButton>
             )}
           />
