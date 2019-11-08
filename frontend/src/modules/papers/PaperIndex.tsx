@@ -66,7 +66,7 @@ const PaperIndex: React.FC<Props> = props => {
     <>
       <Header />
       <main>
-        <Container fixed maxWidth="md">
+        <Container fixed>
           <Box display="flex" alignItems="center" className={classes.margin}>
             <Typography variant="h4" className={classes.grow}>
               Your Papers

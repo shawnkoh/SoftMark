@@ -9,8 +9,6 @@ import PaperSetup from "../paperSetup/PaperSetup";
 import ScriptView from "../scripts/ScriptView";
 import theme from "./theme";
 
-console.log(theme);
-
 const AuthenticatedApp: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>

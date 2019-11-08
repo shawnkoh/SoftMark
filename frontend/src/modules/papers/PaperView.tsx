@@ -6,43 +6,31 @@ import api from "../../api";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserData } from "../../types/paperUsers";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { Check, People, Person, Settings } from "@material-ui/icons";
+import lightBlue from "@material-ui/core/colors/lightBlue";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
-import AddMarkerModal from "./components/modals/AddMarkerModal";
 import SetupSubpage from "./subpages/Setup";
 import StudentsSubpage from "./subpages/Students";
 import PaperViewHeader from "./components/headers/PaperViewHeader";
 
-const useStyles = makeStyles(theme => ({
-  navBar: {
-    width: "100%",
-    height: "7%",
-    position: "fixed",
-    bottom: 0,
-    backgroundColor: "#2b4980"
-  },
-  navIcon: {
-    height: 30,
-    width: 30,
-    color: "#edeff1",
-    backgroundColor: "#2b4980"
-  },
-  labelOn: {
-    color: "#edeff1"
-  },
-  labelOff: {
-    color: "#2b4980",
-    backgroundColor: "#2b4980"
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    navBar: {
+      width: "100%",
+      position: "fixed",
+      bottom: 0,
+      backgroundColor: lightBlue[50]
+    }
+  })
+);
 
 type Props = RouteComponentProps;
 
 const TEAM = "team";
-const SET_UP = "setup";
+const SETUP = "setup";
 const GRADING = "grading";
 const STUDENTS = "students";
 
@@ -56,7 +44,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     currentPaperUser,
     setCurrentPaperUser
   ] = useState<PaperUserData | null>(null);
-  const [value, setValue] = React.useState(SET_UP);
+  const [value, setValue] = useState(SETUP);
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -89,11 +77,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
 
   return (
     <>
-      <PaperViewHeader
-        paper={paper}
-        title={value}
-        refreshPaper={refreshPaper}
-      />
+      <PaperViewHeader paper={paper} refreshPaper={refreshPaper} />
       <Switch>
         <Route exact path={path}>
           <h3>Exact</h3>
@@ -111,55 +95,41 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           <StudentsSubpage paper={paper} />
         </Route>
       </Switch>
-
       <BottomNavigation
         className={classes.navBar}
-        color="primary"
         value={value}
         onChange={(event: any, newValue: string) => {
           setValue(newValue);
         }}
-        showLabels
+        showLabels // removing this prop is sufficient to remove labels for unselected tabs
       >
-        <BottomNavigationAction
-          component={Link}
-          to={`${url}/${SET_UP}`}
-          value={SET_UP}
-          label="Set up"
-          classes={{
-            label: value === SET_UP ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Settings className={classes.navIcon} />}
-        />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${TEAM}`}
           value={TEAM}
-          label="Markers"
-          classes={{
-            label: value === TEAM ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Person className={classes.navIcon} />}
+          label="Team"
+          icon={<Person />}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`${url}/${SETUP}`}
+          value={SETUP}
+          label="Setup"
+          icon={<Settings />}
         />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${GRADING}`}
           value={GRADING}
           label="Grading"
-          classes={{
-            label: value === GRADING ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Check className={classes.navIcon} />}
+          icon={<Check />}
         />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${STUDENTS}`}
           value={STUDENTS}
           label="Students"
-          classes={{
-            label: value === STUDENTS ? classes.labelOn : classes.labelOff
-          }}
-          icon={<People className={classes.navIcon} />}
+          icon={<People />}
         />
       </BottomNavigation>
     </>
