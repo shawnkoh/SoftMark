@@ -2,7 +2,8 @@ import React from "react";
 
 const SvgSoftmarkLogo = props => (
   // <svg width="1em" height="1em" viewBox="0 0 300 47" fill="none" {...props}>
-  <svg style={{ display: "flex", width: "100%", height: "initial" }}>
+  //<svg style={{ display: "flex", width: "100%", height: "initial" }}>
+  <svg style={{ height: "48px" }}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
