@@ -1,14 +1,12 @@
 import { validate, validateOrReject } from "class-validator";
-import { addMinutes } from "date-fns";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { Brackets, getManager, getRepository, IsNull, Not } from "typeorm";
+import { getManager, getRepository, IsNull, Not } from "typeorm";
 import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
 import { Question } from "../entities/Question";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
-import { isAllocated } from "../middlewares/canModifyMark";
 import { PaperUserRole } from "../types/paperUsers";
 import {
   QuestionTemplatePatchData,
@@ -98,17 +96,13 @@ export async function create(request: Request, response: Response) {
   response.status(201).json({ questionTemplate: data });
 }
 
-export async function index(request: Request, response: Response) {  
+export async function index(request: Request, response: Response) {
   let questionTemplates: QuestionTemplate[] = [];
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const paperId = Number(request.params.id);
     const requesterId = payload.userId;
-    await allowedRequesterOrFail(
-      requesterId,
-      paperId,
-      PaperUserRole.Student
-    );
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
     questionTemplates = await getActiveQuestionTemplates(paperId);
   } catch (error) {
     response.sendStatus(404);
@@ -116,7 +110,9 @@ export async function index(request: Request, response: Response) {
   }
 
   try {
-    const data = await Promise.all(questionTemplates.map(questionTemplate => questionTemplate.getListData()));
+    const data = await Promise.all(
+      questionTemplates.map(questionTemplate => questionTemplate.getListData())
+    );
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
     response.sendStatus(500);
@@ -286,95 +282,4 @@ export async function undiscard(request: Request, response: Response) {
 
   const data = await questionTemplate.getData();
   response.status(200).json({ questionTemplate: data });
-}
-
-/**
- * MVP Key Assumptions
- * 1. This is currently only intended for parent questions. It will not inherit parent questions
- */
-export async function markQuestion(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
-  const questionTemplateId = request.params.id;
-  const questionTemplate = await getRepository(QuestionTemplate).findOne(
-    questionTemplateId,
-    {
-      relations: ["scriptTemplate", "allocations"],
-      where: { discardedAt: IsNull() }
-    }
-  );
-  if (!questionTemplate) {
-    response.sendStatus(404);
-    return;
-  }
-  const paperId = questionTemplate.scriptTemplate!.paperId;
-  const allowed = await allowedRequester(
-    requesterId,
-    paperId,
-    PaperUserRole.Marker
-  );
-  if (!allowed) {
-    response.sendStatus(404);
-    return;
-  }
-  const { paper, requester } = allowed;
-
-  if (!(await isAllocated(questionTemplate, requesterId))) {
-    response.sendStatus(404);
-    return;
-  }
-
-  // prettier-ignore
-  const question = await getRepository(Question)
-    .createQueryBuilder("question")
-    .leftJoin("question.marks", "mark")
-    .where("question.discardedAt IS NULL")
-    .andWhere("question.questionTemplateId = :questionTemplateId", {
-      questionTemplateId
-    })
-    .andWhere(
-      new Brackets(qb => {
-        qb.where("question.currentMarker IS NULL")
-        .orWhere("question.currentMarkerId = :id", { id: requester.id })
-        // Prevent other markers from accessing this route for the next 30 minutes
-        .orWhere("question.currentMarkerUpdatedAt < :date", { date: addMinutes(new Date(), -30) });
-      })
-    )
-    .andWhere(
-      new Brackets(qb => {
-        qb.where("mark IS NULL")
-        .orWhere("mark.discardedAt IS NOT NULL");
-      })
-    )
-    .getOne();
-
-  if (!question) {
-    response.sendStatus(204);
-    return;
-  }
-
-  // Prevent other markers from accessing this route for the next 30 minutes
-  question.currentMarker = requester;
-  question.currentMarkerUpdatedAt = new Date();
-  const errors = await validate(question);
-  if (errors.length > 0) {
-    response.sendStatus(400);
-    return;
-  }
-  await getRepository(Question).save(question);
-
-  // load nested data
-
-  const questionData = await question.getData();
-  response.status(200).json({ question: questionData });
-}
-
-export async function getActiveQuestionTemplates(paperId: number) {
-  const scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail({
-    where: { paperId, discardedAt: IsNull() },
-    relations: ["questionTemplates"]
-  });
-  return await getRepository(QuestionTemplate).find({
-    where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
-  });
 }

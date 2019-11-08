@@ -77,7 +77,8 @@ export class QuestionTemplate extends Discardable {
 
   @OneToMany(
     type => PageQuestionTemplate,
-    pageQuestionTemplate => pageQuestionTemplate.questionTemplate
+    pageQuestionTemplate => pageQuestionTemplate.questionTemplate,
+    { cascade: true }
   )
   pageQuestionTemplates?: PageQuestionTemplate[];
 
