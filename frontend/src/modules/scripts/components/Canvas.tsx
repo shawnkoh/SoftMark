@@ -146,13 +146,13 @@ const Canvas: React.FC<CanvasProps> = ({
   width,
   height,
   backgroundImageSource,
-  backgroundAnnotations,
-  foregroundAnnotation,
-  mode,
-  penColor,
-  penWidth,
-  onForegroundAnnotationChange
-}) => {
+  backgroundAnnotations = [[]],
+  foregroundAnnotation = [],
+  mode = CanvasMode.View,
+  penColor = "#ff0000",
+  penWidth = 5,
+  onForegroundAnnotationChange = console.log
+}: CanvasProps) => {
   const initialCanvasState = {
     lines: foregroundAnnotation,
     isDrawing: false,
@@ -232,33 +232,59 @@ const Canvas: React.FC<CanvasProps> = ({
       if ((mode as CanvasMode) === CanvasMode.View) {
         const stage: any = currentStageRef.getStage();
 
-        const oldScale = stage.scaleX();
+        // adapted from Inspoboard code courtesy of Jian Jie @liaujianjie
+        if (event.evt.ctrlKey) {
+          const oldScale = stage.scaleX();
 
-        const mousePointTo = {
-          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
-        };
+          const mousePointTo = {
+            x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+            y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+          };
 
-        const scaleBy = 1.02;
-        const newScale =
-          event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        const newPosition = {
-          x:
-            -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
-            newScale,
-          y:
-            -(mousePointTo.y - stage.getPointerPosition().y / newScale) *
-            newScale
-        };
-
-        dispatch({
-          type: CanvasActionType.PanZoom,
-          payload: {
-            stageScale: newScale,
-            stagePosition: newPosition,
-            lastDist: canvasState.lastDist
+          const unboundedNewScale = oldScale - event.evt.deltaY * 0.01;
+          let newScale = unboundedNewScale;
+          if (unboundedNewScale < 0.1) {
+            newScale = 0.1;
+          } else if (unboundedNewScale > 10.0) {
+            newScale = 10.0;
           }
-        });
+
+          const newPosition = {
+            x:
+              -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
+              newScale,
+            y:
+              -(mousePointTo.y - stage.getPointerPosition().y / newScale) *
+              newScale
+          };
+
+          dispatch({
+            type: CanvasActionType.PanZoom,
+            payload: {
+              stageScale: newScale,
+              stagePosition: newPosition,
+              lastDist: canvasState.lastDist
+            }
+          });
+        } else {
+          const dragDistanceScale = 0.75;
+          const newPosition = {
+            x:
+              canvasState.stagePosition.x -
+              dragDistanceScale * event.evt.deltaX,
+            y:
+              canvasState.stagePosition.y - dragDistanceScale * event.evt.deltaY
+          };
+
+          dispatch({
+            type: CanvasActionType.PanZoom,
+            payload: {
+              stageScale: canvasState.stageScale,
+              stagePosition: newPosition,
+              lastDist: canvasState.lastDist
+            }
+          });
+        }
       }
     }
   };
