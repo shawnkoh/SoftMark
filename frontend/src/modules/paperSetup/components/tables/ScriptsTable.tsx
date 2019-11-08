@@ -26,6 +26,7 @@ import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadSc
 import ScriptsTableRow from "./ScriptTableRow";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ThemedButton from "../../../../components/buttons/ThemedButton";
+import { PaperUserListData } from "types/paperUsers";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -93,6 +94,10 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
     {
       name: "Scripts (File name)",
       key: "scripts"
+    },
+    {
+      name: "Pages",
+      key: "pages"
     },
     {
       name: "Student matriculation number",
@@ -199,6 +204,9 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
             {filteredScripts.map(script => (
               <ScriptsTableRow
                 key={script.id}
+                scriptTemplatePagesCount={
+                  scriptTemplate ? scriptTemplate.pageTemplates.length : -1
+                }
                 script={script}
                 refreshScripts={refreshScripts}
               />
