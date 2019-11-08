@@ -341,8 +341,8 @@ describe("POST /papers/:id/scripts", () => {
     const scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
     const q1 = new QuestionTemplate(scriptTemplate, "1", 7);
     const q2 = new QuestionTemplate(scriptTemplate, "2", null);
-    const q2a = new QuestionTemplate(scriptTemplate, "2a", 3, q2);
-    const q2b = new QuestionTemplate(scriptTemplate, "2b", 2, q2);
+    const q2a = new QuestionTemplate(scriptTemplate, "2a", 3, 100, 100, q2);
+    const q2b = new QuestionTemplate(scriptTemplate, "2b", 2, 200, 200, q2);
 
     await getRepository(ScriptTemplate).save(scriptTemplate);
     await getRepository(QuestionTemplate).save([q1, q2, q2a, q2b]);

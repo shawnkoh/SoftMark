@@ -4,10 +4,10 @@ import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
 export interface QuestionTemplatePostData {
   name: string;
   parentName?: string | null;
-  score: number;
-  pageCovered: string;
-  topOffset?: number;
-  leftOffset?: number;
+  score?: number | null;
+  pageCovered?: string | null;
+  topOffset?: number | null;
+  leftOffset?: number | null;
 }
 
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;

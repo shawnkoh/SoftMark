@@ -28,7 +28,7 @@ export class QuestionTemplate extends Discardable {
   constructor(
     scriptTemplate: ScriptTemplate,
     name: string,
-    score: number | null,
+    score?: number | null,
     topOffset?: number | null,
     leftOffset?: number | null,
     parentQuestionTemplate?: QuestionTemplate | null
@@ -37,9 +37,9 @@ export class QuestionTemplate extends Discardable {
     this.scriptTemplate = scriptTemplate;
     this.name = name;
     this.score = score || null;
-    this.parentQuestionTemplate = parentQuestionTemplate;
     this.topOffset = topOffset || null;
     this.leftOffset = leftOffset || null;
+    this.parentQuestionTemplate = parentQuestionTemplate || null;
   }
 
   @Column()

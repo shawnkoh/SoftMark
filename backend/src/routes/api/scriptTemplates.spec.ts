@@ -127,6 +127,7 @@ describe("POST /script_templates/:id/question_templates", () => {
   it("should allow creating a Question Template with no score and no parent", async () => {
     const postData: QuestionTemplatePostData = {
       name: "1",
+      pageCovered: "1, 2, 3",
       score: null,
       topOffset: null,
       leftOffset: null
