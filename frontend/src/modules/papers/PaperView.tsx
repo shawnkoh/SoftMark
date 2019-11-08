@@ -110,52 +110,43 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
 
       <BottomNavigation
         className={classes.navBar}
-        color="primary"
         value={value}
         onChange={(event: any, newValue: string) => {
           setValue(newValue);
         }}
-        showLabels
+        showLabels // removing this prop is sufficient to remove labels for unselected tabs
       >
-        <BottomNavigationAction
-          component={Link}
-          to={`${url}/${SET_UP}`}
-          value={SET_UP}
-          label="Set up"
-          classes={{
-            label: value === SET_UP ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Settings className={classes.navIcon} />}
-        />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${TEAM}`}
           value={TEAM}
-          label="Markers"
-          classes={{
-            label: value === TEAM ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Person className={classes.navIcon} />}
+          label="Team"
+          icon={<Person />}
+          className={classes.navAction}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`${url}/${SET_UP}`}
+          value={SET_UP}
+          label="Setup"
+          icon={<Settings />}
+          className={classes.navAction}
         />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${GRADING}`}
           value={GRADING}
           label="Grading"
-          classes={{
-            label: value === GRADING ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Check className={classes.navIcon} />}
+          icon={<Check />}
+          className={classes.navAction}
         />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${STUDENTS}`}
           value={STUDENTS}
           label="Students"
-          classes={{
-            label: value === STUDENTS ? classes.labelOn : classes.labelOff
-          }}
-          icon={<People className={classes.navIcon} />}
+          icon={<People />}
+          className={classes.navAction}
         />
       </BottomNavigation>
     </>
