@@ -7,20 +7,19 @@ import PaperView from "./papers/PaperView";
 import PaperSetup from "./paperSetup/PaperSetup";
 import ScriptView from "./scripts/ScriptView";
 
-
 const AuthenticatedApp: React.FC = () => {
   return (
     <>
-    <CssBaseline />
-    <Switch>
-      <Route exact path="/" component={PaperIndex} />
-      <Route path="/papers/:paper_id/set_up" component={PaperSetup} />
-      <Route path="/papers/:paper_id" component={PaperView} />
-      <Route path="/scripts/:script_id" component={ScriptView} />
-      <Route>
-        <NotFoundPage isAuthenticated />
-      </Route>
-    </Switch>
+      <CssBaseline />
+      <Switch>
+        <Route exact path="/" component={PaperIndex} />
+        <Route path="/papers/:paper_id/set_up" component={PaperSetup} />
+        <Route path="/papers/:paper_id" component={PaperView} />
+        <Route path="/scripts/:script_id" component={ScriptView} />
+        <Route>
+          <NotFoundPage isAuthenticated />
+        </Route>
+      </Switch>
     </>
   );
 };

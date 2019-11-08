@@ -1,18 +1,20 @@
 import { CssBaseline } from "@material-ui/core";
+import { ThemeProvider } from "@material-ui/styles";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../api";
-import { getRefreshToken } from "../localStorage";
-import { setUser } from "./auth/actions";
-import ForgotPasswordPage from "./auth/ForgotPasswordPage";
-import ResetPasswordPage from "./auth/ResetPasswordPage";
-import { getUser } from "./auth/selectors";
-import SignInPage from "./auth/SignInPage";
-import SignUpPage from "./auth/SignUpPage";
-import VerifyAccountPage from "./auth/VerifyAccountPage";
-import NotFoundPage from "./main/NotFoundPage";
+import api from "../../api";
+import { getRefreshToken } from "../../localStorage";
+import { setUser } from "../auth/actions";
+import ForgotPasswordPage from "../auth/ForgotPasswordPage";
+import ResetPasswordPage from "../auth/ResetPasswordPage";
+import { getUser } from "../auth/selectors";
+import SignInPage from "../auth/SignInPage";
+import SignUpPage from "../auth/SignUpPage";
+import VerifyAccountPage from "../auth/VerifyAccountPage";
+import NotFoundPage from "../main/NotFoundPage";
+import theme from "./theme";
 
 const UnauthenticatedApp: React.FC = () => {
   const user = useSelector(getUser);
@@ -44,7 +46,7 @@ const UnauthenticatedApp: React.FC = () => {
   }, [user]);
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
         <Route exact path="/" component={SignInPage} />
@@ -63,7 +65,7 @@ const UnauthenticatedApp: React.FC = () => {
         />
         <Route component={NotFoundPage} />
       </Switch>
-    </>
+    </ThemeProvider>
   );
 };
 

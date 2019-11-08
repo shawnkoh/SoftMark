@@ -4,7 +4,9 @@ import {
   Link,
   Paper,
   TextField,
-  Typography
+  Theme,
+  Typography,
+  withStyles
 } from "@material-ui/core";
 import { Formik } from "formik";
 import React, { useState } from "react";
@@ -22,6 +24,12 @@ const validationSchema = yup.object().shape({
     .required(),
   password: yup.string()
 });
+
+const ThemedTextField = withStyles((theme: Theme) => ({
+  root: {
+    backgroundColor: theme.palette.common.white
+  }
+}))(TextField);
 
 const SignInForm = () => {
   const history = useHistory();
@@ -58,7 +66,6 @@ const SignInForm = () => {
       return;
     }
     dispatch(setUser(user));
-    console.log("signinform push papers");
     history.push("/");
   };
 
@@ -90,17 +97,16 @@ const SignInForm = () => {
         } = props;
 
         return (
-          <form onSubmit={handleSubmit} className="l-form">
+          <form onSubmit={handleSubmit}>
             <Grid
               container
               direction="column"
               justify="center"
-              alignItems="center"
+              alignItems="stretch"
               id="SignInForm"
             >
               <Grid item>
-                <TextField
-                  variant="outlined"
+                <ThemedTextField
                   fullWidth
                   required
                   id="email"
@@ -124,8 +130,7 @@ const SignInForm = () => {
                   </Grid>
 
                   <Grid item>
-                    <TextField
-                      variant="outlined"
+                    <ThemedTextField
                       required
                       fullWidth
                       error={touched.password && !!errors.password}
@@ -148,7 +153,6 @@ const SignInForm = () => {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  className="form-submit-btn"
                   disabled={isSubmitting}
                 >
                   Log In

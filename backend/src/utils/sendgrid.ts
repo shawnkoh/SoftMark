@@ -34,7 +34,7 @@ export function sendVerificationEmail(user: User) {
   const message =
     "<p>Welcome aboard!</p>" +
     "<p>We're excited that you're joining us! Because we're here to help you make marking exams great again, we want to get you up to speed quickly so that you can make the most of everything at ${APP_NAME}</P>" +
-    `<p>To get started, please <a href='${APP_URL}/auth/verify-email/${token}'>verify your email now!</a></p>`;
+    `<p>To get started, please <a href='${APP_URL}/verify_email/${token}'>verify your email now!</a></p>`;
 
   send(user, `Welcome to ${APP_NAME}!`, message);
 }
@@ -73,9 +73,9 @@ export function sendResetPasswordEmail(user: User) {
 
   const message =
     `<p>We heard that you lost your ${APP_NAME} password. Sorry about that!</p>` +
-    `<p>But don’t worry! You can <a href='${APP_URL}/auth/reset-password/${token}'>click here to reset your password</a></p>` +
+    `<p>But don’t worry! You can <a href='${APP_URL}/auth/password_reset/${token}'>click here to reset your password</a></p>` +
     "<br />" +
-    `<p>If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit ${APP_URL}/auth/reset-password-request</p>` +
+    `<p>If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit ${APP_URL}/password_reset</p>` +
     "<br />" +
     "<p>Thanks,<br />" +
     `The ${APP_NAME} team</p>`;

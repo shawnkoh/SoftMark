@@ -1,4 +1,3 @@
-
 import { StylesProvider } from "@material-ui/styles";
 import React, { useEffect } from "react";
 import { Provider, useSelector } from "react-redux";
@@ -32,13 +31,11 @@ const ActiveApp: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      {/* <MuiThemeProvider theme={theme}> */}
       <StylesProvider injectFirst>
         <BrowserRouter>
           <ActiveApp />
         </BrowserRouter>
       </StylesProvider>
-      {/* </MuiThemeProvider> */}
     </Provider>
   );
 };
