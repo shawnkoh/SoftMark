@@ -61,6 +61,12 @@ export async function getStudents(
   return client.get(`papers/${id}/students`);
 }
 
+export async function getUnmatchedStudents(
+  id: number
+): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
+  return client.get(`papers/${id}/unmatched_students`);
+}
+
 export async function patchStudent(
   id: number,
   data

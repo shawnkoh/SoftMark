@@ -80,6 +80,10 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
       key: "matric"
     },
     {
+      name: "Pages",
+      key: "pages"
+    },
+    {
       name: "Name",
       key: "name"
     },
