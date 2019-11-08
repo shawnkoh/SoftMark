@@ -6,43 +6,31 @@ import api from "../../api";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserData } from "../../types/paperUsers";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { Check, People, Person, Settings } from "@material-ui/icons";
+import lightBlue from "@material-ui/core/colors/lightBlue";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
-import AddMarkerModal from "./components/modals/AddMarkerModal";
 import SetupSubpage from "./subpages/Setup";
 import StudentsSubpage from "./subpages/Students";
 import PaperViewHeader from "./components/headers/PaperViewHeader";
 
-const useStyles = makeStyles(theme => ({
-  navBar: {
-    width: "100%",
-    height: "7%",
-    position: "fixed",
-    bottom: 0,
-    backgroundColor: "#2b4980"
-  },
-  navIcon: {
-    height: 30,
-    width: 30,
-    color: "#edeff1",
-    backgroundColor: "#2b4980"
-  },
-  labelOn: {
-    color: "#edeff1"
-  },
-  labelOff: {
-    color: "#2b4980",
-    backgroundColor: "#2b4980"
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    navBar: {
+      width: "100%",
+      position: "fixed",
+      bottom: 0,
+      backgroundColor: lightBlue[50]
+    }
+  })
+);
 
 type Props = RouteComponentProps;
 
 const TEAM = "team";
-const SET_UP = "setup";
+const SETUP = "setup";
 const GRADING = "grading";
 const STUDENTS = "students";
 
@@ -56,7 +44,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
     currentPaperUser,
     setCurrentPaperUser
   ] = useState<PaperUserData | null>(null);
-  const [value, setValue] = React.useState(SET_UP);
+  const [value, setValue] = useState(SETUP);
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -107,7 +95,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           <StudentsSubpage paper={paper} />
         </Route>
       </Switch>
-
       <BottomNavigation
         className={classes.navBar}
         value={value}
@@ -122,15 +109,13 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           value={TEAM}
           label="Team"
           icon={<Person />}
-          className={classes.navAction}
         />
         <BottomNavigationAction
           component={Link}
-          to={`${url}/${SET_UP}`}
-          value={SET_UP}
+          to={`${url}/${SETUP}`}
+          value={SETUP}
           label="Setup"
           icon={<Settings />}
-          className={classes.navAction}
         />
         <BottomNavigationAction
           component={Link}
@@ -138,7 +123,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           value={GRADING}
           label="Grading"
           icon={<Check />}
-          className={classes.navAction}
         />
         <BottomNavigationAction
           component={Link}
@@ -146,7 +130,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           value={STUDENTS}
           label="Students"
           icon={<People />}
-          className={classes.navAction}
         />
       </BottomNavigation>
     </>
