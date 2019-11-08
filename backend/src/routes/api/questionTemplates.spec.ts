@@ -42,8 +42,22 @@ beforeEach(async () => {
   scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
 
   q1Template = new QuestionTemplate(scriptTemplate, "1", null);
-  q1aTemplate = new QuestionTemplate(scriptTemplate, "1a", 1.5, q1Template);
-  q1bTemplate = new QuestionTemplate(scriptTemplate, "1b", 1.5, q1Template);
+  q1aTemplate = new QuestionTemplate(
+    scriptTemplate,
+    "1a",
+    1.5,
+    100,
+    100,
+    q1Template
+  );
+  q1bTemplate = new QuestionTemplate(
+    scriptTemplate,
+    "1b",
+    1.5,
+    200,
+    200,
+    q1Template
+  );
   q2Template = new QuestionTemplate(scriptTemplate, "2", 6);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);

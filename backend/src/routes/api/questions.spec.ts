@@ -35,7 +35,14 @@ beforeEach(async () => {
   scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
   q1Template = new QuestionTemplate(scriptTemplate, "1", 10);
   q2Template = new QuestionTemplate(scriptTemplate, "2", null);
-  q2aTemplate = new QuestionTemplate(scriptTemplate, "2a", 7, q2Template);
+  q2aTemplate = new QuestionTemplate(
+    scriptTemplate,
+    "2a",
+    7,
+    100,
+    100,
+    q2Template
+  );
   q1Allocation = new Allocation(q1Template, fixtures.marker);
   q2Allocation = new Allocation(q2Template, fixtures.marker);
 

@@ -80,6 +80,7 @@ export async function create(request: Request, response: Response) {
   );
 
   if (
+    postData.pageCovered &&
     scriptTemplate.pageTemplates &&
     isPageValid(postData.pageCovered, scriptTemplate.pageTemplates.length)
   ) {
