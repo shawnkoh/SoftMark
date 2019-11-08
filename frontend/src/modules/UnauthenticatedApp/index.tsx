@@ -1,5 +1,4 @@
-import { CssBaseline } from "@material-ui/core";
-import { ThemeProvider } from "@material-ui/styles";
+import { CssBaseline, MuiThemeProvider } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch } from "react-router-dom";
@@ -46,7 +45,7 @@ const UnauthenticatedApp: React.FC = () => {
   }, [user]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
         <Route exact path="/" component={SignInPage} />
@@ -65,7 +64,7 @@ const UnauthenticatedApp: React.FC = () => {
         />
         <Route component={NotFoundPage} />
       </Switch>
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 };
 
