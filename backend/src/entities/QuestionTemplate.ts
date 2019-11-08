@@ -29,9 +29,9 @@ export class QuestionTemplate extends Discardable {
     scriptTemplate: ScriptTemplate,
     name: string,
     score: number | null,
-    parentQuestionTemplate?: QuestionTemplate | null,
     topOffset?: number | null,
-    leftOffset?: number | null
+    leftOffset?: number | null,
+    parentQuestionTemplate?: QuestionTemplate | null
   ) {
     super();
     this.scriptTemplate = scriptTemplate;

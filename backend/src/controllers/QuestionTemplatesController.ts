@@ -16,6 +16,8 @@ import {
 } from "../types/questionTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequesterOrFail, allowedRequester } from "../utils/papers";
+import { generatePages, isPageValid } from "../utils/questionTemplate";
+import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -25,7 +27,8 @@ export async function create(request: Request, response: Response) {
     request.body,
     "name",
     "parentName",
-    "score"
+    "score",
+    "pageCovered"
   ) as QuestionTemplatePostData;
 
   const scriptTemplate = await getRepository(ScriptTemplate).findOne(
@@ -50,7 +53,9 @@ export async function create(request: Request, response: Response) {
   const questionTemplate = new QuestionTemplate(
     scriptTemplate,
     postData.name,
-    postData.score
+    postData.score,
+    50,
+    50
   );
   if (postData.parentName) {
     const parent = await getRepository(QuestionTemplate).findOne({
@@ -73,6 +78,16 @@ export async function create(request: Request, response: Response) {
   const questions = scripts.map(
     script => new Question(script, questionTemplate)
   );
+
+  if (
+    scriptTemplate.pageTemplates &&
+    isPageValid(postData.pageCovered, scriptTemplate.pageTemplates.length)
+  ) {
+    const pageNos = generatePages(postData.pageCovered);
+    questionTemplate.pageQuestionTemplates = scriptTemplate.pageTemplates
+      .filter(value => pageNos.has(value.pageNo))
+      .map(value => new PageQuestionTemplate(value, questionTemplate));
+  }
 
   await getManager().transaction(async manager => {
     await manager.save(questionTemplate);
@@ -126,7 +141,10 @@ export async function update(request: Request, response: Response) {
     request.body,
     "name",
     "parentName",
-    "score"
+    "score",
+    "leftOffset",
+    "topOffset",
+    "pageCovered"
   ) as QuestionTemplatePatchData;
 
   let questionTemplate: QuestionTemplate;
@@ -151,6 +169,18 @@ export async function update(request: Request, response: Response) {
         where: { name: patchData.parentName }
       });
       questionTemplate.parentQuestionTemplate = parent;
+    }
+    if (questionTemplate.scriptTemplate && patchData.pageCovered) {
+      const pageTemplates = questionTemplate.scriptTemplate.pageTemplates;
+      if (
+        pageTemplates &&
+        isPageValid(patchData.pageCovered, pageTemplates.length)
+      ) {
+        const pageNos = generatePages(patchData.pageCovered);
+        questionTemplate.pageQuestionTemplates = pageTemplates
+          .filter(value => pageNos.has(value.pageNo))
+          .map(value => new PageQuestionTemplate(value, questionTemplate));
+      }
     }
     Object.assign(questionTemplate, patchData);
     await validateOrReject(questionTemplate);

@@ -28,7 +28,7 @@ const ForgotPasswordForm: React.FC = () => {
       initialValues={{ email: "" }}
       onSubmit={(values, { setSubmitting, resetForm }) => {
         requestResetPassword(values.email);
-        resetForm({ email: "" });
+        resetForm();
         setSubmitting(false);
       }}
       validationSchema={validationSchema}

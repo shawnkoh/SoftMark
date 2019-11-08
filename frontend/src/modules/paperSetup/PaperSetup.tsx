@@ -64,7 +64,7 @@ const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
   );
   const questionAllocationRoute = (
     <Route exact path={`${BASE_URL}/question_allocation`}>
-      <QuestionAllocation paper={paper} />
+      <QuestionAllocation />
     </Route>
   );
   const scriptMappingRoute = (
