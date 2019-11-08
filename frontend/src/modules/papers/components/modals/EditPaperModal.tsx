@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import * as Yup from "yup";
 import {
   Dialog,
@@ -25,19 +25,13 @@ const useStyles = makeStyles(() => ({
 
 interface OwnProps {
   paper: PaperData;
-  visible: boolean;
-  toggleVisibility: () => void;
-  toggleRefresh: () => void;
+  render: any;
+  refreshPaper: () => void;
 }
 
 type Props = OwnProps;
 
-const EditPaperModal: React.FC<Props> = ({
-  paper,
-  visible,
-  toggleVisibility,
-  toggleRefresh
-}) => {
+const EditPaperModal: React.FC<Props> = ({ paper, refreshPaper, render }) => {
   const classes = useStyles();
 
   const values: PaperPostData = {
@@ -51,28 +45,34 @@ const EditPaperModal: React.FC<Props> = ({
     name: Yup.string().required("Name is required")
   });
 
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
   return (
-    <Dialog open={visible} onBackdropClick={toggleVisibility} fullWidth>
-      <DialogContent>
-        <Typography variant="h4" className={classes.dialogTitle}>
-          Edit paper
-        </Typography>
-        <FadedDivider />
-        <SimpleForm
-          initialValues={values}
-          formMetadata={formMetadata}
-          validationSchema={validationSchema}
-          onCancel={toggleVisibility}
-          onSubmit={(newValues: PaperPostData) =>
-            editPaper(paper.id, newValues).then(resp => {
-              toggleRefresh();
-              toggleVisibility();
-              return false;
-            })
-          }
-        />
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isVisible} onBackdropClick={toggleVisibility} fullWidth>
+        <DialogContent>
+          <Typography variant="h4" className={classes.dialogTitle}>
+            Edit paper
+          </Typography>
+          <FadedDivider />
+          <SimpleForm
+            initialValues={values}
+            formMetadata={formMetadata}
+            validationSchema={validationSchema}
+            onCancel={toggleVisibility}
+            onSubmit={(newValues: PaperPostData) =>
+              editPaper(paper.id, newValues).then(resp => {
+                refreshPaper();
+                toggleVisibility();
+                return false;
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      {render(toggleVisibility)}
+    </>
   );
 };
 

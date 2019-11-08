@@ -13,6 +13,8 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import AddMarkerModal from "./components/modals/AddMarkerModal";
 import SetupSubpage from "./subpages/Setup";
+import StudentsSubpage from "./subpages/Students";
+import PaperViewHeader from "./components/headers/PaperViewHeader";
 
 const useStyles = makeStyles(theme => ({
   navBar: {
@@ -58,7 +60,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0);
-  const toggleRefreshFlag = () => setRefreshFlag(refreshFlag + 1);
+  const refreshPaper = () => setRefreshFlag(refreshFlag + 1);
   const [isOpenAddMarkerDialog, setOpenAddMarkerDialog] = useState(false);
   const toggleOpenAddMarkerDialog = () =>
     setOpenAddMarkerDialog(!isOpenAddMarkerDialog);
@@ -87,6 +89,11 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
 
   return (
     <>
+      <PaperViewHeader
+        paper={paper}
+        title={value}
+        refreshPaper={refreshPaper}
+      />
       <Switch>
         <Route exact path={path}>
           <h3>Exact</h3>
@@ -95,13 +102,13 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           <h3>Users</h3>
         </Route>
         <Route path={`${path}/setup`}>
-          <SetupSubpage paper={paper} toggleRefresh={toggleRefreshFlag} />
+          <SetupSubpage paper={paper} />
         </Route>
         <Route path={`${path}/grading`}>
           <h3>Grading</h3>
         </Route>
         <Route path={`${path}/students`}>
-          <h3>Students</h3>
+          <StudentsSubpage paper={paper} />
         </Route>
       </Switch>
 
@@ -116,16 +123,6 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
       >
         <BottomNavigationAction
           component={Link}
-          to={`${url}/${TEAM}`}
-          value={TEAM}
-          label="Team"
-          classes={{
-            label: value === TEAM ? classes.labelOn : classes.labelOff
-          }}
-          icon={<Person className={classes.navIcon} />}
-        />
-        <BottomNavigationAction
-          component={Link}
           to={`${url}/${SET_UP}`}
           value={SET_UP}
           label="Set up"
@@ -133,6 +130,16 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
             label: value === SET_UP ? classes.labelOn : classes.labelOff
           }}
           icon={<Settings className={classes.navIcon} />}
+        />
+        <BottomNavigationAction
+          component={Link}
+          to={`${url}/${TEAM}`}
+          value={TEAM}
+          label="Markers"
+          classes={{
+            label: value === TEAM ? classes.labelOn : classes.labelOff
+          }}
+          icon={<Person className={classes.navIcon} />}
         />
         <BottomNavigationAction
           component={Link}

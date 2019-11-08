@@ -14,7 +14,8 @@
     },
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck" : true
   },
   "include": ["src/**/*"]
 }

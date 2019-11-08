@@ -14,15 +14,16 @@ export async function postStudents(
   paperId: number,
   file: File,
   onSuccess: (name: string) => void,
-  onFail: (name: string) => void
+  onFail: (name: string) => void,
+  refresh: () => void
 ) {
   const reader = new FileReader();
-  reader.onloadend = (e: any) => {
+  reader.onloadend = async (e: any) => {
     const rows: string[] = e.target.result.split("\n");
-    Promise.all(
+    await Promise.all(
       rows.map(row => {
         if (row) {
-          var cells = row.split(",");
+          const cells = row.split("\r")[0].split(",");
           if (cells.length >= 3) {
             const name = cells[1];
             const paperUserPostData: PaperUserPostData = {
@@ -40,10 +41,7 @@ export async function postStudents(
         }
       })
     );
-
-    for (let i = 0; i < rows.length; i++) {
-      var row = rows[i];
-    }
+    refresh();
   };
   reader.readAsText(file);
 }
