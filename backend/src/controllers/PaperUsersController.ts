@@ -4,6 +4,7 @@ import { pick } from "lodash";
 import { getRepository, IsNull, Not, getManager } from "typeorm";
 
 import { PaperUser } from "../entities/PaperUser";
+import { Script } from "../entities/Script";
 import { User } from "../entities/User";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
@@ -91,6 +92,50 @@ export async function getStudents(request: Request, response: Response) {
     role: PaperUserRole.Student,
     discardedAt: IsNull()
   })).sort(sortByMatricNo);
+
+  const data = await Promise.all(
+    students.map(async (student: PaperUser) => await student.getListData())
+  );
+  return response.status(200).json({ paperUsers: data });
+}
+
+export async function getUnmatchedStudents(
+  request: Request,
+  response: Response
+) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const paperId = Number(request.params.id);
+  const allowed = await allowedRequester(
+    payload.id,
+    paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const scripts = await getRepository(Script).find({
+    paperId,
+    discardedAt: IsNull()
+  });
+
+  // store studentIds that have been matched
+  const boundedStudentIdsSet: Set<number> = new Set();
+  for (let i = 0; i < scripts.length; i++) {
+    const studentId = scripts[i].studentId;
+    if (studentId) {
+      boundedStudentIdsSet.add(studentId);
+    }
+  }
+
+  const students = (await getRepository(PaperUser).find({
+    paperId,
+    role: PaperUserRole.Student,
+    discardedAt: IsNull()
+  }))
+    .filter(student => !boundedStudentIdsSet.has(student.id))
+    .sort(sortByMatricNo);
 
   const data = await Promise.all(
     students.map(async (student: PaperUser) => await student.getListData())

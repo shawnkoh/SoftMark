@@ -13,13 +13,15 @@ import {
   TableRow,
   TableCell,
   Tooltip,
-  Typography
+  Typography,
+  Paper
 } from "@material-ui/core";
-import Clear from "@material-ui/icons/Clear";
+import Change from "@material-ui/icons/Autorenew";
 import Delete from "@material-ui/icons/Delete";
 import Edit from "@material-ui/icons/Edit";
 import View from "@material-ui/icons/Search";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
+import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
 import { toast } from "react-toastify";
@@ -41,6 +43,7 @@ const useStyles = makeStyles(() => ({
 
 interface OwnProps {
   script: ScriptListData;
+  scriptTemplatePagesCount: number;
   refreshScripts: () => void;
 }
 
@@ -48,7 +51,7 @@ type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
-  const { refreshScripts } = props;
+  const { refreshScripts, scriptTemplatePagesCount } = props;
 
   const [script, setScript] = useState(props.script);
 
@@ -66,7 +69,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
       });
   };
 
-  const { filename, student, hasVerifiedStudent } = script;
+  const { filename, student, hasVerifiedStudent, pagesCount } = script;
 
   return (
     <TableRow>
@@ -80,6 +83,17 @@ const ScriptsTableRow: React.FC<Props> = props => {
           onSubmit={patchScript}
         />
       </TableCell>
+      <TableCell align="center">
+        <Typography
+          className={
+            pagesCount === scriptTemplatePagesCount
+              ? classes.black
+              : classes.red
+          }
+        >
+          {pagesCount}
+        </Typography>
+      </TableCell>
       <TableCell>
         <Grid
           container
@@ -88,11 +102,17 @@ const ScriptsTableRow: React.FC<Props> = props => {
           alignItems="center"
         >
           {student ? student.matriculationNumber : "No match found"}
-          <Tooltip title={"Change student"}>
-            <IconButton>
-              <Edit />
-            </IconButton>
-          </Tooltip>
+          <PickStudentModal
+            callbackScript={setScript}
+            script={script}
+            render={toggleModal => (
+              <Tooltip title={"Change student"}>
+                <IconButton onClick={toggleModal}>
+                  <Change />
+                </IconButton>
+              </Tooltip>
+            )}
+          />
         </Grid>
       </TableCell>
       <TableCell>

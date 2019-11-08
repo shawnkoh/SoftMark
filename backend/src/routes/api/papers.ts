@@ -13,6 +13,10 @@ export const router = Router();
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 
 router.get("/:id/students", PaperUsersController.getStudents);
+router.get(
+  "/:id/unmatched_students",
+  PaperUsersController.getUnmatchedStudents
+);
 router.post("/:id/users", PaperUsersController.create);
 
 router.post("/", PapersController.create);
