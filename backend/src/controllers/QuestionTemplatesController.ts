@@ -233,6 +233,10 @@ export async function undiscard(request: Request, response: Response) {
   response.status(200).json({ questionTemplate: data });
 }
 
+/**
+ * MVP Key Assumptions
+ * 1. This is currently only intended for parent questions. It will not inherit parent questions
+ */
 export async function markQuestion(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.id;
@@ -277,6 +281,7 @@ export async function markQuestion(request: Request, response: Response) {
       new Brackets(qb => {
         qb.where("question.currentMarker IS NULL")
         .orWhere("question.currentMarkerId = :id", { id: requester.id })
+        // Prevent other markers from accessing this route for the next 30 minutes
         .orWhere("question.currentMarkerUpdatedAt < :date", { date: addMinutes(new Date(), -30) });
       })
     )
@@ -293,6 +298,7 @@ export async function markQuestion(request: Request, response: Response) {
     return;
   }
 
+  // Prevent other markers from accessing this route for the next 30 minutes
   question.currentMarker = requester;
   question.currentMarkerUpdatedAt = new Date();
   const errors = await validate(question);
@@ -301,6 +307,8 @@ export async function markQuestion(request: Request, response: Response) {
     return;
   }
   await getRepository(Question).save(question);
+
+  // load nested data
 
   const questionData = await question.getData();
   response.status(200).json({ question: questionData });
