@@ -1,10 +1,13 @@
 import { hashSync, compareSync } from "bcryptjs";
-import { validateOrReject } from "class-validator";
+import { validateOrReject, validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
 import { User } from "../entities/User";
-import { AccessTokenSignedPayload } from "../types/tokens";
+import {
+  AccessTokenSignedPayload,
+  ResetPasswordTokenSignedPayload
+} from "../types/tokens";
 import {
   sendVerificationEmail,
   sendResetPasswordEmail
@@ -128,16 +131,40 @@ export async function requestResetPassword(
   request: Request,
   response: Response
 ) {
-  try {
-    const email = request.body.email;
-
-    const user = await getRepository(User).findOneOrFail({
-      where: { email }
-    });
-
-    sendResetPasswordEmail(user);
-    response.sendStatus(204);
-  } catch (error) {
+  const email = request.body.email;
+  if (!email) {
     response.sendStatus(404);
+    return;
   }
+  const user = await getRepository(User).findOne({
+    where: { email }
+  });
+  if (!user) {
+    response.sendStatus(404);
+    return;
+  }
+
+  sendResetPasswordEmail(user);
+  response.sendStatus(204);
+}
+
+export async function resetPassword(request: Request, response: Response) {
+  const payload = response.locals.payload as ResetPasswordTokenSignedPayload;
+  const password = request.body.password;
+
+  const user = await getRepository(User).findOne(payload.id);
+  if (!user) {
+    response.sendStatus(404);
+    return;
+  }
+  user.password = password;
+  const errors = await validate(user);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
+  user.password = hashSync(password);
+
+  await getRepository(User).save(user);
+  response.sendStatus(204);
 }
