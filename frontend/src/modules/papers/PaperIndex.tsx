@@ -12,9 +12,12 @@ import {
   Typography,
   Button,
   Box,
-  Paper
+  IconButton,
+  Card,
+  CardActionArea
 } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
+import AddIcon from "@material-ui/icons/Add";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -23,11 +26,10 @@ import Header from "./components/headers/PaperIndexHeader";
 import AddPaperModal from "./components/modals/AddPaperModal";
 
 const useStyles = makeStyles(theme => ({
-  grid: {
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(4)
+  margin: {
+    marginTop: theme.spacing(4)
   },
-  cardItemGrow: {
+  grow: {
     flexGrow: 1
   },
   cardItem: {
@@ -65,50 +67,59 @@ const PaperIndex: React.FC<Props> = props => {
       <Header />
       <main>
         <Container fixed maxWidth="md">
-          <Grid container spacing={2} className={classes.grid}>
+          <Box display="flex" alignItems="center" className={classes.margin}>
+            <Typography variant="h4" className={classes.grow}>
+              Your Papers
+            </Typography>
+            <Button
+              onClick={toggleOpenAddPaperDialog}
+              variant="outlined"
+              color="primary"
+              size="large"
+              startIcon={<AddIcon />}
+            >
+              Add Paper
+            </Button>
+          </Box>
+          <Grid container spacing={2} className={classes.margin}>
             {papers.map(paper => (
               <Grid key={paper.id} item xs={12}>
-                <Paper>
-                  <Box display="flex" alignItems="center">
-                    <Typography
-                      variant="h5"
-                      className={clsx(classes.cardItem, classes.cardItemGrow)}
-                    >
-                      {paper.name}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      className={classes.cardItem}
-                    >
-                      created on{" "}
-                      {format(new Date(paper.createdAt), "d MMM yyyy")}
-                    </Typography>
-                    <RoundedButton
-                      onClick={() => {
-                        props.history.push(`/papers/${paper.id}/setup`);
-                      }}
-                      size="small"
-                      variant="contained"
-                      color="primary"
-                      className={classes.cardItem}
-                    >
-                      View
-                    </RoundedButton>
-                  </Box>
-                </Paper>
+                <Card>
+                  <CardActionArea
+                    onClick={() => {
+                      props.history.push(`/papers/${paper.id}/setup`);
+                    }}
+                  >
+                    <Box display="flex" alignItems="center">
+                      <Typography
+                        variant="h6"
+                        className={clsx(classes.cardItem, classes.grow)}
+                      >
+                        {paper.name}
+                      </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        className={classes.cardItem}
+                      >
+                        {`Created on ${format(
+                          new Date(paper.createdAt),
+                          "d MMM yyyy"
+                        )}`}
+                      </Typography>
+                      <IconButton
+                        color="primary"
+                        edge="end"
+                        className={classes.cardItem}
+                        aria-label={`go to ${paper.name}`}
+                      >
+                        <ArrowForwardIcon />
+                      </IconButton>
+                    </Box>
+                  </CardActionArea>
+                </Card>
               </Grid>
             ))}
           </Grid>
-          <Button
-            onClick={toggleOpenAddPaperDialog}
-            variant="outlined"
-            color="primary"
-            size="large"
-            startIcon={<Add />}
-            fullWidth
-          >
-            Add Paper
-          </Button>
           <AddPaperModal
             visible={isOpenAddPaperDialog}
             toggleVisibility={toggleOpenAddPaperDialog}

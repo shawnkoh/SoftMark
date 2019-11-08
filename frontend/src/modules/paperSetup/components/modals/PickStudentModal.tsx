@@ -15,7 +15,6 @@ import {
   Typography
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import matchSorter from "match-sorter";
 
 import api from "../../../../api";
 
