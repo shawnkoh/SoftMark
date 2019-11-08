@@ -71,7 +71,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
     }, 300);
   };
 
-  useEffect(() => {
+  const getScripts = () => {
     api.scripts
       .getScripts(paper.id)
       .then(resp => {
@@ -80,7 +80,15 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
         }
       })
       .finally(() => setIsLoadingScripts(false));
-  }, [refreshScriptsFlag]);
+  };
+
+  useEffect(getScripts, [refreshScriptsFlag]);
+
+  const callbackScripts = () => {
+    setTimeout(() => {
+      getScripts();
+    }, 2000);
+  };
 
   const [searchText, setSearchText] = useState("");
 
@@ -144,7 +152,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
         <Grid item>
           <UploadScriptsWrapper
             paperId={paper.id}
-            refreshScripts={refreshScripts}
+            refreshScripts={callbackScripts}
           >
             <ThemedButton label="Upload" filled />
           </UploadScriptsWrapper>
@@ -152,7 +160,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
         <Grid item>
           <DeleteAllScriptsModal
             scripts={scripts}
-            refreshScripts={refreshScripts}
+            refreshScripts={callbackScripts}
           />
         </Grid>
         <Grid item>
@@ -163,7 +171,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
               onClick={() => {
                 api.scripts.matchScriptsToPaperUsers(paper.id).then(resp => {
                   setScripts([]);
-                  refreshScripts();
+                  getScripts();
                 });
               }}
             />
@@ -208,7 +216,7 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
                   scriptTemplate ? scriptTemplate.pageTemplates.length : -1
                 }
                 script={script}
-                refreshScripts={refreshScripts}
+                refreshScripts={getScripts}
               />
             ))}
           </TableBody>

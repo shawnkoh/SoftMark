@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Button, Grid, IconButton, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import Edit from "@material-ui/icons/EditOutlined";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import { PaperData } from "backend/src/types/papers";
-import EditPaperModal from "../components/modals/EditPaperModal";
 import ThemedButton from "../../../components/buttons/ThemedButton";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
@@ -14,7 +12,7 @@ import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
-import api from "../../../api";
+import api from "../../../api"; 
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -38,13 +36,12 @@ const BULLET_POINT = `\u2022 `;
 
 interface OwnProps {
   paper: PaperData;
-  toggleRefresh: () => void;
 }
 
 type Props = OwnProps & RouteComponentProps;
 
 const SetupPage: React.FC<Props> = props => {
-  const { paper, toggleRefresh } = props;
+  const { paper } = props;
   const classes = useStyles();
 
   const [
@@ -214,54 +211,6 @@ const SetupPage: React.FC<Props> = props => {
           alignItems="center"
           spacing={2}
         >
-          <Grid
-            key={paper.id}
-            item
-            xs={12}
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="flex-start"
-            spacing={1}
-          >
-            <Grid
-              item
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-            >
-              <IconButton onClick={() => props.history.push("/")}>
-                <ArrowLeftSharp />
-              </IconButton>
-              <Typography variant="h4">{paper.name}</Typography>
-              <EditPaperModal
-                paper={paper}
-                visible={isOpenEditPaperDialog}
-                toggleVisibility={toggleOpenEditPaperDialog}
-                toggleRefresh={toggleRefresh}
-              />
-              <IconButton onClick={toggleOpenEditPaperDialog}>
-                <Edit />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Typography variant="subtitle1">
-                {!scriptTemplate && (
-                  <>
-                    {`${BULLET_POINT} Upload script template`}
-                    <br />
-                  </>
-                )}
-                {scriptTemplate && scripts.length === 0 && (
-                  <>
-                    {`${BULLET_POINT} Upload scripts!`}
-                    <br />
-                  </>
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
           <div className={classes.divider} />
           <Grid
             container

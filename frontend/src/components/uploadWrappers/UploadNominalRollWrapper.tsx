@@ -9,7 +9,6 @@ interface Props {
   clickable?: boolean;
   refreshScripts?: () => void;
   refreshStudents?: () => void;
-  refreshStudentsAfter?: (t: number) => void;
 }
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
@@ -17,7 +16,6 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
     paperId,
     children,
     clickable = true,
-    refreshStudentsAfter,
     refreshScripts,
     refreshStudents
   } = props;
@@ -30,22 +28,27 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
           const file = files[key];
-          const onSuccess = (name: string) => {
-            if (refreshStudentsAfter) {
-              refreshStudentsAfter(7000);
-            }
+          const refresh = () => {
             if (refreshStudents) {
               refreshStudents();
             }
             if (refreshScripts) {
               refreshScripts();
             }
+          };
+          const onSuccess = (name: string) => {
             toast.success(`Account for student ${name} created successfully.`);
           };
           const onFail = (name: string) => {
             toast.error(`Account for student ${name} could not be created.`);
           };
-          api.paperUsers.postStudents(paperId, file, onSuccess, onFail);
+          api.paperUsers.postStudents(
+            paperId,
+            file,
+            onSuccess,
+            onFail,
+            refresh
+          );
         });
       }}
     >

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
-import api from "../../../../api";
+import api from "../../../api";
 import { PaperData } from "backend/src/types/papers";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { PaperUserListData } from "../../../types/paperUsers";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import { TableColumn } from "../../../../components/tables/TableTypes";
+import { TableColumn } from "../../../components/tables/TableTypes";
 
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -21,12 +21,8 @@ import {
   Tooltip,
   Paper
 } from "@material-ui/core";
-import SearchBar from "../../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
-import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
-import AddStudentModal from "../modals/AddStudentModal";
-import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
+import SearchBar from "../../../components/fields/SearchBar";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import StudentsTableRow from "./StudentsTableRow";
 
 const useStyles = makeStyles(theme => ({
@@ -80,20 +76,20 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
 
   const columns: TableColumn[] = [
     {
+      name: "",
+      key: ""
+    },
+    {
       name: "Student matriculation number",
       key: "matric"
     },
     {
-      name: "Pages",
-      key: "pages"
-    },
-    {
-      name: "Name",
+      name: "Name / Email",
       key: "name"
     },
     {
-      name: "Email",
-      key: "email"
+      name: "Score",
+      key: "score"
     },
     {
       name: "",
@@ -107,7 +103,7 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
     const studentName = user.name || "";
     const email  = user.email || "";
     const lowerCaseSearchText = searchText.toLowerCase();
-    return (
+    return ( 
       searchText === "" ||
       matricNo.toLowerCase().includes(lowerCaseSearchText) ||
       studentName.toLowerCase().includes(lowerCaseSearchText) ||
@@ -130,23 +126,6 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
             placeholder="Search..."
             onChange={str => setSearchText(str)}
           />
-        </Grid>
-        <Grid item>
-          <UploadNominalRollWrapper
-            paperId={paper.id}
-            refreshStudents={getStudents}
-          >
-            <ThemedButton label="Upload" filled />
-          </UploadNominalRollWrapper>
-        </Grid>
-        <Grid item>
-          <DeleteAllStudentsModal
-            students={students}
-            refreshStudents={callbackStudents}
-          />
-        </Grid>
-        <Grid item>
-          <AddStudentModal paperId={paper.id} refreshStudents={getStudents} />
         </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
@@ -180,12 +159,12 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
                 </TableCell>
               </TableRow>
             )}
-            {filteredStudents.map((student: PaperUserListData) => {
+            {filteredStudents.map((student: PaperUserListData, index) => {
               return (
                 <StudentsTableRow
                   key={student.id}
+                  index={index + 1}
                   student={student}
-                  refreshStudents={refreshStudents}
                 />
               );
             })}

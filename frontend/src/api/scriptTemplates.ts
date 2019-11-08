@@ -64,12 +64,18 @@ export async function postScriptTemplate(
       };
       createScriptTemplate(paper_id, scriptTemplatePostData)
         .then(res => {
+          console.log("res");
+          console.log(res);
           onSuccess();
           if (callbackScriptData) {
             callbackScriptData(res.data.scriptTemplate);
           }
         })
-        .catch(() => onFail());
+        .catch(errors => {
+          onFail();
+          console.log("errors");
+          console.log(errors);
+        });
     });
   };
   reader.readAsDataURL(file);

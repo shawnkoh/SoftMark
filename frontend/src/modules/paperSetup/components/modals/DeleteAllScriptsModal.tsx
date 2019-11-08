@@ -11,6 +11,7 @@ import {
 import { ScriptListData } from "backend/src/types/scripts";
 import { toast } from "react-toastify";
 import ThemedButton from "../../../../components/buttons/ThemedButton";
+import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 interface OwnProps {
   scripts: ScriptListData[];
@@ -26,48 +27,34 @@ const DeleteAllScriptsModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Delete all scripts.`}</DialogTitle>
-        <DialogContent>
-          <Grid container direction="row" justify="space-between">
-            <Grid item>
-              This action is irreversible. Do you still want to delete?
-            </Grid>
-            <Grid item>
-              <Button color="primary" onClick={toggleVisibility}>
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                onClick={async () => {
-                  await Promise.all(
-                    scripts.map(script => {
-                      api.scripts
-                        .discardScript(script.id)
-                        .then(() => {
-                          toast.success(
-                            `Script ${script.filename} has been deleted successfully.`
-                          );
-                        })
-                        .catch(errors => {
-                          toast.error(
-                            `Script ${script.filename} could not be deleted.`
-                          );
-                        });
-                    })
+      <ConfirmationDialog
+        title={`Delete all scripts.`}
+        message={`This action is irreversible. Do you still want to delete?`}
+        open={isOpen}
+        handleClose={toggleVisibility}
+        handleConfirm={async () => {
+          await Promise.all(
+            scripts.map(script => {
+              api.scripts
+                .discardScript(script.id)
+                .then(() => {
+                  toast.success(
+                    `Script ${script.filename} has been deleted successfully.`
                   );
-                  if (refreshScripts) {
-                    refreshScripts();
-                  }
-                  toggleVisibility();
-                }}
-              >
-                Discard
-              </Button>
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
+                })
+                .catch(errors => {
+                  toast.error(
+                    `Script ${script.filename} could not be deleted.`
+                  );
+                });
+            })
+          );
+          if (refreshScripts) {
+            refreshScripts();
+          }
+          toggleVisibility();
+        }}
+      />
       <ThemedButton label="Clear" filled onClick={toggleVisibility} />
     </>
   );

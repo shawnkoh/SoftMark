@@ -12,6 +12,7 @@ import {
 import Clear from "@material-ui/icons/Clear";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import { toast } from "react-toastify";
+import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 interface OwnProps {
   student: PaperUserListData;
@@ -29,42 +30,26 @@ const DeleteStudentModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Delete student "${name}" (Matric no: ${matriculationNumber}).`}</DialogTitle>
-        <DialogContent>
-          <Grid container direction="row" justify="space-between">
-            <Grid item>
-              This action is irreversible. Do you still want to delete?
-            </Grid>
-            <Grid item>
-              <Button color="primary" onClick={toggleVisibility}>
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                onClick={async () => {
-                  api.paperUsers
-                    .discardPaperUser(student.id)
-                    .then(() => {
-                      toast.success(
-                        `Student ${name} has been deleted successfully.`
-                      );
-                      if (refreshStudents) {
-                        refreshStudents();
-                      }
-                    })
-                    .catch(errors => {
-                      toast.error(`Student ${name} could not be deleted.`);
-                    });
-                  toggleVisibility();
-                }}
-              >
-                Discard
-              </Button>
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
+      <ConfirmationDialog
+        title={`Delete student "${name}" (Matric no: ${matriculationNumber}).`}
+        message={`This action is irreversible. Do you still want to delete?`}
+        open={isOpen}
+        handleClose={toggleVisibility}
+        handleConfirm={async () => {
+          api.paperUsers
+            .discardPaperUser(student.id)
+            .then(() => {
+              toast.success(`Student ${name} has been deleted successfully.`);
+              if (refreshStudents) {
+                refreshStudents();
+              }
+            })
+            .catch(errors => {
+              toast.error(`Student ${name} could not be deleted.`);
+            });
+          toggleVisibility();
+        }}
+      />
       <IconButton onClick={toggleVisibility}>
         <Clear />
       </IconButton>
