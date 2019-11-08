@@ -1,14 +1,6 @@
 import React from "react";
 
-type Width = {
-  width: string;
-};
-
-type Height = {
-  height: string;
-};
-
-type Props = Width | Height | {};
+type Props = { width: string } | { height: string } | {};
 
 const SvgSoftmarkLogo: React.FC<Props> = props => {
   const paths = (

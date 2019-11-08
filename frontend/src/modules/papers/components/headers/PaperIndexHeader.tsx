@@ -39,7 +39,7 @@ const Header: React.FC<Props> = props => {
       <Container fixed maxWidth="md">
         <Toolbar className={classes.toolbar}>
           <div className={clsx(classes.logo, classes.grow)}>
-            <SvgSoftmarkLogo height="32px" />
+            <SvgSoftmarkLogo height="24px" />
           </div>
           <AccountModal
             render={toggleModal => (
