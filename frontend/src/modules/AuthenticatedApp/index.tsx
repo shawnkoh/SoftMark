@@ -1,4 +1,5 @@
-import { CssBaseline, MuiThemeProvider } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
+import { ThemeProvider } from "@material-ui/core/styles";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import NotFoundPage from "../main/NotFoundPage";
@@ -8,9 +9,11 @@ import PaperSetup from "../paperSetup/PaperSetup";
 import ScriptView from "../scripts/ScriptView";
 import theme from "./theme";
 
+console.log(theme);
+
 const AuthenticatedApp: React.FC = () => {
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
         <Route exact path="/" component={PaperIndex} />
@@ -21,7 +24,7 @@ const AuthenticatedApp: React.FC = () => {
           <NotFoundPage isAuthenticated />
         </Route>
       </Switch>
-    </MuiThemeProvider>
+    </ThemeProvider>
   );
 };
 
