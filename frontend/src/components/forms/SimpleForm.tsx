@@ -14,7 +14,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
 
 import { OptionsType } from "../../utils/options";
-import { RoundedButton } from "../buttons/styledButtons";
+import { RoundedButton } from "../buttons/StyledButtons";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
