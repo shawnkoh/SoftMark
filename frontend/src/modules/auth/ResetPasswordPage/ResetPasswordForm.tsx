@@ -33,6 +33,7 @@ const ResetPasswordForm: React.FC<Props> = ({ token }) => {
       toast.error(
         "The reset password token has expired. Please request for another."
       );
+      history.push("/reset_password");
       return;
     }
     toast.success("Your password has been reset successfully!");
