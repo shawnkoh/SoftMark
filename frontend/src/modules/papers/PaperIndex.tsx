@@ -97,7 +97,7 @@ const PaperIndex: React.FC<Props> = props => {
                         {paper.name}
                       </Typography>
                       <Typography
-                        variant="subtitle2"
+                        variant="subtitle1"
                         className={classes.cardItem}
                       >
                         {`Created on ${format(
