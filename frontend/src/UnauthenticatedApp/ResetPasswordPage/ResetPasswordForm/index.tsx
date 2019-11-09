@@ -11,7 +11,7 @@ import React from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import api from "../../api";
+import api from "../../../api";
 
 interface Props {
   token: string;

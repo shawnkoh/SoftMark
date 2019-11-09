@@ -14,8 +14,8 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import api from "../../api";
-import { setUser } from "../../store/auth/actions";
+import api from "../../../api";
+import { setUser } from "../../../store/auth/actions";
 import MailSentSvg from "./undraw_Mail_sent_qwwx.svg";
 
 const validationSchema = yup.object().shape({

@@ -1,14 +1,12 @@
-import React from "react";
-import { useHistory } from "react-router";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-import { Formik } from "formik";
-import * as Yup from "yup";
-
-import api from "../../api";
-import { setUser } from "../../store/auth/actions";
-
 import { Button, Grid, Link, TextField } from "@material-ui/core";
+import { Formik } from "formik";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
+import api from "../../../api";
+import { setUser } from "../../../store/auth/actions";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
