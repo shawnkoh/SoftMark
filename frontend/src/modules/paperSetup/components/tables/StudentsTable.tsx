@@ -148,6 +148,9 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
         <Grid item>
           <AddStudentModal paperId={paper.id} refreshStudents={getStudents} />
         </Grid>
+        <Grid item>
+          Total students: {students.length}
+        </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>

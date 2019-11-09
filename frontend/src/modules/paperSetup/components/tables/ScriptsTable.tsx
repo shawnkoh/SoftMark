@@ -177,6 +177,9 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
             />
           </Tooltip>
         </Grid>
+        <Grid item>
+          Total scripts: {scripts.length}
+        </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>

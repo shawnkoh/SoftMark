@@ -98,6 +98,31 @@ export async function create(request: Request, response: Response) {
   response.status(201).json({ questionTemplate: data });
 }
 
+export async function index(request: Request, response: Response) {  
+  let questionTemplates: QuestionTemplate[] = [];
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const paperId = Number(request.params.id);
+    const requesterId = payload.userId;
+    await allowedRequesterOrFail(
+      requesterId,
+      paperId,
+      PaperUserRole.Student
+    );
+    questionTemplates = await getActiveQuestionTemplates(paperId);
+  } catch (error) {
+    response.sendStatus(404);
+    return;
+  }
+
+  try {
+    const data = await Promise.all(questionTemplates.map(questionTemplate => questionTemplate.getListData()));
+    response.status(200).json({ questionTemplates: data });
+  } catch (error) {
+    response.sendStatus(500);
+  }
+}
+
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
@@ -342,4 +367,14 @@ export async function markQuestion(request: Request, response: Response) {
 
   const questionData = await question.getData();
   response.status(200).json({ question: questionData });
+}
+
+export async function getActiveQuestionTemplates(paperId: number) {
+  const scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail({
+    where: { paperId, discardedAt: IsNull() },
+    relations: ["questionTemplates"]
+  });
+  return await getRepository(QuestionTemplate).find({
+    where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
+  });
 }

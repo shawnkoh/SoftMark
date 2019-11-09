@@ -3,8 +3,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 
 import api from "../../../api";
 import { PaperData } from "backend/src/types/papers";
-import { PaperUserListData } from "../../../types/paperUsers";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import { ScriptListData } from "backend/src/types/scripts";
 import { TableColumn } from "../../../components/tables/TableTypes";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -23,7 +22,7 @@ import {
 } from "@material-ui/core";
 import SearchBar from "../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import StudentsTableRow from "./StudentsTableRow";
+import ScriptsTableRow from "./ScriptsTableRow";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -39,45 +38,47 @@ interface OwnProps {
 
 type Props = OwnProps & RouteComponentProps;
 
-const StudentsTable: React.FC<Props> = ({ paper }) => {
+const ScriptsSubpage: React.FC<Props> = ({ paper }) => {
   const classes = useStyles();
 
-  const [students, setStudents] = useState<PaperUserListData[]>([]);
-  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
-  const [refreshStudentsFlag, setRefreshStudentsFlag] = useState(0);
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
+  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
+  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
 
-  const getStudents = () => {
-    api.paperUsers
-      .getStudents(paper.id)
+  const getScripts = () => {
+    api.scripts
+      .getScripts(paper.id)
       .then(resp => {
-        setStudents(resp.data.paperUsers);
+        if (resp !== null) {
+          setScripts(resp);
+        }
       })
-      .finally(() => setIsLoadingStudents(false));
+      .finally(() => setIsLoadingScripts(false));
   };
 
-  useEffect(getStudents, [refreshStudentsFlag]);
+  useEffect(getScripts, [refreshScriptsFlag]);
 
-  const refreshStudents = () => {
+  const refreshScripts = () => {
     setTimeout(() => {
-      setRefreshStudentsFlag(refreshStudentsFlag + 1);
+      setRefreshScriptsFlag(refreshScriptsFlag + 1);
     }, 2500);
   };
-  const callbackStudents = () => {
+  const callbackScripts = () => {
     setTimeout(() => {
-      getStudents();
+      getScripts();
     }, 2000);
   };
 
   const [searchText, setSearchText] = useState("");
 
-  if (isLoadingStudents) {
-    return <LoadingSpinner loadingMessage={`Loading students...`} />;
+  if (isLoadingScripts) {
+    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
   }
 
   const columns: TableColumn[] = [
     {
-      name: "",
-      key: ""
+      name: "Script (File name)",
+      key: "script"
     },
     {
       name: "Student matriculation number",
@@ -97,14 +98,15 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
     }
   ];
 
-  const filteredStudents = students.filter(student => {
-    const { user, matriculationNumber } = student;
-    const matricNo = matriculationNumber || "";
-    const studentName = user.name || "";
-    const email  = user.email || "";
+  const filteredScripts = scripts.filter(script => {
+    const { filename, student } = script;
+    const matricNo = student && student.matriculationNumber ? student.matriculationNumber : "";
+    const studentName = student && student.user && student.user.name ? student.user.name : "";
+    const email  = student && student.user ? student.user.email : "";
     const lowerCaseSearchText = searchText.toLowerCase();
     return ( 
       searchText === "" ||
+      filename.toLowerCase().includes(lowerCaseSearchText) ||
       matricNo.toLowerCase().includes(lowerCaseSearchText) ||
       studentName.toLowerCase().includes(lowerCaseSearchText) ||
       email.toLowerCase().includes(lowerCaseSearchText)
@@ -126,6 +128,9 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
             placeholder="Search..."
             onChange={str => setSearchText(str)}
           />
+        </Grid>
+        <Grid item>
+          Total scripts: {scripts.length}
         </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
@@ -150,7 +155,7 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredStudents.length === 0 && (
+            {filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
@@ -159,12 +164,11 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
                 </TableCell>
               </TableRow>
             )}
-            {filteredStudents.map((student: PaperUserListData, index) => {
+            {filteredScripts.map((script: ScriptListData, index) => {
               return (
-                <StudentsTableRow
-                  key={student.id}
-                  index={index + 1}
-                  student={student}
+                <ScriptsTableRow
+                  key={script.id}
+                  script={script}
                 />
               );
             })}
@@ -175,4 +179,4 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
   );
 };
 
-export default withRouter(StudentsTable);
+export default withRouter(ScriptsSubpage);
