@@ -1,6 +1,7 @@
-import { Formik, FormikProps, FieldArray, Field } from "formik";
 import * as React from "react";
+import { Formik, FormikProps, FieldArray, Field } from "formik";
 import { ObjectSchema } from "yup";
+
 import {
   Button,
   Grid,
@@ -9,30 +10,22 @@ import {
   TextField,
   Tooltip
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
 
 import { OptionsType } from "../../utils/options";
-import ThemedButton from "../buttons/ThemedButton";
+import { RoundedButton } from "../buttons/styledButtons";
 
-const useStyles = makeStyles(() => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: `40px 40px 40px 40px`
-  },
-  buttons: {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  textField: {
-    background: "000000" //change color to change textfield fill
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      padding: theme.spacing(4)
+    }
+  })
+);
 
 type GridSizeType =
   | boolean
@@ -201,7 +194,6 @@ const SimpleForm: React.FC<Props<any>> = ({
                           <TextField
                             id={key}
                             name={key}
-                            className={classes.textField}
                             helperText={touched[key] ? errors[key] : ""}
                             error={touched[key] && Boolean(errors[key])}
                             label={fields.label}
@@ -239,7 +231,6 @@ const SimpleForm: React.FC<Props<any>> = ({
                     item
                     container
                     xs={12}
-                    spacing={0}
                     direction="row"
                     justify="flex-end"
                     alignItems="center"
@@ -262,19 +253,24 @@ const SimpleForm: React.FC<Props<any>> = ({
                       </Grid>
                     )}
                     <Grid item>
-                      <ThemedButton onClick={onCancel} label="Cancel" />
+                      <RoundedButton
+                        variant="outlined"
+                        size="medium"
+                        onClick={onCancel}
+                      >
+                        Cancel
+                      </RoundedButton>
                     </Grid>
-                    <Grid item style={{ paddingLeft: 20 }}>
-                      <Button
+                    <Grid item>
+                      <RoundedButton
                         type="submit"
                         variant="contained"
-                        style={{ borderRadius: 25 }}
                         disabled={!isValid || isSubmitting}
                         size="medium"
                         color="primary"
                       >
-                        SUBMIT
-                      </Button>
+                        Submit
+                      </RoundedButton>
                     </Grid>
                   </Grid>
                 </Grid>

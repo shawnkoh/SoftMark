@@ -1,19 +1,14 @@
 import React from "react";
 import * as Yup from "yup";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Divider,
-  Typography
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import { PaperPostData } from "backend/src/types/papers";
+import { createPaper } from "../../../../api/papers";
+
+import { Dialog, DialogContent } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import FadedDivider from "../../../../components/dividers/FadedDivider";
-import { createPaper } from "../../../../api/papers";
 
 const useStyles = makeStyles(() => ({
   dialogTitle: {
@@ -51,11 +46,13 @@ const AddPaperModal: React.FC<Props> = ({
 
   return (
     <Dialog open={visible} onBackdropClick={toggleVisibility} fullWidth>
+      <CustomDialogTitle
+        id="customized-dialog-title"
+        onClose={toggleVisibility}
+      >
+        Add new paper
+      </CustomDialogTitle>
       <DialogContent>
-        <Typography variant="h4" className={classes.dialogTitle}>
-          Add new paper
-        </Typography>
-        <FadedDivider />
         <SimpleForm
           initialValues={values}
           formMetadata={formMetadata}

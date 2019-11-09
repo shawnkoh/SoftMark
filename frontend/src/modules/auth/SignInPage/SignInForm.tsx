@@ -104,9 +104,10 @@ const SignInForm = () => {
               justify="center"
               alignItems="stretch"
               id="SignInForm"
+              spacing={2}
             >
               <Grid item>
-                <ThemedTextField
+                <TextField
                   fullWidth
                   required
                   id="email"
@@ -118,19 +119,14 @@ const SignInForm = () => {
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  variant="outlined"
                 />
               </Grid>
 
               {!passwordless && (
                 <>
                   <Grid item>
-                    <Link href="/password_reset" variant="body2">
-                      Forgot password?
-                    </Link>
-                  </Grid>
-
-                  <Grid item>
-                    <ThemedTextField
+                    <TextField
                       required
                       fullWidth
                       error={touched.password && !!errors.password}
@@ -142,7 +138,13 @@ const SignInForm = () => {
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      variant="outlined"
                     />
+                  </Grid>
+                  <Grid item>
+                    <Link href="/password_reset" variant="body2">
+                      Forgot password?
+                    </Link>
                   </Grid>
                 </>
               )}
@@ -160,9 +162,9 @@ const SignInForm = () => {
               </Grid>
 
               <Grid item>
-                <Typography>
-                  New to SoftMark?
-                  <Link href="/signup" variant="body2">
+                <Typography variant="body1">
+                  New to SoftMark?{" "}
+                  <Link href="/signup" variant="body1">
                     Create an account.
                   </Link>
                 </Typography>

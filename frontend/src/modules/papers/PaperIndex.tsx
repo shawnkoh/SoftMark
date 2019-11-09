@@ -21,7 +21,7 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { RoundedButton } from "../../components/buttons/StyledButtons";
+import { RoundedButton } from "../../components/buttons/styledButtons";
 import Header from "./components/headers/PaperIndexHeader";
 import AddPaperModal from "./components/modals/AddPaperModal";
 

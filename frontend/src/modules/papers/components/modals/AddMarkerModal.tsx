@@ -1,11 +1,13 @@
 import React from "react";
 import * as Yup from "yup";
-import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
-import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
+import { toast } from "react-toastify";
 import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
 import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
-import { toast } from "react-toastify";
 import api from "../../../../api";
+
+import { Dialog, DialogContent } from "@material-ui/core";
+import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 
 interface OwnProps {
   paperId: number;
@@ -46,7 +48,12 @@ const AddMarkerModal: React.FC<Props> = ({
 
   return (
     <Dialog open={visible} onBackdropClick={toggleVisibility} fullWidth>
-      <DialogTitle>Add new paper</DialogTitle>
+      <CustomDialogTitle
+        id="customized-dialog-title"
+        onClose={toggleVisibility}
+      >
+        Add new marker
+      </CustomDialogTitle>
       <DialogContent>
         <SimpleForm
           initialValues={values}

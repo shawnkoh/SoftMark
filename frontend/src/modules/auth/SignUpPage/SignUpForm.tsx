@@ -1,12 +1,14 @@
-import { Button, Grid, Link, TextField } from "@material-ui/core";
-import { Formik } from "formik";
 import React from "react";
+import { useHistory } from "react-router";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { Formik } from "formik";
 import * as Yup from "yup";
+
 import api from "../../../api";
 import { setUser } from "../actions";
-import { useHistory } from "react-router";
+
+import { Button, Grid, Link, TextField } from "@material-ui/core";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -65,6 +67,7 @@ const SignUpForm: React.FC = () => {
               direction="column"
               justify="center"
               alignItems="stretch"
+              spacing={2}
             >
               <Grid item>
                 <TextField
