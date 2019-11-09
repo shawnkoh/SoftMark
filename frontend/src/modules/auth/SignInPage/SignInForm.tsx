@@ -15,6 +15,7 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import api from "../../../api";
+import MailSentSvg from "../../../assets/undraw_Mail_sent_qwwx.svg";
 import { setUser } from "../actions";
 
 const validationSchema = yup.object().shape({
@@ -36,13 +37,14 @@ const SignInForm = () => {
   const dispatch = useDispatch();
   const [passwordless, setPasswordless] = useState(true);
   const [sentPasswordlessEmail, setSentPasswordlessEmail] = useState(false);
+  const [email, setEmail] = useState("");
 
   const passwordlessLogin = async (email: string) => {
     const status = await api.auth.passwordlessLogin(email);
     switch (status) {
       case 201:
         setSentPasswordlessEmail(true);
-        toast.success("Sent email");
+        setEmail(email);
         break;
       case 403:
         setPasswordless(false);
@@ -70,7 +72,30 @@ const SignInForm = () => {
   };
 
   if (sentPasswordlessEmail) {
-    return <Paper>Sent email</Paper>;
+    return (
+      <Paper>
+        <Grid container direction="column" alignItems="center">
+          <Grid item>
+            <Typography align="center" color="primary" variant="h4">
+              You've Got Mail!
+            </Typography>
+          </Grid>
+
+          <Grid item>
+            <img src={MailSentSvg} width={131.4} height={119.8} />
+          </Grid>
+
+          <Grid item>
+            <Typography align="center" variant="subtitle1">
+              We sent a login link to:
+            </Typography>
+            <Typography align="center" variant="h6">
+              {email}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Paper>
+    );
   }
 
   return (
