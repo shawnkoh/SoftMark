@@ -1,36 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Button, Grid, IconButton, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { DropAreaBase } from "material-ui-file-dropzone";
+
+import api from "../../../api";
 import { PaperData } from "backend/src/types/papers";
-import ThemedButton from "../../../components/buttons/ThemedButton";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
+
+import { Container, Box, Grid, Typography } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+import { RoundedButton } from "../../../components/buttons/StyledButtons";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import ArrowLeftSharp from "@material-ui/icons/ArrowLeftSharp";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
-import api from "../../../api"; 
 
-const useStyles = makeStyles(theme => ({
-  content: {
-    marginTop: 20,
-    marginLeft: 100,
-    marginRight: 100,
-    minWidth: 500,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3), // padding between content and top and side bars
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
-  },
-  divider: {
-    marginTop: 50
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      marginTop: theme.spacing(4),
+      marginBottom: theme.spacing(4)
+    },
+    grow: {
+      flexGrow: 1
+    }
+  })
+);
 
 const BULLET_POINT = `\u2022 `;
 
@@ -97,41 +92,86 @@ const SetupPage: React.FC<Props> = props => {
   }
 
   const createGridRow = ({ title, button }) => (
-    <Grid
-      item
-      container
-      direction="row"
-      justify="space-between"
-      alignItems="center"
-    >
-      <Grid item xs={6}>
-        <Typography variant="h6">{title}</Typography>
-      </Grid>
-      <Grid item xs={3} container direction="row" justify="flex-end">
+    <Grid item xs={12}>
+      <Box display="flex" alignItems="center" justifyContent="center">
+        <Typography variant="subtitle1" className={classes.grow}>
+          {title}
+        </Typography>
         {button}
-      </Grid>
+      </Box>
     </Grid>
   );
 
   const rowDetails = [
     {
-      title: "Script master copy",
+      title: "Upload master copy",
       button: (
         <UploadScriptTemplateWrapper
           clickable={!isLoadingScriptTemplate}
           paperId={paper.id}
           setScriptTemplate={setScriptTemplate}
         >
-          <Button>{scriptTemplate ? "Re-Upload" : "Upload"}</Button>
+          <RoundedButton color="primary" variant="contained">
+            {scriptTemplate ? "Re-Upload" : "Upload"}
+          </RoundedButton>
         </UploadScriptTemplateWrapper>
       )
     },
     {
       title:
-        "Template" +
-        (scriptTemplate ? "" : " (Upload script master copy first)"),
+        "Upload student scripts " +
+        (scriptTemplate
+          ? "(" + scripts.length + " scripts)"
+          : " (Upload master copy first)"),
       button: (
-        <Button
+        <UploadScriptsWrapper
+          paperId={paper.id}
+          refreshScripts={refreshScripts}
+        >
+          <RoundedButton color="primary" variant="contained">
+            Upload
+          </RoundedButton>
+        </UploadScriptsWrapper>
+      )
+    },
+    {
+      title: "Upload student list / nominal roll",
+      button: (
+        <UploadNominalRollWrapper
+          paperId={paper.id}
+          clickable={!isLoadingScriptTemplate}
+        >
+          <RoundedButton color="primary" variant="contained">
+            {false ? "Re-Upload" : "Upload"}
+          </RoundedButton>
+        </UploadNominalRollWrapper>
+      )
+    },
+    {
+      title:
+        "Map student scripts to student list / nominal roll" +
+        (scripts.length === 0 ? " (Upload student scripts first)" : ""),
+      button: (
+        <RoundedButton
+          color="primary"
+          variant="contained"
+          disabled={scripts.length === 0}
+          onClick={() =>
+            props.history.push(`/papers/${paper.id}/set_up/script_mapping`)
+          }
+        >
+          Map
+        </RoundedButton>
+      )
+    },
+    {
+      title:
+        "Set up marking template" +
+        (scriptTemplate ? "" : " (Upload master copy first)"),
+      button: (
+        <RoundedButton
+          color="primary"
+          variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() => {
             if (scriptTemplate) {
@@ -140,89 +180,35 @@ const SetupPage: React.FC<Props> = props => {
           }}
         >
           Set up
-        </Button>
+        </RoundedButton>
       )
     },
     {
       title:
-        "Question allocation" +
-        (scriptTemplate ? "" : " (Upload script master copy first)"),
+        "Allocate questions to markers" +
+        (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
-        <Button
+        <RoundedButton
+          color="primary"
+          variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() =>
             props.history.push(`/papers/${paper.id}/set_up/question_allocation`)
           }
         >
           Allocate
-        </Button>
-      )
-    },
-    {
-      title: "Student list",
-      button: (
-        <UploadNominalRollWrapper
-          paperId={paper.id}
-          clickable={!isLoadingScriptTemplate}
-        >
-          <Button>{false ? "Re-Upload" : "Upload"}</Button>
-        </UploadNominalRollWrapper>
-      )
-    },
-    {
-      title:
-        "Scripts " +
-        (scriptTemplate
-          ? "(" + scripts.length + " scripts)"
-          : " (Upload script master copy first)"),
-      button: (
-        <UploadScriptsWrapper
-          paperId={paper.id}
-          refreshScripts={refreshScripts}
-        >
-          <Button fullWidth>Upload</Button>
-        </UploadScriptsWrapper>
-      )
-    },
-    {
-      title:
-        "Mapping of scripts to nominal roll" +
-        (scripts.length === 0 ? " (Upload scripts)" : ""),
-      button: (
-        <Button
-          disabled={scripts.length === 0}
-          onClick={() =>
-            props.history.push(`/papers/${paper.id}/set_up/script_mapping`)
-          }
-        >
-          View
-        </Button>
+        </RoundedButton>
       )
     }
   ];
 
   return (
     <>
-      <main className={classes.content}>
-        <Grid
-          container
-          direction="column"
-          justify="flex-start"
-          alignItems="center"
-          spacing={2}
-        >
-          <div className={classes.divider} />
-          <Grid
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="center"
-            spacing={4}
-          >
-            {rowDetails.map(row => createGridRow(row))}
-          </Grid>
+      <Container fixed>
+        <Grid container spacing={4} className={classes.container}>
+          {rowDetails.map(row => createGridRow(row))}
         </Grid>
-      </main>
+      </Container>
     </>
   );
 };
