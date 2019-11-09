@@ -283,3 +283,13 @@ export async function undiscard(request: Request, response: Response) {
   const data = await questionTemplate.getData();
   response.status(200).json({ questionTemplate: data });
 }
+
+export async function getActiveQuestionTemplates(paperId: number) {
+  const scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail({
+    where: { paperId, discardedAt: IsNull() },
+    relations: ["questionTemplates"]
+  });
+  return await getRepository(QuestionTemplate).find({
+    where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
+  });
+}
