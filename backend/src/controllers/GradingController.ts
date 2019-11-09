@@ -18,7 +18,7 @@ import { allowedRequester } from "../utils/papers";
 
 export async function markQuestion(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const questionTemplateId = Number(request.params.id);
   const questionTemplate = await getRepository(QuestionTemplate).findOne(
     questionTemplateId,
