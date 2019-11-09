@@ -1,19 +1,20 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
 import {
-  isBearerToken,
   BearerTokenType,
   isAccessTokenSignedPayload,
+  isBearerToken,
+  isPasswordlessTokenSignedPayload,
   isRefreshTokenSignedPayload,
-  isEntityTokenSignedPayload,
-  isResetPasswordTokenSignedPayload
+  isResetPasswordTokenSignedPayload,
+  isVerifyEmailTokenSignedPayload
 } from "../types/tokens";
 
-export const checkBearerToken = (
-  type: BearerTokenType,
-  entityName?: string
-) => (req: Request, res: Response, next: NextFunction) => {
+export const checkBearerToken = (type: BearerTokenType) => (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const bearerToken = req.headers.authorization;
   if (!bearerToken || !isBearerToken(bearerToken)) {
     res.sendStatus(401);
@@ -38,6 +39,13 @@ export const checkBearerToken = (
       }
       break;
 
+    case BearerTokenType.PasswordlessToken:
+      if (!isPasswordlessTokenSignedPayload(payload)) {
+        res.sendStatus(401);
+        return;
+      }
+      break;
+
     case BearerTokenType.RefreshToken:
       if (!isRefreshTokenSignedPayload(payload)) {
         res.sendStatus(401);
@@ -45,19 +53,15 @@ export const checkBearerToken = (
       }
       break;
 
-    case BearerTokenType.EntityToken:
-      if (
-        !isEntityTokenSignedPayload(payload) ||
-        !entityName ||
-        payload.entityName !== entityName
-      ) {
+    case BearerTokenType.ResetPasswordToken:
+      if (!isResetPasswordTokenSignedPayload(payload)) {
         res.sendStatus(401);
         return;
       }
       break;
 
-    case BearerTokenType.ResetPasswordToken:
-      if (!isResetPasswordTokenSignedPayload(payload)) {
+    case BearerTokenType.VerifyEmailToken:
+      if (!isVerifyEmailTokenSignedPayload(payload)) {
         res.sendStatus(401);
         return;
       }

@@ -1,22 +1,22 @@
 import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, getManager, Not } from "typeorm";
 import { pick } from "lodash";
-
-import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { getManager, getRepository, IsNull, Not } from "typeorm";
 import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
+import { PageTemplate } from "../entities/PageTemplate";
+import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
 import {
-  PageQuestionTemplatePostData,
-  isPageQuestionTemplatePatchData
+  isPageQuestionTemplatePatchData,
+  PageQuestionTemplatePostData
 } from "../types/pageQuestionTemplates";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequesterOrFail } from "../utils/papers";
-import { PageTemplate } from "../entities/PageTemplate";
-import { QuestionTemplate } from "../entities/QuestionTemplate";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
   const scriptTemplateId = Number(request.params.id);
   const postData: PageQuestionTemplatePostData = pick(
     request.body,
@@ -33,7 +33,7 @@ export async function create(request: Request, response: Response) {
       }
     );
     await allowedRequesterOrFail(
-      payload.id,
+      requesterId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );
@@ -81,6 +81,7 @@ export async function create(request: Request, response: Response) {
 
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
   const pageQuestionTemplateId = Number(request.params.id);
   const patchData = pick(request.body, "pageTemplateId", "questionTemplateId");
   let pageQuestionTemplate: PageQuestionTemplate;
@@ -95,7 +96,7 @@ export async function update(request: Request, response: Response) {
     scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
     await allowedRequesterOrFail(
-      payload.id,
+      requesterId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );
@@ -132,6 +133,7 @@ export async function update(request: Request, response: Response) {
 
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
   const pageQuestionTemplateId = Number(request.params.id);
   try {
     const pageQuestionTemplate = await getRepository(
@@ -143,7 +145,7 @@ export async function discard(request: Request, response: Response) {
     const scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
     await allowedRequesterOrFail(
-      payload.id,
+      requesterId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );
@@ -164,6 +166,7 @@ export async function discard(request: Request, response: Response) {
 
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
   const pageQuestionTemplateId = Number(request.params.id);
   let pageQuestionTemplate: PageQuestionTemplate;
   try {
@@ -176,7 +179,7 @@ export async function undiscard(request: Request, response: Response) {
     const scriptTemplate = pageQuestionTemplate.pageTemplate!.scriptTemplate!;
 
     await allowedRequesterOrFail(
-      payload.id,
+      requesterId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );

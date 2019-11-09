@@ -14,7 +14,7 @@ export async function canModifyMark(
   next: NextFunction
 ) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const markId = request.params.id;
   const mark = await getRepository(Mark).findOne(markId, {
     where: { discardedAt: IsNull() },

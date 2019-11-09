@@ -1,11 +1,11 @@
 import { compareSync } from "bcryptjs";
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
 import { verify } from "jsonwebtoken";
+import { getRepository } from "typeorm";
 import { User } from "../entities/User";
 import {
-  isRefreshTokenSignedPayload,
-  isAuthorizationTokenPayload
+  isPasswordlessTokenPayload,
+  isRefreshTokenSignedPayload
 } from "../types/tokens";
 import { sendPasswordlessLoginEmail } from "../utils/sendgrid";
 
@@ -76,17 +76,16 @@ export async function token(request: Request, response: Response) {
     const payload = verify(token, process.env.JWT_SECRET!);
 
     if (
-      !isAuthorizationTokenPayload(payload) &&
+      !isPasswordlessTokenPayload(payload) &&
       !isRefreshTokenSignedPayload(payload)
     ) {
       throw new Error("No valid input");
     }
-
-    const user = await getRepository(User).findOneOrFail(payload.id);
+    const { userId } = payload;
+    const user = await getRepository(User).findOneOrFail(userId);
     const data = user.createAuthenticationTokens();
     response.status(200).json(data);
   } catch (error) {
-    console.error(error);
     response.sendStatus(400);
   }
 }
