@@ -170,6 +170,7 @@ export async function markQuestion(request: Request, response: Response) {
     .getRawMany();
 
   const pages: PageGradingData[] = _.chain(pagesData)
+    .uniqBy("id")
     .groupBy("id")
     .map((array, id) => {
       const questionIds = Array.from(
