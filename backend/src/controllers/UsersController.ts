@@ -1,5 +1,5 @@
-import { hashSync, compareSync } from "bcryptjs";
-import { validateOrReject, validate } from "class-validator";
+import { compareSync, hashSync } from "bcryptjs";
+import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
@@ -10,36 +10,32 @@ import {
   VerifyEmailTokenSignedPayload
 } from "../types/tokens";
 import {
-  sendVerificationEmail,
-  sendResetPasswordEmail
+  sendResetPasswordEmail,
+  sendVerificationEmail
 } from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
-  try {
-    const { email, password, name } = pick(
-      request.body,
-      "email",
-      "password",
-      "name"
-    );
-    const user = new User(email, password, name);
-    await validateOrReject(user);
-
-    if (user.password) {
-      user.password = hashSync(user.password!);
-    }
-    await getRepository(User).save(user);
-
-    sendVerificationEmail(user);
-
-    const data = {
-      user: user.getData(),
-      ...user.createAuthenticationTokens()
-    };
-    response.status(201).json({ user: data });
-  } catch (error) {
+  const { email, password, name } = pick(
+    request.body,
+    "email",
+    "password",
+    "name"
+  );
+  const user = new User(email, password, name);
+  const errors = await validate(user);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(User).save(user);
+
+  sendVerificationEmail(user);
+
+  const data = {
+    user: user.getData(),
+    ...user.createAuthenticationTokens()
+  };
+  response.status(201).json({ user: data });
 }
 
 export async function showSelf(request: Request, response: Response) {
