@@ -1,24 +1,23 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import {
   Column,
   Entity,
+  getRepository,
   ManyToOne,
   OneToMany,
-  Unique,
-  getRepository
+  Unique
 } from "typeorm";
-
+import { PageTemplateListData } from "../types/pageTemplates";
+import {
+  QuestionTemplateData,
+  QuestionTemplateListData
+} from "../types/questionTemplates";
 import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
-import { Question } from "./Question";
-import { ScriptTemplate } from "./ScriptTemplate";
 import { PageQuestionTemplate } from "./PageQuestionTemplate";
 import { PageTemplate } from "./PageTemplate";
-import {
-  QuestionTemplateListData,
-  QuestionTemplateData
-} from "../types/questionTemplates";
-import { PageTemplateListData } from "../types/pageTemplates";
+import { Question } from "./Question";
+import { ScriptTemplate } from "./ScriptTemplate";
 
 @Entity()
 @Unique(["scriptTemplate", "name"])
@@ -78,7 +77,8 @@ export class QuestionTemplate extends Discardable {
 
   @OneToMany(
     type => PageQuestionTemplate,
-    pageQuestionTemplate => pageQuestionTemplate.questionTemplate
+    pageQuestionTemplate => pageQuestionTemplate.questionTemplate,
+    { cascade: true }
   )
   pageQuestionTemplates?: PageQuestionTemplate[];
 
@@ -161,3 +161,5 @@ export class QuestionTemplate extends Discardable {
     };
   };
 }
+
+export default QuestionTemplate;
