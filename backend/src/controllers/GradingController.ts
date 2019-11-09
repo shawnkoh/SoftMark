@@ -165,44 +165,60 @@ export async function markQuestion(request: Request, response: Response) {
     .addSelect("annotation.layer", "layer")
     .getRawMany();
 
-  let pages: PageGradingData[];
-
-  const result = _.chain(pagesData)
+  const pages: PageGradingData[] = _.chain(pagesData)
     .groupBy("id")
     .map((array, id) => {
-      console.log(array, id);
+      const questionIds = Array.from(
+        new Set(array.map(element => element["questionId"]))
+      );
+      const annotations = array
+        .filter(
+          element =>
+            "annotationId" in element &&
+            "layer" in element &&
+            element["annotationId"] !== null &&
+            element["annotationId"] !== undefined &&
+            element["layer"] !== null &&
+            element["layer"] !== undefined
+        )
+        .map(element => ({
+          id: element["annotationId"],
+          layer: element["layer"]
+        }));
       return {
         id,
-        annotationIds: Array.from(
-          new Set(array.map(element => element["annotationId"]))
-        )
+        pageNo: array[0].pageNo,
+        imageUrl: array[0].imageUrl,
+        questionIds,
+        annotations
       };
-    });
+    })
+    .value();
 
   // for debugging - remove this
-  response.status(200).json(result);
+  //response.status(200).json(result);
 
   // collate raw pages data
-  // pages = _.uniqBy(pagesData, "id");
-  // const pagesById = _.groupBy(pagesData, pageData => {
-  //   return pageData.id;
-  // });
-  // const annotationsByPageId = _.mapValues(pagesById, page => {
-  //   return page.map(field => {
-  //     const annotation = _.pick(field, "annotationId", "layer");
-  //     return { id: annotation.annotationId, layer: annotation.layer };
-  //     return annotation;
-  //   });
-  // });
-  // _.reduce(pagesData, (prev, curr, index, list) => {
-  // }, [])
+  /*
+  pages = _.uniqBy(pagesData, "id");
+  const pagesById = _.groupBy(pagesData, pageData => {
+    return pageData.id;
+  });
+  const annotationsByPageId = _.mapValues(pagesById, page => {
+     return page.map(field => {
+       const annotation = _.pick(field, "annotationId", "layer");
+       return { id: annotation.annotationId, layer: annotation.layer };
+       return annotation;
+     });
+   });
+   */
 
   // uncomment this when you finished transforming pages
-  // const data: GradingData = {
-  //   matriculationNumber,
-  //   parentQuestion,
-  //   childQuestions,
-  //   pages
-  // };
-  // response.status(200).json(data);
+  const data: GradingData = {
+    matriculationNumber,
+    parentQuestion,
+    childQuestions,
+    pages
+  };
+  response.status(200).json(data);
 }
