@@ -1,13 +1,8 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
 import { Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-
+import React from "react";
 import softmarkLogo from "../../../assets/softmark-logo.svg";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-
-type Props = RouteComponentProps;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const ForgotPasswordPage: React.FC<Props> = props => {
+const ForgotPasswordPage: React.FC = () => {
   const classes = useStyles();
 
   return (
@@ -47,4 +42,4 @@ const ForgotPasswordPage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(ForgotPasswordPage);
+export default ForgotPasswordPage;
