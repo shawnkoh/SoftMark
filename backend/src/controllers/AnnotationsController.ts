@@ -2,17 +2,16 @@ import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
-
 import { Annotation } from "../entities/Annotation";
 import { Page } from "../entities/Page";
-import { AccessTokenSignedPayload } from "../types/tokens";
+import { AnnotationPatchData, AnnotationPostData } from "../types/annotations";
 import { PaperUserRole } from "../types/paperUsers";
-import { AnnotationPostData, AnnotationPatchData } from "../types/annotations";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const pageId = request.params.id;
   const postData: AnnotationPostData = pick(request.body, "layer");
   const page = await getRepository(Page).findOne(pageId, {
@@ -53,7 +52,7 @@ export async function create(request: Request, response: Response) {
 
 export async function showSelf(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const pageId = request.params.id;
   const page = await getRepository(Page).findOne(pageId, {
     where: { discardedAt: IsNull() },
@@ -85,7 +84,7 @@ export async function showSelf(request: Request, response: Response) {
 
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const annotationId = Number(request.params.id);
   const patchData: AnnotationPatchData = pick(request.body, "layer");
   const annotation = await getRepository(Annotation).findOne(annotationId, {
@@ -116,7 +115,7 @@ export async function update(request: Request, response: Response) {
 // hard delete
 export async function destroy(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const annotationId = Number(request.params.id);
   const annotation = await getRepository(Annotation).findOne(annotationId, {
     relations: ["paperUser"]

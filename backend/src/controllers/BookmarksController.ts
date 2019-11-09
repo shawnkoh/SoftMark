@@ -1,11 +1,4 @@
-import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, Not } from "typeorm";
-import { Bookmark } from "../entities/Bookmark";
-import { PaperUser } from "../entities/PaperUser";
-import { Question } from "../entities/Question";
-import { AccessTokenSignedPayload } from "../types/tokens";
-import { BookmarkPostData } from "../types/bookmarks";
 
 export async function create(request: Request, response: Response) {
   try {

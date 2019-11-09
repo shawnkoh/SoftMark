@@ -1,28 +1,31 @@
-import jwt from "jsonwebtoken";
-import sendgrid from "@sendgrid/mail";
 import { MailData } from "@sendgrid/helpers/classes/mail";
-
+import sendgrid from "@sendgrid/mail";
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
-import { ResetPasswordTokenPayload, BearerTokenType } from "../types/tokens";
 
 const APP_NAME = "SoftMark";
-const APP_URL = "https://softmark.io";
+const APP_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://softmark.io"
+    : "localhost:3000";
+
 const LOGIN_URL = `${APP_URL}/login`;
 const PASSWORD_RESET_URL = `${APP_URL}/reset_password`;
-const AUTH_PASSWORD_RESET_URL = `${APP_URL}/auth/reset_password`;
+
 const AUTH_PASSWORDLESS_URL = `${APP_URL}/auth/passwordless`;
-const VERIFY_EMAIL_URL = `${APP_URL}/auth/verify_email`;
+
+const USERS_PASSWORD_RESET_URL = `${APP_URL}/users/reset_password`;
+const VERIFY_EMAIL_URL = `${APP_URL}/users/verify_email`;
 
 function send(user: User, subject: string, message: string) {
-  if (process.env.NODE_ENV !== "production") {
+  if (!process.env.SENDGRID_API_KEY) {
     return;
   }
 
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
     to: user.email,
-    from: "mail@softmark.io",
+    from: "no-reply@softmark.io",
     subject,
     text: message,
     html: message
@@ -31,21 +34,18 @@ function send(user: User, subject: string, message: string) {
 }
 
 export function sendVerificationEmail(user: User) {
-  const payload = user.createPayload();
-  const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: "7 days"
-  });
+  const token = user.createVerifyEmailToken();
 
   const message =
     "<p>Welcome aboard!</p>" +
-    "<p>We're excited that you're joining us! Because we're here to help you make marking exams great again, we want to get you up to speed quickly so that you can make the most of everything at ${APP_NAME}</P>" +
+    `<p>We're excited that you're joining us! Because we're here to help you make marking exams great again, we want to get you up to speed quickly so that you can make the most of everything at ${APP_NAME}</P>` +
     `<p>To get started, please <a href='${VERIFY_EMAIL_URL}/${token}'>verify your email now!</a></p>`;
 
   send(user, `Welcome to ${APP_NAME}!`, message);
 }
 
 export function sendPasswordlessLoginEmail(user: User) {
-  const token = user.createAuthorizationToken();
+  const token = user.createPasswordlessToken();
 
   const message = `<p>You may login by visiting <a href='${AUTH_PASSWORDLESS_URL}/${token}'>this link</a></p>`;
 
@@ -57,7 +57,7 @@ export function sendNewPaperUserEmail(paperUser: PaperUser) {
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = user.createAuthorizationToken();
+  const token = user.createNewPaperUserToken();
 
   const message =
     `<p>You have been invited as a ${paperUser.role} to ${paper.name}</p>` +
@@ -68,17 +68,11 @@ export function sendNewPaperUserEmail(paperUser: PaperUser) {
 }
 
 export function sendResetPasswordEmail(user: User) {
-  const payload: ResetPasswordTokenPayload = {
-    type: BearerTokenType.ResetPasswordToken,
-    ...user.getCredentials()
-  };
-  const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: "3 hours"
-  });
+  const token = user.createResetPasswordToken();
 
   const message =
     `<p>We heard that you lost your ${APP_NAME} password. Sorry about that!</p>` +
-    `<p>But don’t worry! You can <a href='${AUTH_PASSWORD_RESET_URL}/${token}'>click here to reset your password</a></p>` +
+    `<p>But don’t worry! You can <a href='${USERS_PASSWORD_RESET_URL}/${token}'>click here to reset your password</a></p>` +
     "<br />" +
     `<p>If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit ${PASSWORD_RESET_URL}</p>` +
     "<br />" +
@@ -93,7 +87,7 @@ export function sendScriptEmail(paperUser: PaperUser) {
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = user.createAuthorizationToken();
+  const token = user.createNewPaperUserToken();
 
   const message =
     `<p>Dear ${user.name || "User"}</p>` +

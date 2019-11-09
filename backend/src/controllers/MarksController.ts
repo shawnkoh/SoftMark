@@ -2,18 +2,17 @@ import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
-
 import { Mark } from "../entities/Mark";
 import { Question } from "../entities/Question";
 import { isAllocated } from "../middlewares/canModifyMark";
-import { MarkPostData, MarkPatchData } from "../types/marks";
+import { MarkPatchData, MarkPostData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterId = payload.userId;
   const questionId = request.params.id;
   const postData: MarkPostData = pick(request.body, "score");
   const question = await getRepository(Question).findOne(questionId, {
@@ -27,7 +26,7 @@ export async function create(request: Request, response: Response) {
   const paperId = question.script!.paperId;
   const questionTemplate = question.questionTemplate!;
   const allowed = await allowedRequester(
-    requesterUserId,
+    requesterId,
     paperId,
     PaperUserRole.Marker
   );

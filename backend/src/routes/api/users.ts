@@ -12,6 +12,11 @@ router.post(
   [checkBearerToken(BearerTokenType.ResetPasswordToken)],
   UsersController.resetPassword
 );
+router.post(
+  "/verify_email",
+  [checkBearerToken(BearerTokenType.VerifyEmailToken)],
+  UsersController.verifyEmail
+);
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.get("/self", UsersController.showSelf);

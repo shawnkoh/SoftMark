@@ -8,6 +8,7 @@ import api from "../../api";
 import { getRefreshToken } from "../../localStorage";
 import { setUser } from "../auth/actions";
 import ForgotPasswordPage from "../auth/ForgotPasswordPage";
+import PasswordlessPage from "../auth/PasswordlessPage";
 import ResetPasswordPage from "../auth/ResetPasswordPage";
 import { getUser } from "../auth/selectors";
 import SignInPage from "../auth/SignInPage";
@@ -52,17 +53,24 @@ const UnauthenticatedApp: React.FC = () => {
         <Route exact path="/" component={SignInPage} />
         <Route exact path="/login" component={SignInPage} />
         <Route exact path="/signup" component={SignUpPage} />
-        <Route exact path="/password_reset" component={ForgotPasswordPage} />
+        <Route exact path="/reset_password" component={ForgotPasswordPage} />
+
         <Route
           exact
-          path="/auth/password_reset/:token"
+          path="/auth/passwordless/:token"
+          component={PasswordlessPage}
+        />
+        <Route
+          exact
+          path="/users/reset_password/:token"
           component={ResetPasswordPage}
         />
         <Route
           exact
-          path="/auth/email_verification/:token"
+          path="/users/verify_email/:token"
           component={VerifyAccountPage}
         />
+
         <Route component={NotFoundPage} />
       </Switch>
     </ThemeProvider>

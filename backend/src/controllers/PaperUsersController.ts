@@ -1,15 +1,13 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository, IsNull, Not, getManager } from "typeorm";
-
+import { getManager, getRepository, IsNull, Not } from "typeorm";
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
-import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
-import { sendNewPaperUserEmail } from "../utils/sendgrid";
 import { sortByMatricNo } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
@@ -17,7 +15,7 @@ export async function create(request: Request, response: Response) {
     const payload = response.locals.payload as AccessTokenSignedPayload;
     const paperId = request.params.id;
     const allowed = await allowedRequester(
-      payload.id,
+      payload.userId,
       paperId,
       PaperUserRole.Owner
     );
@@ -78,7 +76,7 @@ export async function getStudents(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     paperId,
     PaperUserRole.Owner
   );
@@ -106,7 +104,7 @@ export async function getUnmatchedStudents(
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     paperId,
     PaperUserRole.Owner
   );
@@ -145,7 +143,7 @@ export async function getUnmatchedStudents(
 
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const paperUserId = request.params.id;
   const paperUser = await getRepository(PaperUser).findOne(paperUserId, {
     where: { discardedAt: IsNull() }
@@ -181,7 +179,7 @@ export async function update(request: Request, response: Response) {
 
 export async function updateStudent(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const studentId = request.params.id;
   const student = await getRepository(PaperUser).findOne(studentId, {
     where: { role: PaperUserRole.Student, discardedAt: IsNull() }
@@ -230,7 +228,7 @@ export async function updateStudent(request: Request, response: Response) {
 export async function discard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
+    const userId = payload.userId;
     const paperUserId = Number(request.params.id);
     const paperUser = await getRepository(PaperUser).findOne(paperUserId, {
       where: { discardedAt: IsNull() }
@@ -262,7 +260,7 @@ export async function discard(request: Request, response: Response) {
 export async function undiscard(request: Request, response: Response) {
   try {
     const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.id;
+    const userId = payload.userId;
     const paperUserId = Number(request.params.id);
     const paperUser = await getRepository(PaperUser).findOne(paperUserId);
     if (!paperUser) {

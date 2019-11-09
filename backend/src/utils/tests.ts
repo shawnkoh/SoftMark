@@ -1,15 +1,13 @@
 import faker from "faker";
-faker.seed(127);
-import supertest from "supertest";
 import { getRepository } from "typeorm";
-
-import { User } from "../entities/User";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
+import { User } from "../entities/User";
 import ApiServer from "../server";
 import { PaperUserRole } from "../types/paperUsers";
 import { ScriptPostData } from "../types/scripts";
 import { ScriptTemplatePostData } from "../types/scriptTemplates";
+faker.seed(127);
 
 export async function synchronize(apiServer: ApiServer) {
   if (!apiServer.connection) {
@@ -112,42 +110,4 @@ export async function loadFixtures(apiServer: ApiServer): Promise<Fixtures> {
   await getRepository(PaperUser).save(paperUsers);
 
   return new Fixtures(paper, owner, marker, student);
-}
-
-export async function getToken(
-  server: ApiServer,
-  email: string,
-  password: string
-): Promise<{ accessToken: string; refreshToken: string }> {
-  const encoded = Buffer.from(`${email}:${password}`).toString("base64");
-  const response = await supertest(server.server)
-    .post("/v1/auth/token")
-    .set("Authorization", `Basic ${encoded}`)
-    .send();
-  return response.body;
-}
-
-export async function getAuthorizationToken(
-  server: ApiServer,
-  email: string
-): Promise<string> {
-  const response = await supertest(server.server)
-    .post("/v1/auth/passwordless")
-    .send({ email });
-  if (response.status !== 201) {
-    throw new Error("Mock getAuthorizationToken failed");
-  }
-  const user = await getRepository(User).findOneOrFail({ email });
-  return user.createAuthorizationToken();
-}
-
-export async function getPasswordlessToken(
-  server: ApiServer,
-  authorizationToken: string
-): Promise<{ accessToken: string; refreshToken: string }> {
-  const response = await supertest(server.server)
-    .post("/v1/auth/token")
-    .set("Authorization", `Bearer ${authorizationToken}`)
-    .send();
-  return response.body;
 }

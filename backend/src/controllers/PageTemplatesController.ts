@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getRepository, IsNull } from "typeorm";
-
 import { PageTemplate } from "../entities/PageTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -8,7 +7,7 @@ import { allowedRequesterOrFail } from "../utils/papers";
 
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const pageTemplateId = request.params.id;
   let pageTemplate: PageTemplate;
   try {

@@ -1,8 +1,7 @@
-import { validateOrReject, validate } from "class-validator";
+import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository, IsNull, getManager } from "typeorm";
 import { pick } from "lodash";
-
+import { getManager, getRepository, IsNull } from "typeorm";
 import { PageTemplate } from "../entities/PageTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
@@ -12,7 +11,7 @@ import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const paperId = Number(request.params.id);
   const { imageUrls, sha256 } = pick(
     request.body,
@@ -105,7 +104,7 @@ export async function showActive(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     paperId,
     PaperUserRole.Student
   );
@@ -137,7 +136,7 @@ export async function discard(request: Request, response: Response) {
       scriptTemplateId
     );
     await allowedRequesterOrFail(
-      payload.id,
+      payload.userId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );
@@ -166,7 +165,7 @@ export async function undiscard(request: Request, response: Response) {
       scriptTemplateId
     );
     await allowedRequesterOrFail(
-      payload.id,
+      payload.userId,
       scriptTemplate.paperId,
       PaperUserRole.Owner
     );

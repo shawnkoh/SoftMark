@@ -1,49 +1,47 @@
-import { hashSync, compareSync } from "bcryptjs";
-import { validateOrReject, validate } from "class-validator";
+import { compareSync, hashSync } from "bcryptjs";
+import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
 import { User } from "../entities/User";
 import {
   AccessTokenSignedPayload,
-  ResetPasswordTokenSignedPayload
+  ResetPasswordTokenSignedPayload,
+  VerifyEmailTokenSignedPayload
 } from "../types/tokens";
 import {
-  sendVerificationEmail,
-  sendResetPasswordEmail
+  sendResetPasswordEmail,
+  sendVerificationEmail
 } from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
-  try {
-    const { email, password, name } = pick(
-      request.body,
-      "email",
-      "password",
-      "name"
-    );
-    const user = new User(email, password, name);
-    await validateOrReject(user);
-
-    if (user.password) {
-      user.password = hashSync(user.password!);
-    }
-    await getRepository(User).save(user);
-
-    sendVerificationEmail(user);
-
-    const data = {
-      user: user.getData(),
-      ...user.createAuthenticationTokens()
-    };
-    response.status(201).json({ user: data });
-  } catch (error) {
+  const { email, password, name } = pick(
+    request.body,
+    "email",
+    "password",
+    "name"
+  );
+  const user = new User(email, password, name);
+  const errors = await validate(user);
+  if (errors.length > 0) {
     response.sendStatus(400);
+    return;
   }
+  await getRepository(User).save(user);
+
+  sendVerificationEmail(user);
+
+  const data = {
+    user: user.getData(),
+    ...user.createAuthenticationTokens()
+  };
+  response.status(201).json({ user: data });
 }
 
 export async function showSelf(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = Number(payload.id);
+  const { userId } = payload;
+
   let user: User;
   try {
     user = await getRepository(User).findOneOrFail(userId, {
@@ -64,7 +62,7 @@ export async function showSelf(request: Request, response: Response) {
 
 export async function updateSelf(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = Number(payload.id);
+  const { userId } = payload;
   let user: User;
   try {
     user = await getRepository(User).findOneOrFail(userId, {
@@ -87,9 +85,8 @@ export async function updateSelf(request: Request, response: Response) {
 }
 
 export async function changePassword(request: Request, response: Response) {
-  const accessTokenSignedPayload = response.locals
-    .payload as AccessTokenSignedPayload;
-  const id = accessTokenSignedPayload.id;
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
 
   const oldPasswordB64 = request.body.oldPassword;
   const newPasswordB64 = request.body.newPassword;
@@ -109,7 +106,7 @@ export async function changePassword(request: Request, response: Response) {
   const user = await repo
     .createQueryBuilder("user")
     .addSelect("user.password")
-    .where("user.id = :id", { id })
+    .where("user.id = :userId", { userId })
     .getOne();
 
   if (!user || !user.password || !compareSync(oldPassword, user.password)) {
@@ -120,7 +117,7 @@ export async function changePassword(request: Request, response: Response) {
   try {
     user.password = newPassword;
     await validateOrReject(user);
-    await repo.update(id, { password: hashSync(newPassword) });
+    await repo.update(userId, { password: hashSync(newPassword) });
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(400);
@@ -150,9 +147,10 @@ export async function requestResetPassword(
 
 export async function resetPassword(request: Request, response: Response) {
   const payload = response.locals.payload as ResetPasswordTokenSignedPayload;
+  const { userId } = payload;
   const password = request.body.password;
 
-  const user = await getRepository(User).findOne(payload.id);
+  const user = await getRepository(User).findOne(userId);
   if (!user) {
     response.sendStatus(404);
     return;
@@ -164,6 +162,27 @@ export async function resetPassword(request: Request, response: Response) {
     return;
   }
   user.password = hashSync(password);
+
+  await getRepository(User).save(user);
+  response.sendStatus(204);
+}
+
+export async function verifyEmail(request: Request, response: Response) {
+  const payload = response.locals.payload as VerifyEmailTokenSignedPayload;
+  const { userId } = payload;
+
+  const user = await getRepository(User).findOne(userId);
+  if (!user) {
+    response.sendStatus(404);
+    return;
+  }
+
+  user.emailVerified = true;
+  const errors = await validate(user);
+  if (errors.length > 0) {
+    response.sendStatus(400);
+    return;
+  }
 
   await getRepository(User).save(user);
   response.sendStatus(204);

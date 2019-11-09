@@ -1,23 +1,21 @@
+import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { validateOrReject, validate } from "class-validator";
 import { pick } from "lodash";
-import { getRepository, IsNull, Not, getManager } from "typeorm";
-
+import { getManager, getRepository, IsNull, Not } from "typeorm";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
-import { Script } from "../entities/Script";
-import { PaperUserRole } from "../types/paperUsers";
-import { AccessTokenSignedPayload } from "../types/tokens";
-import { ScriptListData } from "../types/scripts";
-import { allowedRequester } from "../utils/papers";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { Question } from "../entities/Question";
+import { Script } from "../entities/Script";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { PaperUserRole } from "../types/paperUsers";
+import { ScriptListData } from "../types/scripts";
+import { AccessTokenSignedPayload } from "../types/tokens";
+import { allowedRequester } from "../utils/papers";
 import { sortByFilename } from "../utils/sorts";
-import { string } from "prop-types";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const paperId = Number(request.params.id);
   const { filename, sha256, imageUrls } = pick(
     request.body,
@@ -108,7 +106,7 @@ export async function create(request: Request, response: Response) {
 
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const scriptId = Number(request.params.id);
   const script = await getRepository(Script).findOneOrFail(scriptId);
 
@@ -158,7 +156,7 @@ export async function update(request: Request, response: Response) {
 
 export async function match(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const userId = payload.userId;
   const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
     userId,
@@ -233,7 +231,7 @@ export async function match(request: Request, response: Response) {
 
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const userId = payload.userId;
   const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
     userId,
@@ -260,7 +258,7 @@ export async function index(request: Request, response: Response) {
 
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const userId = payload.userId;
   const scriptId = request.params.id;
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() },
@@ -303,7 +301,7 @@ export async function show(request: Request, response: Response) {
 
 export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const userId = payload.userId;
   const scriptId = request.params.id;
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() }
@@ -332,7 +330,7 @@ export async function discard(request: Request, response: Response) {
 
 export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const userId = payload.userId;
   const scriptId = request.params.id;
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: Not(IsNull()) }

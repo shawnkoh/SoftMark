@@ -2,18 +2,17 @@ import { validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getRepository, IsNull } from "typeorm";
-
 import { Allocation } from "../entities/Allocation";
 import { PaperUser } from "../entities/PaperUser";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
-import { AccessTokenSignedPayload } from "../types/tokens";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
-import { allowedRequesterOrFail, allowedRequester } from "../utils/papers";
+import { AccessTokenSignedPayload } from "../types/tokens";
+import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const { userId } = payload;
   const questionTemplateId = Number(request.params.id);
   const postData: AllocationPostData = pick(request.body, "paperUserId");
   try {
@@ -56,7 +55,7 @@ export async function create(request: Request, response: Response) {
 
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.id;
+  const requesterId = payload.userId;
   const paperId = request.params.id;
   const allowed = await allowedRequester(
     requesterId,
@@ -80,7 +79,7 @@ export async function index(request: Request, response: Response) {
 // hard delete
 export async function destroy(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.id;
+  const { userId } = payload;
   const allocationId = Number(request.params.id);
   try {
     const allocation = await getRepository(Allocation).findOneOrFail(

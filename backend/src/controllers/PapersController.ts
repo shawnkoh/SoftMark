@@ -10,7 +10,7 @@ import { allowedRequester } from "../utils/papers";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterUserId = payload.id;
+  const requesterUserId = payload.userId;
   const paper = new Paper(request.body.name);
   const paperErrors = await validate(paper);
   if (paperErrors.length > 0) {
@@ -36,7 +36,7 @@ export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperUsers = await getRepository(PaperUser).find({
     relations: ["paper"],
-    where: { userId: payload.id }
+    where: { userId: payload.userId }
   });
 
   const data = paperUsers.map(paperUser =>
@@ -48,7 +48,7 @@ export async function index(request: Request, response: Response) {
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     request.params.id,
     PaperUserRole.Student
   );
@@ -76,7 +76,7 @@ export async function show(request: Request, response: Response) {
 export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     Number(request.params.id),
     PaperUserRole.Owner
   );
@@ -102,7 +102,7 @@ export async function discard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     paperId,
     PaperUserRole.Owner
   );
@@ -121,7 +121,7 @@ export async function undiscard(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = request.params.id;
   const allowed = await allowedRequester(
-    payload.id,
+    payload.userId,
     Number(request.params.id),
     PaperUserRole.Owner
   );
