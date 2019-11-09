@@ -35,7 +35,7 @@ interface OwnProps {
 
 type Props = OwnProps & RouteComponentProps;
 
-const SetupPage: React.FC<Props> = props => {
+const SetupSubpage: React.FC<Props> = props => {
   const { paper } = props;
   const classes = useStyles();
 
@@ -213,4 +213,4 @@ const SetupPage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(SetupPage);
+export default withRouter(SetupSubpage);

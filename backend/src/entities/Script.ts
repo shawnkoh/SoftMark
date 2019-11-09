@@ -10,15 +10,18 @@ import {
 } from "typeorm";
 
 import { Discardable } from "./Discardable";
+import { Mark } from "./Mark";
 import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
+import { QuestionTemplate } from "./QuestionTemplate";
 import { User } from "./User";
 import { ScriptData, ScriptListData } from "../types/scripts";
 import { sortByPageNo } from "../utils/sorts";
 import IsUniqueFilename from "../constraints/IsUniqueFilename";
 import IsUniqueSha256 from "../constraints/IsUniqueSha256";
+import { ScriptTemplate } from "./ScriptTemplate";
 
 @Entity()
 @Unique(["paper", "filename"])
@@ -90,13 +93,38 @@ export class Script extends Discardable {
     const paperUser = this.studentId
       ? await getRepository(PaperUser).findOne(this.studentId)
       : null;
+    let awardedMarks = 0;
+    let totalMarks = 0;
+    const scriptTemplate = await getRepository(ScriptTemplate).findOne({
+      where: { paperId: this.paperId, discardedAt: IsNull() },
+      relations: ["questionTemplates"]
+    });
+    if (scriptTemplate) {
+      const questionTemplates = await getRepository(QuestionTemplate).find({
+        where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
+      });
+      totalMarks = questionTemplates
+        .map(questionTemplate => questionTemplate.score)
+        .filter(questionTemplate => questionTemplate)
+        .reduce((a: number, b: number | null) => (b ? a + b : a), 0);
+      const questions = await getRepository(Question).find({
+        where: { questionTemplate: questionTemplates, discardedAt: IsNull() }
+      });
+      const marks = await getRepository(Mark).find({
+        where: { question: questions, discardedAt: IsNull() }
+      });
+      awardedMarks = marks
+        .map(questionTemplate => questionTemplate.score)
+        .reduce((a: number, b: number) => a + b, 0);
+    }
     return {
       ...this.getBase(),
       paperId: this.paperId,
       filename: this.filename,
-      sha256: this.sha256,
       student: paperUser ? await paperUser.getData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
+      awardedMarks,
+      totalMarks,
       pagesCount: this.pages
         ? this.pages.length
         : await getRepository(Page).count({ scriptId: this.id }),

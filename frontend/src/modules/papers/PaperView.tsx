@@ -13,7 +13,7 @@ import lightBlue from "@material-ui/core/colors/lightBlue";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
 import SetupSubpage from "./subpages/Setup";
-import StudentsSubpage from "./subpages/Students";
+import ScriptsSubpage from "./subpages/Scripts";
 import PaperViewHeader from "./components/headers/PaperViewHeader";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,7 +32,7 @@ type Props = RouteComponentProps;
 const TEAM = "team";
 const SETUP = "setup";
 const GRADING = "grading";
-const STUDENTS = "students";
+const SCRIPTS = "scripts";
 
 const PaperView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
@@ -91,8 +91,8 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         <Route path={`${path}/grading`}>
           <h3>Grading</h3>
         </Route>
-        <Route path={`${path}/students`}>
-          <StudentsSubpage paper={paper} />
+        <Route path={`${path}/scripts`}>
+          <ScriptsSubpage paper={paper} />
         </Route>
       </Switch>
       <BottomNavigation
@@ -126,9 +126,9 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
         />
         <BottomNavigationAction
           component={Link}
-          to={`${url}/${STUDENTS}`}
-          value={STUDENTS}
-          label="Students"
+          to={`${url}/${SCRIPTS}`}
+          value={SCRIPTS}
+          label="Scripts"
           icon={<People />}
         />
       </BottomNavigation>
