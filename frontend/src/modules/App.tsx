@@ -11,7 +11,7 @@ import configureStore from "./store";
 
 const store = configureStore();
 toast.configure();
-const loadAuthenticatedApp = () => import("./AuthenticatedApp");
+const loadUnauthenticatedApp = () => import("./UnauthenticatedApp");
 const AuthenticatedApp = React.lazy(() => import("./AuthenticatedApp"));
 const UnauthenticatedApp = React.lazy(() => import("./UnauthenticatedApp"));
 
@@ -19,7 +19,7 @@ const ActiveApp: React.FC = () => {
   const user = useSelector(getUser);
 
   useEffect(() => {
-    loadAuthenticatedApp();
+    loadUnauthenticatedApp();
   });
 
   return (
