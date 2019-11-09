@@ -1,15 +1,15 @@
 export type BearerToken = string;
 
 export enum BearerTokenType {
-  AuthorizationToken,
   AccessToken,
+  PasswordlessToken,
   RefreshToken,
-  EntityToken,
-  ResetPasswordToken
+  ResetPasswordToken,
+  VerifyEmailToken
 }
 
 type Payload<BearerTokenType> = {
-  type: BearerTokenType;
+  tokenType: BearerTokenType;
 };
 
 type TokenLifespan = {
@@ -17,33 +17,32 @@ type TokenLifespan = {
   exp: number;
 };
 
-export type Credentials = {
-  id: number;
-  email: string;
-  emailVerified: boolean;
+export type AccessTokenPayload = Payload<BearerTokenType.AccessToken> & {
+  userId: number;
 };
-
-export type AuthorizationTokenPayload = Payload<
-  BearerTokenType.AuthorizationToken
-> & { id: number };
-export type AccessTokenPayload = Payload<BearerTokenType.AccessToken> &
-  Credentials;
 export type AccessTokenSignedPayload = AccessTokenPayload & TokenLifespan;
 
-export type RefreshTokenPayload = Payload<BearerTokenType.RefreshToken> &
-  Credentials;
-export type RefreshTokenSignedPayload = RefreshTokenPayload & TokenLifespan;
-
-export type EntityTokenPayload<Entity> = Payload<BearerTokenType.EntityToken> &
-  Partial<Entity> & { id: number; entityName: string };
-export type EntityTokenSignedPayload<Entity> = EntityTokenPayload<Entity> &
+export type PasswordlessTokenPayload = Payload<
+  BearerTokenType.PasswordlessToken
+> & { userId: number };
+export type PasswordlessTokenSignedPayload = PasswordlessTokenPayload &
   TokenLifespan;
+
+export type RefreshTokenPayload = Payload<BearerTokenType.RefreshToken> & {
+  userId: number;
+};
+export type RefreshTokenSignedPayload = RefreshTokenPayload & TokenLifespan;
 
 export type ResetPasswordTokenPayload = Payload<
   BearerTokenType.ResetPasswordToken
-> &
-  Credentials;
+> & { userId: number };
 export type ResetPasswordTokenSignedPayload = ResetPasswordTokenPayload &
+  TokenLifespan;
+
+export type VerifyEmailTokenPayload = Payload<
+  BearerTokenType.VerifyEmailToken
+> & { userId: number };
+export type VerifyEmailTokenSignedPayload = VerifyEmailTokenPayload &
   TokenLifespan;
 
 // Type checkers
@@ -56,37 +55,25 @@ export function isBearerToken(token: string | undefined): token is BearerToken {
   return words[0] === "Bearer" && !!words[1];
 }
 
-function isPayload<T>(payload: any): payload is Payload<T> {
-  return payload.type in BearerTokenType;
+function isPayload<T>(
+  payload: any,
+  tokenType: BearerTokenType
+): payload is Payload<T> {
+  return (
+    payload.tokenType in BearerTokenType && payload.tokenType === tokenType
+  );
 }
 
 function hasTokenLifespan(payload: any) {
   return typeof payload.iat === "number" && typeof payload.exp === "number";
 }
 
-function hasCredentials(payload: any) {
-  return (
-    typeof payload.id === "number" &&
-    typeof payload.email === "string" &&
-    typeof payload.emailVerified === "boolean"
-  );
-}
-
-export function isAuthorizationTokenPayload(
-  payload: any
-): payload is AuthorizationTokenPayload {
-  return (
-    isPayload(payload) && payload.type === BearerTokenType.AuthorizationToken
-  );
-}
-
 export function isAccessTokenPayload(
   payload: any
 ): payload is AccessTokenPayload {
   return (
-    isPayload(payload) &&
-    payload.type === BearerTokenType.AccessToken &&
-    hasCredentials(payload)
+    typeof payload.userId === "number" &&
+    isPayload(payload, BearerTokenType.AccessToken)
   );
 }
 
@@ -96,13 +83,27 @@ export function isAccessTokenSignedPayload(
   return isAccessTokenPayload(payload) && hasTokenLifespan(payload);
 }
 
+export function isPasswordlessTokenPayload(
+  payload: any
+): payload is PasswordlessTokenPayload {
+  return (
+    typeof payload.userId === "number" &&
+    isPayload(payload, BearerTokenType.PasswordlessToken)
+  );
+}
+
+export function isPasswordlessTokenSignedPayload(
+  payload: any
+): payload is PasswordlessTokenSignedPayload {
+  return isPasswordlessTokenPayload(payload) && hasTokenLifespan(payload);
+}
+
 export function isRefreshTokenPayload(
   payload: any
 ): payload is RefreshTokenPayload {
   return (
-    isPayload(payload) &&
-    payload.type === BearerTokenType.RefreshToken &&
-    hasCredentials(payload)
+    typeof payload.userId === "number" &&
+    isPayload(payload, BearerTokenType.RefreshToken)
   );
 }
 
@@ -112,28 +113,26 @@ export function isRefreshTokenSignedPayload(
   return isRefreshTokenPayload(payload) && hasTokenLifespan(payload);
 }
 
-export function isEntityTokenPayload<Entity>(
-  payload: any
-): payload is EntityTokenPayload<Entity> {
-  return isPayload(payload) && payload.type === BearerTokenType.EntityToken;
-}
-
-export function isEntityTokenSignedPayload<Entity>(
-  payload: any
-): payload is EntityTokenSignedPayload<Entity> {
-  return isEntityTokenPayload(payload) && hasTokenLifespan(payload);
-}
-
 export function isResetPasswordTokenPayload(
   payload: any
 ): payload is ResetPasswordTokenPayload {
-  return (
-    isPayload(payload) && payload.type === BearerTokenType.ResetPasswordToken
-  );
+  return isPayload(payload, BearerTokenType.ResetPasswordToken);
 }
 
 export function isResetPasswordTokenSignedPayload(
   payload: any
 ): payload is ResetPasswordTokenSignedPayload {
   return isResetPasswordTokenPayload(payload) && hasTokenLifespan(payload);
+}
+
+export function isVerifyEmailTokenPayload(
+  payload: any
+): payload is VerifyEmailTokenPayload {
+  return isPayload(payload, BearerTokenType.VerifyEmailToken);
+}
+
+export function isVerifyEmailTokenSignedPayload(
+  payload: any
+): payload is VerifyEmailTokenSignedPayload {
+  return isVerifyEmailTokenPayload(payload) && hasTokenLifespan(payload);
 }
