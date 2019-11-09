@@ -7,7 +7,11 @@ import { PageQuestion } from "../entities/PageQuestion";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { isAllocated } from "../middlewares/canModifyMark";
-import { PageGradingData, QuestionGradingData } from "../types/grading";
+import {
+  PageGradingData,
+  QuestionGradingData,
+  GradingData
+} from "../types/grading";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -186,7 +190,7 @@ export async function markQuestion(request: Request, response: Response) {
           layer: element["layer"]
         }));
       return {
-        id,
+        id: parseInt(id),
         pageNo: array[0].pageNo,
         imageUrl: array[0].imageUrl,
         questionIds,
