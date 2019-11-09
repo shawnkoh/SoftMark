@@ -1,13 +1,15 @@
-import jwt from "jsonwebtoken";
-import sendgrid from "@sendgrid/mail";
 import { MailData } from "@sendgrid/helpers/classes/mail";
-
+import sendgrid from "@sendgrid/mail";
+import jwt from "jsonwebtoken";
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
-import { ResetPasswordTokenPayload, BearerTokenType } from "../types/tokens";
+import { BearerTokenType, ResetPasswordTokenPayload } from "../types/tokens";
 
 const APP_NAME = "SoftMark";
-const APP_URL = "https://softmark.io";
+const APP_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://softmark.io"
+    : "localhost:3000";
 const LOGIN_URL = `${APP_URL}/login`;
 const PASSWORD_RESET_URL = `${APP_URL}/reset_password`;
 const AUTH_PASSWORD_RESET_URL = `${APP_URL}/auth/reset_password`;
@@ -15,14 +17,14 @@ const AUTH_PASSWORDLESS_URL = `${APP_URL}/auth/passwordless`;
 const VERIFY_EMAIL_URL = `${APP_URL}/auth/verify_email`;
 
 function send(user: User, subject: string, message: string) {
-  if (process.env.NODE_ENV !== "production") {
+  if (!process.env.SENDGRID_API_KEY) {
     return;
   }
 
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
     to: user.email,
-    from: "mail@softmark.io",
+    from: "no-reply@softmark.io",
     subject,
     text: message,
     html: message
