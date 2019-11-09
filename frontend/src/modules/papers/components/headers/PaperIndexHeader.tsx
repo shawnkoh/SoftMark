@@ -10,8 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
-import SvgSoftmarkLogo from "../../../../components/svgr/SoftMarkLogo";
 import AccountModal from "../../../auth/components/AccountModal";
+import softmarkLogo from "../../../../assets/softmark-logo.svg";
 
 type Props = RouteComponentProps;
 
@@ -24,9 +24,12 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingLeft: 0,
       paddingRight: 0
     },
-    logo: {
+    logoContainer: {
       paddingTop: theme.spacing(2),
       paddingBottom: theme.spacing(2)
+    },
+    logo: {
+      height: 24
     }
   })
 );
@@ -38,8 +41,8 @@ const Header: React.FC<Props> = props => {
     <AppBar position="sticky" color="inherit" elevation={1}>
       <Container fixed>
         <Toolbar className={classes.toolbar}>
-          <div className={clsx(classes.logo, classes.grow)}>
-            <SvgSoftmarkLogo height="24px" />
+          <div className={clsx(classes.logoContainer, classes.grow)}>
+            <img src={softmarkLogo} className={classes.logo} />
           </div>
           <AccountModal
             render={toggleModal => (

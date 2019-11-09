@@ -62,63 +62,74 @@ const ResetPasswordForm: React.FC<Props> = ({ token }) => {
 
         return (
           <form className="l-form" onSubmit={handleSubmit}>
-            <FormControl
-              fullWidth
-              margin="dense"
-              error={touched.password && !!errors.password}
+            <Grid
+              container
+              direction="column"
+              justify="center"
+              alignItems="stretch"
+              spacing={2}
             >
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                error={touched.password && !!errors.password}
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.password}
-              />
-              {touched.password && !!errors.password && (
-                <FormHelperText>{errors.password}</FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl
-              fullWidth
-              margin="dense"
-              error={touched.confirmPassword && !!errors.confirmPassword}
-            >
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                id="confirmPassword"
-                error={touched.confirmPassword && !!errors.confirmPassword}
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.confirmPassword}
-              />
-              {touched.confirmPassword && !!errors.confirmPassword && (
-                <FormHelperText>{errors.confirmPassword}</FormHelperText>
-              )}
-            </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className="form-submit-btn"
-              disabled={isSubmitting}
-            >
-              Submit
-            </Button>
-            <Grid container>
-              <Grid item xs>
+              <Grid item>
+                <FormControl
+                  fullWidth
+                  margin="dense"
+                  error={touched.password && !!errors.password}
+                >
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    error={touched.password && !!errors.password}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.password}
+                  />
+                  {touched.password && !!errors.password && (
+                    <FormHelperText>{errors.password}</FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl
+                  fullWidth
+                  margin="dense"
+                  error={touched.confirmPassword && !!errors.confirmPassword}
+                >
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    type="password"
+                    id="confirmPassword"
+                    error={touched.confirmPassword && !!errors.confirmPassword}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.confirmPassword}
+                  />
+                  {touched.confirmPassword && !!errors.confirmPassword && (
+                    <FormHelperText>{errors.confirmPassword}</FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className="form-submit-btn"
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </Grid>
+              <Grid item>
                 <Link href="/login" variant="body2">
                   Return to sign-in page
                 </Link>

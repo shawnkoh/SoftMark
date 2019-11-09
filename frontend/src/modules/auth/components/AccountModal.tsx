@@ -1,13 +1,22 @@
-import { UserPatchData } from "backend/src/types/users";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router";
 import * as Yup from "yup";
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 
+import { UserPatchData } from "backend/src/types/users";
 import { setUser, logOut } from "../actions";
 import { getUser } from "../selectors";
 import { getOwnUser, patchOwnUser } from "../../../api/users";
+
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  DialogTitle
+} from "@material-ui/core";
+import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../components/forms/SimpleForm";
@@ -56,9 +65,19 @@ const AccountModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>Account</DialogTitle>
-        <DialogContent>
+      <Dialog
+        open={isOpen}
+        onClose={toggleVisibility}
+        aria-labelledby="customized-dialog-title"
+      >
+        <CustomDialogTitle
+          id="customized-dialog-title"
+          onClose={toggleVisibility}
+        >
+          Account
+        </CustomDialogTitle>
+        <DialogContent dividers>
+          <DialogContentText>Edit account details</DialogContentText>
           <SimpleForm
             initialValues={values}
             formMetadata={formMetadata}
@@ -72,6 +91,8 @@ const AccountModal: React.FC<Props> = props => {
               })
             }
           />
+        </DialogContent>
+        <DialogActions>
           <Button
             color="primary"
             onClick={async () => {
@@ -81,7 +102,7 @@ const AccountModal: React.FC<Props> = props => {
           >
             Log out
           </Button>
-        </DialogContent>
+        </DialogActions>
       </Dialog>
       {props.render(toggleVisibility)}
     </>

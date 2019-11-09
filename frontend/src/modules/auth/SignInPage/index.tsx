@@ -1,13 +1,26 @@
 import React from "react";
 import { RouteComponentProps } from "react-router";
-import { Grid, Typography } from "@material-ui/core";
 
-import SvgSoftmarkLogo from "../../../components/svgr/SoftMarkLogo";
+import { Grid, Typography } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+import softmarkLogo from "../../../assets/softmark-logo.svg";
 import SignInForm from "./SignInForm";
 
 type Props = RouteComponentProps;
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      marginTop: theme.spacing(8),
+      marginBottom: theme.spacing(8)
+    }
+  })
+);
+
 const SignInPage: React.FC<Props> = props => {
+  const classes = useStyles();
+
   return (
     <Grid
       container
@@ -15,9 +28,11 @@ const SignInPage: React.FC<Props> = props => {
       justify="center"
       alignItems="center"
       id="session"
+      spacing={4}
+      className={classes.container}
     >
       <Grid item>
-        <SvgSoftmarkLogo />
+        <img src={softmarkLogo} />
       </Grid>
 
       <Grid item>

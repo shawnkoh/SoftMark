@@ -1,9 +1,11 @@
-import { Button, Grid, Link, TextField } from "@material-ui/core";
-import { Formik } from "formik";
 import React from "react";
-import { toast } from "react-toastify";
+import { Formik } from "formik";
 import * as yup from "yup";
+import { toast } from "react-toastify";
+
 import api from "../../../api";
+
+import { Button, Grid, Link, TextField } from "@material-ui/core";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -46,36 +48,46 @@ const ForgotPasswordForm: React.FC = () => {
 
         return (
           <form className="l-form" onSubmit={handleSubmit}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              error={touched.email && !!errors.email}
-              value={values.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className="form-submit-btn"
-              disabled={isSubmitting}
+            <Grid
+              container
+              direction="column"
+              justify="center"
+              alignItems="stretch"
+              spacing={2}
             >
-              Submit
-            </Button>
-
-            <Grid item>
-              <Link href="/login" variant="body2">
-                Return to sign-in page
-              </Link>
+              <Grid item>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  error={touched.email && !!errors.email}
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className="form-submit-btn"
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </Grid>
+              <Grid item>
+                <Link href="/login" variant="body2">
+                  Return to sign-in page
+                </Link>
+              </Grid>
             </Grid>
           </form>
         );

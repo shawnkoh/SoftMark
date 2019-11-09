@@ -1,9 +1,10 @@
-import { StylesProvider } from "@material-ui/styles";
 import React, { useEffect } from "react";
 import { Provider, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
+import "typeface-roboto";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { StylesProvider } from "@material-ui/styles";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { getUser } from "./auth/selectors";
 import configureStore from "./store";

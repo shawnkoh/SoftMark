@@ -1,27 +1,13 @@
 import React, { useState } from "react";
 import * as Yup from "yup";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Divider,
-  Typography
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import { PaperPostData, PaperData } from "backend/src/types/papers";
+import { editPaper } from "../../../../api/papers";
+
+import { Dialog, DialogContent } from "@material-ui/core";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import FadedDivider from "../../../../components/dividers/FadedDivider";
-import { editPaper } from "../../../../api/papers";
-
-const useStyles = makeStyles(() => ({
-  dialogTitle: {
-    paddingTop: 20,
-    paddingBottom: 10,
-    paddingLeft: 30
-  }
-}));
 
 interface OwnProps {
   paper: PaperData;
@@ -32,8 +18,6 @@ interface OwnProps {
 type Props = OwnProps;
 
 const EditPaperModal: React.FC<Props> = ({ paper, refreshPaper, render }) => {
-  const classes = useStyles();
-
   const values: PaperPostData = {
     name: paper.name
   };
@@ -51,11 +35,13 @@ const EditPaperModal: React.FC<Props> = ({ paper, refreshPaper, render }) => {
   return (
     <>
       <Dialog open={isVisible} onBackdropClick={toggleVisibility} fullWidth>
-        <DialogContent>
-          <Typography variant="h4" className={classes.dialogTitle}>
-            Edit paper
-          </Typography>
-          <FadedDivider />
+        <CustomDialogTitle
+          id="customized-dialog-title"
+          onClose={toggleVisibility}
+        >
+          Edit paper
+        </CustomDialogTitle>
+        <DialogContent dividers>
           <SimpleForm
             initialValues={values}
             formMetadata={formMetadata}
