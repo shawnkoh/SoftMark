@@ -8,9 +8,9 @@ import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { isAllocated } from "../middlewares/canModifyMark";
 import {
+  GradingData,
   PageGradingData,
-  QuestionGradingData,
-  GradingData
+  QuestionGradingData
 } from "../types/grading";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -200,25 +200,6 @@ export async function markQuestion(request: Request, response: Response) {
     })
     .value();
 
-  // for debugging - remove this
-  //response.status(200).json(result);
-
-  // collate raw pages data
-  /*
-  pages = _.uniqBy(pagesData, "id");
-  const pagesById = _.groupBy(pagesData, pageData => {
-    return pageData.id;
-  });
-  const annotationsByPageId = _.mapValues(pagesById, page => {
-     return page.map(field => {
-       const annotation = _.pick(field, "annotationId", "layer");
-       return { id: annotation.annotationId, layer: annotation.layer };
-       return annotation;
-     });
-   });
-   */
-
-  // uncomment this when you finished transforming pages
   const data: GradingData = {
     matriculationNumber,
     parentQuestion,
