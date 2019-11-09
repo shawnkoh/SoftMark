@@ -25,7 +25,9 @@ const SignUpForm: React.FC = () => {
   const signUp = async (email: string, password: string, name: string) => {
     const data = await api.users.createNewUser(email, password, name);
     if (!data) {
-      toast.error("An error occured while signing up");
+      toast.error(
+        `${email} is already registered. Consider resetting your password!`
+      );
       return;
     }
     toast.success(

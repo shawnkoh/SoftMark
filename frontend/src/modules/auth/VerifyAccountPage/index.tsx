@@ -1,34 +1,32 @@
-import React, { useEffect } from "react";
-import { useHistory, useLocation, useParams } from "react-router";
+import React from "react";
+import { useHistory, useParams } from "react-router";
+import { toast } from "react-toastify";
+import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
-const VerifyAccountPage: React.FC = props => {
+const VerifyAccountPage: React.FC = () => {
   const history = useHistory();
-  const location = useLocation();
   const { token } = useParams();
 
-  if (!token) {
+  const verifyEmail = async (token: string) => {
+    const verified = await api.users.verifyEmail(token);
+    if (verified) {
+      toast.success("Successfully verified email!");
+    } else {
+      toast.error(
+        "The email verification link has expired. Please request for another"
+      );
+    }
     history.push("/");
-    return <LoadingSpinner />;
-  }
+  };
 
-  // useEffect(() => {
-  // TODO: Create verify account route
-  // verifyAccount(email, code)
-  //   .then(resp => {
-  //     ReactGA.event({
-  //       category: "User",
-  //       action: "Account is successfully created and verified"
-  //     });
-  //     toast.success("You account has been activated!");
-  //   })
-  //   .catch(error => {
-  //     toast.error("Invalid account verification.");
-  //   })
-  //   .finally(() => {
-  //     history.push("/");
-  //   });
-  // }, [token]);
+  React.useEffect(() => {
+    if (!token) {
+      history.push("/");
+      return;
+    }
+    verifyEmail(token);
+  }, [token]);
 
   return <LoadingSpinner />;
 };

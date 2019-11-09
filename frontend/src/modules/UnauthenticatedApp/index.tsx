@@ -62,12 +62,12 @@ const UnauthenticatedApp: React.FC = () => {
         />
         <Route
           exact
-          path="/auth/reset_password/:token"
+          path="/users/reset_password/:token"
           component={ResetPasswordPage}
         />
         <Route
           exact
-          path="/auth/verify_email/:token"
+          path="/users/verify_email/:token"
           component={VerifyAccountPage}
         />
 

@@ -51,14 +51,15 @@ export async function resetPassword(
   }
 }
 
-export async function verifyAccount(
-  email: string,
-  verificationCode: string
-): Promise<AxiosResponse> {
-  return client.post(`${URL}/verify`, {
-    email: email,
-    verification_code: verificationCode
-  });
+export async function verifyEmail(token: string): Promise<boolean> {
+  try {
+    await client.post(`${URL}/verify_email`, null, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 export async function getUser(id: number): Promise<AxiosResponse<UserData>> {

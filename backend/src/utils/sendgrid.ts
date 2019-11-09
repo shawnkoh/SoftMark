@@ -38,7 +38,7 @@ export function sendVerificationEmail(user: User) {
 
   const message =
     "<p>Welcome aboard!</p>" +
-    "<p>We're excited that you're joining us! Because we're here to help you make marking exams great again, we want to get you up to speed quickly so that you can make the most of everything at ${APP_NAME}</P>" +
+    `<p>We're excited that you're joining us! Because we're here to help you make marking exams great again, we want to get you up to speed quickly so that you can make the most of everything at ${APP_NAME}</P>` +
     `<p>To get started, please <a href='${VERIFY_EMAIL_URL}/${token}'>verify your email now!</a></p>`;
 
   send(user, `Welcome to ${APP_NAME}!`, message);
