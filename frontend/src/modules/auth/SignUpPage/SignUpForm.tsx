@@ -6,7 +6,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 
 import api from "../../../api";
-import { setUser } from "../actions";
+import { setUser } from "../../../store/auth/actions";
 
 import { Button, Grid, Link, TextField } from "@material-ui/core";
 

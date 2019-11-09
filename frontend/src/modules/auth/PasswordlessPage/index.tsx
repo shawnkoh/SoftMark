@@ -4,7 +4,7 @@ import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import { setUser } from "../actions";
+import { setUser } from "../../../store/auth/actions";
 
 const PasswordlessPage: React.FC = () => {
   const { token } = useParams();

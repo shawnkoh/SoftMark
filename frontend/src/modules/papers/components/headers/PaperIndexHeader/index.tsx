@@ -1,19 +1,13 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import clsx from "clsx";
-
 import { Container } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-
-import AccountModal from "../../../auth/components/AccountModal";
-import softmarkLogo from "../../../../assets/softmark-logo.svg";
-
-type Props = RouteComponentProps;
+import clsx from "clsx";
+import React from "react";
+import softmarkLogo from "../../../../../assets/softmark-logo.svg";
+import AccountModal from "./AccountModal";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Header: React.FC<Props> = props => {
+const PaperIndexHeader: React.FC = () => {
   const classes = useStyles();
 
   return (
@@ -64,4 +58,4 @@ const Header: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(Header);
+export default PaperIndexHeader;

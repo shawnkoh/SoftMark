@@ -15,8 +15,8 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import api from "../../../api";
-import MailSentSvg from "../../../assets/undraw_Mail_sent_qwwx.svg";
-import { setUser } from "../actions";
+import { setUser } from "../../../store/auth/actions";
+import MailSentSvg from "./undraw_Mail_sent_qwwx.svg";
 
 const validationSchema = yup.object().shape({
   email: yup
