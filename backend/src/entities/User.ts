@@ -1,19 +1,11 @@
 import { hashSync } from "bcryptjs";
-import { IsNotEmpty, IsEmail, IsOptional, IsString } from "class-validator";
-import { Column, Entity, OneToMany } from "typeorm";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { sign } from "jsonwebtoken";
-
+import { Column, Entity, OneToMany } from "typeorm";
+import { BearerTokenType } from "../types/tokens";
+import { UserData } from "../types/users";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
-import {
-  BearerTokenType,
-  EntityTokenPayload,
-  Credentials,
-  RefreshTokenPayload,
-  AccessTokenPayload,
-  AuthorizationTokenPayload
-} from "../types/tokens";
-import { UserData } from "../types/users";
 
 @Entity()
 export class User extends Discardable {
@@ -43,49 +35,41 @@ export class User extends Discardable {
   @IsString()
   name!: string | null;
 
-  createPayload = (): EntityTokenPayload<User> => ({
-    type: BearerTokenType.EntityToken,
-    entityName: this.entityName,
-    id: this.id,
-    email: this.email
-  });
-
-  getCredentials = (): Credentials => ({
-    id: this.id,
-    email: this.email,
-    emailVerified: this.emailVerified
-  });
-
-  createAuthorizationToken = () => {
-    const payload: AuthorizationTokenPayload = {
-      type: BearerTokenType.AuthorizationToken,
-      id: this.id
+  private createBearerToken = (
+    tokenType: BearerTokenType,
+    expiresIn: string
+  ) => {
+    const payload = {
+      tokenType,
+      userId: this.id
     };
-    const token = sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: "30d"
-    });
+    const token = sign(payload, process.env.JWT_SECRET!, { expiresIn });
     return token;
   };
 
   createAuthenticationTokens = () => {
-    const credentials = this.getCredentials();
-    const accessTokenPayload: AccessTokenPayload = {
-      type: BearerTokenType.AccessToken,
-      ...credentials
-    };
-    const accessToken = sign(accessTokenPayload, process.env.JWT_SECRET!, {
-      expiresIn: "15m"
-    });
-    const refreshTokenPayload: RefreshTokenPayload = {
-      type: BearerTokenType.RefreshToken,
-      ...credentials
-    };
-    const refreshToken = sign(refreshTokenPayload, process.env.JWT_SECRET!, {
-      expiresIn: "7 days"
-    });
-
+    const accessToken = this.createBearerToken(
+      BearerTokenType.AccessToken,
+      "5m"
+    );
+    const refreshToken = this.createBearerToken(
+      BearerTokenType.RefreshToken,
+      "7 days"
+    );
     return { accessToken, refreshToken };
   };
+
+  createNewPaperUserToken = () =>
+    this.createBearerToken(BearerTokenType.PasswordlessToken, "7 days");
+
+  createPasswordlessToken = () =>
+    this.createBearerToken(BearerTokenType.PasswordlessToken, "3h");
+
+  createResetPasswordToken = () =>
+    this.createBearerToken(BearerTokenType.ResetPasswordToken, "3h");
+
+  createVerifyEmailToken = () =>
+    this.createBearerToken(BearerTokenType.VerifyEmailToken, "14d");
 
   @OneToMany(type => PaperUser, paperUser => paperUser.user)
   paperUsers?: PaperUser[];
