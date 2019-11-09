@@ -12,6 +12,7 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 import lightBlue from "@material-ui/core/colors/lightBlue";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
+import GradingSubpage from "./subpages/Grading";
 import SetupSubpage from "./subpages/Setup";
 import ScriptsSubpage from "./subpages/Scripts";
 import PaperViewHeader from "./components/headers/PaperViewHeader";
@@ -89,7 +90,7 @@ const PaperView: React.FC<Props> = ({ match: { params } }) => {
           <SetupSubpage paper={paper} />
         </Route>
         <Route path={`${path}/grading`}>
-          <h3>Grading</h3>
+          <GradingSubpage paper={paper} />
         </Route>
         <Route path={`${path}/scripts`}>
           <ScriptsSubpage paper={paper} />

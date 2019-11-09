@@ -16,7 +16,7 @@ interface OwnProps {
 
 type Props = OwnProps & RouteComponentProps;
 
-const StudentsTableRow: React.FC<Props> = props => {
+const ScriptsTableRow: React.FC<Props> = props => {
   const { script } = props;
   const {student, filename, id, awardedMarks, totalMarks} = script;
   let matriculationNumber = "-";
@@ -52,4 +52,4 @@ const StudentsTableRow: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(StudentsTableRow);
+export default withRouter(ScriptsTableRow);

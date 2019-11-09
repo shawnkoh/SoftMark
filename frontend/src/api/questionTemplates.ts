@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import {
+  QuestionTemplateListData,
   QuestionTemplateData,
   QuestionTemplatePostData,
   QuestionTemplatePatchData
@@ -16,6 +17,12 @@ export async function createQuestionTemplate(
     `/script_templates/${id}/question_templates`,
     QuestionTemplatePostData
   );
+}
+
+export async function getQuestionTemplates(
+  id: number
+): Promise<AxiosResponse<{ questionTemplates: QuestionTemplateListData[] }>> {
+  return client.get(`papers/${id}/question_templates`);
 }
 
 export async function getQuestionTemplate(
