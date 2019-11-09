@@ -19,7 +19,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const ResetPasswordPage: React.FC = () => {
   const classes = useStyles();
-
   const history = useHistory();
   const { token } = useParams();
 

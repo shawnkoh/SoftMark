@@ -167,7 +167,7 @@ const SignInForm = () => {
                     />
                   </Grid>
                   <Grid item>
-                    <Link href="/password_reset" variant="body2">
+                    <Link href="/reset_password" variant="body2">
                       Forgot password?
                     </Link>
                   </Grid>
