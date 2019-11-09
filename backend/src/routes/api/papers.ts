@@ -3,6 +3,7 @@ import { Router } from "express";
 import * as AllocationsController from "../../controllers/AllocationsController";
 import * as PapersController from "../../controllers/PapersController";
 import * as PaperUsersController from "../../controllers/PaperUsersController";
+import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
 import * as ScriptTemplatesController from "../../controllers/ScriptTemplatesController";
 import * as ScriptsController from "../../controllers/ScriptsController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
@@ -25,6 +26,8 @@ router.get("/:id", PapersController.show);
 router.patch("/:id", PapersController.update);
 router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
+
+router.get("/:id/question_templates", QuestionTemplatesController.index);
 
 router.post("/:id/script_templates", ScriptTemplatesController.create);
 router.get(
