@@ -2,7 +2,7 @@ import { DiscardableData, isDiscardableData } from "./entities";
 import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 import { QuestionListData, isQuestionListData } from "./questions";
 
-export interface MarkPostData {
+export interface MarkPutData {
   score: number;
   // TODO: Not in MVP
   // timeSpent: number;
