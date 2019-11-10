@@ -1,13 +1,13 @@
-import { Server } from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import { Server } from "http";
 import morgan from "morgan";
 import "reflect-metadata";
-import { createConnection, Connection } from "typeorm";
-import routes from "./routes";
+import { Connection, createConnection } from "typeorm";
 import ormconfig from "../ormconfig";
+import routes from "./routes";
 
 export class ApiServer {
   public connection: Connection | null = null;
@@ -17,8 +17,8 @@ export class ApiServer {
     this.connection = await createConnection(ormconfig);
 
     const app = express();
-    app.use(bodyParser.json({ limit: "10mb" }));
-    app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
+    app.use(bodyParser.json({ limit: "20mb" }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: "20mb" }));
     app.use(cors());
     app.use(helmet());
     if (process.env.NODE_ENV !== "test") {
