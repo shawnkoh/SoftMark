@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 
 import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
-import { CanvasMode } from "../../../types/canvas";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
 import Canvas from "../../../components/Canvas";
+import { CanvasMode } from "../../../components/Canvas/types";
 
 interface OwnProps {
   pageId: number;
@@ -23,9 +24,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column"
     },
-    canvasContainer: {
-      flexGrow: 1,
-      backgroundColor: "grey"
+    grow: {
+      display: "flex",
+      flexGrow: 1
     }
   })
 );
@@ -48,6 +49,7 @@ const Annotator: React.FC<Props> = ({
   const [backgroundAnnotations, setBackgroundAnnotations] = useState<
     Annotation[]
   >([[]]);
+  const [toResetView, setToResetView] = useState(false);
 
   useEffect(() => {
     getOwnAnnotation(pageId)
@@ -59,24 +61,6 @@ const Annotator: React.FC<Props> = ({
 
   // TODO: get background annotations
 
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const checkSize = () => {
-    const currentCanvasContainerRef = canvasContainerRef.current;
-    if (currentCanvasContainerRef) {
-      const width = currentCanvasContainerRef.offsetWidth;
-      const height = currentCanvasContainerRef.offsetHeight;
-      setWidth(width);
-      setHeight(height);
-    }
-  };
-  useEffect(() => {
-    checkSize();
-    window.addEventListener("resize", checkSize);
-    return window.removeEventListener("resize", checkSize);
-  });
-
   const handlePenClick = event => setMode(CanvasMode.Pen);
   const handleEraserClick = event => setMode(CanvasMode.Eraser);
   const handleViewClick = event => setMode(CanvasMode.View);
@@ -84,6 +68,13 @@ const Annotator: React.FC<Props> = ({
   const handlePenWidthChange = event =>
     setPenWidth(parseInt(event.target.value, 10));
   const handleClearClick = event => setForegroundAnnotation([]);
+  const handleResetViewClick = event => {
+    setToResetView(true);
+    //setTimeout(() => setToResetView(false), 100);
+  };
+  useLayoutEffect(() => {
+    if (toResetView) setToResetView(false);
+  }, [toResetView]);
 
   const onForegroundAnnotationChange = (annotation: Annotation) => {
     setForegroundAnnotation(annotation);
@@ -127,11 +118,10 @@ const Annotator: React.FC<Props> = ({
           value={penWidth}
         />
         <button onClick={handleClearClick}>Clear Canvas</button>
+        <button onClick={handleResetViewClick}>Reset View</button>
       </div>
-      <div ref={canvasContainerRef} className={classes.canvasContainer}>
+      <div className={classes.grow}>
         <Canvas
-          width={width}
-          height={height}
           backgroundImageSource={backgroundImageSource}
           backgroundAnnotations={backgroundAnnotations}
           foregroundAnnotation={foregroundAnnotation}
@@ -139,6 +129,7 @@ const Annotator: React.FC<Props> = ({
           penColor={penColor}
           penWidth={penWidth}
           onForegroundAnnotationChange={onForegroundAnnotationChange}
+          resetView={toResetView}
         />
       </div>
     </div>

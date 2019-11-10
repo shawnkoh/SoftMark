@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { Image } from "react-konva";
 
 export default class URLImage extends React.Component {
