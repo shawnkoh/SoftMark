@@ -46,21 +46,34 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## Folder Structure
 
 - `./components`: reusable (presentational or self-contained) components.
-- `./modules`: each module is a group of related pages and components.
-  - Each module folder follows this general structure: top-level files are pages (e.g. `PaperView.tsx`), other components are inside folders (e.g. `components`, `subpages`)
+- `./App`: the main App. Lazy-loads `UnauthenticatedApp` or `AuthenticatedApp`
+- `./UnauthenticatedApp`
+- `./AuthenticatedApp`
 
-### Paths
+## Component structure
 
-You can reference top-level folders in `frontend/src` directly from anywhere.
+Every component should be in its own folder, with the main component being default exported in index.ts
+You can refer to UnauthenticatedApp for how this is done.
 
-- e.g. `import api from "api"` instead of `import api from "../../../api`
+All of the components that are solely used by that folder should be inside.
+
+Rationale: Css styles and misc stuff can be verbose. It's a lot easier to look at 100-200 lines than 400 line components.
+
+Criticism: Many components will have just one index.tsx file in it.
+Upside: Encourages a standard pattern. Also helps with extensibility.
+
+## components folder
+
+Stuff that are reused across multiple pages should be placed in an appropriate parent components folder
+For instance, if Component A is constantly reused across AuthenticatedApp, it should be placed in AuthenticatedApp/components
+
+Stuff that are reused across both AuthenticatedApp and UnauthenticatedApp should be placed in the root components folder
 
 ### Import order style guide
 
-- NPM modules
-- <line break>
-- Local modules
-- <line break>
-- NPM React components
-- <line break>
-- Local React components
+Unless the import has to be at a specific location, default to Microsoft's Vscode's `Organize Imports` command.
+This can be accessed by using their CLI ">Organize Imports"
+accessible by ctrl shift P (windows)
+cmd shift P (mac)
+
+Prettier's auto cleanup on commit will supersede the format provided by Organize Imports.

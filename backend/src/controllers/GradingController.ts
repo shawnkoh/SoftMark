@@ -16,7 +16,7 @@ import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
-export async function markQuestion(request: Request, response: Response) {
+export async function questionToMark(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const questionTemplateId = Number(request.params.id);
