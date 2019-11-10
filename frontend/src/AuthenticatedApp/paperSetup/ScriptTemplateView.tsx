@@ -4,11 +4,11 @@ import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import { Annotation } from "backend/src/types/annotations";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import { CanvasMode } from "../../types/canvas";
 
 import TogglePageComponent from "../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import Canvas from "../../components/Canvas";
+import { CanvasMode } from "../../components/Canvas/types";
 
 type Props = RouteComponentProps;
 
@@ -59,15 +59,13 @@ const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
   }
 
   return (
-    <div>
+    <div style={{ height: "100vh", width: "100vh" }}>
       {scriptTemplate.pageTemplates.map((page, index) => {
         return (
           <>
             {page.pageNo === viewPageNo && (
               <Canvas
                 key={page.id}
-                width={1000}
-                height={1250}
                 backgroundImageSource={page.imageUrl}
                 penColor={"#ff0000"}
                 penWidth={0}
