@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 import api from "../../../../api";
+import { ScriptData, ScriptListData } from "backend/src/types/scripts";
+
+import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import TogglePageComponent from "../../../../components/misc/TogglePageComponent";
 import Canvas from "../../../../components/Canvas";
 import { CanvasMode } from "../../../../types/canvas";
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
+import DialogTitleWithCloseButton from "../../../../components/dialogs/DialogTitleWithCloseButton";
 
 interface OwnProps {
   script: ScriptListData;
@@ -36,21 +38,24 @@ const ViewScriptModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Viewing script ${script.filename}`}</DialogTitle>
-        <DialogContent>
-          <Button color="primary" onClick={toggleVisibility}>
-            Close
-          </Button>
+      <Dialog open={isOpen} fullWidth onClose={toggleVisibility}>
+        <DialogTitleWithCloseButton
+          id="dialog-title-with-close-button"
+          onClose={toggleVisibility}
+        >
+          {`Viewing script ${script.filename}`}
+        </DialogTitleWithCloseButton>
+        <DialogContent dividers>
+          {`Script id: ${script.id} (for debugging; remove in ViewScriptModal)`}
+          {isLoading && (
+            <LoadingSpinner loadingMessage="Loading script template..." />
+          )}
+          {!scriptData && <>This script does not exist</>}
+          {scriptData &&
+            scriptData.pages.map((page, index) => {
+              return <img src={page.imageUrl} />;
+            })}
         </DialogContent>
-        {isLoading && (
-          <LoadingSpinner loadingMessage="Loading script template..." />
-        )}
-        {!scriptData && <>This script does not exist</>}
-        {scriptData &&
-          scriptData.pages.map((page, index) => {
-            return <img src={page.imageUrl} />;
-          })}
       </Dialog>
       {render(toggleVisibility)}
     </>
