@@ -51,7 +51,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register ../node_modules/typeorm/cli.js",
     "test": "jest --runInBand",
     "test:circleci": "cross-env NODE_ENV=circleci jest --runInBand",
-    "build": "tsc && cp .env ./build/ && cp package.json ./build/ && cd build && yarn install",
+    "build": "tsc && cp package.json ./build/ && cd build && yarn install",
     "production": "cd build && cross-env NODE_ENV=production node ./src/index.js"
   }
 }
