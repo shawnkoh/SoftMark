@@ -9,6 +9,6 @@ export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.post("/:id/bookmarks", BookmarksController.create);
-router.post("/:id/marks", MarksController.create);
+router.put("/:id/mark", MarksController.replace);
 
 export default router;
