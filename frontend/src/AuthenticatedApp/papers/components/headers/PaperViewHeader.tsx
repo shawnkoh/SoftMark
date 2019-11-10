@@ -42,29 +42,27 @@ const PaperViewHeader: React.FC<Props> = props => {
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
-      <Container fixed>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            onClick={() => props.history.push(`/`)}
-            color="inherit"
-            className={classes.papersButton}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h5" className={classes.grow}>
-            {name}
-          </Typography>
-          <EditPaperModal
-            paper={paper}
-            refreshPaper={refreshPaper}
-            render={toggleModal => (
-              <IconButton onClick={toggleModal} color="inherit">
-                <EditIcon />
-              </IconButton>
-            )}
-          />
-        </Toolbar>
-      </Container>
+      <Toolbar>
+        <IconButton
+          onClick={() => props.history.push(`/`)}
+          color="inherit"
+          className={classes.papersButton}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h5" className={classes.grow}>
+          {name}
+        </Typography>
+        <EditPaperModal
+          paper={paper}
+          refreshPaper={refreshPaper}
+          render={toggleModal => (
+            <IconButton onClick={toggleModal} color="inherit">
+              <EditIcon />
+            </IconButton>
+          )}
+        />
+      </Toolbar>
     </AppBar>
   );
 };
