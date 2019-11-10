@@ -8,7 +8,7 @@ import { CanvasMode } from "../../types/canvas";
 
 import TogglePageComponent from "../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import Canvas from "../scripts/components/Canvas";
+import Canvas from "../../components/Canvas";
 
 type Props = RouteComponentProps;
 

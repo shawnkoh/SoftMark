@@ -5,7 +5,7 @@ import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
 import { CanvasMode } from "../../../types/canvas";
 
-import Canvas from "./Canvas";
+import Canvas from "../../../components/Canvas";
 
 interface OwnProps {
   pageId: number;

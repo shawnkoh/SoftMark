@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import api from "../../../../api";
 import TogglePageComponent from "../../../../components/misc/TogglePageComponent";
-import Canvas from "../../../scripts/components/Canvas";
+import Canvas from "../../../../components/Canvas";
 import { CanvasMode } from "../../../../types/canvas";
 import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
