@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import express from "express";
 import helmet from "helmet";
 import { Server } from "http";
@@ -8,6 +8,10 @@ import "reflect-metadata";
 import { Connection, createConnection } from "typeorm";
 import ormconfig from "../ormconfig";
 import routes from "./routes";
+
+const corsOptions: CorsOptions = {
+  origin: process.env.NODE_ENV === "production" ? ".*softmark.io.*" : "*"
+};
 
 export class ApiServer {
   public connection: Connection | null = null;
@@ -19,7 +23,7 @@ export class ApiServer {
     const app = express();
     app.use(bodyParser.json({ limit: "20mb" }));
     app.use(bodyParser.urlencoded({ extended: true, limit: "20mb" }));
-    app.use(cors());
+    app.use(cors(corsOptions));
     app.use(helmet());
     if (process.env.NODE_ENV !== "test") {
       console.log(`Express server has started on port ${port}.`);
