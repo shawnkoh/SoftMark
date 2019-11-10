@@ -2,7 +2,7 @@ import { CssBaseline } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/core/styles";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import NotFoundPage from "../components/NotFoundPage";
+import NotFoundPage from "../App/NotFoundPage";
 import PaperIndex from "./papers/PaperIndex";
 import PaperView from "./papers/PaperView";
 import PaperSetup from "./paperSetup/PaperSetup";

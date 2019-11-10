@@ -5,11 +5,11 @@ import { BrowserRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "typeface-roboto";
-import LoadingSpinner from "./components/LoadingSpinner";
-import { getUser } from "./store/auth/selectors";
-import configureStore from "./store";
-const AuthenticatedApp = React.lazy(() => import("./AuthenticatedApp"));
-const UnauthenticatedApp = React.lazy(() => import("./UnauthenticatedApp"));
+import LoadingSpinner from "../components/LoadingSpinner";
+import { getUser } from "../store/auth/selectors";
+import configureStore from "../store";
+const AuthenticatedApp = React.lazy(() => import("../AuthenticatedApp"));
+const UnauthenticatedApp = React.lazy(() => import("../UnauthenticatedApp"));
 
 const store = configureStore();
 toast.configure();
