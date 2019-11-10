@@ -206,6 +206,11 @@ const SetupSubpage: React.FC<Props> = props => {
     <>
       <Container fixed>
         <Grid container spacing={4} className={classes.container}>
+          <Grid item xs={12}>
+            <Typography variant="h4" component="h2">
+              Setup
+            </Typography>
+          </Grid>
           {rowDetails.map(row => createGridRow(row))}
         </Grid>
       </Container>
