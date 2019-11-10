@@ -5,16 +5,16 @@ import { getRepository, IsNull } from "typeorm";
 import { Mark } from "../entities/Mark";
 import { Question } from "../entities/Question";
 import { isAllocated } from "../middlewares/canModifyMark";
-import { MarkPatchData, MarkPostData } from "../types/marks";
+import { MarkPatchData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
-export async function create(request: Request, response: Response) {
+export async function replace(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const questionId = request.params.id;
-  const postData: MarkPostData = pick(request.body, "score");
+  const { score } = pick(request.body, "score");
   const question = await getRepository(Question).findOne(questionId, {
     where: { discardedAt: IsNull() },
     relations: ["script", "questionTemplate", "questionTemplate.allocations"]
@@ -43,7 +43,10 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const mark = new Mark(question, requester, postData.score);
+  const mark =
+    (await getRepository(Mark).findOne({ question, marker: requester })) ||
+    new Mark(question, requester, score);
+  mark.score = score;
   const errors = await validate(mark);
   if (errors.length > 0) {
     response.sendStatus(400);
@@ -52,7 +55,7 @@ export async function create(request: Request, response: Response) {
   await getRepository(Mark).save(mark);
 
   const data = await mark.getData();
-  response.status(201).json({ mark: data });
+  response.status(200).json({ mark: data });
 }
 
 export async function update(request: Request, response: Response) {
