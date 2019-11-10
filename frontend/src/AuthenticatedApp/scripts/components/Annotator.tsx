@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useStateWithCallbackInstant } from "use-state-with-callback";
 
 import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
@@ -49,7 +50,9 @@ const Annotator: React.FC<Props> = ({
   const [backgroundAnnotations, setBackgroundAnnotations] = useState<
     Annotation[]
   >([[]]);
-  const [toResetView, setToResetView] = useState(false);
+  const [toResetView, setToResetView] = useStateWithCallbackInstant(false, () =>
+    setToResetView(false)
+  );
 
   useEffect(() => {
     getOwnAnnotation(pageId)
@@ -68,13 +71,12 @@ const Annotator: React.FC<Props> = ({
   const handlePenWidthChange = event =>
     setPenWidth(parseInt(event.target.value, 10));
   const handleClearClick = event => setForegroundAnnotation([]);
-  const handleResetViewClick = event => {
-    setToResetView(true);
-    //setTimeout(() => setToResetView(false), 100);
-  };
+  const handleResetViewClick = event => setToResetView(true);
+  /*
   useLayoutEffect(() => {
     if (toResetView) setToResetView(false);
   }, [toResetView]);
+  */
 
   const onForegroundAnnotationChange = (annotation: Annotation) => {
     setForegroundAnnotation(annotation);
