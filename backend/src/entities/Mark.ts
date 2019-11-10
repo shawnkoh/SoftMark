@@ -1,43 +1,10 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  ValidatorConstraintInterface,
-  ValidationArguments,
-  ValidatorConstraint,
-  Validate
-} from "class-validator";
-import { Entity, ManyToOne, Column, getRepository } from "typeorm";
-
+import { IsNotEmpty, IsNumber, Validate } from "class-validator";
+import { Column, Entity, getRepository, ManyToOne } from "typeorm";
+import IsValidScoreConstraint from "../constraints/IsValidScoreConstraint";
+import { MarkData, MarkListData } from "../types/marks";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
-import { MarkData, MarkListData } from "../types/marks";
-import { QuestionTemplate } from "./QuestionTemplate";
-
-@ValidatorConstraint({ name: "IsValidScore", async: true })
-class IsValidScoreConstraint implements ValidatorConstraintInterface {
-  async validate(score: number, args: ValidationArguments) {
-    const questionId = (args.object as any)["questionId"];
-    const question: Question =
-      (args.object as any)["question"] ||
-      (await getRepository(Question).findOneOrFail(questionId, {
-        relations: ["questionTemplate"]
-      }));
-    const questionTemplate =
-      question.questionTemplate ||
-      (await getRepository(QuestionTemplate).findOneOrFail(
-        question.questionTemplateId
-      ));
-    if (!questionTemplate.score || score > questionTemplate.score) {
-      return false;
-    }
-    return true;
-  }
-
-  defaultMessage(args: ValidationArguments) {
-    return "Invalid score";
-  }
-}
 
 @Entity()
 export class Mark extends Discardable {
@@ -82,14 +49,16 @@ export class Mark extends Discardable {
   });
 
   getData = async (): Promise<MarkData> => {
-    this.question = await getRepository(Question).findOneOrFail(
-      this.questionId
-    );
-    this.marker = await getRepository(PaperUser).findOneOrFail(this.markerId);
+    const question =
+      this.question ||
+      (await getRepository(Question).findOneOrFail(this.questionId));
+    const marker =
+      this.marker ||
+      (await getRepository(PaperUser).findOneOrFail(this.markerId));
     return {
       ...this.getListData(),
-      question: await this.question.getListData(),
-      marker: await this.marker.getListData()
+      question: await question.getListData(),
+      marker: await marker.getListData()
     };
   };
 }
