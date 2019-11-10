@@ -10,7 +10,7 @@ import ormconfig from "../ormconfig";
 import routes from "./routes";
 
 const corsOptions: CorsOptions = {
-  origin: process.env.NODE_ENV === "production" ? ".*softmark.io.*" : "*"
+  origin: process.env.NODE_ENV === "production" ? /.*softmark\.io.*/ : "*"
 };
 
 export class ApiServer {
