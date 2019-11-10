@@ -18,7 +18,9 @@ enum CanvasActionType {
   ContinueLine = "continueLine",
   EndLine = "endLine",
   Drag = "drag",
-  ClickLine = "clickLine",
+  BeginErase = "beginErase",
+  EndErase = "endErase",
+  DeleteLine = "deleteLine",
   PanZoom = "panZoom",
   SetDraggable = "setDraggable",
   ResetView = "resetView"
@@ -34,7 +36,9 @@ type CanvasAction =
   | { type: CanvasActionType.BeginLine }
   | { type: CanvasActionType.ContinueLine; payload: Point }
   | { type: CanvasActionType.EndLine }
-  | { type: CanvasActionType.ClickLine; payload: number }
+  | { type: CanvasActionType.BeginErase }
+  | { type: CanvasActionType.EndErase }
+  | { type: CanvasActionType.DeleteLine; payload: number }
   | { type: CanvasActionType.Drag; payload: Point }
   | {
       type: CanvasActionType.PanZoom;
@@ -98,7 +102,17 @@ const createCanvasStateReducer = ({
         draftState.isDrawing = false;
       });
       break;
-    case CanvasActionType.ClickLine:
+    case CanvasActionType.BeginErase:
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = true;
+      });
+      break;
+    case CanvasActionType.EndErase:
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = false;
+      });
+      break;
+    case CanvasActionType.DeleteLine:
       nextState = produce(state, draftState => {
         draftState.lines.splice(action.payload, 1);
       });
@@ -194,6 +208,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleMouseDown = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.BeginLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.BeginErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -221,6 +237,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleMouseUp = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.EndLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.EndErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -296,6 +314,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleTouchStart = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.BeginLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.BeginErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -378,6 +398,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleTouchEnd = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.EndLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.EndErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.PanZoom,
@@ -403,7 +425,13 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const handleLineClick = index => {
     if (mode === CanvasMode.Eraser) {
-      dispatch({ type: CanvasActionType.ClickLine, payload: index });
+      dispatch({ type: CanvasActionType.DeleteLine, payload: index });
+    }
+  };
+
+  const handleLineEnter = index => {
+    if (mode === CanvasMode.Eraser && canvasState.isDrawing) {
+      dispatch({ type: CanvasActionType.DeleteLine, payload: index });
     }
   };
 
@@ -461,6 +489,8 @@ const Canvas: React.FC<CanvasProps> = ({
             lineCap="round"
             onClick={() => handleLineClick(i)}
             onTap={() => handleLineClick(i)}
+            onMouseEnter={() => handleLineEnter(i)}
+            onTouchMove={() => handleLineEnter(i)}
           />
         ))}
       </Layer>
