@@ -7,6 +7,7 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
 import {
+  Grid,
   Drawer,
   Divider,
   List,
@@ -24,7 +25,7 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import QuestionContainer from "./components/QuestionContainer";
 
 import MenuIcon from "@material-ui/icons/Menu";
-import GoBackIcon from "@material-ui/icons/ArrowBackIos";
+import GoBackIcon from "@material-ui/icons/ArrowBack";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 
 import { DndProvider } from "react-dnd";
@@ -61,6 +62,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up("sm")]: {
       display: "none"
     }
+  },
+  backButton: {
+    marginRight: theme.spacing(2)
   },
   addFab: {
     position: "absolute",
@@ -136,26 +140,32 @@ const QuestionAllocation: React.FC<Props> = ({
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" className={classes.appBar} elevation={1}>
         <Toolbar>
           <IconButton
             color="inherit"
-            edge="start"
+            onClick={() => history.goBack()}
+            className={classes.backButton}
+          >
+            <GoBackIcon />
+          </IconButton>
+          <IconButton
+            color="inherit"
             onClick={handleDrawerToggle}
             className={classes.menuButton}
           >
             <MenuIcon />
           </IconButton>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => history.goBack()}
-          >
-            <GoBackIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap>
-            {paper && paper.name}
-          </Typography>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="h6">{paper && paper.name}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1">
+                Set up marking template
+              </Typography>
+            </Grid>
+          </Grid>
         </Toolbar>
       </AppBar>
       <nav>

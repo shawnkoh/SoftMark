@@ -14,13 +14,8 @@ const useStyles = makeStyles((theme: Theme) =>
     grow: {
       flexGrow: 1
     },
-    toolbar: {
-      paddingLeft: 0,
-      paddingRight: 0
-    },
     logoContainer: {
-      paddingTop: theme.spacing(2),
-      paddingBottom: theme.spacing(2)
+      padding: theme.spacing(1)
     },
     logo: {
       height: 24
@@ -33,27 +28,24 @@ const PaperIndexHeader: React.FC = () => {
 
   return (
     <AppBar position="sticky" color="inherit" elevation={1}>
-      <Container fixed>
-        <Toolbar className={classes.toolbar}>
-          <div className={clsx(classes.logoContainer, classes.grow)}>
-            <img src={softmarkLogo} className={classes.logo} />
-          </div>
-          <AccountModal
-            render={toggleModal => (
-              <IconButton
-                onClick={toggleModal}
-                edge="end"
-                aria-label="Account of current user"
-                aria-haspopup="true"
-                color="primary"
-                size="medium"
-              >
-                <AccountCircle />
-              </IconButton>
-            )}
-          />
-        </Toolbar>
-      </Container>
+      <Toolbar>
+        <div className={clsx(classes.logoContainer, classes.grow)}>
+          <img src={softmarkLogo} className={classes.logo} />
+        </div>
+        <AccountModal
+          render={toggleModal => (
+            <IconButton
+              onClick={toggleModal}
+              aria-label="Account of current user"
+              aria-haspopup="true"
+              color="primary"
+              size="medium"
+            >
+              <AccountCircle />
+            </IconButton>
+          )}
+        />
+      </Toolbar>
     </AppBar>
   );
 };
