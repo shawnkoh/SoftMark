@@ -1,9 +1,10 @@
 import { AxiosResponse } from "axios";
+import { GradingData } from "backend/src/types/grading";
 import {
-  QuestionTemplateListData,
   QuestionTemplateData,
-  QuestionTemplatePostData,
-  QuestionTemplatePatchData
+  QuestionTemplateListData,
+  QuestionTemplatePatchData,
+  QuestionTemplatePostData
 } from "backend/src/types/questionTemplates";
 import client from "./client";
 
@@ -48,4 +49,18 @@ export async function editQuestionTemplate(
   questionPatchData: QuestionTemplatePatchData
 ): Promise<AxiosResponse<{ questionTemplate: QuestionTemplateData }>> {
   return client.patch(`${URL}/${id}`, questionPatchData);
+}
+
+/**
+ * Only accessible to Marker
+ */
+export async function getQuestionToMark(id: number) {
+  try {
+    const { data } = await client.get<GradingData>(
+      `${URL}/${id}/question_to_mark`
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
 }

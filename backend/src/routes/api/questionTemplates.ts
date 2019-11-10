@@ -15,6 +15,6 @@ router.patch("/:id/undiscard", QuestionTemplatesController.undiscard);
 
 router.post("/:id/allocations", AllocationsController.create);
 
-router.get("/:id/mark_question", GradingController.markQuestion);
+router.get("/:id/question_to_mark", GradingController.questionToMark);
 
 export default router;
