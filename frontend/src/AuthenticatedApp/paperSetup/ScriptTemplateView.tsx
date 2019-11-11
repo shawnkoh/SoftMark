@@ -1,90 +1,234 @@
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../api";
-import { Annotation } from "backend/src/types/annotations";
+import { DndProvider } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
+import clsx from "clsx";
+import api from "api";
+// Material UI
+import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import {
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Drawer,
+  IconButton,
+  ListItemIcon,
+  Avatar,
+  AppBar,
+  Toolbar,
+  Typography
+} from "@material-ui/core";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import PagesIcon from "@material-ui/icons/Pages";
+// Types
+import { PaperData } from "backend/src/types/papers";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+// Components
+import ScriptTemplatePanel from "./ScriptTemplatePanel";
+import LoadingSpinner from "components/LoadingSpinner";
 
-import TogglePageComponent from "../../components/misc/TogglePageComponent";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import Canvas from "../../components/Canvas";
-import { CanvasMode } from "../../components/Canvas/types";
+const drawerWidth = 175;
 
-type Props = RouteComponentProps;
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    backgroundColor: theme.palette.background.paper,
+    display: "flex",
+    height: "100%"
+  },
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    paddingRight: theme.spacing(3),
+    paddingLeft: theme.spacing(3),
+    minHeight: "100vh",
+    maxHeight: "100vh"
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  },
+  appBarShift: {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  menuButton: {
+    marginRight: 36
+  },
+  hide: {
+    display: "none"
+  },
+  toolbar: theme.mixins.toolbar,
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: "nowrap"
+  },
+  drawerOpen: {
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  drawerClose: {
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    }),
+    overflowX: "hidden",
+    width: theme.spacing(7) + 1,
+    [theme.breakpoints.up("sm")]: {
+      width: theme.spacing(9) + 1
+    }
+  },
+  avatar: {
+    color: "#fff",
+    backgroundColor: theme.palette.primary.light
+  },
+  avatarSelected: {
+    color: "#fff",
+    backgroundColor: theme.palette.primary.dark
+  }
+}));
 
-const ScriptTemplateView: React.FC<Props> = ({ match: { params } }) => {
-  const paper_id = +(params as { paper_id: string }).paper_id;
+interface ScriptTemplateViewProps {
+  paper: PaperData;
+}
+
+const ScriptTemplateView: React.FC<ScriptTemplateViewProps> = props => {
+  const { paper } = props;
+
+  const classes = useStyles();
+  const theme = useTheme();
+
+  const [currentPageNo, setCurrentPageNo] = useState(1);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [
     scriptTemplate,
     setScriptTemplate
   ] = useState<ScriptTemplateData | null>(null);
 
-  const [viewPageNo, setViewPageNo] = useState(1);
-  const incrementViewPageNo = () => {
-    if (scriptTemplate && scriptTemplate.pageTemplates.length > viewPageNo) {
-      setViewPageNo(viewPageNo + 1);
-    }
-  };
-  const decrementViewPageNo = () => {
-    if (viewPageNo > 1) {
-      setViewPageNo(viewPageNo - 1);
-    }
-  };
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
-
-  const getScriptTemplate = async (paperId: number) => {
-    const data = await api.scriptTemplates.getScriptTemplate(paperId);
-    setScriptTemplate(data);
-    setIsLoading(false);
-  };
-
   useEffect(() => {
-    getScriptTemplate(paper_id);
+    api.scriptTemplates.getScriptTemplate(paper.id).then(resp => {
+      if (resp) {
+        setScriptTemplate(resp);
+      }
+    });
   }, []);
 
-  if (isLoading) {
-    return (
-      <>
-        <LoadingSpinner />
-        Loading script template...
-      </>
-    );
+  if (!scriptTemplate) {
+    return <LoadingSpinner />;
   }
 
-  if (!scriptTemplate) {
-    return <>The script does not exist</>;
-  }
+  const handleChangePage = (newPage: number) => (event: any) => {
+    setCurrentPageNo(newPage);
+  };
+
+  const nextPage = () =>
+    currentPageNo < scriptTemplate.pageTemplates.length &&
+    setCurrentPageNo(currentPageNo + 1);
+
+  const prevPage = () =>
+    currentPageNo > 1 && setCurrentPageNo(currentPageNo - 1);
 
   return (
-    <div style={{ height: "100vh", width: "100vh" }}>
-      {scriptTemplate.pageTemplates.map((page, index) => {
-        return (
-          <>
-            {page.pageNo === viewPageNo && (
-              <Canvas
-                key={page.id}
-                backgroundImageSource={page.imageUrl}
-                penColor={"#ff0000"}
-                penWidth={0}
-                mode={CanvasMode.View}
-                foregroundAnnotation={[]}
-                backgroundAnnotations={[]}
-                onForegroundAnnotationChange={(annotation: Annotation) => {}}
-              />
+    <div className={classes.root}>
+      <AppBar
+        position="fixed"
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: drawerOpen
+        })}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            onClick={() => setDrawerOpen(true)}
+            edge="start"
+            className={clsx(classes.menuButton, {
+              [classes.hide]: drawerOpen
+            })}
+          >
+            <PagesIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap>
+            Mini variant drawer
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        className={clsx(classes.drawer, {
+          [classes.drawerOpen]: drawerOpen,
+          [classes.drawerClose]: !drawerOpen
+        })}
+        classes={{
+          paper: clsx({
+            [classes.drawerOpen]: drawerOpen,
+            [classes.drawerClose]: !drawerOpen
+          })
+        }}
+        open={drawerOpen}
+      >
+        <div className={classes.toolbar}>
+          <IconButton onClick={() => setDrawerOpen(false)}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
             )}
-          </>
-        );
-      })}
-      <TogglePageComponent
-        pageNo={viewPageNo}
-        incrementPageNo={incrementViewPageNo}
-        decrementPageNo={decrementViewPageNo}
-      />
+          </IconButton>
+        </div>
+        <Divider />
+        <List>
+          {scriptTemplate.pageTemplates.map(pageTemplate => (
+            <ListItem
+              button
+              key={pageTemplate.id}
+              onClick={handleChangePage(pageTemplate.pageNo)}
+            >
+              <ListItemIcon>
+                <Avatar
+                  className={clsx({
+                    [classes.avatar]: pageTemplate.pageNo != currentPageNo,
+                    [classes.avatarSelected]:
+                      pageTemplate.pageNo == currentPageNo
+                  })}
+                  variant="rounded"
+                >
+                  {pageTemplate.pageNo}
+                </Avatar>
+              </ListItemIcon>
+              <ListItemText primary={`Page ${pageTemplate.pageNo}`} />
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <main className={classes.content}>
+        <div className={classes.toolbar} />
+        <DndProvider backend={HTML5Backend}>
+          {scriptTemplate.pageTemplates.map(pageTemplate => (
+            <ScriptTemplatePanel
+              key={pageTemplate.id}
+              questionTemplates={scriptTemplate.questionTemplates}
+              currentPageNo={currentPageNo}
+              pageCount={scriptTemplate.pageTemplates.length}
+              nextPage={nextPage}
+              prevPage={prevPage}
+              pageTemplate={pageTemplate}
+            />
+          ))}
+        </DndProvider>
+      </main>
     </div>
   );
 };
 
-export default withRouter(ScriptTemplateView);
+export default ScriptTemplateView;

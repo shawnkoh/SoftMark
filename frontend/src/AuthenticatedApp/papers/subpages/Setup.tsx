@@ -193,7 +193,7 @@ const SetupSubpage: React.FC<Props> = props => {
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() =>
-            props.history.push(`/papers/${paper.id}/set_up/question_allocation`)
+            props.history.push(`/papers/${paper.id}/set_up/script_template`)
           }
         >
           Allocate

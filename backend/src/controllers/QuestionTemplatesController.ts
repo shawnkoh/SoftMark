@@ -172,6 +172,7 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
+    console.log(patchData);
     if (patchData.parentName) {
       const parent = await getRepository(QuestionTemplate).findOneOrFail({
         where: { name: patchData.parentName }
@@ -198,6 +199,7 @@ export async function update(request: Request, response: Response) {
     const data = await questionTemplate.getData();
     response.status(200).json({ questionTemplate: data });
   } catch (error) {
+    console.log(error);
     response.sendStatus(400);
   }
 }

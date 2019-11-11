@@ -1,4 +1,8 @@
 import React from "react";
+import api from "api";
+import update from "immutability-helper";
+import { Formik, FormikProps, Form, Field, FieldProps } from "formik";
+// Material UI
 import {
   Dialog,
   DialogTitle,
@@ -10,60 +14,106 @@ import {
   makeStyles,
   Fab
 } from "@material-ui/core";
-import { Formik, FormikProps, Form, Field, FieldProps } from "formik";
-import { isPageValid } from "../../../utils/questionAllocationUtil";
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
+import { isPageValid } from "../../../utils/questionTemplateUtil";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 
-export interface NewQuestionValues {
+export interface NewQuestionTemplateValues {
   title: string;
   score: number;
   pageCovered: string;
 }
 
-export interface QuestionEditDialogProps {
+interface SharedProps {
+  scriptTemplateId: number;
   open: boolean;
   handleClose: (e?: any) => void;
-  initialValues: NewQuestionValues;
-  onSubmit: (values: NewQuestionValues) => Promise<any>;
-  handleDelete?: () => Promise<any>;
-  currentPage: number;
+  currentPageNo: number;
   pageCount: number;
+  initialValues?: NewQuestionTemplateValues;
+  onSuccess: (qTemplate: QuestionTemplateData) => void;
 }
 
-type Props = QuestionEditDialogProps;
+export interface QuestionEditDialogProps extends SharedProps {
+  mode: "edit";
+  questionTemplateId: number;
+  initialValues: NewQuestionTemplateValues;
+  onDeleteSuccess?: () => void;
+}
+
+export interface QuestionCreateDialogProps extends SharedProps {
+  mode: "create";
+}
+
+type Props = QuestionEditDialogProps | QuestionCreateDialogProps;
 
 const QuestionEditDialog: React.FC<Props> = props => {
+  const {
+    scriptTemplateId,
+    open,
+    mode,
+    handleClose,
+    currentPageNo,
+    pageCount,
+    initialValues = { title: "", score: 0, pageCovered: "" },
+    onSuccess
+  } = props;
   const [deleteWarning, setDeleteWarning] = React.useState(false);
+
+  const onSubmit = (values: NewQuestionTemplateValues) =>
+    mode == "create"
+      ? api.questionTemplates.createQuestionTemplate(scriptTemplateId, {
+          name: values.title,
+          score: values.score,
+          pageCovered: values.pageCovered
+        })
+      : api.questionTemplates.editQuestionTemplate(
+          (props as QuestionEditDialogProps).questionTemplateId,
+          {
+            name: values.title,
+            score: values.score
+          }
+        );
+  const handleDelete = () =>
+    api.questionTemplates.discardQuestionTemplate(
+      (props as QuestionEditDialogProps).questionTemplateId
+    );
+
   return (
-    <Dialog open={props.open} onClose={props.handleClose}>
+    <Dialog open={open} onClose={handleClose}>
       <Formik
-        initialValues={props.initialValues}
+        initialValues={initialValues}
         onSubmit={(values, actions) => {
-          props.onSubmit(values);
+          onSubmit(values).then(resp => {
+            resp.status === 201 && onSuccess(resp.data.questionTemplate);
+          });
           actions.setSubmitting(false);
           actions.resetForm();
-          props.handleClose();
+          handleClose();
         }}
       >
-        {(formikProps: FormikProps<NewQuestionValues>) => (
+        {(formikProps: FormikProps<NewQuestionTemplateValues>) => (
           <Form>
             <DialogTitle>
-              {props.handleDelete
-                ? `Editing ${props.initialValues.title}`
+              {mode == "edit"
+                ? `Editing ${initialValues.title}`
                 : "Add Question"}
             </DialogTitle>
             <DialogContent>
               <Grid container justify="flex-start" spacing={2}>
                 <Grid item xs>
                   <Field name="title" validate={value => !value && "Required"}>
-                    {({ field, meta }: FieldProps<NewQuestionValues>) => (
+                    {({
+                      field,
+                      meta
+                    }: FieldProps<NewQuestionTemplateValues>) => (
                       <TextField
                         error={!!meta.error}
                         autoFocus
                         margin="dense"
                         label="Title"
                         helperText={meta.error || "e.g. Q1a"}
-                        required
+                        required={mode == "create"}
                         {...field}
                       />
                     )}
@@ -76,14 +126,17 @@ const QuestionEditDialog: React.FC<Props> = props => {
                       value < 0 && "Score should be non-negative"
                     }
                   >
-                    {({ field, meta }: FieldProps<NewQuestionValues>) => (
+                    {({
+                      field,
+                      meta
+                    }: FieldProps<NewQuestionTemplateValues>) => (
                       <TextField
                         error={!!meta.error}
                         margin="dense"
                         label="Score"
                         helperText={meta.error}
                         type="number"
-                        required
+                        required={mode == "create"}
                         {...field}
                       />
                     )}
@@ -93,16 +146,20 @@ const QuestionEditDialog: React.FC<Props> = props => {
                   <Field
                     name="pageCovered"
                     validate={value =>
-                      isPageValid(value, props.currentPage, props.pageCount)
+                      isPageValid(value, currentPageNo, pageCount)
                     }
                   >
-                    {({ field, meta }: FieldProps<NewQuestionValues>) => (
+                    {({
+                      field,
+                      meta
+                    }: FieldProps<NewQuestionTemplateValues>) => (
                       <TextField
                         error={!!meta.error}
                         margin="dense"
                         label="Page Covered"
                         helperText={meta.error}
-                        required
+                        placeholder="1, 2, 4-5"
+                        required={mode == "create"}
                         fullWidth
                         {...field}
                       />
@@ -112,7 +169,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
               </Grid>
             </DialogContent>
             <DialogActions>
-              {props.handleDelete && (
+              {mode === "edit" && (
                 <>
                   <Button
                     onClick={() => setDeleteWarning(true)}
@@ -123,13 +180,19 @@ const QuestionEditDialog: React.FC<Props> = props => {
                   <ConfirmationDialog
                     open={deleteWarning}
                     handleClose={() => setDeleteWarning(false)}
-                    title={`Deleting ${props.initialValues.title}?`}
+                    title={`Deleting ${initialValues.title}?`}
                     message={`This question will be removed from the script.`}
-                    handleConfirm={props.handleDelete}
+                    handleConfirm={() =>
+                      handleDelete().then(
+                        resp =>
+                          (props as QuestionEditDialogProps).onDeleteSuccess &&
+                          (props as QuestionEditDialogProps).onDeleteSuccess!()
+                      )
+                    }
                   />
                 </>
               )}
-              <Button onClick={props.handleClose} color="default">
+              <Button onClick={handleClose} color="default">
                 Cancel
               </Button>
               <Button type="submit" color="primary">
