@@ -1,12 +1,22 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Validate
+} from "class-validator";
 import {
   Column,
   Entity,
   getRepository,
   ManyToOne,
   OneToMany,
+  Tree,
+  TreeChildren,
+  TreeParent,
   Unique
 } from "typeorm";
+import IsUniqueQuestionTemplateName from "../constraints/IsUniqueQuestionTemplateName";
 import { PageTemplateListData } from "../types/pageTemplates";
 import {
   QuestionTemplateData,
@@ -21,6 +31,7 @@ import { ScriptTemplate } from "./ScriptTemplate";
 
 @Entity()
 @Unique(["scriptTemplate", "name"])
+@Tree("materialized-path")
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
 
@@ -53,11 +64,11 @@ export class QuestionTemplate extends Discardable {
   @Column({ nullable: true })
   parentQuestionTemplateId!: number | null;
 
-  @ManyToOne(
-    type => QuestionTemplate,
-    questionTemplate => questionTemplate.childQuestionTemplates
-  )
+  @TreeParent()
   parentQuestionTemplate?: QuestionTemplate | null;
+
+  @TreeChildren()
+  childQuestionTemplates?: QuestionTemplate[];
 
   @Column({ type: "integer", nullable: true })
   @IsOptional()
@@ -70,12 +81,6 @@ export class QuestionTemplate extends Discardable {
   leftOffset: number | null;
 
   @OneToMany(
-    type => QuestionTemplate,
-    questionTemplate => questionTemplate.parentQuestionTemplate
-  )
-  childQuestionTemplates?: QuestionTemplate[];
-
-  @OneToMany(
     type => PageQuestionTemplate,
     pageQuestionTemplate => pageQuestionTemplate.questionTemplate,
     { cascade: true }
@@ -85,6 +90,7 @@ export class QuestionTemplate extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
+  @Validate(IsUniqueQuestionTemplateName)
   name: string;
 
   @Column({ type: "double precision", nullable: true })
