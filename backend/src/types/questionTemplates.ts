@@ -1,5 +1,6 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
+import { isPageTemplateListData, PageTemplateListData } from "./pageTemplates";
+import { UserListData } from "./users";
 
 export interface QuestionTemplatePostData {
   name: string;
@@ -24,6 +25,15 @@ export interface QuestionTemplateListData extends DiscardableData {
 export interface QuestionTemplateData extends QuestionTemplateListData {
   childQuestionTemplates: QuestionTemplateListData[];
   pageTemplates: PageTemplateListData[];
+}
+
+export interface QuestionTemplateRootData {
+  id: number;
+  name: string;
+  totalScore: number | null;
+  markers: UserListData[];
+  questionCount: number;
+  markCount: number;
 }
 
 export function isQuestionTemplatePostData(

@@ -13,7 +13,6 @@ import {
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
-import { Annotation } from "../entities/Annotation";
 
 /**
  * IMPORTANT NOTE
