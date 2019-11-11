@@ -31,9 +31,16 @@ export interface QuestionTemplateRootData {
   id: number;
   name: string;
   totalScore: number | null;
-  markers: UserListData[];
+  markers: number[];
   questionCount: number;
   markCount: number;
+}
+
+export interface QuestionTemplateGradingListData {
+  rootQuestionTemplates: QuestionTemplateRootData[];
+  markers: UserListData[];
+  totalQuestionCount: number;
+  totalMarkCount: number;
 }
 
 export function isQuestionTemplatePostData(

@@ -1,6 +1,6 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { pick } from "lodash";
+import _ from "lodash";
 import {
   getManager,
   getRepository,
@@ -19,7 +19,8 @@ import { PaperUserRole } from "../types/paperUsers";
 import {
   QuestionTemplatePatchData,
   QuestionTemplatePostData,
-  QuestionTemplateRootData
+  QuestionTemplateRootData,
+  QuestionTemplateGradingListData
 } from "../types/questionTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
@@ -29,7 +30,7 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const scriptTemplateId = request.params.id;
-  const postData = pick(
+  const postData = _.pick(
     request.body,
     "name",
     "parentName",
@@ -167,7 +168,7 @@ export async function update(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const questionTemplateId = request.params.id;
-  const patchData = pick(
+  const patchData = _.pick(
     request.body,
     "name",
     "parentName",
@@ -325,6 +326,10 @@ export async function rootQuestionTemplates(
     return;
   }
 
+  let totalMarkCount = 0;
+  let totalQuestionCount = 0;
+  let aggregateMarkers: any[] = [];
+
   // TODO: I think this can be optimised into one query using group by
   const rawRoots = await getTreeRepository(QuestionTemplate)
     .createQueryBuilder("questionTemplate")
@@ -355,8 +360,9 @@ export async function rootQuestionTemplates(
           questionCount++;
         }
       });
+      totalQuestionCount += questionCount;
 
-      const markers = await getRepository(Allocation)
+      let markers: any = await getRepository(Allocation)
         .createQueryBuilder("allocation")
         .where("allocation.id IN (:...ids)", { ids: descendantIds })
         .innerJoin("allocation.paperUser", "marker")
@@ -366,6 +372,13 @@ export async function rootQuestionTemplates(
         .addSelect("user.emailVerified", "emailVerified")
         .addSelect("user.name", "name")
         .getRawMany();
+      markers.forEach((marker: any) => {
+        aggregateMarkers.push(marker);
+      });
+
+      markers = _.chain(markers)
+        .map(marker => marker.id)
+        .sortedUniq();
 
       const questions = await getRepository(Question)
         .createQueryBuilder("question")
@@ -381,6 +394,7 @@ export async function rootQuestionTemplates(
         .createQueryBuilder("mark")
         .where("mark.questionId IN (:...ids)", { ids: questionIds })
         .getCount();
+      totalMarkCount += markCount;
 
       const root: QuestionTemplateRootData = {
         id: rawRoot.id,
@@ -394,5 +408,14 @@ export async function rootQuestionTemplates(
     })
   );
 
-  response.status(200).json({ rootQuestionTemplates: roots });
+  aggregateMarkers = _.uniqBy(aggregateMarkers, marker => marker.id);
+
+  const data: QuestionTemplateGradingListData = {
+    rootQuestionTemplates: roots,
+    totalQuestionCount,
+    totalMarkCount,
+    markers: aggregateMarkers
+  };
+
+  response.status(200).json(data);
 }
