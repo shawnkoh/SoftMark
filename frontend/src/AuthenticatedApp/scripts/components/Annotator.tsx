@@ -5,9 +5,11 @@ import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
 
+import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import Canvas from "../../../components/Canvas";
+import CanvasWithControls from "../../../components/Canvas/CanvasWithControls";
 import { CanvasMode } from "../../../components/Canvas/types";
 
 interface OwnProps {
@@ -41,18 +43,12 @@ const Annotator: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
 
-  const [mode, setMode] = useState(CanvasMode.Pen);
-  const [penColor, setPenColor] = useState("#ff0000");
-  const [penWidth, setPenWidth] = useState(5);
   const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation>(
     []
   );
   const [backgroundAnnotations, setBackgroundAnnotations] = useState<
     Annotation[]
   >([[]]);
-  const [toResetView, setToResetView] = useStateWithCallbackInstant(false, () =>
-    setToResetView(false)
-  );
 
   useEffect(() => {
     getOwnAnnotation(pageId)
@@ -64,22 +60,7 @@ const Annotator: React.FC<Props> = ({
 
   // TODO: get background annotations
 
-  const handlePenClick = event => setMode(CanvasMode.Pen);
-  const handleEraserClick = event => setMode(CanvasMode.Eraser);
-  const handleViewClick = event => setMode(CanvasMode.View);
-  const handlePenColorChange = event => setPenColor(event.target.value);
-  const handlePenWidthChange = event =>
-    setPenWidth(parseInt(event.target.value, 10));
-  const handleClearClick = event => setForegroundAnnotation([]);
-  const handleResetViewClick = event => setToResetView(true);
-  /*
-  useLayoutEffect(() => {
-    if (toResetView) setToResetView(false);
-  }, [toResetView]);
-  */
-
-  const onForegroundAnnotationChange = (annotation: Annotation) => {
-    setForegroundAnnotation(annotation);
+  const handleForegroundAnnotationChange = (annotation: Annotation) => {
     const annotationPostData: AnnotationPostData = {
       layer: annotation
     };
@@ -92,46 +73,20 @@ const Annotator: React.FC<Props> = ({
 
   return (
     <div className={classes.container}>
-      <div>
-        <button
-          onClick={handlePenClick}
-          style={{ color: mode === "pen" ? "red" : undefined }}
-        >
-          Pen
-        </button>
-        <button
-          onClick={handleEraserClick}
-          style={{ color: mode === "eraser" ? "red" : undefined }}
-        >
-          Eraser
-        </button>
-        <button
-          onClick={handleViewClick}
-          style={{ color: mode === "view" ? "red" : undefined }}
-        >
-          View
-        </button>
-        <input type="color" onChange={handlePenColorChange} value={penColor} />
-        <input
-          type="range"
-          onChange={handlePenWidthChange}
-          min="1"
-          max="10"
-          value={penWidth}
-        />
-        <button onClick={handleClearClick}>Clear Canvas</button>
-        <button onClick={handleResetViewClick}>Reset View</button>
-      </div>
+      <AppBar position="static" color="primary" elevation={1}>
+        <Toolbar>
+          <IconButton color="inherit">
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6">Placeholder Title</Typography>
+        </Toolbar>
+      </AppBar>
       <div className={classes.grow}>
-        <Canvas
+        <CanvasWithControls
           backgroundImageSource={backgroundImageSource}
           backgroundAnnotations={backgroundAnnotations}
           foregroundAnnotation={foregroundAnnotation}
-          mode={mode}
-          penColor={penColor}
-          penWidth={penWidth}
-          onForegroundAnnotationChange={onForegroundAnnotationChange}
-          resetView={toResetView}
+          onForegroundAnnotationChange={handleForegroundAnnotationChange}
         />
       </div>
     </div>
