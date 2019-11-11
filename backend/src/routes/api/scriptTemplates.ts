@@ -18,4 +18,9 @@ router.post(
   PageQuestionTemplatesController.create
 );
 
+router.get(
+  "/:id/root_question_templates",
+  QuestionTemplatesController.rootQuestionTemplates
+);
+
 export default router;
