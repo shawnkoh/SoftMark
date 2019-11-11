@@ -13,6 +13,7 @@ import {
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import { Annotation } from "../entities/Annotation";
 
 /**
  * IMPORTANT NOTE
@@ -177,7 +178,12 @@ export async function questionToMark(request: Request, response: Response) {
     .select("page.id", "id")
     .addSelect("page.pageNo", "pageNo")
     .addSelect("page.imageUrl", "imageUrl")
-    .leftJoin("page.annotations", "annotation")
+    .leftJoin(
+      "page.annotations",
+      "annotation",
+      "annotation.paperUserId = :id",
+      { id: requester.id }
+    )
     .addSelect("annotation.id", "annotationId")
     .addSelect("annotation.layer", "layer")
     .getRawMany();
