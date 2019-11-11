@@ -309,7 +309,16 @@ export async function rootQuestionTemplates(
 ) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
-  const paperId = request.params.id;
+  const scriptTemplateId = request.params.id;
+  const scriptTemplate = await getRepository(ScriptTemplate).findOne(
+    scriptTemplateId,
+    { where: { discardedAt: IsNull() } }
+  );
+  if (!scriptTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const { paperId } = scriptTemplate;
   const allowed = allowedRequester(requesterId, paperId, PaperUserRole.Marker);
   if (!allowed) {
     response.sendStatus(404);
@@ -385,5 +394,5 @@ export async function rootQuestionTemplates(
     })
   );
 
-  response.status(200).json(roots);
+  response.status(200).json({ rootQuestionTemplates: roots });
 }
