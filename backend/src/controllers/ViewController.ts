@@ -5,11 +5,7 @@ import { Brackets, getRepository, getTreeRepository } from "typeorm";
 import { PageQuestion } from "../entities/PageQuestion";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
-import {
-  GradingData,
-  PageGradingData,
-  QuestionGradingData
-} from "../types/grading";
+import { ScriptViewData, PageViewData, QuestionViewData } from "../types/view";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -116,7 +112,7 @@ export async function questionToMark(request: Request, response: Response) {
     ...rootQuestion
   }: {
     matriculationNumber: string | null;
-  } & QuestionGradingData = rootQuestionData;
+  } & QuestionViewData = rootQuestionData;
 
   const descendantQuestionTemplatesData = await getTreeRepository(
     QuestionTemplate
@@ -154,7 +150,7 @@ export async function questionToMark(request: Request, response: Response) {
     const { id, score } = question;
       
     // Temporary workaround for line 131
-    const descendantQuestion: QuestionGradingData = {
+    const descendantQuestion: QuestionViewData = {
       id,
       name: descendant.name,
       score,
@@ -187,7 +183,7 @@ export async function questionToMark(request: Request, response: Response) {
     .addSelect("annotation.layer", "layer")
     .getRawMany();
 
-  const pages: PageGradingData[] = _.chain(pagesData)
+  const pages: PageViewData[] = _.chain(pagesData)
     .uniqBy("id")
     .groupBy("id")
     .map((array, id) => {
@@ -218,7 +214,7 @@ export async function questionToMark(request: Request, response: Response) {
     })
     .value();
 
-  const data: GradingData = {
+  const data: ScriptViewData = {
     matriculationNumber,
     rootQuestion,
     descendantQuestions,
