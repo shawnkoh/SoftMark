@@ -1,22 +1,21 @@
-import React from "react";
-import api from "api";
-import update from "immutability-helper";
-import { Formik, FormikProps, Form, Field, FieldProps } from "formik";
 // Material UI
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Grid,
-  TextField,
-  DialogActions,
   Button,
-  makeStyles,
-  Fab
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField
 } from "@material-ui/core";
+import api from "api";
+import { AxiosResponse } from "axios";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import { Field, FieldProps, Form, Formik, FormikProps } from "formik";
+import React from "react";
+import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
 import { isPageValid } from "../../../utils/questionTemplateUtil";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 
 export interface NewQuestionTemplateValues {
   title: string;
@@ -60,20 +59,33 @@ const QuestionEditDialog: React.FC<Props> = props => {
   } = props;
   const [deleteWarning, setDeleteWarning] = React.useState(false);
 
-  const onSubmit = (values: NewQuestionTemplateValues) =>
-    mode == "create"
-      ? api.questionTemplates.createQuestionTemplate(scriptTemplateId, {
-          name: values.title,
-          score: values.score,
-          pageCovered: values.pageCovered
-        })
-      : api.questionTemplates.editQuestionTemplate(
+  const onSubmit = async (values: NewQuestionTemplateValues) => {
+    try {
+      let response: AxiosResponse<{ questionTemplate: QuestionTemplateData }>;
+      if (mode == "create") {
+        response = await api.questionTemplates.createQuestionTemplate(
+          scriptTemplateId,
+          {
+            name: values.title,
+            score: values.score,
+            pageCovered: values.pageCovered
+          }
+        );
+      } else {
+        response = await api.questionTemplates.editQuestionTemplate(
           (props as QuestionEditDialogProps).questionTemplateId,
           {
             name: values.title,
             score: values.score
           }
         );
+      }
+      onSuccess(response.data.questionTemplate);
+    } catch (error) {
+      toast.error("An error occured while creating the questionTemplate");
+      // TODO: Handle this better
+    }
+  };
   const handleDelete = () =>
     api.questionTemplates.discardQuestionTemplate(
       (props as QuestionEditDialogProps).questionTemplateId
@@ -84,9 +96,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
       <Formik
         initialValues={initialValues}
         onSubmit={(values, actions) => {
-          onSubmit(values).then(resp => {
-            resp.status === 201 && onSuccess(resp.data.questionTemplate);
-          });
+          onSubmit(values);
           actions.setSubmitting(false);
           actions.resetForm();
           handleClose();
