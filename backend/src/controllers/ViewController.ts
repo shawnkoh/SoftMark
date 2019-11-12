@@ -8,6 +8,7 @@ import {
   SelectQueryBuilder
 } from "typeorm";
 import { PageQuestion } from "../entities/PageQuestion";
+import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { PaperUserRole } from "../types/paperUsers";
@@ -127,6 +128,14 @@ function getPages(pagesData: any): PageViewData[] {
       };
     })
     .value();
+}
+
+function lockQuestion(requester: PaperUser, questionId: number) {
+  return getRepository(Question)
+    .createQueryBuilder("question")
+    .update()
+    .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
+    .where("id = :id", { id: questionId });
 }
 
 export async function viewScript(request: Request, response: Response) {
@@ -276,12 +285,7 @@ export async function questionToMark(request: Request, response: Response) {
   }
 
   // Prevent other markers from accessing this route for the next 30 minutes
-  await getRepository(Question)
-    .createQueryBuilder("question")
-    .update()
-    .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
-    .where("id = :id", { id: rootQuestionData.id })
-    .execute();
+  await lockQuestion(requester, rootQuestionData.id).execute();
 
   const {
     matriculationNumber,
@@ -290,46 +294,17 @@ export async function questionToMark(request: Request, response: Response) {
     matriculationNumber: string | null;
   } & QuestionViewData = rootQuestionData;
 
-  const descendantQuestionTemplatesData = await getTreeRepository(
-    QuestionTemplate
-  )
-    .createDescendantsQueryBuilder(
-      "questionTemplate",
-      "questionTemplateClosure",
-      rootQuestionTemplate
-    )
-    .andWhere("questionTemplate.discardedAt is null")
-    .andWhere("questionTemplate.parentQuestionTemplateId is not null")
-    .getMany();
+  const descendantQuestionTemplates = await getDescendantQuestionTemplates(
+    rootQuestionTemplate
+  ).getMany();
 
-  // prettier-ignore
-  const descendantQuestions = await Promise.all(descendantQuestionTemplatesData.map(async descendant => {
-    const question = await getRepository(Question).createQueryBuilder("question")
-      .where("question.discardedAt is null")
-      .innerJoin("question.questionTemplate", "questionTemplate", "questionTemplate.id = :id", { id: descendant.id })
-      .leftJoin("question.marks", "mark")
-      .andWhere(
-        new Brackets(qb => {
-          qb.where("mark IS NULL")
-          .orWhere("mark.discardedAt IS NOT NULL");
-        })
-      )
-      .select("question.id", "id")
-      .addSelect("mark.score", "score")
-      .getRawOne();
-    const { id, score } = question;
-      
-    const descendantQuestion: QuestionViewData = {
-      id,
-      name: descendant.name,
-      score,
-      maxScore: descendant.score,
-      topOffset: descendant.topOffset,
-      leftOffset: descendant.leftOffset,
-    }
+  const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
+    descendant => descendant.id
+  );
 
-    return descendantQuestion;
-  }));
+  const descendantQuestions = await getDescendantQuestions(
+    descendantQuestionTemplateIds
+  ).getRawMany();
 
   const questionIds = descendantQuestions.map(child => child.id);
   questionIds.push(rootQuestion.id);
