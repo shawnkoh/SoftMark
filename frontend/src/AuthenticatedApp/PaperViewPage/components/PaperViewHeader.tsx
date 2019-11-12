@@ -1,17 +1,11 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import {
-  AppBar,
-  Container,
-  IconButton,
-  Toolbar,
-  Typography
-} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/EditOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
+import React from "react";
+import usePaper from "../../../contexts/PaperContext";
 import EditPaperModal from "./EditPaperModal";
-import { PaperData } from "backend/src/types/papers";
+import { useHistory } from "react-router";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,23 +22,17 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface OwnProps {
-  paper: PaperData;
-  refreshPaper: () => void;
-}
-
-type Props = RouteComponentProps & OwnProps;
-
-const PaperViewHeader: React.FC<Props> = props => {
+const PaperViewHeader: React.FC = () => {
   const classes = useStyles();
-  const { paper, refreshPaper } = props;
+  const paper = usePaper();
   const { name } = paper;
+  const history = useHistory();
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
       <Toolbar>
         <IconButton
-          onClick={() => props.history.push(`/`)}
+          onClick={() => history.push(`/`)}
           color="inherit"
           className={classes.papersButton}
         >
@@ -54,8 +42,6 @@ const PaperViewHeader: React.FC<Props> = props => {
           {name}
         </Typography>
         <EditPaperModal
-          paper={paper}
-          refreshPaper={refreshPaper}
           render={toggleModal => (
             <IconButton onClick={toggleModal} color="inherit">
               <EditIcon />
@@ -67,4 +53,4 @@ const PaperViewHeader: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(PaperViewHeader);
+export default PaperViewHeader;

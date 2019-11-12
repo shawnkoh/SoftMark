@@ -1,52 +1,11 @@
-import { makeStyles } from "@material-ui/core/styles";
-import { PaperData } from "backend/src/types/papers";
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
-import api from "../../api";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import { PaperUserData } from "../../types/paperUsers";
+import usePaper from "../../contexts/PaperContext";
 import ScriptMapping from "./ScriptMapping";
 import ScriptTemplateView from "./ScriptTemplateView";
 
-const useStyles = makeStyles(theme => ({}));
-
-type Props = RouteComponentProps;
-
-const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
-  const classes = useStyles();
-  const paper_id = +(params as { paper_id: string }).paper_id;
-  const [paper, setPaper] = useState<PaperData | null>(null);
-  const [
-    currentPaperUser,
-    setCurrentPaperUser
-  ] = useState<PaperUserData | null>(null);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
-
-  const getPaper = async (paperId: number) => {
-    const data = await api.papers.getPaper(paperId);
-    if (!data) {
-      return;
-    }
-    setCurrentPaperUser(data.currentPaperUser);
-    setPaper(data.paper);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    getPaper(paper_id);
-  }, [refreshFlag]);
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!paper || !currentPaperUser) {
-    return <>The paper does not exist.</>;
-  }
+const PaperSetup: React.FC = () => {
+  const paper = usePaper();
 
   const BASE_URL = "/papers/:paper_id/set_up";
 
@@ -72,4 +31,4 @@ const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
   );
 };
 
-export default withRouter(PaperSetup);
+export default PaperSetup;

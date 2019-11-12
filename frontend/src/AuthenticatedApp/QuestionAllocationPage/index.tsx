@@ -48,13 +48,13 @@ const QuestionAllocationPage: React.FC<Props> = ({ paper }) => {
     setRefreshQuestionTemplatesFlag
   ] = useState(0);
   const getQuestionTemplates = () => {
-    api.questionTemplates
-      .getQuestionTemplates(paper.id)
-      .then(resp => {
-        console.log(resp);
-        setQuestionTemplates(resp.data.questionTemplates);
-      })
-      .finally(() => setIsLoadingQuestionTemplates(false));
+    // api.questionTemplates
+    //   .getQuestionTemplates(paper.id)
+    //   .then(resp => {
+    //     console.log(resp);
+    //     setQuestionTemplates(resp.data.questionTemplates);
+    //   })
+    //   .finally(() => setIsLoadingQuestionTemplates(false));
   };
   useEffect(getQuestionTemplates, [refreshQuestionTemplatesFlag]);
 
@@ -81,8 +81,8 @@ const QuestionAllocationPage: React.FC<Props> = ({ paper }) => {
 
   const columns: TableColumn[] = [
     {
-        name: "",
-        key: "index"
+      name: "",
+      key: "index"
     },
     {
       name: "Name",
@@ -93,8 +93,8 @@ const QuestionAllocationPage: React.FC<Props> = ({ paper }) => {
       key: "email"
     },
     {
-        name: "Role",
-        key: "role"
+      name: "Role",
+      key: "role"
     },
     {
       name: "Account status",
@@ -105,8 +105,6 @@ const QuestionAllocationPage: React.FC<Props> = ({ paper }) => {
       key: ""
     }
   ];
-
-
 
   return (
     <>

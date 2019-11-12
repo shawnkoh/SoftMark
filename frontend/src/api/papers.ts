@@ -25,13 +25,8 @@ export async function getPapers(): Promise<
 
 export async function getPaper(
   id: number
-): Promise<{ paper: PaperData; currentPaperUser: PaperUserData } | null> {
-  try {
-    const response = await client.get(`${URL}/${id}`);
-    return response.data;
-  } catch (error) {
-    return null;
-  }
+): Promise<AxiosResponse<{ paper: PaperData }>> {
+  return await client.get(`${URL}/${id}`);
 }
 
 export async function editPaper(
