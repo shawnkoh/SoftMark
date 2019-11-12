@@ -6,6 +6,8 @@ import { ScriptData } from "backend/src/types/scripts";
 
 import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
+import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import TogglePageComponent from "../../../components/misc/TogglePageComponent";
@@ -23,6 +25,27 @@ const useStyles = makeStyles((theme: Theme) =>
     grow: {
       display: "flex",
       flexGrow: 1
+    },
+    prevPageButton: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      margin: "auto"
+    },
+    nextPageButton: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      right: 0,
+      margin: "auto"
+    },
+    pageLabel: {
+      position: "absolute",
+      bottom: theme.spacing(10),
+      left: 0,
+      right: 0,
+      margin: "0 auto"
     }
   })
 );
@@ -76,13 +99,6 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
           <Typography variant="h6">Placeholder Title</Typography>
         </Toolbar>
       </AppBar>
-      <div>
-        <TogglePageComponent
-          pageNo={viewPageNo}
-          incrementPageNo={incrementViewPageNo}
-          decrementPageNo={decrementViewPageNo}
-        />
-      </div>
       {script.pages.map((page, index) => {
         return (
           <div className={classes.grow}>
@@ -96,6 +112,31 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
           </div>
         );
       })}
+      <IconButton
+        onClick={decrementViewPageNo}
+        className={classes.prevPageButton}
+        color="inherit"
+        aria-label="previous page"
+      >
+        <ArrowLeftIcon />
+      </IconButton>
+      <Typography
+        variant="button"
+        gutterBottom
+        align="center"
+        color="primary"
+        className={classes.pageLabel}
+      >
+        {`Page ${viewPageNo}`}
+      </Typography>
+      <IconButton
+        onClick={incrementViewPageNo}
+        className={classes.nextPageButton}
+        color="inherit"
+        aria-label="next page"
+      >
+        <ArrowRightIcon />
+      </IconButton>
     </div>
   );
 };

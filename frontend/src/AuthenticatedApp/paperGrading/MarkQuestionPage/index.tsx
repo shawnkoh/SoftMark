@@ -20,6 +20,8 @@ import {
   Typography
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
+import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import TogglePageComponent from "../../../components/misc/TogglePageComponent";
@@ -40,6 +42,27 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     backButton: {
       marginRight: theme.spacing(2)
+    },
+    prevPageButton: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      margin: "auto"
+    },
+    nextPageButton: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      right: 0,
+      margin: "auto"
+    },
+    pageLabel: {
+      position: "absolute",
+      bottom: theme.spacing(10),
+      left: 0,
+      right: 0,
+      margin: "0 auto"
     }
   })
 );
@@ -129,13 +152,6 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     return (
       <div className={classes.container}>
         <Header />
-        <div>
-          <TogglePageComponent
-            pageNo={pageNo}
-            incrementPageNo={incrementPageNo}
-            decrementPageNo={decrementPageNo}
-          />
-        </div>
         {pages
           .filter(page => page.pageNo === pageNo)
           .map(page => (
@@ -152,6 +168,31 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
               )}
             </div>
           ))}
+        <IconButton
+          onClick={decrementPageNo}
+          className={classes.prevPageButton}
+          color="inherit"
+          aria-label="previous page"
+        >
+          <ArrowLeftIcon />
+        </IconButton>
+        <Typography
+          variant="button"
+          gutterBottom
+          align="center"
+          color="primary"
+          className={classes.pageLabel}
+        >
+          {`Page ${pageNo} of ${pages.length}`}
+        </Typography>
+        <IconButton
+          onClick={incrementPageNo}
+          className={classes.nextPageButton}
+          color="inherit"
+          aria-label="next page"
+        >
+          <ArrowRightIcon />
+        </IconButton>
       </div>
     );
   }
