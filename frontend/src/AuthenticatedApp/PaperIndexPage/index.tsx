@@ -21,8 +21,8 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
-import Header from "./components/headers/PaperIndexHeader";
-import AddPaperModal from "./components/modals/AddPaperModal";
+import Header from "./components/PaperIndexHeader";
+import AddPaperModal from "./components/AddPaperModal";
 
 const useStyles = makeStyles(theme => ({
   margin: {

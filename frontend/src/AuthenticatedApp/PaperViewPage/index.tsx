@@ -15,7 +15,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import GradingSubpage from "./subpages/Grading";
 import SetupSubpage from "./subpages/Setup";
 import ScriptsSubpage from "./subpages/Scripts";
-import PaperViewHeader from "./components/headers/PaperViewHeader";
+import PaperViewHeader from "./components/PaperViewHeader";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
