@@ -1,8 +1,6 @@
-const PAGE_REGEX: RegExp = new RegExp(
-  "^(?:(?:[0-9]+|[0-9+]-[0-9]+)+(?:s*,s*))+$"
-);
-const SINGLE_PAGE_REGEX: RegExp = new RegExp("^[0-9]+$");
-const MULTI_PAGE_REGEX: RegExp = new RegExp("^[0-9]+-[0-9]+$");
+const PAGE_REGEX = /"^(?:(?:[0-9]+|[0-9+]-[0-9]+)+, )+$/;
+const SINGLE_PAGE_REGEX = /^[0-9]+$/;
+const MULTI_PAGE_REGEX = /^[0-9]+-[0-9]+$/;
 
 /**
  * Convert pages covered from string to number set
@@ -35,9 +33,9 @@ export function isPageValid(
   currentPage: number,
   pageCount: number
 ) {
-  pages += ",";
+  pages += ", ";
   if (!PAGE_REGEX.test(pages)) return "Syntax incorrect";
-  let splited = pages.split(/\s*,\s*/);
+  let splited = pages.split(/, /);
   let currentIncluded = false;
   for (let i = 0; i < pages.length - 1; i++) {
     let value = splited[i];

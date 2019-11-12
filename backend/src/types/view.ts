@@ -1,6 +1,8 @@
 import { AnnotationLine } from "./annotations";
 
-export interface QuestionGradingData {
+// TODO: Collapse all the types into their respective entities
+
+export interface QuestionViewData {
   id: number;
   name: string;
   score: number | null;
@@ -9,22 +11,22 @@ export interface QuestionGradingData {
   leftOffset: number | null;
 }
 
-export interface AnnotationGradingData {
+export interface AnnotationViewData {
   id: number;
   layer: AnnotationLine[];
 }
 
-export interface PageGradingData {
+export interface PageViewData {
   id: number;
   pageNo: number;
   imageUrl: string;
-  annotations: AnnotationGradingData[];
+  annotations: AnnotationViewData[];
   questionIds: number[];
 }
 
-export interface GradingData {
+export interface ScriptViewData {
   matriculationNumber: string | null;
-  rootQuestion: QuestionGradingData;
-  descendantQuestions: QuestionGradingData[];
-  pages: PageGradingData[];
+  rootQuestion: QuestionViewData;
+  descendantQuestions: QuestionViewData[];
+  pages: PageViewData[];
 }

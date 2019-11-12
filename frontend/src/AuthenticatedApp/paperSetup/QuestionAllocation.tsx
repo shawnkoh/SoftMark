@@ -1,217 +1,82 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { PaperData } from "backend/src/types/papers";
-import api from "../../api";
+import React from "react";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
 
-import LoadingSpinner from "../../components/LoadingSpinner";
-import {
-  Grid,
-  Drawer,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  CssBaseline,
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Hidden
-} from "@material-ui/core";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import QuestionContainer from "./components/QuestionContainer";
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
 
-import MenuIcon from "@material-ui/icons/Menu";
-import GoBackIcon from "@material-ui/icons/ArrowBack";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      <Box p={3}>{children}</Box>
+    </Typography>
+  );
+}
 
-import { DndProvider } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
-const drawerWidth = 240;
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`
+  };
+}
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    display: "flex"
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1
-  },
-  drawer: {
-    [theme.breakpoints.up("sm")]: {
-      width: drawerWidth,
-      flexShrink: 0
-    }
-  },
-  drawerPaper: {
-    width: drawerWidth
-  },
-  toolbar: theme.mixins.toolbar,
-  content: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    paddingRight: theme.spacing(3),
-    paddingLeft: theme.spacing(3),
-    minHeight: "100vh",
-    maxHeight: "100vh"
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up("sm")]: {
-      display: "none"
-    }
-  },
-  backButton: {
-    marginRight: theme.spacing(2)
-  },
-  addFab: {
-    position: "absolute",
-    right: theme.spacing(2),
-    bottom: theme.spacing(2)
+    backgroundColor: theme.palette.background.paper
   }
 }));
 
-type Props = RouteComponentProps;
-
-const QuestionAllocation: React.FC<Props> = ({
-  match: { params },
-  history
-}) => {
+export default function SimpleTabs() {
   const classes = useStyles();
-  const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [viewPageNo, setViewPage] = React.useState(1);
+  const [value, setValue] = React.useState(0);
 
-  const paper_id = +(params as { paper_id: string }).paper_id;
-  const [isLoadingPaper, setIsLoadingPaper] = useState(true);
-  const [isLoadingTemplate, setIsLoadingTemplate] = useState(true);
-  const [paper, setPaper] = useState<PaperData | null>(null);
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  useEffect(() => {
-    api.papers
-      .getPaper(paper_id)
-      .then(resp => {
-        resp && setPaper(resp.paper);
-      })
-      .finally(() => setIsLoadingPaper(false));
-    api.scriptTemplates
-      .getScriptTemplate(paper_id)
-      .then(resp => {
-        resp && setScriptTemplate(resp);
-      })
-      .finally(() => setIsLoadingTemplate(false));
-  }, [paper_id]);
-
-  if (isLoadingPaper || isLoadingTemplate) {
-    return <LoadingSpinner />;
-  }
-
-  if (!scriptTemplate) {
-    return <>The script does not exist</>;
-  }
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
   };
 
-  const drawer = (
-    <>
-      <div className={classes.toolbar} />
-      <Divider />
-      <List>
-        {scriptTemplate.questionTemplates.map((questionTemplate, index) => (
-          <ListItem button key={index}>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={questionTemplate.name} />
-          </ListItem>
-        ))}
-      </List>
-    </>
-  );
-
   return (
+    // <Header
+    //     paper={paper}
+    //     title="Map student scripts to student list / nominal roll"
+    //   />
     <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar} elevation={1}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            onClick={() => history.goBack()}
-            className={classes.backButton}
-          >
-            <GoBackIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            onClick={handleDrawerToggle}
-            className={classes.menuButton}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="h6">{paper && paper.name}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">
-                Set up marking template
-              </Typography>
-            </Grid>
-          </Grid>
-        </Toolbar>
+      <AppBar position="static">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="simple tabs example"
+        >
+          <Tab label="Item One" {...a11yProps(0)} />
+          <Tab label="Item Two" {...a11yProps(1)} />
+          <Tab label="Item Three" {...a11yProps(2)} />
+        </Tabs>
       </AppBar>
-      <nav>
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Hidden smUp implementation="css">
-          <Drawer
-            className={classes.drawer}
-            variant="temporary"
-            anchor={theme.direction === "rtl" ? "right" : "left"}
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            ModalProps={{
-              keepMounted: true // Better open performance on mobile.
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-        <Hidden xsDown implementation="css">
-          <Drawer
-            className={classes.drawer}
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            variant="permanent"
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-      </nav>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        <DndProvider backend={HTML5Backend}>
-          <QuestionContainer
-            scriptTemplate={scriptTemplate}
-            viewPageNo={viewPageNo}
-            setViewPage={setViewPage}
-          />
-        </DndProvider>
-      </main>
+      <TabPanel value={value} index={0}>
+        Item One
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        Item Two
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        Item Three
+      </TabPanel>
     </div>
   );
-};
-
-export default withRouter(QuestionAllocation);
+}

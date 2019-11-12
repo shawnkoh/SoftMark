@@ -6,7 +6,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import clsx from "clsx";
 import React from "react";
-import softmarkLogo from "../../../../../assets/softmark-logo.svg";
+import softmarkLogo from "../../../../assets/softmark-logo.svg";
 import AccountModal from "./AccountModal";
 
 const useStyles = makeStyles((theme: Theme) =>

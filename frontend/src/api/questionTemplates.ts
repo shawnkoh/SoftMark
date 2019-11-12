@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { GradingData } from "backend/src/types/grading";
+import { ScriptViewData } from "backend/src/types/view";
 import {
   QuestionTemplateData,
   QuestionTemplateListData,
@@ -12,12 +12,9 @@ const URL = "/question_templates";
 
 export async function createQuestionTemplate(
   id: number,
-  QuestionTemplatePostData: QuestionTemplatePostData
+  postData: QuestionTemplatePostData
 ): Promise<AxiosResponse<{ questionTemplate: QuestionTemplateData }>> {
-  return client.post(
-    `/script_templates/${id}/question_templates`,
-    QuestionTemplatePostData
-  );
+  return client.post(`/script_templates/${id}/question_templates`, postData);
 }
 
 export async function getQuestionTemplates(
@@ -56,7 +53,7 @@ export async function editQuestionTemplate(
  */
 export async function getQuestionToMark(id: number) {
   try {
-    const { data } = await client.get<GradingData>(
+    const { data } = await client.get<ScriptViewData>(
       `${URL}/${id}/question_to_mark`
     );
     return data;

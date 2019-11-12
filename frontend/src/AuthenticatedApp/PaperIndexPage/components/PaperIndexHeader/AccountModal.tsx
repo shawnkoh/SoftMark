@@ -10,13 +10,13 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import * as Yup from "yup";
-import { patchOwnUser } from "../../../../../api/users";
-import CustomDialogTitle from "../../../../../components/dialogs/DialogTitleWithCloseButton";
+import { patchOwnUser } from "../../../../api/users";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
-} from "../../../../../components/forms/SimpleForm";
-import { logOut } from "../../../../../store/auth/actions";
-import { getUser } from "../../../../../store/auth/selectors";
+} from "../../../../components/forms/SimpleForm";
+import { logOut } from "../../../../store/auth/actions";
+import { getUser } from "../../../../store/auth/selectors";
 
 interface Props {
   render: any;
