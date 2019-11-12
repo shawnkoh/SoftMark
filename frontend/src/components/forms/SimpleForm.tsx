@@ -21,8 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
-      padding: theme.spacing(4)
+      alignItems: "center"
     }
   })
 );
@@ -113,13 +112,7 @@ const SimpleForm: React.FC<Props<any>> = ({
 
   return (
     <div className={classes.root}>
-      <Grid
-        container
-        direction="column"
-        justify="center"
-        alignItems="stretch"
-        spacing={2}
-      >
+      <Grid container direction="column" justify="center" alignItems="stretch">
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -166,7 +159,7 @@ const SimpleForm: React.FC<Props<any>> = ({
 
             return (
               <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
+                <Grid container spacing={1}>
                   {// Form fields
                   formKeys.map(key => {
                     const fields = formMetadata[key];

@@ -6,7 +6,7 @@ import { PaperData } from "backend/src/types/papers";
 import { PaperUserListData } from "backend/src/types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 
-import { AppBar, Tab, Tabs } from "@material-ui/core";
+import { Container, Tab, Tabs } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 import TabPanel from "../../components/tables/TabPanel";
@@ -36,7 +36,10 @@ const ScriptMapping: React.FC<Props> = ({ paper, match: { params } }) => {
 
   return (
     <>
-      <Header paper={paper} title="Mapping of scripts to nominal roll" />
+      <Header
+        paper={paper}
+        title="Map student scripts to student list / nominal roll"
+      />
       <div>
         <Tabs
           value={tabValue}

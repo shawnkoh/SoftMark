@@ -193,7 +193,7 @@ const SetupSubpage: React.FC<Props> = props => {
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() =>
-            props.history.push(`/papers/${paper.id}/set_up/question_allocation`)
+            props.history.push(`/papers/${paper.id}/set_up/script_template`)
           }
         >
           Allocate
@@ -204,8 +204,13 @@ const SetupSubpage: React.FC<Props> = props => {
 
   return (
     <>
-      <Container fixed>
+      <Container maxWidth={false}>
         <Grid container spacing={4} className={classes.container}>
+          <Grid item xs={12}>
+            <Typography variant="h4" component="h2">
+              Setup
+            </Typography>
+          </Grid>
           {rowDetails.map(row => createGridRow(row))}
         </Grid>
       </Container>

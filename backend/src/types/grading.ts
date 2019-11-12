@@ -7,7 +7,6 @@ export interface QuestionGradingData {
   maxScore: number | null;
   topOffset: number | null;
   leftOffset: number | null;
-  parentQuestionId: number | null;
 }
 
 export interface AnnotationGradingData {
@@ -25,7 +24,7 @@ export interface PageGradingData {
 
 export interface GradingData {
   matriculationNumber: string | null;
-  parentQuestion: QuestionGradingData;
-  childQuestions: QuestionGradingData[];
+  rootQuestion: QuestionGradingData;
+  descendantQuestions: QuestionGradingData[];
   pages: PageGradingData[];
 }

@@ -2,28 +2,15 @@ import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 
-import { CanvasMode } from "../../../types/canvas";
 import { AnnotationLine, Annotation } from "backend/src/types/annotations";
-
+import { CanvasMode, CanvasProps } from "./types";
 import {
   getDistance,
   getClientPointerRelativeToStage,
   getRelativePointerPosition
-} from "utils/canvas";
+} from "./utils";
 
 import UrlImage from "./UrlImage";
-
-interface CanvasProps {
-  width: number;
-  height: number;
-  backgroundImageSource: string;
-  backgroundAnnotations: Annotation[];
-  foregroundAnnotation: Annotation;
-  mode: CanvasMode;
-  penColor: string;
-  penWidth: number;
-  onForegroundAnnotationChange: (annotation: Annotation) => void;
-}
 
 enum CanvasActionType {
   ReplaceForegroundAnnotation = "replaceForegroundAnnotation",
@@ -31,9 +18,12 @@ enum CanvasActionType {
   ContinueLine = "continueLine",
   EndLine = "endLine",
   Drag = "drag",
-  ClickLine = "clickLine",
+  BeginErase = "beginErase",
+  EndErase = "endErase",
+  DeleteLine = "deleteLine",
   PanZoom = "panZoom",
-  SetDraggable = "setDraggable"
+  SetDraggable = "setDraggable",
+  ResetView = "resetView"
 }
 
 interface Point {
@@ -46,13 +36,16 @@ type CanvasAction =
   | { type: CanvasActionType.BeginLine }
   | { type: CanvasActionType.ContinueLine; payload: Point }
   | { type: CanvasActionType.EndLine }
-  | { type: CanvasActionType.ClickLine; payload: number }
+  | { type: CanvasActionType.BeginErase }
+  | { type: CanvasActionType.EndErase }
+  | { type: CanvasActionType.DeleteLine; payload: number }
   | { type: CanvasActionType.Drag; payload: Point }
   | {
       type: CanvasActionType.PanZoom;
       payload: { stageScale: number; stagePosition: Point; lastDist: number };
     }
-  | { type: CanvasActionType.SetDraggable; payload: boolean };
+  | { type: CanvasActionType.SetDraggable; payload: boolean }
+  | { type: CanvasActionType.ResetView };
 
 interface CanvasState {
   lines: AnnotationLine[];
@@ -109,7 +102,17 @@ const createCanvasStateReducer = ({
         draftState.isDrawing = false;
       });
       break;
-    case CanvasActionType.ClickLine:
+    case CanvasActionType.BeginErase:
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = true;
+      });
+      break;
+    case CanvasActionType.EndErase:
+      nextState = produce(state, draftState => {
+        draftState.isDrawing = false;
+      });
+      break;
+    case CanvasActionType.DeleteLine:
       nextState = produce(state, draftState => {
         draftState.lines.splice(action.payload, 1);
       });
@@ -133,6 +136,12 @@ const createCanvasStateReducer = ({
         draggable: action.payload
       };
       break;
+    case CanvasActionType.ResetView:
+      nextState = produce(state, draftState => {
+        draftState.stageScale = 1;
+        draftState.stagePosition = { x: 32, y: 32 };
+      });
+      break;
     default:
       nextState = state;
   }
@@ -146,18 +155,19 @@ const Canvas: React.FC<CanvasProps> = ({
   width,
   height,
   backgroundImageSource,
-  backgroundAnnotations = [[]],
-  foregroundAnnotation = [],
-  mode = CanvasMode.View,
-  penColor = "#ff0000",
-  penWidth = 5,
-  onForegroundAnnotationChange = console.log
+  backgroundAnnotations,
+  foregroundAnnotation,
+  mode,
+  penColor,
+  penWidth,
+  onForegroundAnnotationChange,
+  resetView
 }: CanvasProps) => {
   const initialCanvasState = {
     lines: foregroundAnnotation,
     isDrawing: false,
     stageScale: 1,
-    stagePosition: { x: 0, y: 0 },
+    stagePosition: { x: 32, y: 32 },
     lastDist: 0,
     draggable: false
   };
@@ -185,11 +195,21 @@ const Canvas: React.FC<CanvasProps> = ({
     }
   }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
 
+  useEffect(() => {
+    if (resetView) {
+      dispatch({
+        type: CanvasActionType.ResetView
+      });
+    }
+  }, [resetView]); // Ignore warning - do not change dependency array!
+
   const stageRef = useRef<any>(null);
 
   const handleMouseDown = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.BeginLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.BeginErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -217,6 +237,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleMouseUp = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.EndLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.EndErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -292,6 +314,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleTouchStart = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.BeginLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.BeginErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.SetDraggable,
@@ -374,6 +398,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleTouchEnd = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.EndLine });
+    } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.EndErase });
     } else if ((mode as CanvasMode) === CanvasMode.View) {
       dispatch({
         type: CanvasActionType.PanZoom,
@@ -399,7 +425,13 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const handleLineClick = index => {
     if (mode === CanvasMode.Eraser) {
-      dispatch({ type: CanvasActionType.ClickLine, payload: index });
+      dispatch({ type: CanvasActionType.DeleteLine, payload: index });
+    }
+  };
+
+  const handleLineEnter = index => {
+    if (mode === CanvasMode.Eraser && canvasState.isDrawing) {
+      dispatch({ type: CanvasActionType.DeleteLine, payload: index });
     }
   };
 
@@ -457,6 +489,8 @@ const Canvas: React.FC<CanvasProps> = ({
             lineCap="round"
             onClick={() => handleLineClick(i)}
             onTap={() => handleLineClick(i)}
+            onMouseEnter={() => handleLineEnter(i)}
+            onTouchMove={() => handleLineEnter(i)}
           />
         ))}
       </Layer>
