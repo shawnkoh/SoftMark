@@ -9,21 +9,18 @@ export async function createNewUser(
   email: string,
   password: string,
   name: string
-): Promise<{
-  user: UserData;
-  accessToken: string;
-  refreshToken: string;
-} | null> {
-  try {
-    const response = await client.post(`${URL}`, {
-      email,
-      name,
-      password
-    });
-    return response.data;
-  } catch (error) {
-    return null;
-  }
+): Promise<
+  AxiosResponse<{
+    user: UserData;
+    accessToken: string;
+    refreshToken: string;
+  }>
+> {
+  return client.post(`${URL}`, {
+    email,
+    name,
+    password
+  });
 }
 
 export async function requestResetPassword(email: string): Promise<boolean> {

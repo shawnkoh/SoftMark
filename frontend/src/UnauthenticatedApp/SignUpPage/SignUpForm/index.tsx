@@ -21,18 +21,19 @@ const SignUpForm: React.FC = () => {
   const history = useHistory();
 
   const signUp = async (email: string, password: string, name: string) => {
-    const data = await api.users.createNewUser(email, password, name);
-    if (!data) {
+    try {
+      const { data } = await api.users.createNewUser(email, password, name);
+      const { user } = data;
+      dispatch(setUser(user));
+      toast.success(
+        `Welcome to SoftMark! A verification email has been sent to you`
+      );
+      history.push("/");
+    } catch (error) {
       toast.error(
         `${email} is already registered. Consider resetting your password!`
       );
-      return;
     }
-    toast.success(
-      `Welcome to SoftMark! A verification email has been sent to you`
-    );
-    dispatch(setUser(data.user));
-    history.push("/");
   };
 
   return (
