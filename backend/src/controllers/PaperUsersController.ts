@@ -7,8 +7,8 @@ import { Script } from "../entities/Script";
 import { User } from "../entities/User";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { allowedRequester } from "../utils/papers";
-import { sortByMatricNo } from "../utils/sorts";
+import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import { sortPaperUserByName, sortByMatricNo } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -72,13 +72,37 @@ export async function create(request: Request, response: Response) {
   }
 }
 
+export async function getMarkers(request: Request, response: Response) {
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const paperId = Number(request.params.id);
+    await allowedRequesterOrFail(payload.userId, paperId, PaperUserRole.Marker);
+
+    const markers = await getRepository(PaperUser)
+      .createQueryBuilder("paperUser")
+      .where("paperUser.paperId = :id", { id: paperId })
+      .andWhere("paperUser.role IN (:...roles)", {
+        roles: [PaperUserRole.Marker, PaperUserRole.Owner]
+      })
+      .andWhere("paperUser.discardedAt is null")
+      .getMany();
+
+    const data = (await Promise.all(
+      markers.map(async (marker: PaperUser) => await marker.getListData())
+    )).sort(sortPaperUserByName);
+    return response.status(200).json({ paperUsers: data });
+  } catch (error) {
+    response.sendStatus(404);
+  }
+}
+
 export async function getStudents(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
     payload.userId,
     paperId,
-    PaperUserRole.Owner
+    PaperUserRole.Marker
   );
   if (!allowed) {
     response.sendStatus(404);

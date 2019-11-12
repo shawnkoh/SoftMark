@@ -9,7 +9,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import React from "react";
 import { useHistory } from "react-router";
-import usePaper from "../../../../contexts/PaperContext";
+import usePaper from "../../../contexts/PaperContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

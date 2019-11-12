@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { PaperUserRole } from "../types/paperUsers";
+import { PaperUserRole, isPaperUserListData } from "../types/paperUsers";
 import { PaperData } from "../types/papers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -39,9 +39,9 @@ export async function index(request: Request, response: Response) {
     where: { userId: payload.userId }
   });
 
-  const data = paperUsers.map(paperUser =>
-    paperUser.paper!.getListData(paperUser.role)
-  );
+  const data = paperUsers
+    .map(paperUser => paperUser.paper!.getListData(paperUser.role))
+    .filter(paperUserListData => !paperUserListData.discardedAt);
   response.status(200).json({ paper: data });
 }
 

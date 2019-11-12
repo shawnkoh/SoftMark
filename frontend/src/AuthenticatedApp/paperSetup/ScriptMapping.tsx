@@ -1,9 +1,10 @@
+import React, { useState } from "react";
+
 import { Tab, Tabs } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React from "react";
 import TabPanel from "../../components/tables/TabPanel";
-import Header from "./components/headers/PaperSetupHeader";
 import ScriptsTable from "./components/tables/ScriptsTable";
+import Header from "./components/PaperSetupHeader";
 import StudentsTable from "./components/tables/StudentsTable";
 
 const useStyles = makeStyles(theme => ({
@@ -17,7 +18,7 @@ const useStyles = makeStyles(theme => ({
 const ScriptMapping: React.FC = () => {
   const classes = useStyles();
 
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = useState(0);
   const handleChange = (event, newValue) => setTabValue(newValue);
 
   return (
