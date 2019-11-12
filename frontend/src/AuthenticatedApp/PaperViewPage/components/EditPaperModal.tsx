@@ -48,7 +48,7 @@ const EditPaperModal: React.FC<Props> = ({ render }) => {
             onCancel={toggleVisibility}
             onSubmit={(newValues: PaperPostData) =>
               editPaper(paper.id, newValues).then(resp => {
-                // refreshPaper();
+                paper.refreshPaper();
                 toggleVisibility();
                 return false;
               })

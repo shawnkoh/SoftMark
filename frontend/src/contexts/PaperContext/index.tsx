@@ -5,7 +5,9 @@ import { toast } from "react-toastify";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
-const PaperContext = React.createContext<PaperData | null>(null);
+type PaperContextProps = (PaperData & { refreshPaper: () => void }) | null;
+
+const PaperContext = React.createContext<PaperContextProps>(null);
 
 export const PaperProvider: React.FC = props => {
   const { children } = props;
@@ -33,14 +35,13 @@ export const PaperProvider: React.FC = props => {
         "An error occured while trying to load the paper. Redirecting you to the home page."
       );
       history.push("/");
-      // TODO: Handle this better, maybe go back to previous page
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
     getPaper();
-  }, [paper_id]);
+  }, [paper_id, refreshFlag]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -60,7 +61,9 @@ export const PaperProvider: React.FC = props => {
   }
 
   return (
-    <PaperContext.Provider value={paper}>{children}</PaperContext.Provider>
+    <PaperContext.Provider value={paper ? { ...paper, refreshPaper } : null}>
+      {children}
+    </PaperContext.Provider>
   );
 };
 
