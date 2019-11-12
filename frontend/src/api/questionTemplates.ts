@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { GradingData } from "backend/src/types/grading";
+import { ScriptViewData } from "backend/src/types/view";
 import {
   QuestionTemplateData,
   QuestionTemplateListData,
@@ -53,7 +53,7 @@ export async function editQuestionTemplate(
  */
 export async function getQuestionToMark(id: number) {
   try {
-    const { data } = await client.get<GradingData>(
+    const { data } = await client.get<ScriptViewData>(
       `${URL}/${id}/question_to_mark`
     );
     return data;

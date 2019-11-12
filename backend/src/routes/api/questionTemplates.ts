@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as AllocationsController from "../../controllers/AllocationsController";
-import * as GradingController from "../../controllers/GradingController";
+import * as ViewController from "../../controllers/ViewController";
 import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
@@ -15,6 +15,6 @@ router.patch("/:id/undiscard", QuestionTemplatesController.undiscard);
 
 router.post("/:id/allocations", AllocationsController.create);
 
-router.get("/:id/question_to_mark", GradingController.questionToMark);
+router.get("/:id/question_to_mark", ViewController.questionToMark);
 
 export default router;
