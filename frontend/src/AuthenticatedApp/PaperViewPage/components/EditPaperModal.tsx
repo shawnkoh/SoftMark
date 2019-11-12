@@ -1,23 +1,22 @@
+import { Dialog, DialogContent } from "@material-ui/core";
+import { PaperPostData } from "backend/src/types/papers";
 import React, { useState } from "react";
 import * as Yup from "yup";
-import { PaperPostData, PaperData } from "backend/src/types/papers";
 import { editPaper } from "../../../api/papers";
-
-import { Dialog, DialogContent } from "@material-ui/core";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../components/forms/SimpleForm";
+import usePaper from "../../../contexts/PaperContext";
 
 interface OwnProps {
-  paper: PaperData;
   render: any;
-  refreshPaper: () => void;
 }
 
 type Props = OwnProps;
 
-const EditPaperModal: React.FC<Props> = ({ paper, refreshPaper, render }) => {
+const EditPaperModal: React.FC<Props> = ({ render }) => {
+  const paper = usePaper();
   const values: PaperPostData = {
     name: paper.name
   };
@@ -49,7 +48,7 @@ const EditPaperModal: React.FC<Props> = ({ paper, refreshPaper, render }) => {
             onCancel={toggleVisibility}
             onSubmit={(newValues: PaperPostData) =>
               editPaper(paper.id, newValues).then(resp => {
-                refreshPaper();
+                paper.refreshPaper();
                 toggleVisibility();
                 return false;
               })

@@ -1,27 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../api";
-import { PaperData } from "backend/src/types/papers";
-import { ScriptListData } from "backend/src/types/scripts";
-import { TableColumn } from "../../../components/tables/TableTypes";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
-  Button,
   Grid,
-  IconButton,
+  Paper,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  TableSortLabel,
-  Tooltip,
-  Paper
+  TableHead,
+  TableRow,
+  TableSortLabel
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { ScriptListData } from "backend/src/types/scripts";
+import React, { useEffect, useState } from "react";
+import api from "../../../api";
 import SearchBar from "../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../components/LoadingSpinner";
+import { TableColumn } from "../../../components/tables/TableTypes";
+import usePaper from "../../../contexts/PaperContext";
 import ScriptsTableRow from "./ScriptsTableRow";
 
 const useStyles = makeStyles(theme => ({
@@ -32,14 +26,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface OwnProps {
-  paper: PaperData;
-}
-
-type Props = OwnProps & RouteComponentProps;
-
-const ScriptsSubpage: React.FC<Props> = ({ paper }) => {
+const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
+  const paper = usePaper();
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
@@ -174,4 +163,4 @@ const ScriptsSubpage: React.FC<Props> = ({ paper }) => {
   );
 };
 
-export default withRouter(ScriptsSubpage);
+export default ScriptsSubpage;

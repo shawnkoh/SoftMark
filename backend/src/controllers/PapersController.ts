@@ -68,9 +68,7 @@ export async function show(request: Request, response: Response) {
   } else {
     data = await paper.getData(requester.role);
   }
-  response
-    .status(200)
-    .json({ paper: data, currentPaperUser: await requester.getData() });
+  response.status(200).json({ paper: data });
 }
 
 export async function update(request: Request, response: Response) {

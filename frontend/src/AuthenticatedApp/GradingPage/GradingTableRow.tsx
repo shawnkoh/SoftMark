@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { IconButton, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import { QuestionTemplateRootData } from "backend/src/types/questionTemplates";
+import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
-
-import { makeStyles } from "@material-ui/core/styles";
-import { IconButton, TableRow, TableCell, Tooltip } from "@material-ui/core";
 
 interface OwnProps {
-  questionTemplate: QuestionTemplateListData;
+  questionTemplate: QuestionTemplateRootData;
 }
 
 type Props = OwnProps & RouteComponentProps;

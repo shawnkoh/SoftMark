@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../api";
-import { PaperData } from "backend/src/types/papers";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import { ScriptListData } from "backend/src/types/scripts";
-
-import { Container, Box, Grid, Typography } from "@material-ui/core";
+import { Box, Container, Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-
+import { ScriptListData } from "backend/src/types/scripts";
+import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import api from "../../../api";
 import { RoundedButton } from "../../../components/buttons/StyledButtons";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
-import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
+import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
+import usePaper from "../../../contexts/PaperContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,14 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const BULLET_POINT = `\u2022 `;
 
-interface OwnProps {
-  paper: PaperData;
-}
-
-type Props = OwnProps & RouteComponentProps;
-
-const SetupSubpage: React.FC<Props> = props => {
-  const { paper } = props;
+const SetupSubpage: React.FC = () => {
+  const history = useHistory();
+  const paper = usePaper();
   const classes = useStyles();
 
   const [
@@ -157,7 +149,7 @@ const SetupSubpage: React.FC<Props> = props => {
           variant="contained"
           disabled={scripts.length === 0}
           onClick={() =>
-            props.history.push(`/papers/${paper.id}/set_up/script_mapping`)
+            history.push(`/papers/${paper.id}/set_up/script_mapping`)
           }
         >
           Map
@@ -175,7 +167,7 @@ const SetupSubpage: React.FC<Props> = props => {
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() => {
             if (scriptTemplate) {
-              props.history.push(`/papers/${paper.id}/set_up/script_template`);
+              history.push(`/papers/${paper.id}/set_up/script_template`);
             }
           }}
         >
@@ -193,7 +185,7 @@ const SetupSubpage: React.FC<Props> = props => {
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
           onClick={() =>
-            props.history.push(`/papers/${paper.id}/set_up/script_template`)
+            history.push(`/papers/${paper.id}/set_up/script_template`)
           }
         >
           Allocate
@@ -218,4 +210,4 @@ const SetupSubpage: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(SetupSubpage);
+export default SetupSubpage;

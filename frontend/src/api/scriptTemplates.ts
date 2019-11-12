@@ -1,13 +1,13 @@
 import { AxiosResponse } from "axios";
-import PDFJS from "pdfjs-dist/webpack";
-import { sha256 } from "js-sha256";
+import { QuestionTemplateGradingListData } from "backend/src/types/questionTemplates";
 import {
   ScriptTemplateData,
   ScriptTemplatePostData
 } from "backend/src/types/scriptTemplates";
-
-import client from "./client";
+import { sha256 } from "js-sha256";
+import PDFJS from "pdfjs-dist/webpack";
 import { getPage } from "../utils/canvas";
+import client from "./client";
 
 const URL = "/script_templates";
 
@@ -79,4 +79,10 @@ export async function postScriptTemplate(
     });
   };
   reader.readAsDataURL(file);
+}
+
+export async function getRootQuestionTemplates(
+  scriptTemplateId: number
+): Promise<AxiosResponse<QuestionTemplateGradingListData>> {
+  return await client.get(`${URL}/${scriptTemplateId}/root_question_templates`);
 }
