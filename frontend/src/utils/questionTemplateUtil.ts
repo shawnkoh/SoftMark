@@ -1,4 +1,4 @@
-const PAGE_REGEX = /"^(?:(?:[0-9]+|[0-9+]-[0-9]+)+, )+$/;
+const PAGE_REGEX = /^(?:(?:[0-9]+|[0-9+]-[0-9]+)+, )+$/;
 const SINGLE_PAGE_REGEX = /^[0-9]+$/;
 const MULTI_PAGE_REGEX = /^[0-9]+-[0-9]+$/;
 
