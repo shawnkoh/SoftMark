@@ -4,7 +4,13 @@ import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../../api";
 import { ScriptData } from "backend/src/types/scripts";
 
-import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
+import {
+  Button,
+  AppBar,
+  IconButton,
+  Toolbar,
+  Typography
+} from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
@@ -46,6 +52,10 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       right: 0,
       margin: "0 auto"
+    },
+    questionsBar: {
+      top: "auto",
+      bottom: 0
     }
   })
 );
@@ -112,6 +122,15 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
           </div>
         );
       })}
+      <AppBar position="fixed" color="primary" className={classes.questionsBar}>
+        <Toolbar>
+          {currentPageQuestions.map(question => (
+            <Button color="inherit">
+              {question.name} - {question.score || "no score"}
+            </Button>
+          ))}
+        </Toolbar>
+      </AppBar>
       <IconButton
         onClick={decrementViewPageNo}
         className={classes.prevPageButton}

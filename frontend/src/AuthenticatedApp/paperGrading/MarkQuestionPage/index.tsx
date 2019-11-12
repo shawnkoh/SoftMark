@@ -24,7 +24,6 @@ import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import TogglePageComponent from "../../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import Annotator from "./Annotator";
 
@@ -63,6 +62,10 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       right: 0,
       margin: "0 auto"
+    },
+    questionsBar: {
+      top: "auto",
+      bottom: 0
     }
   })
 );
@@ -149,6 +152,11 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       pages
     } = scriptViewData;
 
+    const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const currentPageQuestions = descendantQuestions
+      .concat(rootQuestion)
+      .filter(question => currentPage.questionIds.includes(question.id));
+
     return (
       <div className={classes.container}>
         <Header />
@@ -168,6 +176,19 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
               )}
             </div>
           ))}
+        <AppBar
+          position="fixed"
+          color="primary"
+          className={classes.questionsBar}
+        >
+          <Toolbar>
+            {currentPageQuestions.map(question => (
+              <Button color="inherit">
+                {question.name} - {question.score || "no score"}
+              </Button>
+            ))}
+          </Toolbar>
+        </AppBar>
         <IconButton
           onClick={decrementPageNo}
           className={classes.prevPageButton}
