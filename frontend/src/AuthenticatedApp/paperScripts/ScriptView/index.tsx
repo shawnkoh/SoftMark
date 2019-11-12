@@ -99,6 +99,12 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     return <>The script does not exist</>;
   }
 
+  const currentPageQuestions = [
+    { name: "Q1", score: 5 },
+    { name: "Q2", score: 2 },
+    { name: "Q3", score: null }
+  ];
+
   return (
     <div className={classes.container}>
       <AppBar position="static" color="primary" elevation={1}>
@@ -126,7 +132,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
         <Toolbar>
           {currentPageQuestions.map(question => (
             <Button color="inherit">
-              {question.name} - {question.score || "no score"}
+              {question.name}: {question.score || "no score"}
             </Button>
           ))}
         </Toolbar>

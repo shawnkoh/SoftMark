@@ -184,7 +184,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           <Toolbar>
             {currentPageQuestions.map(question => (
               <Button color="inherit">
-                {question.name} - {question.score || "no score"}
+                {question.name}: {question.score || "no score"}
               </Button>
             ))}
           </Toolbar>
