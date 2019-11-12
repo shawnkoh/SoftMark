@@ -3,6 +3,7 @@ import { useStateWithCallbackInstant } from "use-state-with-callback";
 
 import { Annotation } from "backend/src/types/annotations";
 
+import clsx from "clsx";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -31,13 +32,14 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+      width: "100%"
     },
-    grow: {
-      flexGrow: 1
+    padding: {
+      padding: theme.spacing(2)
     },
     sliderContainer: {
-      width: theme.spacing(8)
+      width: 300
     }
   })
 );
@@ -60,10 +62,7 @@ const CanvasWithControls: React.FC<Props> = ({
   const handleClearClick = event => setFgAnnotation([]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(CanvasMode.Pen);
-  const handleCanvasMode = (
-    event: React.MouseEvent<HTMLElement>,
-    newCanvasMode: CanvasMode
-  ) => {
+  const handleCanvasMode = (event: any, newCanvasMode: CanvasMode) => {
     setCanvasMode(newCanvasMode);
   };
 
@@ -82,53 +81,61 @@ const CanvasWithControls: React.FC<Props> = ({
 
   return (
     <div className={classes.container}>
-      <AppBar position="static">
+      <AppBar position="static" color="inherit">
         <Toolbar>
-          <div className={classes.grow}>
-            <ToggleButtonGroup
-              value={canvasMode}
-              exclusive
-              onChange={handleCanvasMode}
-              aria-label="canvas mode"
-            >
-              <ToggleButton value={CanvasMode.Pen} aria-label="pen">
-                <PenIcon />
-              </ToggleButton>
-              <ToggleButton value={CanvasMode.Eraser} aria-label="eraser">
-                <EraserIcon />
-              </ToggleButton>
-              <ToggleButton value={CanvasMode.View} aria-label="view">
-                <PanIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-            {canvasMode === CanvasMode.Pen && (
-              <>
-                <input
-                  type="color"
-                  onChange={handlePenColorChange}
-                  value={penColor}
+          <ToggleButtonGroup
+            value={canvasMode}
+            exclusive
+            onChange={handleCanvasMode}
+            aria-label="canvas mode"
+            className={classes.padding}
+          >
+            <ToggleButton value={CanvasMode.Pen} aria-label="pen">
+              <PenIcon />
+            </ToggleButton>
+            <ToggleButton value={CanvasMode.Eraser} aria-label="eraser">
+              <EraserIcon />
+            </ToggleButton>
+            <ToggleButton value={CanvasMode.View} aria-label="view">
+              <PanIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+          {canvasMode === CanvasMode.Pen && (
+            <>
+              <input
+                type="color"
+                onChange={handlePenColorChange}
+                value={penColor}
+                className={classes.padding}
+              />
+              <div className={clsx(classes.sliderContainer, classes.padding)}>
+                <Slider
+                  value={penWidth}
+                  onChange={handlePenWidthChange}
+                  step={1}
+                  marks
+                  min={1}
+                  max={10}
                 />
-                <div className={classes.sliderContainer}>
-                  <Slider
-                    value={penWidth}
-                    onChange={handlePenWidthChange}
-                    step={1}
-                    marks
-                    min={1}
-                    max={10}
-                  />
-                </div>
-              </>
-            )}
-            {canvasMode === CanvasMode.View && (
-              <Button onClick={handleResetViewClick} color="inherit">
-                Reset View
+              </div>
+              <Button
+                onClick={handleClearClick}
+                color="inherit"
+                className={classes.padding}
+              >
+                Clear Canvas
               </Button>
-            )}
-          </div>
-          <Button onClick={handleClearClick} color="inherit">
-            Clear Canvas
-          </Button>
+            </>
+          )}
+          {canvasMode === CanvasMode.View && (
+            <Button
+              onClick={handleResetViewClick}
+              color="inherit"
+              className={classes.padding}
+            >
+              Reset View
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <CanvasContainer
