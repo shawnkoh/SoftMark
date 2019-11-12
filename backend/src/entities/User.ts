@@ -1,7 +1,14 @@
 import { hashSync } from "bcryptjs";
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Validate
+} from "class-validator";
 import { sign } from "jsonwebtoken";
 import { Column, Entity, OneToMany } from "typeorm";
+import IsUniqueEmail from "../constraints/IsUniqueEmail";
 import { BearerTokenType } from "../types/tokens";
 import { UserData } from "../types/users";
 import { Discardable } from "./Discardable";
@@ -21,6 +28,7 @@ export class User extends Discardable {
   @Column({ unique: true })
   @IsNotEmpty()
   @IsEmail()
+  @Validate(IsUniqueEmail)
   email!: string;
 
   @Column({ type: "character varying", nullable: true, select: false })
