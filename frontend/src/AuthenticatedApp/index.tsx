@@ -5,7 +5,7 @@ import { Route, Switch } from "react-router-dom";
 import NotFoundPage from "../App/NotFoundPage";
 import PaperIndex from "./PaperIndexPage";
 import PaperView from "./PaperViewPage";
-import ScriptView from "./scripts/ScriptView";
+import ScriptView from "./paperScripts/ScriptView";
 import theme from "./theme";
 
 const AuthenticatedApp: React.FC = () => {
