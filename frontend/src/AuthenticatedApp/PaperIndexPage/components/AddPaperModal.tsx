@@ -1,14 +1,14 @@
 import React from "react";
 import * as Yup from "yup";
 import { PaperPostData } from "backend/src/types/papers";
-import { createPaper } from "../../../../api/papers";
+import { createPaper } from "../../../api/papers";
 
 import { Dialog, DialogContent } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
+import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
-} from "../../../../components/forms/SimpleForm";
+} from "../../../components/forms/SimpleForm";
 
 const useStyles = makeStyles(() => ({
   dialogTitle: {

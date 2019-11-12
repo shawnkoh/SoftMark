@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/EditOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
-import EditPaperModal from "../modals/EditPaperModal";
+import EditPaperModal from "./EditPaperModal";
 import { PaperData } from "backend/src/types/papers";
 
 const useStyles = makeStyles((theme: Theme) =>
