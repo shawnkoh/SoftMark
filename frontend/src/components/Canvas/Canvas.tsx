@@ -3,7 +3,7 @@ import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 
 import { AnnotationLine, Annotation } from "backend/src/types/annotations";
-import { CanvasMode, CanvasProps } from "./types";
+import { Point, CanvasMode, CanvasProps } from "./types";
 import {
   getDistance,
   getClientPointerRelativeToStage,
@@ -22,13 +22,7 @@ enum CanvasActionType {
   EndErase = "endErase",
   DeleteLine = "deleteLine",
   PanZoom = "panZoom",
-  SetDraggable = "setDraggable",
-  ResetView = "resetView"
-}
-
-interface Point {
-  x: number;
-  y: number;
+  SetDraggable = "setDraggable"
 }
 
 type CanvasAction =
@@ -44,8 +38,7 @@ type CanvasAction =
       type: CanvasActionType.PanZoom;
       payload: { stageScale: number; stagePosition: Point; lastDist: number };
     }
-  | { type: CanvasActionType.SetDraggable; payload: boolean }
-  | { type: CanvasActionType.ResetView };
+  | { type: CanvasActionType.SetDraggable; payload: boolean };
 
 interface CanvasState {
   lines: AnnotationLine[];
@@ -59,10 +52,11 @@ interface CanvasState {
 const createCanvasStateReducer = ({
   penColor,
   penWidth,
-  onForegroundAnnotationChange
+  onForegroundAnnotationChange,
+  onViewChange
 }: Pick<
   CanvasProps,
-  "penColor" | "penWidth" | "onForegroundAnnotationChange"
+  "penColor" | "penWidth" | "onForegroundAnnotationChange" | "onViewChange"
 >) => (state: CanvasState, action: CanvasAction): CanvasState => {
   let nextState = state;
   let hasForegroundAnnotationChanged = false;
@@ -129,18 +123,13 @@ const createCanvasStateReducer = ({
         draftState.stagePosition = action.payload.stagePosition;
         draftState.lastDist = action.payload.lastDist;
       });
+      onViewChange(nextState.stagePosition, nextState.stageScale);
       break;
     case CanvasActionType.SetDraggable:
       nextState = {
         ...state,
         draggable: action.payload
       };
-      break;
-    case CanvasActionType.ResetView:
-      nextState = produce(state, draftState => {
-        draftState.stageScale = 1;
-        draftState.stagePosition = { x: 32, y: 32 };
-      });
       break;
     default:
       nextState = state;
@@ -160,14 +149,16 @@ const Canvas: React.FC<CanvasProps> = ({
   mode,
   penColor,
   penWidth,
+  position,
+  scale,
   onForegroundAnnotationChange,
-  resetView
+  onViewChange
 }: CanvasProps) => {
   const initialCanvasState = {
     lines: foregroundAnnotation,
     isDrawing: false,
-    stageScale: 1,
-    stagePosition: { x: 32, y: 32 },
+    stageScale: scale,
+    stagePosition: position,
     lastDist: 0,
     draggable: false
   };
@@ -176,7 +167,8 @@ const Canvas: React.FC<CanvasProps> = ({
     createCanvasStateReducer({
       penColor,
       penWidth,
-      onForegroundAnnotationChange
+      onForegroundAnnotationChange,
+      onViewChange
     }),
     [penColor, penWidth, onForegroundAnnotationChange]
   );
@@ -196,12 +188,20 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
 
   useEffect(() => {
-    if (resetView) {
+    if (
+      position !== canvasState.stagePosition ||
+      scale !== canvasState.stageScale
+    ) {
       dispatch({
-        type: CanvasActionType.ResetView
+        type: CanvasActionType.PanZoom,
+        payload: {
+          stagePosition: position,
+          stageScale: scale,
+          lastDist: canvasState.lastDist
+        }
       });
     }
-  }, [resetView]); // Ignore warning - do not change dependency array!
+  }, [position, scale]); // Ignore warning - do not change dependency array!
 
   const stageRef = useRef<any>(null);
 
