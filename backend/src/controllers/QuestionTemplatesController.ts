@@ -106,6 +106,28 @@ export async function create(request: Request, response: Response) {
   response.status(201).json({ questionTemplate: data });
 }
 
+export async function index(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const paperId = Number(request.params.id);
+  let questionTemplates: QuestionTemplate[] = [];
+  try {
+    questionTemplates = await getActiveQuestionTemplates(paperId);
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
+  } catch (error) {
+    return response.sendStatus(404);
+  }
+
+  try {
+    const data = await Promise.all(
+      questionTemplates.map(questionTemplate => questionTemplate.getListData())
+    );
+    response.status(200).json({ questionTemplates: data });
+  } catch (error) {
+    return response.sendStatus(500);
+  }
+}
+
 export async function show(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;

@@ -76,6 +76,35 @@ export async function index(request: Request, response: Response) {
   response.status(200).json({ allocations: data });
 }
 
+export async function getAllocationsOfMarker(
+  request: Request,
+  response: Response
+) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const paperUserId = Number(request.params.id);
+  let allocations: Allocation[] = [];
+  try {
+    const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
+    const paperId = paperUser.paperId;
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Marker);
+    allocations = await getRepository(Allocation).find({
+      where: { paperUserId }
+    });
+  } catch (error) {
+    return response.sendStatus(404);
+  }
+
+  try {
+    const data = await Promise.all(
+      allocations.map(allocation => allocation.getListData())
+    );
+    response.status(200).json({ allocations: data });
+  } catch (error) {
+    response.sendStatus(500);
+  }
+}
+
 // hard delete
 export async function destroy(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;

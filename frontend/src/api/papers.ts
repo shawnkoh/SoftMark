@@ -36,6 +36,10 @@ export async function editPaper(
   return client.patch(`${URL}/${id}`, paperPatchData);
 }
 
+export async function discardPaper(id: number): Promise<AxiosResponse> {
+  return client.delete(`${URL}/${id}`);
+}
+
 export async function createPaperUser(
   id: number,
   paperUserPostData: PaperUserPostData

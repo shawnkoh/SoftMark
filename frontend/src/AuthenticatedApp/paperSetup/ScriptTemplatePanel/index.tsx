@@ -67,7 +67,7 @@ const ScriptTemplatePanel: React.FC<Props> = props => {
     <Typography
       component="div"
       role="tabpanel"
-      hidden={pageTemplate.id !== currentPageNo}
+      hidden={pageTemplate.pageNo !== currentPageNo}
     >
       <QuestionTemplateDialog
         mode="create"

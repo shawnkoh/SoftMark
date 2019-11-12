@@ -53,6 +53,12 @@ export async function createPaperUser(
   return client.post(`papers/${id}/users`, paperUserPostData);
 }
 
+export async function getMarkers(
+  id: number
+): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
+  return client.get(`papers/${id}/markers`);
+}
+
 export async function getStudents(
   id: number
 ): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
