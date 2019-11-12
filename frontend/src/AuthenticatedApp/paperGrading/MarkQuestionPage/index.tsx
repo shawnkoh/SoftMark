@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { Link } from "react-router-dom";
 
 import api from "../../../api";
 import usePaper from "../../../contexts/PaperContext";
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) =>
     grow: {
       display: "flex",
       flexGrow: 1
+    },
+    backButton: {
+      marginRight: theme.spacing(2)
     }
   })
 );
@@ -75,7 +79,12 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   const Header = () => (
     <AppBar position="static" color="primary" elevation={1}>
       <Toolbar>
-        <IconButton color="inherit">
+        <IconButton
+          color="inherit"
+          component={Link}
+          to={`/papers/${paper.id}/setup`}
+          className={classes.backButton}
+        >
           <ArrowBackIcon />
         </IconButton>
         <Grid container className={classes.grow}>
@@ -83,7 +92,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
             <Typography variant="h6">{paper.name}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle1">{`Marking question ID ${questionTemplateId}`}</Typography>
+            <Typography variant="subtitle1">{`Marking question template ID ${questionTemplateId}`}</Typography>
           </Grid>
         </Grid>
         <Button color="inherit" onClick={toggleRefreshFlag}>
