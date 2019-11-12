@@ -1,16 +1,15 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import {
   AppBar,
-  Container,
   Grid,
   IconButton,
   Toolbar,
   Typography
 } from "@material-ui/core";
-import { PaperData } from "backend/src/types/papers";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import React from "react";
+import { useHistory } from "react-router";
+import usePaper from "../../../../contexts/PaperContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,23 +22,22 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface OwnProps {
-  paper: PaperData;
+interface Props {
   title: string;
 }
 
-type Props = RouteComponentProps & OwnProps;
-
 const Header: React.FC<Props> = props => {
+  const history = useHistory();
+  const paper = usePaper();
   const classes = useStyles();
-  const { paper, title } = props;
+  const { title } = props;
   const { name } = paper;
 
   return (
     <AppBar position="sticky" color="primary" elevation={1}>
       <Toolbar>
         <IconButton
-          onClick={() => props.history.push(`/papers/${paper.id}/setup`)}
+          onClick={() => history.push(`/papers/${paper.id}/setup`)}
           color="inherit"
           className={classes.backButton}
         >
@@ -58,4 +56,4 @@ const Header: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(Header);
+export default Header;

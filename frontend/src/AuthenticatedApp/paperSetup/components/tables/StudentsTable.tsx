@@ -1,28 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../../api";
-import { PaperData } from "backend/src/types/papers";
-import { PaperUserListData } from "../../../../types/paperUsers";
-import { TableColumn } from "../../../../components/tables/TableTypes";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Grid,
+  Paper,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  TableSortLabel,
-  Paper
+  TableHead,
+  TableRow,
+  TableSortLabel
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
+import api from "../../../../api";
+import ThemedButton from "../../../../components/buttons/ThemedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
+import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
+import usePaper from "../../../../contexts/PaperContext";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import AddStudentModal from "../modals/AddStudentModal";
 import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
 import StudentsTableRow from "./StudentsTableRow";
 
 const useStyles = makeStyles(theme => ({
@@ -33,13 +30,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface OwnProps {
-  paper: PaperData;
-}
-
-type Props = OwnProps & RouteComponentProps;
-
-const StudentsTable: React.FC<Props> = ({ paper }) => {
+const StudentsTable: React.FC = () => {
+  const paper = usePaper();
   const classes = useStyles();
 
   const [students, setStudents] = useState<PaperUserListData[]>([]);
@@ -193,4 +185,4 @@ const StudentsTable: React.FC<Props> = ({ paper }) => {
   );
 };
 
-export default withRouter(StudentsTable);
+export default StudentsTable;

@@ -11,31 +11,23 @@ import {
   Toolbar,
   Typography
 } from "@material-ui/core";
-// Material UI
 import { useTheme } from "@material-ui/core/styles";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import PagesIcon from "@material-ui/icons/Pages";
 import api from "api";
-// Types
-import { PaperData } from "backend/src/types/papers";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import clsx from "clsx";
 import LoadingSpinner from "components/LoadingSpinner";
 import React, { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
-// Components
+import usePaper from "../../../contexts/PaperContext";
 import ScriptTemplatePanel from "../ScriptTemplatePanel";
 import useStyles from "./useStyles";
 
-interface ScriptTemplateViewProps {
-  paper: PaperData;
-}
-
-const ScriptTemplateView: React.FC<ScriptTemplateViewProps> = props => {
-  const { paper } = props;
-
+const ScriptTemplateView: React.FC = () => {
+  const paper = usePaper();
   const classes = useStyles();
   const theme = useTheme();
 

@@ -1,32 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../../api";
-import { PaperData } from "backend/src/types/papers";
+import {
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Tooltip
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import { TableColumn } from "../../../../components/tables/TableTypes";
-
-import { makeStyles } from "@material-ui/core/styles";
-import {
-  Button,
-  Grid,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableSortLabel,
-  Tooltip,
-  Paper
-} from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import api from "../../../../api";
+import ThemedButton from "../../../../components/buttons/ThemedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
+import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
-import ScriptsTableRow from "./ScriptTableRow";
+import usePaper from "../../../../contexts/PaperContext";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
-import { PaperUserListData } from "types/paperUsers";
+import ScriptsTableRow from "./ScriptTableRow";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
@@ -36,13 +31,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface OwnProps {
-  paper: PaperData;
-}
-
-type Props = OwnProps & RouteComponentProps;
-
-const ScriptsTable: React.FC<Props> = ({ paper }) => {
+const ScriptsTable: React.FC = () => {
+  const paper = usePaper();
   const classes = useStyles();
 
   const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
@@ -227,4 +217,4 @@ const ScriptsTable: React.FC<Props> = ({ paper }) => {
   );
 };
 
-export default withRouter(ScriptsTable);
+export default ScriptsTable;
