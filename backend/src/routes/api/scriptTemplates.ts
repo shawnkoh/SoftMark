@@ -23,4 +23,6 @@ router.get(
   QuestionTemplatesController.rootQuestionTemplates
 );
 
+router.get("/:id/setup", ScriptTemplatesController.getSetupData);
+
 export default router;

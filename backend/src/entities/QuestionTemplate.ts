@@ -39,6 +39,8 @@ export class QuestionTemplate extends Discardable {
     scriptTemplate: ScriptTemplate,
     name: string,
     score?: number | null,
+    pageCovered?: string | null,
+    displayPage?: number | null,
     topOffset?: number | null,
     leftOffset?: number | null,
     parentQuestionTemplate?: QuestionTemplate | null
@@ -47,8 +49,10 @@ export class QuestionTemplate extends Discardable {
     this.scriptTemplate = scriptTemplate;
     this.name = name;
     this.score = score || null;
+    this.displayPage = displayPage || null;
     this.topOffset = topOffset || null;
     this.leftOffset = leftOffset || null;
+    this.pageCovered = pageCovered || null;
     this.parentQuestionTemplate = parentQuestionTemplate || null;
   }
 
@@ -69,6 +73,16 @@ export class QuestionTemplate extends Discardable {
 
   @TreeChildren()
   childQuestionTemplates?: QuestionTemplate[];
+
+  @Column({ type: "character varying", nullable: true })
+  @IsOptional()
+  @IsString()
+  pageCovered: string | null;
+
+  @Column({ type: "integer", nullable: true })
+  @IsOptional()
+  @IsNumber()
+  displayPage: number | null;
 
   @Column({ type: "integer", nullable: true })
   @IsOptional()

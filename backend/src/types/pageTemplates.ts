@@ -1,6 +1,7 @@
 import {
   QuestionTemplateListData,
-  isQuestionTemplateListData
+  isQuestionTemplateListData,
+  QuestionTemplateLeafData
 } from "./questionTemplates";
 import { DiscardableData, isDiscardableData } from "./entities";
 
@@ -12,6 +13,13 @@ export interface PageTemplateListData extends DiscardableData {
 
 export interface PageTemplateData extends PageTemplateListData {
   questionTemplates: QuestionTemplateListData[];
+}
+
+export interface PageTemplateSetupData {
+  id: number;
+  pageNo: number;
+  imageUrl: string;
+  questionTemplates: QuestionTemplateLeafData[];
 }
 
 export function isPageTemplateListData(

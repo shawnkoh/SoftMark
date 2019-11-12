@@ -35,7 +35,8 @@ export async function create(request: Request, response: Response) {
     "name",
     "parentName",
     "score",
-    "pageCovered"
+    "pageCovered",
+    "displayPage"
   ) as QuestionTemplatePostData;
 
   const scriptTemplate = await getRepository(ScriptTemplate).findOne(
@@ -61,6 +62,8 @@ export async function create(request: Request, response: Response) {
     scriptTemplate,
     postData.name,
     postData.score,
+    postData.pageCovered,
+    postData.displayPage,
     50,
     50
   );
