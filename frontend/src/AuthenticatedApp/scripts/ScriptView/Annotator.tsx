@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useStateWithCallbackInstant } from "use-state-with-callback";
 
 import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageData } from "backend/src/types/pages";
 
-import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import CanvasWithToolbar from "../../../components/Canvas/CanvasWithToolbar";
-import { CanvasMode } from "../../../components/Canvas/types";
+import { CanvasWithToolbar } from "../../../components/Canvas";
 
 interface OwnProps {
   pageId: number;
@@ -21,12 +17,6 @@ type Props = OwnProps;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    container: {
-      minHeight: "100vh",
-      minWidth: "100vw",
-      display: "flex",
-      flexDirection: "column"
-    },
     grow: {
       display: "flex",
       flexGrow: 1
@@ -72,25 +62,13 @@ const Annotator: React.FC<Props> = ({
   }
 
   return (
-    <div className={classes.container}>
-      <AppBar position="static" color="primary" elevation={1}>
-        <Toolbar>
-          <IconButton color="inherit">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6">Placeholder Title</Typography>
-        </Toolbar>
-      </AppBar>
-      <div className={classes.grow}>
-        <CanvasWithToolbar
-          drawable
-          backgroundImageSource={backgroundImageSource}
-          backgroundAnnotations={backgroundAnnotations}
-          foregroundAnnotation={foregroundAnnotation}
-          onForegroundAnnotationChange={handleForegroundAnnotationChange}
-        />
-      </div>
-    </div>
+    <CanvasWithToolbar
+      drawable
+      backgroundImageSource={backgroundImageSource}
+      backgroundAnnotations={backgroundAnnotations}
+      foregroundAnnotation={foregroundAnnotation}
+      onForegroundAnnotationChange={handleForegroundAnnotationChange}
+    />
   );
 };
 
