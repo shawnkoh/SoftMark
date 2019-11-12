@@ -4,7 +4,7 @@ import { RouteComponentProps } from "react-router";
 import ScriptMapping from "./ScriptMapping";
 import ScriptTemplateView from "./ScriptTemplateView";
 
-const PaperSetup: React.FC<RouteComponentProps> = ({ match }) => {
+const PaperSetupRouter: React.FC<RouteComponentProps> = ({ match }) => {
   return (
     <Switch>
       <Route
@@ -21,4 +21,4 @@ const PaperSetup: React.FC<RouteComponentProps> = ({ match }) => {
   );
 };
 
-export default PaperSetup;
+export default PaperSetupRouter;

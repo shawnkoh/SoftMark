@@ -15,7 +15,7 @@ const AuthenticatedApp: React.FC = () => {
       <CssBaseline />
       <Switch>
         <Route exact path="/" component={PaperIndex} />
-        <Route path="/papers/:paper_id/setup" component={PaperSetup} />
+        {/*<Route path="/papers/:paper_id/setup" component={PaperSetup} />*/}
         <Route path="/papers/:paper_id" component={PaperView} />
         <Route path="/scripts/:script_id" component={ScriptView} />
         <Route>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, RouteComponentProps } from "react-router";
+import { Route, Switch } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
@@ -27,6 +28,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
+  console.log(match.path);
+
   const history = useHistory();
   const paper = usePaper();
   const classes = useStyles();
@@ -190,18 +193,16 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   ];
 
   return (
-    <>
-      <Container maxWidth={false}>
-        <Grid container spacing={4} className={classes.container}>
-          <Grid item xs={12}>
-            <Typography variant="h4" component="h2">
-              Setup
-            </Typography>
-          </Grid>
-          {rowDetails.map(row => createGridRow(row))}
+    <Container maxWidth={false}>
+      <Grid container spacing={4} className={classes.container}>
+        <Grid item xs={12}>
+          <Typography variant="h4" component="h2">
+            Setup
+          </Typography>
         </Grid>
-      </Container>
-    </>
+        {rowDetails.map(row => createGridRow(row))}
+      </Grid>
+    </Container>
   );
 };
 
