@@ -298,19 +298,25 @@ export async function questionToMark(request: Request, response: Response) {
     rootQuestionTemplate
   ).getMany();
 
-  const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
-    descendant => descendant.id
-  );
-
-  const descendantQuestions = await getDescendantQuestions(
-    descendantQuestionTemplateIds
-  ).getRawMany();
+  let descendantQuestions: QuestionViewData[];
+  if (descendantQuestionTemplates.length === 0) {
+    descendantQuestions = [];
+  } else {
+    const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
+      descendant => descendant.id
+    );
+    descendantQuestions = await getDescendantQuestions(
+      descendantQuestionTemplateIds
+    ).getRawMany();
+  }
 
   const questionIds = descendantQuestions.map(child => child.id);
   questionIds.push(rootQuestion.id);
 
   const pagesData = await getPagesData(questionIds)
-    .andWhere("annotation.paperUserId = :id", { id: requester.id })
+    .andWhere("annotation.id IS NULL OR annotation.paperUserId = :id", {
+      id: requester.id
+    })
     .getRawMany();
 
   const pages: PageViewData[] = getPages(pagesData);
