@@ -4,21 +4,17 @@ import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../../../api";
 import { PaperData } from "backend/src/types/papers";
 import { PaperUserListData } from "../../../../types/paperUsers";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  Button,
   Grid,
-  IconButton,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
   TableSortLabel,
-  Tooltip,
   Paper
 } from "@material-ui/core";
 import SearchBar from "../../../../components/fields/SearchBar";

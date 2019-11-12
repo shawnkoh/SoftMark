@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import * as Yup from "yup";
 import { PaperPostData, PaperData } from "backend/src/types/papers";
-import { editPaper } from "../../../../api/papers";
+import { editPaper } from "../../../api/papers";
 
 import { Dialog, DialogContent } from "@material-ui/core";
-import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
+import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
-} from "../../../../components/forms/SimpleForm";
+} from "../../../components/forms/SimpleForm";
 
 interface OwnProps {
   paper: PaperData;
