@@ -1,6 +1,6 @@
-const PAGE_REGEX: RegExp = new RegExp("^(?:(?:[0-9]+|[0-9+]-[0-9]+)+, )+$");
-const SINGLE_PAGE_REGEX: RegExp = new RegExp("^[0-9]+$");
-const MULTI_PAGE_REGEX: RegExp = new RegExp("^[0-9]+-[0-9]+$");
+const PAGE_REGEX = /"^(?:(?:[0-9]+|[0-9+]-[0-9]+)+, )+$/;
+const SINGLE_PAGE_REGEX = /^[0-9]+$/;
+const MULTI_PAGE_REGEX = /^[0-9]+-[0-9]+$/;
 
 /**
  * Convert pages covered from string to number set
