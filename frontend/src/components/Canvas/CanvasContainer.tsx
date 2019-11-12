@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { Annotation } from "backend/src/types/annotations";
 import { CanvasProps, CanvasMode } from "./types";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Canvas from "./Canvas";
 
 /*
-    CanvasContainer component automatically fills space of its parent element
-    if parent element is a flex container
+CanvasContainer component automatically fills space of its parent element
+if parent element is a flex container
+*/
+
+/* For future improvement
+type StyleProps = {
+  backgroundColor: string;
+};
 */
 
 type Props = Partial<
@@ -19,8 +26,10 @@ type Props = Partial<
     | "mode"
     | "penColor"
     | "penWidth"
+    | "position"
+    | "scale"
     | "onForegroundAnnotationChange"
-    | "resetView"
+    | "onViewChange"
   >
 >;
 
@@ -40,8 +49,10 @@ const CanvasContainer: React.FC<Props> = ({
   mode = CanvasMode.View,
   penColor = "ff0000",
   penWidth = 5,
+  position = { x: 0, y: 0 },
+  scale = 1.0,
   onForegroundAnnotationChange = annotation => {},
-  resetView = false
+  onViewChange = (position, scale) => {}
 }: Props) => {
   const classes = useStyles();
 
@@ -76,8 +87,10 @@ const CanvasContainer: React.FC<Props> = ({
         mode={mode}
         penColor={penColor}
         penWidth={penWidth}
+        position={position}
+        scale={scale}
         onForegroundAnnotationChange={onForegroundAnnotationChange}
-        resetView={resetView}
+        onViewChange={onViewChange}
       />
     </div>
   );
