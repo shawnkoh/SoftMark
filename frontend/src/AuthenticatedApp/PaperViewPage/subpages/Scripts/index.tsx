@@ -11,11 +11,11 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { ScriptListData } from "backend/src/types/scripts";
 import React, { useEffect, useState } from "react";
-import api from "../../../api";
-import SearchBar from "../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../components/LoadingSpinner";
-import { TableColumn } from "../../../components/tables/TableTypes";
-import usePaper from "../../../contexts/PaperContext";
+import api from "../../../../api";
+import SearchBar from "../../../../components/fields/SearchBar";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
+import { TableColumn } from "../../../../components/tables/TableTypes";
+import usePaper from "../../../../contexts/PaperContext";
 import ScriptsTableRow from "./ScriptsTableRow";
 
 const useStyles = makeStyles(theme => ({

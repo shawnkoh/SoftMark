@@ -1,16 +1,18 @@
-import { Box, Container, Grid, Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
+import { useHistory, RouteComponentProps } from "react-router";
+import { Link } from "react-router-dom";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
-import api from "../../../api";
-import { RoundedButton } from "../../../components/buttons/StyledButtons";
-import LoadingSpinner from "../../../components/LoadingSpinner";
-import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
-import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
-import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
-import usePaper from "../../../contexts/PaperContext";
+import api from "../../../../api";
+import usePaper from "../../../../contexts/PaperContext";
+
+import { Button, Box, Container, Grid, Typography } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { RoundedButton } from "../../../../components/buttons/StyledButtons";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
+import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
+import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
+import UploadScriptTemplateWrapper from "../../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,9 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const BULLET_POINT = `\u2022 `;
-
-const SetupSubpage: React.FC = () => {
+const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   const history = useHistory();
   const paper = usePaper();
   const classes = useStyles();
@@ -103,9 +103,9 @@ const SetupSubpage: React.FC = () => {
           paperId={paper.id}
           setScriptTemplate={setScriptTemplate}
         >
-          <RoundedButton color="primary" variant="contained">
+          <Button color="primary" variant="contained">
             {scriptTemplate ? "Re-Upload" : "Upload"}
-          </RoundedButton>
+          </Button>
         </UploadScriptTemplateWrapper>
       )
     },
@@ -120,9 +120,9 @@ const SetupSubpage: React.FC = () => {
           paperId={paper.id}
           refreshScripts={refreshScripts}
         >
-          <RoundedButton color="primary" variant="contained">
+          <Button color="primary" variant="contained">
             Upload
-          </RoundedButton>
+          </Button>
         </UploadScriptsWrapper>
       )
     },
@@ -133,9 +133,9 @@ const SetupSubpage: React.FC = () => {
           paperId={paper.id}
           clickable={!isLoadingScriptTemplate}
         >
-          <RoundedButton color="primary" variant="contained">
+          <Button color="primary" variant="contained">
             {false ? "Re-Upload" : "Upload"}
-          </RoundedButton>
+          </Button>
         </UploadNominalRollWrapper>
       )
     },
@@ -144,16 +144,15 @@ const SetupSubpage: React.FC = () => {
         "Map student scripts to student list / nominal roll" +
         (scripts.length === 0 ? " (Upload student scripts first)" : ""),
       button: (
-        <RoundedButton
+        <Button
+          component={Link}
+          to={`${match.url}/script_mapping`}
           color="primary"
           variant="contained"
           disabled={scripts.length === 0}
-          onClick={() =>
-            history.push(`/papers/${paper.id}/set_up/script_mapping`)
-          }
         >
           Map
-        </RoundedButton>
+        </Button>
       )
     },
     {
@@ -161,18 +160,15 @@ const SetupSubpage: React.FC = () => {
         "Set up marking template" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
-        <RoundedButton
+        <Button
+          component={Link}
+          to={`${match.url}/script_template`}
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
-          onClick={() => {
-            if (scriptTemplate) {
-              history.push(`/papers/${paper.id}/set_up/script_template`);
-            }
-          }}
         >
           Set up
-        </RoundedButton>
+        </Button>
       )
     },
     {
@@ -180,16 +176,15 @@ const SetupSubpage: React.FC = () => {
         "Allocate questions to markers" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
-        <RoundedButton
+        <Button
+          component={Link}
+          to={`${match.url}/script_template`}
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
-          onClick={() =>
-            history.push(`/papers/${paper.id}/set_up/script_template`)
-          }
         >
           Allocate
-        </RoundedButton>
+        </Button>
       )
     }
   ];

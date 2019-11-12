@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { useRouteMatch } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
 import { PaperProvider } from "../../contexts/PaperContext";
-import GradingSubpage from "../GradingPage";
 import PaperViewHeader from "./components/PaperViewHeader";
 import useStyles from "./styles";
-import ScriptsSubpage from "./subpages/Scripts";
 import SetupSubpage from "./subpages/Setup";
+import GradingSubpage from "./subpages/Grading";
+import ScriptsSubpage from "./subpages/Scripts";
 
 const TEAM = "team";
 const SETUP = "setup";
@@ -25,21 +25,9 @@ const PaperView: React.FC = () => {
     <PaperProvider>
       <PaperViewHeader />
       <Switch>
-        <Route exact path={path}>
-          <h3>Exact</h3>
-        </Route>
-        <Route path={`${path}/users`}>
-          <h3>Users</h3>
-        </Route>
-        <Route path={`${path}/setup`}>
-          <SetupSubpage />
-        </Route>
-        <Route path={`${path}/grading`}>
-          <GradingSubpage />
-        </Route>
-        <Route path={`${path}/scripts`}>
-          <ScriptsSubpage />
-        </Route>
+        <Route exact path={`${path}/setup`} component={SetupSubpage} />
+        <Route exact path={`${path}/grading`} component={GradingSubpage} />
+        <Route exact path={`${path}/scripts`} component={ScriptsSubpage} />
       </Switch>
       <BottomNavigation
         className={classes.navBar}
@@ -49,13 +37,6 @@ const PaperView: React.FC = () => {
         }}
         showLabels // removing this prop is sufficient to remove labels for unselected tabs
       >
-        <BottomNavigationAction
-          component={Link}
-          to={`${url}/${TEAM}`}
-          value={TEAM}
-          label="Team"
-          icon={<Person />}
-        />
         <BottomNavigationAction
           component={Link}
           to={`${url}/${SETUP}`}
