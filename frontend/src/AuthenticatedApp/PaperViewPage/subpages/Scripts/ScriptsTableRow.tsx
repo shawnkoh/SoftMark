@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
 import * as Yup from "yup";
-import { PaperUserListData } from "../../../types/paperUsers";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 
 import { makeStyles } from "@material-ui/core/styles";
