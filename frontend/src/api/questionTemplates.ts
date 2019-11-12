@@ -12,12 +12,9 @@ const URL = "/question_templates";
 
 export async function createQuestionTemplate(
   id: number,
-  QuestionTemplatePostData: QuestionTemplatePostData
+  postData: QuestionTemplatePostData
 ): Promise<AxiosResponse<{ questionTemplate: QuestionTemplateData }>> {
-  return client.post(
-    `/script_templates/${id}/question_templates`,
-    QuestionTemplatePostData
-  );
+  return client.post(`/script_templates/${id}/question_templates`, postData);
 }
 
 export async function getQuestionTemplates(

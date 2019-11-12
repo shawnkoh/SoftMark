@@ -1,17 +1,13 @@
+import { makeStyles } from "@material-ui/core/styles";
+import { PaperData } from "backend/src/types/papers";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
-
 import api from "../../api";
-import { PaperData } from "backend/src/types/papers";
-import { PaperUserData } from "../../types/paperUsers";
-
-import { makeStyles } from "@material-ui/core/styles";
-
 import LoadingSpinner from "../../components/LoadingSpinner";
-import QuestionAllocation from "./QuestionAllocation";
-import ScriptTemplateView from "./ScriptTemplateView";
+import { PaperUserData } from "../../types/paperUsers";
 import ScriptMapping from "./ScriptMapping";
+import ScriptTemplateView from "./ScriptTemplateView";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -56,15 +52,8 @@ const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
 
   // Sub routes
   const scriptTemplateViewRoute = (
-    <Route
-      exact
-      path={`${BASE_URL}/script_template`}
-      component={ScriptTemplateView}
-    />
-  );
-  const questionAllocationRoute = (
-    <Route exact path={`${BASE_URL}/question_allocation`}>
-      <QuestionAllocation />
+    <Route exact path={`${BASE_URL}/script_template`}>
+      <ScriptTemplateView paper={paper} />
     </Route>
   );
   const scriptMappingRoute = (
@@ -76,7 +65,6 @@ const PaperSetup: React.FC<Props> = ({ match: { params } }) => {
   return (
     <>
       <Switch>
-        {questionAllocationRoute}
         {scriptTemplateViewRoute}
         {scriptMappingRoute}
       </Switch>
