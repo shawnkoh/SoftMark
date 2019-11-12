@@ -14,11 +14,11 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Slider from "@material-ui/core/Slider";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import PenIcon from "@material-ui/icons/BorderColor";
-import EraserIcon from "@material-ui/icons/PhonelinkErase";
 import PanIcon from "@material-ui/icons/PanTool";
-import MinWidthIcon from "@material-ui/icons/Adjust";
-import MaxWidthIcon from "@material-ui/icons/FiberManualRecord";
+import PenIcon from "mdi-material-ui/Pen";
+import EraserIcon from "mdi-material-ui/Eraser";
+import MinWidthIcon from "mdi-material-ui/CircleMedium";
+import MaxWidthIcon from "mdi-material-ui/Circle";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 
