@@ -1,31 +1,12 @@
+import { Fab } from "@material-ui/core";
+import {
+  QuestionTemplateData,
+  QuestionTemplateListData
+} from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Fab, Avatar } from "@material-ui/core";
-import QuestionTemplateDialog from "./components/QuestionTemplateDialog";
-import {
-  QuestionTemplateListData,
-  QuestionTemplateData
-} from "backend/src/types/questionTemplates";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    fab: {
-      position: "absolute",
-      cursor: "move",
-      padding: theme.spacing(2),
-      fontSize: theme.typography.body1.fontSize
-    },
-    score: {
-      marginLeft: theme.spacing(1),
-      color: "#fff",
-      backgroundColor: theme.palette.primary.dark,
-      borderRadius: 15,
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1)
-    }
-  })
-);
+import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
+import useStyles from "./useStyles";
 
 interface ScriptTemplateQuestionProps {
   index: number;

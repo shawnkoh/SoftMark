@@ -1,33 +1,16 @@
+import { Box, Fab, IconButton, Typography } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
+import BackIcon from "@material-ui/icons/ArrowBackIos";
+import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
+import { PageTemplateListData } from "backend/src/types/pageTemplates";
+import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
+import update from "immutability-helper";
 import React, { useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
-import update from "immutability-helper";
-import api from "api";
-// Material UI
-import { Typography, Box, IconButton, Fab } from "@material-ui/core";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
-import BackIcon from "@material-ui/icons/ArrowBackIos";
-import AddIcon from "@material-ui/icons/Add";
-// Types
-import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
-import { PageTemplateListData } from "backend/src/types/pageTemplates";
-// Components
-import QuestionTemplateDialog from "./components/QuestionTemplateDialog";
-import ScriptTemplateQuestion from "./ScriptTemplateQuestion";
-const useStyles = makeStyles((theme: Theme) => ({
-  container: {
-    position: "relative"
-  },
-  scriptImage: {
-    objectFit: "contain",
-    height: "calc(99vh - 64px)"
-  },
-  addFab: {
-    position: "absolute",
-    right: theme.spacing(2),
-    bottom: theme.spacing(2)
-  }
-}));
+import api from "../../../api";
+import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
+import ScriptTemplateQuestion from "../ScriptTemplateQuestion";
+import useStyles from "./useStyles";
 
 type DragItem = QuestionTemplateListData & { type: string; index: number };
 

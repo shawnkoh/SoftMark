@@ -1,14 +1,11 @@
+import { makeStyles } from "@material-ui/core/styles";
+import { PaperData } from "backend/src/types/papers";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
-
 import api from "../../api";
-import { PaperData } from "backend/src/types/papers";
-import { PaperUserData } from "../../types/paperUsers";
-
-import { makeStyles } from "@material-ui/core/styles";
-
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { PaperUserData } from "../../types/paperUsers";
 import ScriptMapping from "./ScriptMapping";
 import ScriptTemplateView from "./ScriptTemplateView";
 
