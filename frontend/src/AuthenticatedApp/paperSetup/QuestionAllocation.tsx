@@ -5,7 +5,7 @@ import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import Typography from "@material-ui/core/Typography";
 import React from "react";
-import Header from "./components/headers/PaperSetupHeader";
+import Header from "./components/PaperSetupHeader";
 
 interface TabPanelProps {
   children?: React.ReactNode;

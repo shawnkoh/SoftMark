@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import {
   AnnotationPostData,
+  AnnotationListData,
   AnnotationData
 } from "backend/src/types/annotations";
 
