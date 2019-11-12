@@ -1,5 +1,10 @@
 import { Annotation } from "backend/src/types/annotations";
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export enum CanvasMode {
   Pen = "pen",
   Eraser = "eraser",
@@ -15,6 +20,8 @@ export interface CanvasProps {
   mode: CanvasMode;
   penColor: string;
   penWidth: number;
-  resetView: boolean;
+  position: Point;
+  scale: number;
   onForegroundAnnotationChange: (annotation: Annotation) => void;
+  onViewChange: (position: Point, scale: number) => void;
 }

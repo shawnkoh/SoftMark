@@ -9,7 +9,7 @@ import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import CanvasWithControls from "../../../components/Canvas/CanvasWithControls";
+import CanvasWithToolbar from "../../../components/Canvas/CanvasWithToolbar";
 import { CanvasMode } from "../../../components/Canvas/types";
 
 interface OwnProps {
@@ -82,7 +82,8 @@ const Annotator: React.FC<Props> = ({
         </Toolbar>
       </AppBar>
       <div className={classes.grow}>
-        <CanvasWithControls
+        <CanvasWithToolbar
+          drawable
           backgroundImageSource={backgroundImageSource}
           backgroundAnnotations={backgroundAnnotations}
           foregroundAnnotation={foregroundAnnotation}
