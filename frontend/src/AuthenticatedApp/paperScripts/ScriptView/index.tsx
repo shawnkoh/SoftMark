@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { Link } from "react-router-dom";
 
 import api from "../../../api";
-import { ScriptData } from "backend/src/types/scripts";
+import usePaper from "../../../contexts/PaperContext";
+import { ScriptViewData } from "backend/src/types/view";
 
 import {
+  Grid,
   Button,
   AppBar,
   IconButton,
@@ -19,7 +22,7 @@ import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { lightBlue } from "@material-ui/core/colors";
 
-import TogglePageComponent from "../../../components/misc/TogglePageComponent";
+import { CanvasWithToolbar } from "../../../components/Canvas";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import Annotator from "./Annotator";
 
@@ -34,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) =>
     grow: {
       display: "flex",
       flexGrow: 1
+    },
+    backButton: {
+      marginRight: theme.spacing(2)
     },
     prevPageButton: {
       position: "absolute",
@@ -72,126 +78,153 @@ type Props = RouteComponentProps;
 const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
 
-  const script_id = +(params as { script_id: string }).script_id;
-  const [script, setScript] = useState<ScriptData | null>(null);
+  const scriptId = parseInt((params as { script_id: string }).script_id, 10);
 
-  const [viewPageNo, setViewPageNo] = useState(1);
-  const incrementViewPageNo = () =>
-    setViewPageNo(prevPageNo =>
-      Math.min(script ? script.pages.length : 1, prevPageNo + 1)
-    );
-  const decrementViewPageNo = () =>
-    setViewPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
-
+  const [scriptViewData, setScriptViewData] = useState<ScriptViewData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
-  const getScript = async (scriptId: number) => {
-    const data = await api.scripts.getScript(scriptId);
-    setScript(data);
+  const getScriptViewData = async (questionTemplateId: number) => {
+    setIsLoading(true);
+    const data = null; // TODO: fetch from GET /scripts/:id/view
+    setScriptViewData(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    getScript(script_id);
+    getScriptViewData(scriptId);
   }, [refreshFlag]);
+
+  const [pageNo, setPageNo] = useState(1);
+
+  const Header = () => (
+    <AppBar position="static" color="primary" elevation={1}>
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          component={Link}
+          to="/papers"
+          className={classes.backButton}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Grid container className={classes.grow}>
+          <Grid item xs={12}>
+            <Typography variant="h6">Paper name</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">{`Viewing script ID ${scriptId}`}</Typography>
+          </Grid>
+        </Grid>
+      </Toolbar>
+    </AppBar>
+  );
 
   if (isLoading) {
     return (
-      <>
-        <LoadingSpinner />
-        Loading script...
-      </>
+      <div className={classes.container}>
+        <Header />
+        <LoadingSpinner loadingMessage="Loading script..." />
+      </div>
     );
   }
 
-  if (!script) {
-    return <>The script does not exist</>;
-  }
+  if (scriptViewData) {
+    console.log(scriptViewData);
 
-  const currentPageQuestions = [
-    { name: "Q1", score: 5.5 },
-    { name: "Q2", score: 2 },
-    { name: "Q3", score: null }
-  ];
+    const incrementPageNo = () =>
+      setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
+    const decrementPageNo = () =>
+      setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
 
-  return (
-    <div className={classes.container}>
-      <AppBar position="static" color="primary" elevation={1}>
-        <Toolbar>
-          <IconButton color="inherit">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6">Placeholder Title</Typography>
-        </Toolbar>
-      </AppBar>
-      {script.pages.map((page, index) => {
-        return (
-          <div className={classes.grow}>
-            {page.pageNo === viewPageNo && (
-              <Annotator
-                key={page.id}
-                pageId={page.id}
-                backgroundImageSource={page.imageUrl}
-              />
-            )}
-          </div>
-        );
-      })}
-      <AppBar position="fixed" color="inherit" className={classes.questionBar}>
-        <Toolbar>
-          <Typography variant="button" className={classes.questionBarItem}>
-            A0180340U Page {viewPageNo} of {script.pages.length}
-          </Typography>
-          {currentPageQuestions.map(question =>
-            question.score ? (
+    const {
+      matriculationNumber,
+      rootQuestion,
+      descendantQuestions,
+      pages
+    } = scriptViewData;
+
+    const getCurrentPageQuestions = () => {
+      const currentPage = pages.find(page => page.pageNo === pageNo)!;
+      const currentPageQuestions =
+        descendantQuestions === undefined ||
+        descendantQuestions === null ||
+        descendantQuestions.length == 0
+          ? [rootQuestion]
+          : descendantQuestions.filter(question =>
+              currentPage.questionIds.includes(question.id)
+            );
+      return currentPageQuestions;
+    };
+
+    return (
+      <div className={classes.container}>
+        <Header />
+        {pages.map((page, index) => {
+          return (
+            <div className={classes.grow}>
+              {page.pageNo === pageNo && (
+                <CanvasWithToolbar
+                  key={page.id}
+                  backgroundImageSource={page.imageUrl}
+                  backgroundAnnotations={page.annotations.map(
+                    annotation => annotation["layer"]
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
+        <AppBar
+          position="fixed"
+          color="inherit"
+          className={classes.questionBar}
+        >
+          <Toolbar>
+            <Typography variant="button" className={classes.questionBarItem}>
+              Page {pageNo} of {pages.length}
+            </Typography>
+            {getCurrentPageQuestions().map(question => (
               <Chip
                 avatar={<Avatar>{question.score || "-"}</Avatar>}
                 label={question.name}
-                color="primary"
+                color={question.score ? "primary" : "inherit"}
                 className={classes.questionBarItem}
               />
-            ) : (
-              <Chip
-                avatar={<Avatar>-</Avatar>}
-                label={question.name}
-                color="inherit"
-                className={classes.questionBarItem}
-              />
-            )
-          )}
-        </Toolbar>
-      </AppBar>
-      {viewPageNo !== 1 && (
-        <IconButton
-          onClick={decrementViewPageNo}
-          className={classes.prevPageButton}
-          color="inherit"
-          aria-label="previous page"
-        >
-          <ArrowLeftIcon />
-        </IconButton>
-      )}
-      <Typography
-        variant="button"
-        gutterBottom
-        align="center"
-        color="primary"
-        className={classes.pageLabel}
-      >
-        {`Page ${viewPageNo}`}
-      </Typography>
-      {viewPageNo !== script.pages.length && (
-        <IconButton
-          onClick={incrementViewPageNo}
-          className={classes.nextPageButton}
-          color="inherit"
-          aria-label="next page"
-        >
-          <ArrowRightIcon />
-        </IconButton>
-      )}
+            ))}
+          </Toolbar>
+        </AppBar>
+        {pageNo !== 1 && (
+          <IconButton
+            onClick={decrementPageNo}
+            className={classes.prevPageButton}
+            color="inherit"
+            aria-label="previous page"
+          >
+            <ArrowLeftIcon />
+          </IconButton>
+        )}
+        {pageNo !== pages.length && (
+          <IconButton
+            onClick={incrementPageNo}
+            className={classes.nextPageButton}
+            color="inherit"
+            aria-label="next page"
+          >
+            <ArrowRightIcon />
+          </IconButton>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.container}>
+      <Header />
+      <Typography variant="subtitle1">An error occurred.</Typography>
     </div>
   );
 };
