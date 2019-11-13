@@ -40,6 +40,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   const classes = useStyles();
   const paper = usePaper();
 
+  /** Question template hooks start */
   const [questionTemplates, setQuestionTemplates] = useState<
     QuestionTemplateData[]
   >([]);
@@ -52,12 +53,14 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   ] = useState(0);
   const getQuestionTemplates = () => {
     api.questionTemplates
-      .getQuestionTemplates(paper.id)
+      .getRootQuestionTemplates(paper.id)
       .then(resp => setQuestionTemplates(resp.data.questionTemplates))
       .finally(() => setIsLoadingQuestionTemplates(false));
   };
   useEffect(getQuestionTemplates, [refreshQuestionTemplatesFlag]);
+  /** Question template hooks end */
 
+  /** Markers hooks start */
   const [markers, setMarkers] = useState<PaperUserListData[]>([]);
   const [isLoadingMarkers, setIsLoadingMarkers] = useState(true);
   const [refreshMarkersFlag, setRefreshMarkersFlag] = useState(0);
@@ -69,6 +72,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   };
   useEffect(getMarkers, [refreshMarkersFlag]);
   const refreshMarkers = () => setRefreshMarkersFlag(refreshMarkersFlag + 1);
+  /** Markers hooks end */
 
   if (isLoadingQuestionTemplates) {
     return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
@@ -103,6 +107,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
     <>
       <Header title="Question allocation" />
       <Paper className={classes.tableWrapper}>
+        Marking team
         <Table>
           <TableHead>
             <TableRow>

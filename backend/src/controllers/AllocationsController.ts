@@ -5,10 +5,12 @@ import { getRepository, IsNull } from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { PaperUser } from "../entities/PaperUser";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
+import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import { sortAllocationsByQuestionNameThenPaperUserName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -56,7 +58,7 @@ export async function create(request: Request, response: Response) {
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
-  const paperId = request.params.id;
+  const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
     requesterId,
     paperId,
@@ -68,11 +70,29 @@ export async function index(request: Request, response: Response) {
   }
   const { paper } = allowed;
 
-  const allocations = await getRepository(Allocation).find({
-    where: { paper }
-  });
+  const allocations = await getActiveAllocationsByPaperId(paperId);
 
-  const data = allocations.map(allocation => allocation.getListData());
+  const data = await Promise.all(allocations.map(allocation => allocation.getListData()));
+  response.status(200).json({ allocations: data });
+}
+
+export async function getRootAllocations(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const paperId = Number(request.params.id);
+  let allocations: Allocation[] = [];
+
+  try {
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Marker);
+    allocations = await getActiveRootAllocationsByPaperId(paperId);
+  } catch (error) {
+    return response.sendStatus(404);
+  }
+
+  const data = (await Promise.all(allocations
+    .map(allocation => allocation.getData())))
+    .filter(allocation => !allocation.questionTemplate.parentQuestionTemplateId)
+    .sort(sortAllocationsByQuestionNameThenPaperUserName);
   response.status(200).json({ allocations: data });
 }
 
@@ -88,9 +108,7 @@ export async function getAllocationsOfMarker(
     const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
     const paperId = paperUser.paperId;
     await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Marker);
-    allocations = await getRepository(Allocation).find({
-      where: { paperUserId }
-    });
+    allocations = await getActiveAllocationsByPaperUserId(paperUserId);
   } catch (error) {
     return response.sendStatus(404);
   }
@@ -131,4 +149,46 @@ export async function destroy(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(400);
   }
+}
+
+/** helper functions */
+async function getActiveScriptTemplate(paperId: number){
+  return await getRepository(ScriptTemplate).findOneOrFail({
+    paperId, discardedAt: IsNull()
+  })
+}
+
+async function getActiveQuestionTemplates(paperId: number){
+  const activeScriptTemplate = await getActiveScriptTemplate(paperId);
+  return await getRepository(QuestionTemplate).find({
+    scriptTemplateId: activeScriptTemplate.id,
+    discardedAt: IsNull()
+  });
+}
+
+async function getAllocationsByQuestionTemplateIds(questionTemplateIds: number[]){
+  return await getRepository(Allocation)
+  .createQueryBuilder("allocation")
+  .where("allocation.questionTemplateId IN (:...ids)", {
+    ids: questionTemplateIds
+  }).getMany();
+}
+
+async function getActiveRootAllocationsByPaperId(paperId: number){
+  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
+  const activeRootQuestionTemplates = activeQuestionTemplates.filter(x => !x.parentQuestionTemplateId);
+  const activeRootQuestionTemplateIds = activeRootQuestionTemplates.map(q => q.id);
+  return await getAllocationsByQuestionTemplateIds(activeRootQuestionTemplateIds);
+}
+
+async function getActiveAllocationsByPaperId(paperId: number){
+  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
+  const activeQuestionTemplateIds = activeQuestionTemplates.map(q => q.id);
+  return await getAllocationsByQuestionTemplateIds(activeQuestionTemplateIds);
+}
+
+async function getActiveAllocationsByPaperUserId(paperUserId: number){
+  const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
+  const activeAllocations = await getActiveAllocationsByPaperId(paperUser.paperId);
+  return activeAllocations.filter(allocation => allocation.paperUserId === paperUserId);
 }

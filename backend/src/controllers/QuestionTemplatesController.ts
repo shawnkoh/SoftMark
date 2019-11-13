@@ -115,15 +115,42 @@ export async function index(request: Request, response: Response) {
   const paperId = Number(request.params.id);
   let questionTemplates: QuestionTemplate[] = [];
   try {
-    questionTemplates = await getActiveQuestionTemplates(paperId);
     await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
+    questionTemplates = await getActiveQuestionTemplates(paperId);
   } catch (error) {
     return response.sendStatus(404);
   }
 
   try {
     const data = await Promise.all(
-      questionTemplates.map(questionTemplate => questionTemplate.getData())
+      questionTemplates.map(questionTemplate =>
+        questionTemplate.getData()
+      )
+    );
+    response.status(200).json({ questionTemplates: data });
+  } catch (error) {
+    return response.sendStatus(500);
+  }
+}
+
+
+export async function getRootQuestionTemplates(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const paperId = Number(request.params.id);
+  let rootQuestionTemplates: QuestionTemplate[] = [];
+  try {
+    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
+    rootQuestionTemplates = (await getActiveQuestionTemplates(paperId)).filter(
+      questionTemplate => !questionTemplate.parentQuestionTemplateId
+    );
+  } catch (error) {
+    return response.sendStatus(404);
+  }
+
+  try {
+    const data = await Promise.all(
+      rootQuestionTemplates.map(questionTemplate => questionTemplate.getData())
     );
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
@@ -370,7 +397,7 @@ export async function rootQuestionTemplates(
           ids: descendantIds
         })
         .innerJoin("allocation.paperUser", "marker")
-        .innerJoin("marker.user", "user")
+        .innerJoin("marker.user", "user") 
         .select("user.id", "id")
         .addSelect("user.email", "email")
         .addSelect("user.emailVerified", "emailVerified")

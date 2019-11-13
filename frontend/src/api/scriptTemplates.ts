@@ -84,8 +84,8 @@ export async function postScriptTemplate(
   reader.readAsDataURL(file);
 }
 
-export async function getRootQuestionTemplates(
+export function getRootQuestionTemplates(
   scriptTemplateId: number
 ): Promise<AxiosResponse<QuestionTemplateGradingListData>> {
-  return await client.get(`${URL}/${scriptTemplateId}/root_question_templates`);
+  return client.get(`${URL}/${scriptTemplateId}/root_question_templates`);
 }
