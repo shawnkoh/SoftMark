@@ -5,6 +5,7 @@ import {
   ScriptPostData,
   ScriptPatchData
 } from "backend/src/types/scripts";
+import { ScriptViewData } from "backend/src/types/view";
 import PDFJS from "pdfjs-dist/webpack";
 import { sha256 } from "js-sha256";
 
@@ -29,6 +30,15 @@ export async function getScript(id: number): Promise<ScriptData | null> {
   try {
     const response = await client.get<{ script: ScriptData }>(`${URL}/${id}`);
     return response.data.script;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function viewScript(id: number): Promise<ScriptViewData | null> {
+  try {
+    const { data } = await client.get<ScriptViewData>(`${URL}/${id}/view`);
+    return data;
   } catch (error) {
     return null;
   }

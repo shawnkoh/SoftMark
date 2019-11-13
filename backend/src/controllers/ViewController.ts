@@ -176,9 +176,12 @@ export async function viewScript(request: Request, response: Response) {
     descendant => descendant.id
   );
 
-  const descendantQuestions = await getDescendantQuestions(
-    descendantQuestionTemplateIds
-  ).getRawMany();
+  let descendantQuestions = [];
+  if (descendantQuestionTemplateIds.length > 0) {
+    descendantQuestions = await getDescendantQuestions(
+      descendantQuestionTemplateIds
+    ).getRawMany();
+  }
 
   const questionIds = descendantQuestions.map(descendant => descendant.id);
   questionIds.push(rootQuestion.id);
