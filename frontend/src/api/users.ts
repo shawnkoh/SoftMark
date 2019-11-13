@@ -1,6 +1,5 @@
 import { AxiosResponse } from "axios";
 import { UserData, UserPatchData } from "backend/src/types/users";
-
 import client from "./client";
 
 const URL = "/users";

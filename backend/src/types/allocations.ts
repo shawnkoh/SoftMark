@@ -1,7 +1,7 @@
 import { BaseData, isBaseData } from "./entities";
 import {
-  QuestionTemplateListData,
-  isQuestionTemplateListData
+  QuestionTemplateData,
+  isQuestionTemplateData
 } from "./questionTemplates";
 import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 
@@ -17,7 +17,7 @@ export interface AllocationListData extends BaseData {
 }
 
 export interface AllocationData extends AllocationListData {
-  questionTemplate: QuestionTemplateListData;
+  questionTemplate: QuestionTemplateData;
   paperUser: PaperUserListData;
 }
 
@@ -31,7 +31,7 @@ export function isAllocationListData(data: any): data is AllocationListData {
 
 export function isAllocationData(data: any): data is AllocationData {
   return (
-    isQuestionTemplateListData(data.questionTemplate) &&
+    isQuestionTemplateData(data.questionTemplate) &&
     isPaperUserListData(data.paperUser) &&
     isAllocationListData(data)
   );

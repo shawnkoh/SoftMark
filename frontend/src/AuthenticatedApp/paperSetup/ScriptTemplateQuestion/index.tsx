@@ -1,8 +1,5 @@
 import { Fab } from "@material-ui/core";
-import {
-  QuestionTemplateData,
-  QuestionTemplateListData
-} from "backend/src/types/questionTemplates";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
 import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
@@ -10,7 +7,7 @@ import useStyles from "./useStyles";
 
 interface ScriptTemplateQuestionProps {
   index: number;
-  questionTemplate: QuestionTemplateListData;
+  questionTemplate: QuestionTemplateData;
   onEditSuccess: (qTemplate: QuestionTemplateData) => void;
   currentPageNo: number;
   pageCount: number;

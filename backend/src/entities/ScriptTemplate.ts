@@ -2,19 +2,18 @@ import { IsNotEmpty, IsString, Validate } from "class-validator";
 import {
   Column,
   Entity,
+  getRepository,
   ManyToOne,
   OneToMany,
-  getRepository,
   Unique
 } from "typeorm";
-
+import IsUniqueSha256 from "../constraints/IsUniqueSha256";
+import { ScriptTemplateData } from "../types/scriptTemplates";
+import { sortByPageNo } from "../utils/sorts";
 import { Discardable } from "./Discardable";
 import { PageTemplate } from "./PageTemplate";
 import { Paper } from "./Paper";
 import { QuestionTemplate } from "./QuestionTemplate";
-import { sortByPageNo } from "../utils/sorts";
-import IsUniqueSha256 from "../constraints/IsUniqueSha256";
-import { ScriptTemplateData } from "../types/scriptTemplates";
 
 @Entity()
 @Unique(["paper", "sha256"])
@@ -73,8 +72,8 @@ export class ScriptTemplate extends Discardable {
         pageTemplate.getListData()
       ),
       questionTemplates: await Promise.all(
-        questionTemplates.map(
-          async questionTemplate => await questionTemplate.getListData()
+        questionTemplates.map(async questionTemplate =>
+          questionTemplate.getData()
         )
       )
     };

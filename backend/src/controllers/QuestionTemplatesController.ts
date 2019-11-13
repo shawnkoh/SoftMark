@@ -105,7 +105,7 @@ export async function create(request: Request, response: Response) {
     await manager.save(questions);
   });
 
-  const data = await questionTemplate.getData();
+  const data = questionTemplate.getData();
   response.status(201).json({ questionTemplate: data });
 }
 
@@ -123,7 +123,7 @@ export async function index(request: Request, response: Response) {
 
   try {
     const data = await Promise.all(
-      questionTemplates.map(questionTemplate => questionTemplate.getListData())
+      questionTemplates.map(questionTemplate => questionTemplate.getData())
     );
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
@@ -159,7 +159,7 @@ export async function show(request: Request, response: Response) {
   }
 
   try {
-    const data = await questionTemplate.getData();
+    const data = questionTemplate.getData();
     response.status(200).json({ questionTemplate: data });
   } catch (error) {
     response.sendStatus(500);
@@ -220,7 +220,7 @@ export async function update(request: Request, response: Response) {
 
     await getRepository(QuestionTemplate).save(questionTemplate);
 
-    const data = await questionTemplate.getData();
+    const data = questionTemplate.getData();
     response.status(200).json({ questionTemplate: data });
   } catch (error) {
     response.sendStatus(400);
@@ -292,7 +292,7 @@ export async function undiscard(request: Request, response: Response) {
   }
   await getRepository(QuestionTemplate).save(questionTemplate);
 
-  const data = await questionTemplate.getData();
+  const data = questionTemplate.getData();
   response.status(200).json({ questionTemplate: data });
 }
 

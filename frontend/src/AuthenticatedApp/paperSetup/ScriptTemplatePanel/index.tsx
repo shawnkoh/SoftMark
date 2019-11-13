@@ -3,7 +3,7 @@ import AddIcon from "@material-ui/icons/Add";
 import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
 import { PageTemplateListData } from "backend/src/types/pageTemplates";
-import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import update from "immutability-helper";
 import React, { useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
@@ -12,14 +12,14 @@ import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
 import ScriptTemplateQuestion from "../ScriptTemplateQuestion";
 import useStyles from "./useStyles";
 
-type DragItem = QuestionTemplateListData & { type: string; index: number };
+type DragItem = QuestionTemplateData & { type: string; index: number };
 
 interface OwnProps {
   currentPageNo: number;
   pageCount: number;
   nextPage: (e?: any) => void;
   prevPage: (e?: any) => void;
-  questionTemplates: QuestionTemplateListData[];
+  questionTemplates: QuestionTemplateData[];
   pageTemplate: PageTemplateListData;
 }
 
@@ -37,9 +37,7 @@ const ScriptTemplatePanel: React.FC<Props> = props => {
   } = props;
 
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [boxes, setBoxes] = useState<QuestionTemplateListData[]>(
-    questionTemplates
-  );
+  const [boxes, setBoxes] = useState<QuestionTemplateData[]>(questionTemplates);
 
   const [, drop] = useDrop({
     accept: "questionBox",
@@ -77,21 +75,9 @@ const ScriptTemplatePanel: React.FC<Props> = props => {
         pageCount={pageCount}
         currentPageNo={currentPageNo}
         onSuccess={qTemplate => {
+          // TODO: @Jian Xi - not sure if this change is ok - please check
           update(boxes, {
-            $push: [
-              {
-                id: qTemplate.id,
-                createdAt: qTemplate.createdAt,
-                updatedAt: qTemplate.updatedAt,
-                discardedAt: qTemplate.discardedAt,
-                scriptTemplateId: qTemplate.id,
-                name: qTemplate.name,
-                score: qTemplate.score,
-                parentQuestionTemplateId: qTemplate.parentQuestionTemplateId,
-                topOffset: qTemplate.topOffset,
-                leftOffset: qTemplate.leftOffset
-              }
-            ]
+            $push: [qTemplate]
           });
         }}
       />
