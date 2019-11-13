@@ -35,7 +35,7 @@ export async function create(request: Request, response: Response) {
     user: user.getData(),
     ...user.createAuthenticationTokens()
   };
-  response.status(201).json({ user: data });
+  response.status(201).json(data);
 }
 
 export async function showSelf(request: Request, response: Response) {
