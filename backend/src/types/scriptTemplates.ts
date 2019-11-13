@@ -1,8 +1,13 @@
 import { DiscardableData } from "./entities";
-import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
 import {
+  isPageTemplateListData,
+  PageTemplateListData,
+  PageTemplateSetupData
+} from "./pageTemplates";
+import {
+  isQuestionTemplateListData,
   QuestionTemplateListData,
-  isQuestionTemplateListData
+  QuestionTemplateTreeData
 } from "./questionTemplates";
 
 export interface ScriptTemplatePostData {
@@ -10,9 +15,16 @@ export interface ScriptTemplatePostData {
   imageUrls: string[];
 }
 
+// potentially deprecated
 export interface ScriptTemplateData extends DiscardableData {
   pageTemplates: PageTemplateListData[];
   questionTemplates: QuestionTemplateListData[];
+}
+
+export interface ScriptTemplateSetupData {
+  id: number;
+  pageTemplates: PageTemplateSetupData[];
+  questionTemplates: QuestionTemplateTreeData[];
 }
 
 export function isScriptTemplateData(data: any): data is ScriptTemplateData {

@@ -25,9 +25,28 @@ beforeEach(async () => {
   fixtures = await loadFixtures(server);
 
   scriptTemplate = new ScriptTemplate(fixtures.paper, "sha256");
+
   q1 = new QuestionTemplate(scriptTemplate, "1", null);
-  q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, 100, 100, q1);
-  q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, 200, 200, q1);
+  q1a = new QuestionTemplate(
+    scriptTemplate,
+    "1a",
+    1.5,
+    "1, 2, 3",
+    1,
+    100,
+    100,
+    q1
+  );
+  q1b = new QuestionTemplate(
+    scriptTemplate,
+    "1b",
+    1.5,
+    "1, 2, 3",
+    1,
+    200,
+    200,
+    q1
+  );
   q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 
   allocation = new Allocation(q1, fixtures.marker);
