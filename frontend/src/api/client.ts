@@ -1,14 +1,12 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { AuthenticationData } from "backend/src/types/auth";
-import { attach, RetryConfig } from "retry-axios";
-
-import { tokenLogin } from "./auth";
-import { csrfToken } from "./helpers/server-context";
 import {
   getRefreshToken,
   setAccessToken,
   setRefreshToken
 } from "../localStorage";
+import { tokenLogin } from "./auth";
+import { csrfToken } from "./helpers/server-context";
 
 const client = axios.create({
   baseURL:
@@ -25,26 +23,31 @@ const client = axios.create({
   }
 });
 
-// Credit: Liau Jian Jie
-// We need to cast the type because the `retry-axios` package does not extend
-// the `AxiosRequestConfig` type.
-// See: https://github.com/JustinBeckwith/retry-axios/issues/64
-(client.defaults as { raxConfig: RetryConfig }).raxConfig = {
-  instance: client,
-  retry: 1,
-  onRetryAttempt: async () => {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-      // TODO: Handle this better
-      console.log("No refresh token found");
-      return;
-    }
-    await tokenLogin(refreshToken);
-  },
-  statusCodesToRetry: [[401, 401]]
-};
+// TODO: Store a dictionary of incremental refresh ids to fix the race condition
+let isRefreshing = false;
 
-attach(client);
+client.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+    if (!isRefreshing && error.response.status === 401) {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        return Promise.reject(error);
+      }
+      isRefreshing = true;
+      const loggedIn = await tokenLogin(refreshToken);
+      isRefreshing = false;
+      if (!loggedIn) {
+        return Promise.reject(error);
+      }
+
+      originalRequest.headers.Authorization =
+        client.defaults.headers.common.Authorization;
+      return axios(originalRequest);
+    }
+  }
+);
 
 export function setAuthenticationTokens(data: AuthenticationData) {
   const { accessToken, refreshToken } = data;
