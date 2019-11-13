@@ -6,7 +6,7 @@ import { BearerTokenType } from "../../types/tokens";
 export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
-router.post("/:id/annotations", AnnotationsController.create);
+router.put("/:id/annotations", AnnotationsController.replace);
 router.get("/:id/annotations/self", AnnotationsController.showSelf);
 
 export default router;

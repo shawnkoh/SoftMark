@@ -1,10 +1,8 @@
 import { AxiosResponse } from "axios";
 import {
-  AnnotationPostData,
-  AnnotationListData,
-  AnnotationData
+  AnnotationData,
+  AnnotationPostData
 } from "backend/src/types/annotations";
-
 import client from "./client";
 
 const URL = "/annotations";
@@ -13,7 +11,7 @@ export async function saveAnnotation(
   pageId: number,
   data: AnnotationPostData
 ): Promise<AxiosResponse<{ annotation: AnnotationData }>> {
-  return client.post(`/pages/${pageId}/annotations`, data);
+  return client.put(`/pages/${pageId}/annotations`, data);
 }
 
 export async function getOwnAnnotation(
