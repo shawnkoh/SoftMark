@@ -16,11 +16,11 @@ import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { UserListData } from "backend/src/types/users";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "../../../../api";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
-import { TableColumn } from "../../../../components/tables/TableTypes";
-import usePaper from "../../../../contexts/PaperContext";
-import GradingTableRow from "./GradingTableRow";
+import api from "../../api";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { TableColumn } from "../../components/tables/TableTypes";
+import usePaper from "../../contexts/PaperContext";
+import GradingTableRow from "./components/GradingTableRow";
 import useStyles from "./styles";
 
 const GradingSubpage: React.FC = () => {
