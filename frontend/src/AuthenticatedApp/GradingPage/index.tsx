@@ -11,48 +11,38 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
-import { QuestionTemplateRootData } from "backend/src/types/questionTemplates";
+import {
+  QuestionTemplateRootData,
+  QuestionTemplateGradingListData
+} from "backend/src/types/questionTemplates";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { UserListData } from "backend/src/types/users";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "../../../../api";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
-import { TableColumn } from "../../../../components/tables/TableTypes";
-import usePaper from "../../../../contexts/PaperContext";
-import GradingTableRow from "./GradingTableRow";
+import api from "../../api";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { TableColumn } from "../../components/tables/TableTypes";
+import usePaper from "../../contexts/PaperContext";
+import GradingTableRow from "./components/GradingTableRow";
 import useStyles from "./styles";
 
 const GradingSubpage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
-  const [isLoading, setIsLoading] = useState(true);
 
+  /** Script template hooks start */
+  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
   const [
     scriptTemplate,
     setScriptTemplate
   ] = useState<ScriptTemplateData | null>(null);
-
-  // getRootQuestionTemplates states
-  const [rootQuestionTemplates, setRootQuestionTemplates] = useState<
-    QuestionTemplateRootData[]
-  >([]);
-  const [markers, setMarkers] = useState<UserListData[]>([]);
-  const [totalQuestionCount, setTotalQuestionCount] = useState(0);
-  const [totalMarkCount, setTotalMarkCount] = useState(0);
-
-  const resetState = () => {
-    setRootQuestionTemplates([]);
-    setMarkers([]);
-    setTotalQuestionCount(0);
-    setTotalMarkCount(0);
-  };
 
   const getScriptTemplate = async () => {
     const scriptTemplate = await api.scriptTemplates.getScriptTemplate(
       paper.id
     );
     setScriptTemplate(scriptTemplate);
+    setIsLoadingScriptTemplate(false);
     return scriptTemplate;
   };
 
@@ -60,41 +50,44 @@ const GradingSubpage: React.FC = () => {
     getScriptTemplate();
   }, []);
 
-  const getRootQuestionTemplates = async () => {
-    if (!scriptTemplate) {
-      resetState();
-      return;
-    }
+  // getRootQuestionTemplates states
+  const [
+    questionTemplateGradingListData,
+    setQuestionTemplateGradingListData
+  ] = useState<QuestionTemplateGradingListData>({
+    rootQuestionTemplates: [],
+    markers: [],
+    totalQuestionCount: 0,
+    totalMarkCount: 0
+  });
 
-    try {
-      const { data } = await api.scriptTemplates.getRootQuestionTemplates(
-        scriptTemplate.id
-      );
-      const {
-        rootQuestionTemplates,
-        markers,
-        totalQuestionCount,
-        totalMarkCount
-      } = data;
-      setRootQuestionTemplates(rootQuestionTemplates);
-      setMarkers(markers);
-      setTotalQuestionCount(totalQuestionCount);
-      setTotalMarkCount(totalMarkCount);
-      setIsLoading(false);
-    } catch (error) {
-      toast.error("An error occured while loading the rootQuestionTemplates");
-      resetState();
+  const getRootQuestionTemplates = () => {
+    if (scriptTemplate) {
+      api.scriptTemplates
+        .getRootQuestionTemplates(scriptTemplate.id)
+        .then(res => setQuestionTemplateGradingListData(res.data));
     }
   };
+  useEffect(getRootQuestionTemplates, [scriptTemplate]);
+  /** root question template hooks end */
 
-  useEffect(() => {
-    getRootQuestionTemplates();
-  }, [scriptTemplate]);
+  if (isLoadingScriptTemplate) {
+    return <LoadingSpinner loadingMessage={`Loading script template...`} />;
+  } else if (!scriptTemplate) {
+    return <div>Please upload a script template first</div>;
+  }
 
-  useEffect(() => {}, [scriptTemplate]);
+  const {
+    rootQuestionTemplates = [],
+    totalQuestionCount,
+    totalMarkCount,
+    markers
+  } = questionTemplateGradingListData;
 
-  if (isLoading) {
-    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
+  const userMap = new Map<number, UserListData>();
+  for (let i = 0; i < markers.length; i++) {
+    const marker = markers[i];
+    userMap.set(marker.id, marker);
   }
 
   const columns: TableColumn[] = [
@@ -125,7 +118,11 @@ const GradingSubpage: React.FC = () => {
       <Typography variant="h6">Marking</Typography>
       <Divider />
       <Box justifyContent="center">
-        <LinearProgress value={70} color="secondary" variant="determinate" />
+        <LinearProgress
+          value={totalMarkCount / totalQuestionCount}
+          color="secondary"
+          variant="determinate"
+        />
         {`${rootQuestionTemplates.length}`} questions
       </Box>
       <Paper className={classes.tableWrapper}>
@@ -161,6 +158,10 @@ const GradingSubpage: React.FC = () => {
             )}
             {rootQuestionTemplates.map(
               (rootQuestionTemplate: QuestionTemplateRootData, index) => {
+                const modifiedTemplate: any = rootQuestionTemplate;
+                modifiedTemplate.markers = rootQuestionTemplate.markers
+                  .map(markerId => userMap.get(markerId))
+                  .filter(marker => marker);
                 return (
                   <GradingTableRow
                     key={rootQuestionTemplate.id}

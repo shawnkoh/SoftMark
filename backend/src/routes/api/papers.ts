@@ -28,6 +28,7 @@ router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
 
 router.get("/:id/question_templates", QuestionTemplatesController.index);
+router.get("/:id/root_question_templates", QuestionTemplatesController.getRootQuestionTemplates);
 
 router.post("/:id/script_templates", ScriptTemplatesController.create);
 router.get(
@@ -40,5 +41,6 @@ router.get("/:id/scripts", ScriptsController.index);
 router.patch("/:id/scripts/match", ScriptsController.match);
 
 router.get("/:id/allocations", AllocationsController.index);
+router.get("/:id/root_allocations", AllocationsController.getRootAllocations);
 
 export default router;

@@ -1,12 +1,25 @@
 import { AxiosResponse } from "axios";
 import {
   AllocationListData,
+  AllocationData,
   AllocationPostData
 } from "backend/src/types/allocations";
 
 import client from "./client";
 
 const URL = "/allocations";
+
+export async function getAllocationsOfPaper(
+  paperId: number
+): Promise<AxiosResponse<{ allocations: AllocationListData[] }>> {
+  return client.get(`/papers/${paperId}/allocations`);
+}
+
+export async function getRootAllocationsOfPaper(
+  paperId: number
+): Promise<AxiosResponse<{ allocations: AllocationData[] }>> {
+  return client.get(`/papers/${paperId}/root_allocations`);
+}
 
 export async function getAllocationsOfMarker(
   paperUserId: number

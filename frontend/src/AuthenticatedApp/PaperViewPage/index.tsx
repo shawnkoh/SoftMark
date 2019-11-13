@@ -10,7 +10,7 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 import useStyles from "./styles";
 import PaperViewHeader from "./components/PaperViewHeader";
 import SetupSubpage from "./subpages/Setup";
-import GradingSubpage from "./subpages/Grading";
+import GradingSubpage from "../GradingPage";
 import ScriptsSubpage from "./subpages/Scripts";
 
 import ScriptMapping from "../paperSetup/ScriptMapping";

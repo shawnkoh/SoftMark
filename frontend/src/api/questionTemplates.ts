@@ -28,6 +28,12 @@ export async function getQuestionTemplates(
   return client.get(`papers/${id}/question_templates`);
 }
 
+export async function getRootQuestionTemplates(
+  id: number
+): Promise<AxiosResponse<{ questionTemplates: QuestionTemplateData[] }>> {
+  return client.get(`papers/${id}/root_question_templates`);
+}
+
 export async function discardQuestionTemplate(
   id: number
 ): Promise<AxiosResponse> {

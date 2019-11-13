@@ -1,4 +1,5 @@
 import { PaperUser } from "../entities/PaperUser";
+import { AllocationData } from "allocations";
 import { PaperUserListData } from "paperUsers";
 
 interface withPageNo {
@@ -40,4 +41,25 @@ export function sortPaperUserByName(
   const nameA = a.user.name ? a.user.name : "";
   const nameB = b.user.name ? b.user.name : "";
   return nameA.toUpperCase().localeCompare(nameB.toUpperCase());
+}
+
+export function sortAllocationsByQuestionNameThenPaperUserName(
+  a: AllocationData,
+  b: AllocationData
+) {
+  const questionNameA = a.questionTemplate.name.toLocaleUpperCase();
+  const questionNameB = b.questionTemplate.name.toLocaleUpperCase();
+  
+  const paperUserNameA = (a.paperUser.user.name
+    ? a.paperUser.user.name
+    : ""
+  ).toUpperCase();
+  const paperUserNameB = (b.paperUser.user.name
+    ? b.paperUser.user.name
+    : ""
+  ).toUpperCase();
+
+  return questionNameA !== questionNameB
+    ? questionNameA.localeCompare(questionNameB)
+    : paperUserNameA.localeCompare(paperUserNameB);
 }

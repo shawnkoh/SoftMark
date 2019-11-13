@@ -1,5 +1,6 @@
 import { DiscardableData, isDiscardableData } from "./entities";
 import { UserListData } from "./users";
+import { PaperUserListData } from "./paperUsers";
 
 export interface QuestionTemplatePostData {
   name: string;
