@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from "@material-ui/core/styles";
 
-const drawerWidth = 175;
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -17,19 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxHeight: "100vh"
   },
   appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+    zIndex: theme.zIndex.drawer + 1
   },
   menuButton: {
     marginRight: 36
@@ -40,26 +28,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   toolbar: theme.mixins.toolbar,
   drawer: {
     width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: "nowrap"
+    flexShrink: 0
   },
-  drawerOpen: {
-    width: drawerWidth,
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
-  drawerClose: {
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    overflowX: "hidden",
-    width: theme.spacing(7) + 1,
-    [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9) + 1
-    }
+  drawerPaper: {
+    width: drawerWidth
   },
   avatar: {
     color: "#fff",
@@ -68,6 +40,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   avatarSelected: {
     color: "#fff",
     backgroundColor: theme.palette.primary.dark
+  },
+  questionTreeRoot: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper
   }
 }));
 

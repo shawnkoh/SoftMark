@@ -1,8 +1,11 @@
 import { Fab } from "@material-ui/core";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import {
+  QuestionTemplateData,
+  QuestionTemplateTreeData
+} from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
-import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
+import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
 import useStyles from "./useStyles";
 
 interface ScriptTemplateQuestionProps {
@@ -11,6 +14,7 @@ interface ScriptTemplateQuestionProps {
   onEditSuccess: (qTemplate: QuestionTemplateData) => void;
   currentPageNo: number;
   pageCount: number;
+  questionTemplateTrees: QuestionTemplateTreeData[];
 }
 
 type Props = ScriptTemplateQuestionProps;
@@ -20,7 +24,8 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
   questionTemplate,
   onEditSuccess,
   currentPageNo,
-  pageCount
+  pageCount,
+  questionTemplateTrees
 }) => {
   const classes = useStyles();
   const [editOpen, setEditOpen] = React.useState(false);
@@ -37,6 +42,7 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
   return (
     <>
       <QuestionTemplateDialog
+        questionTemplateTrees={questionTemplateTrees}
         mode="edit"
         scriptTemplateId={questionTemplate.scriptTemplateId}
         questionTemplateId={questionTemplate.id}
@@ -47,7 +53,10 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
         initialValues={{
           title: questionTemplate.name,
           score: questionTemplate.score ? questionTemplate.score : 0,
-          pageCovered: ""
+          pageCovered: questionTemplate.pageCovered
+            ? questionTemplate.pageCovered
+            : "",
+          parentName: questionTemplate.name
         }}
         pageCount={pageCount}
         currentPageNo={currentPageNo}

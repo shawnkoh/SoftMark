@@ -18,6 +18,7 @@
     "@types/react-router": "^5.1.2",
     "@types/react-router-dom": "^5.1.2",
     "@types/yup": "^0.26.24",
+    "antd": "^3.25.1",
     "autosuggest-highlight": "^3.1.1",
     "axios": "^0.19.0",
     "backend": "1.0.0",
