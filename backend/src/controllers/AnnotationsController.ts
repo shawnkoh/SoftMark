@@ -9,7 +9,7 @@ import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
-export async function create(request: Request, response: Response) {
+export async function replace(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterUserId = payload.userId;
   const pageId = request.params.id;

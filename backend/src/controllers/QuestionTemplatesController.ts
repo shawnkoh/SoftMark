@@ -366,7 +366,9 @@ export async function rootQuestionTemplates(
 
       let markers: any = await getRepository(Allocation)
         .createQueryBuilder("allocation")
-        .where("allocation.id IN (:...ids)", { ids: descendantIds })
+        .where("allocation.questionTemplateId IN (:...ids)", {
+          ids: descendantIds
+        })
         .innerJoin("allocation.paperUser", "marker")
         .innerJoin("marker.user", "user")
         .select("user.id", "id")

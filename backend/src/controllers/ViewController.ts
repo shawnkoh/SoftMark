@@ -36,6 +36,7 @@ function getRootQuestion(scriptId: number) {
       "script.id = :id AND script.discardedAt IS NULL",
       { id: scriptId }
     )
+    // It is not necessary for a script to be tagged to a student - see below
     .leftJoin("script.student", "student", "student.discardedAt IS NULL")
     .innerJoin(
       "question.questionTemplate",
@@ -45,6 +46,7 @@ function getRootQuestion(scriptId: number) {
     .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL");
 
   return selectQuestionViewData(queryBuilder)
+    .addSelect("student.id", "studentId")
     .addSelect("student.matriculationNumber", "matriculationNumber")
     .addSelect("script.paperId", "paperId")
     .addSelect("questionTemplate.id", "questionTemplateId");
@@ -151,6 +153,7 @@ export async function viewScript(request: Request, response: Response) {
   }
   const {
     paperId,
+    studentId,
     matriculationNumber,
     questionTemplateId,
     ...rootQuestion
@@ -186,6 +189,7 @@ export async function viewScript(request: Request, response: Response) {
 
   const data: ScriptViewData = {
     rootQuestion,
+    studentId,
     matriculationNumber,
     descendantQuestions,
     pages
@@ -251,9 +255,11 @@ export async function questionToMark(request: Request, response: Response) {
     .createQueryBuilder("question")
     .where("question.discardedAt IS NULL")
     .innerJoin("question.questionTemplate", "questionTemplate", "questionTemplate.id = :id", { id: rootQuestionTemplate.id })
-    // Ensure that the question is tagged to a script and a student
-    .innerJoin("question.script", "script")
-    .innerJoin("script.student", "student")
+    // Ensure that the question is tagged to a script
+    .innerJoin("question.script", "script", "script.discardedAt IS NULL")
+    // It is not necessary for the script to have a mapped student
+    // In a physical setting, leftover scripts lying around are definitely something to take action on
+    .leftJoin("script.student", "student", "student.discardedAt IS NULL")
     // Ensure that there are no active marks
     .leftJoin("question.marks", "mark")
     .andWhere(
@@ -277,6 +283,7 @@ export async function questionToMark(request: Request, response: Response) {
     .addSelect("questionTemplate.score", "maxScore")
     .addSelect("questionTemplate.topOffset", "topOffset")
     .addSelect("questionTemplate.leftOffset", "leftOffset")
+    .addSelect("student.id", "studentId")
     .addSelect("student.matriculationNumber", "matriculationNumber")
     .getRawOne();
 
@@ -289,9 +296,11 @@ export async function questionToMark(request: Request, response: Response) {
   await lockQuestion(requester, rootQuestionData.id).execute();
 
   const {
+    studentId,
     matriculationNumber,
     ...rootQuestion
   }: {
+    studentId: number | null;
     matriculationNumber: string | null;
   } & QuestionViewData = rootQuestionData;
 
@@ -323,6 +332,7 @@ export async function questionToMark(request: Request, response: Response) {
   const pages: PageViewData[] = getPages(pagesData);
 
   const data: ScriptViewData = {
+    studentId,
     matriculationNumber,
     rootQuestion,
     descendantQuestions,
