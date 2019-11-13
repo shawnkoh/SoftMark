@@ -24,7 +24,6 @@ import { lightBlue } from "@material-ui/core/colors";
 
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import Annotator from "./Annotator";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,8 +76,9 @@ type Props = RouteComponentProps;
 
 const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const classes = useStyles();
+  const paper = usePaper();
 
-  const scriptId = parseInt((params as { script_id: string }).script_id, 10);
+  const scriptId = parseInt((params as { scriptId: string }).scriptId, 10);
 
   const [scriptViewData, setScriptViewData] = useState<ScriptViewData | null>(
     null
@@ -113,7 +113,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
         </IconButton>
         <Grid container className={classes.grow}>
           <Grid item xs={12}>
-            <Typography variant="h6">Paper name</Typography>
+            <Typography variant="h6">{paper.name}</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle1">{`Viewing script ID ${scriptId}`}</Typography>
@@ -185,10 +185,11 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
         >
           <Toolbar>
             <Typography variant="button" className={classes.questionBarItem}>
-              Page {pageNo} of {pages.length}
+              {matriculationNumber} Page {pageNo} of {pages.length}
             </Typography>
             {getCurrentPageQuestions().map(question => (
               <Chip
+                key={question.id}
                 avatar={<Avatar>{question.score || "-"}</Avatar>}
                 label={question.name}
                 color={question.score ? "primary" : "inherit"}

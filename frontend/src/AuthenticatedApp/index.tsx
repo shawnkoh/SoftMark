@@ -16,7 +16,6 @@ const AuthenticatedApp: React.FC = () => {
         <Route exact path="/" component={PaperIndex} />
         <Route exact path="/papers" component={PaperIndex} />
         <Route path="/papers/:paper_id" component={PaperView} />
-        <Route path="/scripts/:script_id" component={ScriptView} />
         <Route>
           <NotFoundPage isAuthenticated />
         </Route>
