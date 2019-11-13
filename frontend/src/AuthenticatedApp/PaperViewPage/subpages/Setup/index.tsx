@@ -28,8 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
-  console.log(match.path);
-
   const history = useHistory();
   const paper = usePaper();
   const classes = useStyles();
@@ -181,7 +179,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       button: (
         <Button
           component={Link}
-          to={`${match.url}/script_template`}
+          to={`${match.url}/question_allocation`}
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}

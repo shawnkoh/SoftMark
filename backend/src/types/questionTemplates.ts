@@ -4,11 +4,12 @@ import { UserListData } from "./users";
 
 export interface QuestionTemplatePostData {
   name: string;
-  parentName?: string | null;
   score?: number | null;
   pageCovered?: string | null;
+  displayPage?: number | null;
   topOffset?: number | null;
   leftOffset?: number | null;
+  parentName?: string | null;
 }
 
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;
@@ -41,6 +42,24 @@ export interface QuestionTemplateGradingListData {
   markers: UserListData[];
   totalQuestionCount: number;
   totalMarkCount: number;
+}
+
+export interface QuestionTemplateLeafData {
+  id: number;
+  name: string;
+  score: number;
+  displayPage: number;
+  topOffset: number;
+  leftOffset: number;
+  pageCovered: string;
+}
+
+export interface QuestionTemplateTreeData {
+  id: number;
+  name: string;
+  score: number | null;
+  displayPage: number | null;
+  childQuestionTemplates: QuestionTemplateTreeData[];
 }
 
 export function isQuestionTemplatePostData(

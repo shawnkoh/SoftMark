@@ -1,15 +1,8 @@
-import { MigrationInterface, QueryRunner, getRepository } from "typeorm";
-
-import { User } from "../entities/User";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class Initial1571150302537 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await getRepository(User).save([
-      new User("shawnkoh@me.com"),
-      new User("ooimingsheng@gmail.com"),
-      new User("rlrh1996@gmail.com"),
-      new User("fungsiqi07@gmail.com")
-    ]);
+    // TODO: Don't rely on sync, instead, should Build all required tables
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {}

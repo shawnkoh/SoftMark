@@ -2,7 +2,8 @@ import { AxiosResponse } from "axios";
 import { QuestionTemplateGradingListData } from "backend/src/types/questionTemplates";
 import {
   ScriptTemplateData,
-  ScriptTemplatePostData
+  ScriptTemplatePostData,
+  ScriptTemplateSetupData
 } from "backend/src/types/scriptTemplates";
 import { sha256 } from "js-sha256";
 import PDFJS from "pdfjs-dist/webpack";
@@ -29,6 +30,12 @@ export async function getScriptTemplate(
   } catch (error) {
     return null;
   }
+}
+
+export async function getScriptTemplateSetupData(
+  scriptTemplateId: number
+): Promise<AxiosResponse<ScriptTemplateSetupData>> {
+  return await client.get(`${URL}/${scriptTemplateId}/setup`);
 }
 
 export async function discardScriptTemplate(
@@ -64,8 +71,6 @@ export async function postScriptTemplate(
       };
       createScriptTemplate(paper_id, scriptTemplatePostData)
         .then(res => {
-          console.log("res");
-          console.log(res);
           onSuccess();
           if (callbackScriptData) {
             callbackScriptData(res.data.scriptTemplate);
@@ -73,8 +78,6 @@ export async function postScriptTemplate(
         })
         .catch(errors => {
           onFail();
-          console.log("errors");
-          console.log(errors);
         });
     });
   };

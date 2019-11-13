@@ -12,8 +12,11 @@ import PaperViewHeader from "./components/PaperViewHeader";
 import SetupSubpage from "./subpages/Setup";
 import GradingSubpage from "./subpages/Grading";
 import ScriptsSubpage from "./subpages/Scripts";
-import { ScriptMapping, ScriptTemplateView } from "../paperSetup";
+
+import ScriptMapping from "../paperSetup/ScriptMapping";
+import ScriptTemplateView from "../paperSetup/ScriptTemplateView";
 import { MarkQuestionPage } from "../paperGrading";
+import QuestionAllocationPage from "AuthenticatedApp/QuestionAllocationPage";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -61,6 +64,10 @@ const PaperView: React.FC = () => {
   return (
     <PaperProvider>
       <Switch>
+        <Route
+          path={`${path}/setup/question_allocation`}
+          component={QuestionAllocationPage}
+        />
         <Route
           path={`${path}/setup/script_template`}
           component={ScriptTemplateView}

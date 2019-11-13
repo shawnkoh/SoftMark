@@ -1,19 +1,30 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import { pick } from "lodash";
-import { getManager, getRepository, IsNull } from "typeorm";
+import _ from "lodash";
+import {
+  getManager,
+  getRepository,
+  IsNull,
+  getTreeRepository,
+  SelectQueryBuilder
+} from "typeorm";
 import { PageTemplate } from "../entities/PageTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
-import { ScriptTemplatePostData } from "../types/scriptTemplates";
+import {
+  ScriptTemplatePostData,
+  ScriptTemplateSetupData
+} from "../types/scriptTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import QuestionTemplate from "../entities/QuestionTemplate";
+import { QuestionTemplateTreeData } from "../types/questionTemplates";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const paperId = Number(request.params.id);
-  const { imageUrls, sha256 } = pick(
+  const { imageUrls, sha256 } = _.pick(
     request.body,
     "imageUrls",
     "sha256"
@@ -184,4 +195,85 @@ export async function undiscard(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(400);
   }
+}
+
+export async function getSetupData(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = Number(payload.userId);
+  const scriptTemplateId = Number(request.params.id);
+  const scriptTemplate = await getRepository(ScriptTemplate)
+    .createQueryBuilder("scriptTemplate")
+    .where("scriptTemplate.id = :id", { id: scriptTemplateId })
+    .andWhere("scriptTemplate.discardedAt IS NULL")
+    .innerJoin("scriptTemplate.paper", "paper", "paper.discardedAt IS NULL")
+    .select("paper.id", "paperId")
+    .getRawOne();
+  const { paperId } = scriptTemplate;
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Owner
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const trees = await getTreeRepository(QuestionTemplate).findTrees();
+  // TODO: recursively traverse trees to _.pick only the relevant fields
+  const questionTemplates = trees.filter(
+    tree => tree.scriptTemplateId === scriptTemplateId
+  ) as QuestionTemplateTreeData[];
+
+  const pageTemplatesData = await getRepository(PageTemplate)
+    .createQueryBuilder("pageTemplate")
+    .where("pageTemplate.scriptTemplateId = :id", { id: scriptTemplateId })
+    .andWhere("pageTemplate.discardedAt IS NULL")
+    .select("pageTemplate.id", "id")
+    .addSelect("pageTemplate.pageNo", "pageNo")
+    .addSelect("pageTemplate.imageUrl", "imageUrl")
+    .getRawMany();
+
+  const pageTemplates = await Promise.all(
+    pageTemplatesData.map(async pageTemplate => {
+      const queryBuilder = getTreeRepository(QuestionTemplate)
+        .createQueryBuilder("questionTemplate")
+        // WARNING: This assumes that only leaf question templates has a score
+        // TODO: Find a better way to get the leafs
+        .where("questionTemplate.score IS NOT NULL")
+        .innerJoin(
+          "questionTemplate.pageQuestionTemplates",
+          "pageQuestionTemplate",
+          "pageQuestionTemplate.discardedAt IS NULL AND pageQuestionTemplate.pageTemplateId = :id",
+          { id: pageTemplate.id }
+        );
+
+      const questionTemplates = await selectQuestionTemplateLeafData(
+        queryBuilder
+      ).getRawMany();
+
+      return { ...pageTemplate, questionTemplates };
+    })
+  );
+
+  const data: ScriptTemplateSetupData = {
+    id: scriptTemplateId,
+    pageTemplates,
+    questionTemplates
+  };
+
+  response.status(200).json(data);
+}
+
+function selectQuestionTemplateLeafData(
+  queryBuilder: SelectQueryBuilder<QuestionTemplate>
+) {
+  return queryBuilder
+    .select("questionTemplate.id", "id")
+    .addSelect("questionTemplate.name", "name")
+    .addSelect("questionTemplate.score", "score")
+    .addSelect("questionTemplate.displayPage", "displayPage")
+    .addSelect("questionTemplate.topOffset", "topOffset")
+    .addSelect("questionTemplate.leftOffset", "leftOffset")
+    .addSelect("questionTemplate.pageCovered", "pageCovered");
 }

@@ -46,6 +46,8 @@ beforeEach(async () => {
     scriptTemplate,
     "1a",
     1.5,
+    "1, 2, 3",
+    1,
     100,
     100,
     q1Template
@@ -54,6 +56,8 @@ beforeEach(async () => {
     scriptTemplate,
     "1b",
     1.5,
+    "1, 2, 3",
+    1,
     200,
     200,
     q1Template

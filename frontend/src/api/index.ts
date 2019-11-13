@@ -1,3 +1,4 @@
+import * as allocations from "./allocations";
 import * as annotations from "./annotations";
 import * as auth from "./auth";
 import * as paperUsers from "./paperUsers";
@@ -8,6 +9,7 @@ import * as questionTemplates from "./questionTemplates";
 import * as users from "./users";
 
 const api = {
+  allocations,
   annotations,
   auth,
   paperUsers,

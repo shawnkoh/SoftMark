@@ -32,8 +32,26 @@ beforeEach(async () => {
   page2 = new PageTemplate(scriptTemplate, "page2", 2);
   page3 = new PageTemplate(scriptTemplate, "page3", 3);
   q1 = new QuestionTemplate(scriptTemplate, "1", null);
-  q1a = new QuestionTemplate(scriptTemplate, "1a", 1.5, 100, 100, q1);
-  q1b = new QuestionTemplate(scriptTemplate, "1b", 1.5, 200, 200, q1);
+  q1a = new QuestionTemplate(
+    scriptTemplate,
+    "1a",
+    1.5,
+    "1, 2, 3",
+    1,
+    100,
+    100,
+    q1
+  );
+  q1b = new QuestionTemplate(
+    scriptTemplate,
+    "1b",
+    1.5,
+    "1, 2, 3",
+    1,
+    200,
+    200,
+    q1
+  );
   q2 = new QuestionTemplate(scriptTemplate, "2", 6);
 
   await getRepository(ScriptTemplate).save(scriptTemplate);

@@ -7,12 +7,13 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../api";
 import { setUser } from "../../../store/auth/actions";
+import { setAuthenticationTokens } from "../../../api/client";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email()
     .required("Required"),
-  password: Yup.string().required("Required"),
+  password: Yup.string(),
   name: Yup.string().required("Required")
 });
 
@@ -25,6 +26,7 @@ const SignUpForm: React.FC = () => {
       const { data } = await api.users.createNewUser(email, password, name);
       const { user } = data;
       dispatch(setUser(user));
+      setAuthenticationTokens(data);
       toast.success(
         `Welcome to SoftMark! A verification email has been sent to you`
       );
@@ -45,7 +47,8 @@ const SignUpForm: React.FC = () => {
         name: ""
       }}
       onSubmit={async (values, { setSubmitting }) => {
-        await signUp(values.email, values.password, values.name);
+        const { email, password, name } = values;
+        await signUp(email, password, name);
         setSubmitting(false);
       }}
       validationSchema={validationSchema}
@@ -104,7 +107,6 @@ const SignUpForm: React.FC = () => {
               <Grid item>
                 <TextField
                   variant="outlined"
-                  required
                   fullWidth
                   name="password"
                   label="Password"

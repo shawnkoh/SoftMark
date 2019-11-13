@@ -1,9 +1,11 @@
 import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/EditOutlined";
+import DeleteIcon from "@material-ui/icons/Delete";
 import MenuIcon from "@material-ui/icons/Menu";
 import React from "react";
 import usePaper from "../../../contexts/PaperContext";
+import DeletePaperModal from "./DeletePaperModal";
 import EditPaperModal from "./EditPaperModal";
 import { useHistory } from "react-router";
 
@@ -45,6 +47,14 @@ const PaperViewHeader: React.FC = () => {
           render={toggleModal => (
             <IconButton onClick={toggleModal} color="inherit">
               <EditIcon />
+            </IconButton>
+          )}
+        />
+        <DeletePaperModal
+          paper={paper}
+          render={toggleModal => (
+            <IconButton onClick={toggleModal} color="inherit">
+              <DeleteIcon />
             </IconButton>
           )}
         />

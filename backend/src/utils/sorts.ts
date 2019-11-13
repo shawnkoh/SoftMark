@@ -1,4 +1,5 @@
 import { PaperUser } from "../entities/PaperUser";
+import { PaperUserListData } from "paperUsers";
 
 interface withPageNo {
   pageNo: number;
@@ -30,4 +31,13 @@ export function sortByMatricNo(a: PaperUser, b: PaperUser) {
   const matricA = a.matriculationNumber ? a.matriculationNumber : "";
   const matricB = b.matriculationNumber ? b.matriculationNumber : "";
   return matricA.toUpperCase().localeCompare(matricB.toUpperCase());
+}
+
+export function sortPaperUserByName(
+  a: PaperUserListData,
+  b: PaperUserListData
+) {
+  const nameA = a.user.name ? a.user.name : "";
+  const nameB = b.user.name ? b.user.name : "";
+  return nameA.toUpperCase().localeCompare(nameB.toUpperCase());
 }
