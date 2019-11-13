@@ -1,30 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../api";
-import { PaperData } from "backend/src/types/papers";
-import { PaperUserListData } from "../../types/paperUsers";
-import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
-import { TableColumn } from "../../components/tables/TableTypes";
-import usePaper from "../../contexts/PaperContext";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Box,
   Button,
+  Paper,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  TableSortLabel,
-  Paper
+  TableHead,
+  TableRow,
+  TableSortLabel
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import React, { useEffect, useState } from "react";
+import { RouteComponentProps, withRouter } from "react-router";
+import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import MarkersTableRow from "./components/MarkersTableRow";
-import AddMarkerModal from "./components/AddMarkerModal";
+import { TableColumn } from "../../components/tables/TableTypes";
+import usePaper from "../../contexts/PaperContext";
+import { PaperUserListData } from "../../types/paperUsers";
 import Header from "../paperSetup/components/PaperSetupHeader";
+import AddMarkerModal from "./components/AddMarkerModal";
+import MarkersTableRow from "./components/MarkersTableRow";
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -44,7 +41,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   const paper = usePaper();
 
   const [questionTemplates, setQuestionTemplates] = useState<
-    QuestionTemplateListData[]
+    QuestionTemplateData[]
   >([]);
   const [isLoadingQuestionTemplates, setIsLoadingQuestionTemplates] = useState(
     true
@@ -101,7 +98,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
       key: ""
     }
   ];
-  
+
   return (
     <>
       <Header title="Question allocation" />

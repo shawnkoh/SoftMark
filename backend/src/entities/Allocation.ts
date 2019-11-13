@@ -1,9 +1,8 @@
-import { Entity, ManyToOne, Column, getRepository, Unique } from "typeorm";
-
+import { Column, Entity, getRepository, ManyToOne, Unique } from "typeorm";
+import { AllocationData, AllocationListData } from "../types/allocations";
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
-import { AllocationListData, AllocationData } from "../types/allocations";
 
 @Entity()
 @Unique(["paperUser", "questionTemplate"])
@@ -52,7 +51,7 @@ export class Allocation extends Base {
       (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
     return {
       ...this.getListData(),
-      questionTemplate: await questionTemplate.getListData(),
+      questionTemplate: questionTemplate.getData(),
       paperUser: await paperUser.getListData()
     };
   };

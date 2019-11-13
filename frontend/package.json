@@ -50,7 +50,6 @@
     "redux": "^4.0.4",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "retry-axios": "^1.0.1",
     "typeface-roboto": "^0.0.75",
     "typescript": "3.6.4",
     "use-state-with-callback": "^1.0.18",

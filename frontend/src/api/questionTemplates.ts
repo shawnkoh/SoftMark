@@ -1,11 +1,10 @@
 import { AxiosResponse } from "axios";
-import { ScriptViewData } from "backend/src/types/view";
 import {
   QuestionTemplateData,
-  QuestionTemplateListData,
   QuestionTemplatePatchData,
   QuestionTemplatePostData
 } from "backend/src/types/questionTemplates";
+import { ScriptViewData } from "backend/src/types/view";
 import client from "./client";
 
 const URL = "/question_templates";
@@ -25,7 +24,7 @@ export async function getQuestionTemplate(
 
 export async function getQuestionTemplates(
   id: number
-): Promise<AxiosResponse<{ questionTemplates: QuestionTemplateListData[] }>> {
+): Promise<AxiosResponse<{ questionTemplates: QuestionTemplateData[] }>> {
   return client.get(`papers/${id}/question_templates`);
 }
 

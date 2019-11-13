@@ -1,35 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-
-import api from "../../../api";
-import * as Yup from "yup";
-import { PaperUserListData } from "../../../types/paperUsers";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
-  Button,
   Chip,
-  Grid,
   IconButton,
-  TableRow,
   TableCell,
-  Tooltip,
-  Typography
+  TableRow,
+  Tooltip
 } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
+import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import DeleteMarkerModal from "./DeleteMarkerModal";
 import {
   AllocationListData,
   AllocationPostData
 } from "backend/src/types/allocations";
-import { QuestionTemplateListData } from "backend/src/types/questionTemplates";
-import { getUser } from "../../../store/auth/selectors";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { sumArray } from "utils/arrays";
+import api from "../../../api";
+import { getUser } from "../../../store/auth/selectors";
+import { PaperUserListData } from "../../../types/paperUsers";
+import DeleteMarkerModal from "./DeleteMarkerModal";
 
 const useStyles = makeStyles(theme => ({
   green: {
@@ -57,7 +50,7 @@ interface OwnProps {
   index: number;
   columns: number;
   marker: PaperUserListData;
-  questionTemplates: QuestionTemplateListData[];
+  questionTemplates: QuestionTemplateData[];
   refreshMarkers: () => void;
 }
 

@@ -109,20 +109,6 @@ describe("GET /question_templates/:id", () => {
     const data: QuestionTemplateData = response.body.questionTemplate;
     expect(isQuestionTemplateData(data)).toBe(true);
   });
-
-  it("should return the parent's discardedAt if only the parent has been discarded", async () => {
-    const discardedAt = new Date();
-    scriptTemplate.discardedAt = discardedAt;
-    await getRepository(ScriptTemplate).save(scriptTemplate);
-
-    const response = await request(server.server)
-      .get(`${fixtures.api}/question_templates/${q1Template.id}`)
-      .set("Authorization", fixtures.studentAccessToken)
-      .send();
-    expect(response.status).toEqual(200);
-    const data: QuestionTemplateData = response.body.questionTemplate;
-    expect(data.discardedAt).toBe(discardedAt.toJSON());
-  });
 });
 
 describe("PATCH /question_templates/:id", () => {

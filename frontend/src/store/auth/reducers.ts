@@ -1,5 +1,5 @@
-import * as types from "./types";
 import { setAccessToken, setRefreshToken } from "../../localStorage";
+import * as types from "./types";
 
 const initialState: types.AuthState = {
   user: null

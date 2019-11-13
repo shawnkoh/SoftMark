@@ -1,11 +1,10 @@
-import { Column, Entity, ManyToOne, OneToMany, getRepository } from "typeorm";
-
+import { Column, Entity, getRepository, ManyToOne, OneToMany } from "typeorm";
+import { PageTemplateData, PageTemplateListData } from "../types/pageTemplates";
+import { QuestionTemplateData } from "../types/questionTemplates";
 import { Discardable } from "./Discardable";
 import { PageQuestionTemplate } from "./PageQuestionTemplate";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { ScriptTemplate } from "./ScriptTemplate";
-import { PageTemplateListData, PageTemplateData } from "../types/pageTemplates";
-import { QuestionTemplateListData } from "../types/questionTemplates";
 
 @Entity()
 export class PageTemplate extends Discardable {
@@ -56,7 +55,7 @@ export class PageTemplate extends Discardable {
 
   getData = async (): Promise<PageTemplateData> => {
     const pageQuestionTemplates = this.pageQuestionTemplates;
-    let questionTemplates: QuestionTemplateListData[];
+    let questionTemplates: QuestionTemplateData[];
     if (
       pageQuestionTemplates &&
       pageQuestionTemplates.every(
@@ -64,9 +63,8 @@ export class PageTemplate extends Discardable {
       )
     ) {
       questionTemplates = await Promise.all(
-        pageQuestionTemplates.map(
-          async pageQuestionTemplate =>
-            await pageQuestionTemplate.questionTemplate!.getListData()
+        pageQuestionTemplates.map(async pageQuestionTemplate =>
+          pageQuestionTemplate.questionTemplate!.getData()
         )
       );
     } else {
@@ -78,9 +76,7 @@ export class PageTemplate extends Discardable {
             "pageQuestionTemplates"
           )
           .leftJoin("pageQuestionTemplates.pageTemplate", "pageTemplate")
-          .getMany()).map(
-          async questionTemplate => await questionTemplate.getListData()
-        )
+          .getMany()).map(async questionTemplate => questionTemplate.getData())
       );
     }
 

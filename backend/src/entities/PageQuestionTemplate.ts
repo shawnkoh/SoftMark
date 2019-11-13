@@ -1,12 +1,11 @@
-import { Entity, ManyToOne, Column, Unique, getRepository } from "typeorm";
-
+import { Column, Entity, getRepository, ManyToOne, Unique } from "typeorm";
+import {
+  PageQuestionTemplateData,
+  PageQuestionTemplateListData
+} from "../types/pageQuestionTemplates";
 import { Discardable } from "./Discardable";
 import { PageTemplate } from "./PageTemplate";
 import { QuestionTemplate } from "./QuestionTemplate";
-import {
-  PageQuestionTemplateListData,
-  PageQuestionTemplateData
-} from "../types/pageQuestionTemplates";
 
 @Entity()
 @Unique(["pageTemplate", "questionTemplate"])
@@ -55,7 +54,7 @@ export class PageQuestionTemplate extends Discardable {
     return {
       ...this.getListData(),
       pageTemplate: pageTemplate.getListData(),
-      questionTemplate: await questionTemplate.getListData()
+      questionTemplate: questionTemplate.getData()
     };
   };
 }
