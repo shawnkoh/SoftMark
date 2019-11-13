@@ -7,8 +7,8 @@ const URL = "/users";
 
 export async function createNewUser(
   email: string,
-  password: string,
-  name: string
+  password?: string,
+  name?: string
 ): Promise<
   AxiosResponse<{
     user: UserData;
