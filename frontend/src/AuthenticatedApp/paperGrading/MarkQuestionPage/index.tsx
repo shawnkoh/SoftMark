@@ -29,6 +29,7 @@ import { lightBlue } from "@material-ui/core/colors";
 
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import Annotator from "./Annotator";
+import MarkQuestionModal from "./MarkQuestionModal";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -102,11 +103,6 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     );
     setScriptViewData(data);
     setIsLoading(false);
-  };
-
-  const putMarkData = async (questionId: number, score: number) => {
-    await api.marks.replaceMark(questionId, { score });
-    return score;
   };
 
   useEffect(() => {
@@ -206,23 +202,21 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
             <Typography variant="button" className={classes.questionBarItem}>
               {matriculationNumber} page {pageNo}
             </Typography>
-            {getCurrentPageQuestions().map(question =>
-              question.score ? (
-                <Chip
-                  avatar={<Avatar>{question.score || "-"}</Avatar>}
-                  label={question.name}
-                  color="primary"
-                  className={classes.questionBarItem}
-                />
-              ) : (
-                <Chip
-                  avatar={<Avatar>-</Avatar>}
-                  label={question.name}
-                  color="inherit"
-                  className={classes.questionBarItem}
-                />
-              )
-            )}
+            {getCurrentPageQuestions().map(question => (
+              <MarkQuestionModal
+                key={question.id}
+                question={question}
+                render={(toggleVisibility, score, name) => (
+                  <Chip
+                    onClick={toggleVisibility}
+                    label={name}
+                    avatar={<Avatar>{score || "-"}</Avatar>}
+                    color={score ? "primary" : "inherit"}
+                    className={classes.questionBarItem}
+                  />
+                )}
+              />
+            ))}
           </Toolbar>
         </AppBar>
         {pageNo !== 1 && (

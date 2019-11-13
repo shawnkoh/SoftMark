@@ -41,6 +41,21 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
     setLocalScore(newValue as number);
   };
 
+  const putMarkData = async (questionId: number, score: number) => {
+    await api.marks.replaceMark(questionId, { score });
+    setActualScore(score);
+    return score;
+  };
+
+  const handleCancel = event => {
+    setLocalScore(actualScore || 0);
+    toggleVisibility();
+  };
+
+  const handleSave = event => {
+    putMarkData(question.id, localScore);
+  };
+
   return (
     <>
       <Dialog open={isVisible} onClose={toggleVisibility} fullWidth>
@@ -52,7 +67,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score: {question.score || "no score yet"}
+            Current score: {actualScore || "no score yet"}
           </Typography>
           <div className={classes.slider}>
             <Slider
@@ -67,11 +82,15 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button color="primary">Cancel</Button>
-          <Button color="primary">Save</Button>
+          <Button color="primary" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button color="primary" onClick={handleSave}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
-      {render(toggleVisibility)}
+      {render(toggleVisibility, actualScore, question.name)}
     </>
   );
 };
