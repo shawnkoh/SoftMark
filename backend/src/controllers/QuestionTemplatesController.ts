@@ -97,6 +97,9 @@ export async function create(request: Request, response: Response) {
     questionTemplate.pageQuestionTemplates = scriptTemplate.pageTemplates
       .filter(value => pageNos.has(value.pageNo))
       .map(value => new PageQuestionTemplate(value, questionTemplate));
+    await getRepository(PageQuestionTemplate).save(
+      questionTemplate.pageQuestionTemplates
+    );
   }
 
   await getManager().transaction(async manager => {
@@ -248,9 +251,11 @@ export async function update(request: Request, response: Response) {
         questionTemplate.pageQuestionTemplates = pageTemplates
           .filter(value => pageNos.has(value.pageNo))
           .map(value => new PageQuestionTemplate(value, questionTemplate));
+        await getRepository(PageQuestionTemplate).save(
+          questionTemplate.pageQuestionTemplates
+        );
       }
     }
-    Object.assign(questionTemplate, patchData);
     await validateOrReject(questionTemplate);
 
     await getRepository(QuestionTemplate).save(questionTemplate);

@@ -1,7 +1,7 @@
 import React from "react";
 import { TreeSelect } from "antd";
-import "./styles.css";
 import { QuestionTemplateTreeData } from "backend/src/types/questionTemplates";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 
 interface TreeData {
   value: string;
@@ -11,13 +11,14 @@ interface TreeData {
 }
 
 interface SelectTreeProps {
-  questionTemplateTrees: QuestionTemplateTreeData[];
   initialValue: string;
   onChange: (value: any) => void;
   container: (triggerNode: any) => any;
 }
 
-const GenerateTreeData = (questionTemplateTree: QuestionTemplateTreeData) => {
+const GenerateTreeData = (
+  questionTemplateTree: QuestionTemplateTreeData
+): TreeData => {
   return {
     value: questionTemplateTree.name,
     title: questionTemplateTree.name,
@@ -30,7 +31,10 @@ const GenerateTreeData = (questionTemplateTree: QuestionTemplateTreeData) => {
 
 const QuestionTemplateSelect: React.FC<SelectTreeProps> = props => {
   const [value, setValue] = React.useState(props.initialValue);
-  const treeData = props.questionTemplateTrees.map(d => GenerateTreeData(d));
+  const { scriptTemplateSetupData } = useScriptSetup();
+  const treeData = scriptTemplateSetupData.questionTemplates.map(d =>
+    GenerateTreeData(d)
+  );
   return (
     <TreeSelect
       showSearch

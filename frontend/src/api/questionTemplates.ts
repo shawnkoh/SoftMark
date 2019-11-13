@@ -2,8 +2,7 @@ import { AxiosResponse } from "axios";
 import {
   QuestionTemplateData,
   QuestionTemplatePatchData,
-  QuestionTemplatePostData,
-  QuestionTemplateTreeData
+  QuestionTemplatePostData
 } from "backend/src/types/questionTemplates";
 import { ScriptViewData } from "backend/src/types/view";
 import client from "./client";

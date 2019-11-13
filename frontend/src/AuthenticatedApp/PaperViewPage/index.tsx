@@ -5,7 +5,9 @@ import { Link, Route, Switch } from "react-router-dom";
 import { PaperProvider } from "../../contexts/PaperContext";
 
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
-import { Check, People, Person, Settings } from "@material-ui/icons";
+import Check from "@material-ui/icons/Check";
+import People from "@material-ui/icons/People";
+import Settings from "@material-ui/icons/Settings";
 
 import useStyles from "./styles";
 import PaperViewHeader from "./components/PaperViewHeader";

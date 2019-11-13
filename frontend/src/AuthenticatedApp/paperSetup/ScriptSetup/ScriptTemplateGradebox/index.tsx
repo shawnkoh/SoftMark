@@ -1,8 +1,5 @@
 import { Fab } from "@material-ui/core";
-import {
-  QuestionTemplateData,
-  QuestionTemplateTreeData
-} from "backend/src/types/questionTemplates";
+import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
 import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
@@ -10,22 +7,14 @@ import useStyles from "./useStyles";
 
 interface ScriptTemplateQuestionProps {
   index: number;
-  questionTemplate: QuestionTemplateData;
-  onEditSuccess: (qTemplate: QuestionTemplateData) => void;
-  currentPageNo: number;
-  pageCount: number;
-  questionTemplateTrees: QuestionTemplateTreeData[];
+  questionTemplate: QuestionTemplateLeafData;
 }
 
 type Props = ScriptTemplateQuestionProps;
 
 const ScriptTemplateQuestion: React.FC<Props> = ({
   index,
-  questionTemplate,
-  onEditSuccess,
-  currentPageNo,
-  pageCount,
-  questionTemplateTrees
+  questionTemplate
 }) => {
   const classes = useStyles();
   const [editOpen, setEditOpen] = React.useState(false);
@@ -42,14 +31,11 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
   return (
     <>
       <QuestionTemplateDialog
-        questionTemplateTrees={questionTemplateTrees}
+        isParent={questionTemplate.displayPage === null}
         mode="edit"
-        scriptTemplateId={questionTemplate.scriptTemplateId}
         questionTemplateId={questionTemplate.id}
         open={editOpen}
         handleClose={() => setEditOpen(false)}
-        onSuccess={onEditSuccess}
-        onDeleteSuccess={() => setEditOpen(false)}
         initialValues={{
           title: questionTemplate.name,
           score: questionTemplate.score ? questionTemplate.score : 0,
@@ -58,8 +44,6 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
             : "",
           parentName: questionTemplate.name
         }}
-        pageCount={pageCount}
-        currentPageNo={currentPageNo}
       />
       <Fab
         variant="extended"

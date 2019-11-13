@@ -1,16 +1,9 @@
 import React from "react";
 import { QuestionTemplateTreeData } from "backend/src/types/questionTemplates";
 import { useTheme } from "@material-ui/core/styles";
-import {
-  List,
-  ListItem,
-  ListItemText,
-  ListSubheader,
-  Collapse
-} from "@material-ui/core";
+import { List, ListItem, ListItemText, Collapse } from "@material-ui/core";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import useStyles from "./useStyles";
 
 interface TreeProps {
   questionTemplateTree: QuestionTemplateTreeData;
@@ -33,11 +26,17 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
         style={{
           paddingLeft: theme.spacing(depth + 2)
         }}
-        onClick={() => leafOnClick(questionTemplateTree.displayPage!)}
+        onClick={() =>
+          questionTemplateTree.displayPage &&
+          leafOnClick(questionTemplateTree.displayPage)
+        }
       >
         <ListItemText
           primary={questionTemplateTree.name}
-          secondary={`Score: ${questionTemplateTree.score}`}
+          secondary={
+            questionTemplateTree.score !== null &&
+            `Score: ${questionTemplateTree.score}`
+          }
         />
       </ListItem>
     </List>

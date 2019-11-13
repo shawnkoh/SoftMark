@@ -3,10 +3,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../../api";
 import { ScriptData, ScriptListData } from "backend/src/types/scripts";
 
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import TogglePageComponent from "../../../../components/misc/TogglePageComponent";
-import Canvas from "../../../../components/Canvas";
-import { CanvasMode } from "../../../../components/Canvas/types";
+import { Dialog, DialogContent } from "@material-ui/core";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import DialogTitleWithCloseButton from "../../../../components/dialogs/DialogTitleWithCloseButton";
 

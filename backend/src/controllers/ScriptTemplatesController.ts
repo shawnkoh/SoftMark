@@ -12,13 +12,13 @@ import { PageTemplate } from "../entities/PageTemplate";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
-import { QuestionTemplateTreeData } from "../types/questionTemplates";
 import {
   ScriptTemplatePostData,
   ScriptTemplateSetupData
 } from "../types/scriptTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import { cleanTrees } from "../utils/questionTemplate";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -221,10 +221,11 @@ export async function getSetupData(request: Request, response: Response) {
   }
 
   const trees = await getTreeRepository(QuestionTemplate).findTrees();
-  // TODO: recursively traverse trees to _.pick only the relevant fields
-  const questionTemplates = trees.filter(
-    tree => tree.scriptTemplateId === scriptTemplateId
-  ) as QuestionTemplateTreeData[];
+  const questionTemplates = cleanTrees(
+    trees.filter(
+      tree => !tree.discardedAt && tree.scriptTemplateId === scriptTemplateId
+    )
+  );
 
   const pageTemplatesData = await getRepository(PageTemplate)
     .createQueryBuilder("pageTemplate")
@@ -239,9 +240,8 @@ export async function getSetupData(request: Request, response: Response) {
     pageTemplatesData.map(async pageTemplate => {
       const queryBuilder = getTreeRepository(QuestionTemplate)
         .createQueryBuilder("questionTemplate")
-        // WARNING: This assumes that only leaf question templates has a score
-        // TODO: Find a better way to get the leafs
-        .where("questionTemplate.score IS NOT NULL")
+        .where("questionTemplate.displayPage IS NOT NULL")
+        .where("questionTemplate.discardedAt IS NULL")
         .innerJoin(
           "questionTemplate.pageQuestionTemplates",
           "pageQuestionTemplate",
