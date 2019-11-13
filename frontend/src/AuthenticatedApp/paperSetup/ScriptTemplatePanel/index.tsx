@@ -3,18 +3,22 @@ import AddIcon from "@material-ui/icons/Add";
 import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
 import { PageTemplateListData } from "backend/src/types/pageTemplates";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import {
+  QuestionTemplateData,
+  QuestionTemplateTreeData
+} from "backend/src/types/questionTemplates";
 import update from "immutability-helper";
 import React, { useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
 import api from "../../../api";
-import QuestionTemplateDialog from "../components/QuestionTemplateDialog";
+import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
 import ScriptTemplateQuestion from "../ScriptTemplateQuestion";
 import useStyles from "./useStyles";
 
 type DragItem = QuestionTemplateData & { type: string; index: number };
 
 interface OwnProps {
+  questionTemplateTrees: QuestionTemplateTreeData[];
   currentPageNo: number;
   pageCount: number;
   nextPage: (e?: any) => void;
@@ -28,6 +32,7 @@ type Props = OwnProps;
 const ScriptTemplatePanel: React.FC<Props> = props => {
   const classes = useStyles();
   const {
+    questionTemplateTrees,
     questionTemplates,
     pageTemplate,
     currentPageNo,
@@ -68,6 +73,7 @@ const ScriptTemplatePanel: React.FC<Props> = props => {
       hidden={pageTemplate.pageNo !== currentPageNo}
     >
       <QuestionTemplateDialog
+        questionTemplateTrees={questionTemplateTrees}
         mode="create"
         scriptTemplateId={pageTemplate.scriptTemplateId}
         open={openEditDialog}
@@ -96,6 +102,7 @@ const ScriptTemplatePanel: React.FC<Props> = props => {
           <img className={classes.scriptImage} src={pageTemplate.imageUrl} />
           {boxes.map((questionTemplate, index) => (
             <ScriptTemplateQuestion
+              questionTemplateTrees={questionTemplateTrees}
               key={questionTemplate.id}
               index={index}
               questionTemplate={questionTemplate}

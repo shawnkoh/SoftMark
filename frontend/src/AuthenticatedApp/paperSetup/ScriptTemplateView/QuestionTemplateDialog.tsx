@@ -10,20 +10,26 @@ import {
 } from "@material-ui/core";
 import api from "api";
 import { AxiosResponse } from "axios";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import {
+  QuestionTemplateData,
+  QuestionTemplateTreeData
+} from "backend/src/types/questionTemplates";
 import { Field, FieldProps, Form, Formik, FormikProps } from "formik";
 import React from "react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
 import { isPageValid } from "../../../utils/questionTemplateUtil";
+import QuestionTemplateSelect from "./QuestionTemplateSelect";
 
 export interface NewQuestionTemplateValues {
   title: string;
   score: number;
   pageCovered: string;
+  parentName: string;
 }
 
 interface SharedProps {
+  questionTemplateTrees: QuestionTemplateTreeData[];
   scriptTemplateId: number;
   open: boolean;
   handleClose: (e?: any) => void;
@@ -54,29 +60,41 @@ const QuestionEditDialog: React.FC<Props> = props => {
     handleClose,
     currentPageNo,
     pageCount,
-    initialValues = { title: "", score: 0, pageCovered: "" },
-    onSuccess
+    initialValues = { title: "", score: 0, pageCovered: "", parentName: "" },
+    onSuccess,
+    questionTemplateTrees
   } = props;
   const [deleteWarning, setDeleteWarning] = React.useState(false);
-
   const onSubmit = async (values: NewQuestionTemplateValues) => {
     try {
       let response: AxiosResponse<{ questionTemplate: QuestionTemplateData }>;
       if (mode == "create") {
-        response = await api.questionTemplates.createQuestionTemplate(
-          scriptTemplateId,
-          {
-            name: values.title,
-            score: values.score,
-            pageCovered: values.pageCovered
-          }
-        );
+        if (values.parentName === "") {
+          response = await api.questionTemplates.createQuestionTemplate(
+            scriptTemplateId,
+            {
+              name: values.title
+            }
+          );
+        } else {
+          response = await api.questionTemplates.createQuestionTemplate(
+            scriptTemplateId,
+            {
+              name: values.title,
+              score: values.score,
+              pageCovered: values.pageCovered,
+              displayPage: currentPageNo,
+              parentName: values.parentName
+            }
+          );
+        }
       } else {
         response = await api.questionTemplates.editQuestionTemplate(
           (props as QuestionEditDialogProps).questionTemplateId,
           {
             name: values.title,
-            score: values.score
+            score: values.score,
+            pageCovered: values.pageCovered
           }
         );
       }
@@ -111,7 +129,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
             </DialogTitle>
             <DialogContent>
               <Grid container justify="flex-start" spacing={2}>
-                <Grid item xs>
+                <Grid item xs={12}>
                   <Field name="title" validate={value => !value && "Required"}>
                     {({
                       field,
@@ -124,58 +142,91 @@ const QuestionEditDialog: React.FC<Props> = props => {
                         label="Title"
                         helperText={meta.error || "e.g. Q1a"}
                         required={mode == "create"}
-                        {...field}
-                      />
-                    )}
-                  </Field>
-                </Grid>
-                <Grid item xs>
-                  <Field
-                    name="score"
-                    validate={value =>
-                      value < 0 && "Score should be non-negative"
-                    }
-                  >
-                    {({
-                      field,
-                      meta
-                    }: FieldProps<NewQuestionTemplateValues>) => (
-                      <TextField
-                        error={!!meta.error}
-                        margin="dense"
-                        label="Score"
-                        helperText={meta.error}
-                        type="number"
-                        required={mode == "create"}
-                        {...field}
-                      />
-                    )}
-                  </Field>
-                </Grid>
-                <Grid container item>
-                  <Field
-                    name="pageCovered"
-                    validate={value =>
-                      isPageValid(value, currentPageNo, pageCount)
-                    }
-                  >
-                    {({
-                      field,
-                      meta
-                    }: FieldProps<NewQuestionTemplateValues>) => (
-                      <TextField
-                        error={!!meta.error}
-                        margin="dense"
-                        label="Page Covered"
-                        helperText={meta.error}
-                        placeholder="1, 2, 4-5"
-                        required={mode == "create"}
                         fullWidth
                         {...field}
                       />
                     )}
                   </Field>
                 </Grid>
+
+                {questionTemplateTrees.length !== 0 && (
+                  <Grid item xs={12}>
+                    <Field
+                      name="parentName"
+                      validate={value =>
+                        (value < 1 || value > pageCount) && "Page out of range"
+                      }
+                    >
+                      {({
+                        field,
+                        form
+                      }: FieldProps<NewQuestionTemplateValues>) => (
+                        <QuestionTemplateSelect
+                          questionTemplateTrees={questionTemplateTrees}
+                          initialValue={form.initialValues.parentName}
+                          onChange={(value: string) =>
+                            form.setValues({
+                              ...form.values,
+                              parentName: value
+                            })
+                          }
+                          container={node => node.parentNode}
+                        />
+                      )}
+                    </Field>
+                  </Grid>
+                )}
+                {formikProps.values.parentName !== "" && (
+                  <>
+                    <Grid item xs={4}>
+                      <Field
+                        name="score"
+                        validate={value =>
+                          value < 0 && "Score should be non-negative"
+                        }
+                      >
+                        {({
+                          field,
+                          meta
+                        }: FieldProps<NewQuestionTemplateValues>) => (
+                          <TextField
+                            error={!!meta.error}
+                            margin="dense"
+                            label="Score"
+                            helperText={meta.error}
+                            type="number"
+                            required={mode == "create"}
+                            {...field}
+                          />
+                        )}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Field
+                        name="pageCovered"
+                        validate={value =>
+                          isPageValid(value, currentPageNo, pageCount)
+                        }
+                      >
+                        {({
+                          field,
+                          meta
+                        }: FieldProps<NewQuestionTemplateValues>) => (
+                          <TextField
+                            error={!!meta.error}
+                            margin="dense"
+                            label="Page Covered"
+                            helperText={meta.error}
+                            placeholder="1, 2, 4-5"
+                            required={mode == "create"}
+                            fullWidth
+                            {...field}
+                          />
+                        )}
+                      </Field>
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </DialogContent>
             <DialogActions>
@@ -205,7 +256,14 @@ const QuestionEditDialog: React.FC<Props> = props => {
               <Button onClick={handleClose} color="default">
                 Cancel
               </Button>
-              <Button type="submit" color="primary">
+              <Button
+                onClick={() => {
+                  console.log(formikProps.validateForm());
+                  formikProps.submitForm();
+                }}
+                type="submit"
+                color="primary"
+              >
                 Confirm
               </Button>
             </DialogActions>
