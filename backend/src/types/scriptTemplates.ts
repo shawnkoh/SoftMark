@@ -5,8 +5,8 @@ import {
   PageTemplateSetupData
 } from "./pageTemplates";
 import {
-  isQuestionTemplateListData,
-  QuestionTemplateListData,
+  isQuestionTemplateData,
+  QuestionTemplateData,
   QuestionTemplateTreeData
 } from "./questionTemplates";
 
@@ -18,7 +18,7 @@ export interface ScriptTemplatePostData {
 // potentially deprecated
 export interface ScriptTemplateData extends DiscardableData {
   pageTemplates: PageTemplateListData[];
-  questionTemplates: QuestionTemplateListData[];
+  questionTemplates: QuestionTemplateData[];
 }
 
 export interface ScriptTemplateSetupData {
@@ -33,7 +33,7 @@ export function isScriptTemplateData(data: any): data is ScriptTemplateData {
       isPageTemplateListData(pageTemplate)
     ) &&
     data.questionTemplates.every((questionTemplate: any) =>
-      isQuestionTemplateListData(questionTemplate)
+      isQuestionTemplateData(questionTemplate)
     )
   );
 }

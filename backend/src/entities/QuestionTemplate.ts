@@ -18,10 +18,7 @@ import {
 } from "typeorm";
 import IsUniqueQuestionTemplateName from "../constraints/IsUniqueQuestionTemplateName";
 import { PageTemplateListData } from "../types/pageTemplates";
-import {
-  QuestionTemplateData,
-  QuestionTemplateListData
-} from "../types/questionTemplates";
+import { QuestionTemplateData } from "../types/questionTemplates";
 import { Allocation } from "./Allocation";
 import { Discardable } from "./Discardable";
 import { PageQuestionTemplate } from "./PageQuestionTemplate";
@@ -139,45 +136,17 @@ export class QuestionTemplate extends Discardable {
       .getMany()).map(pageTemplate => pageTemplate.getListData());
   };
 
-  getListData = async (): Promise<QuestionTemplateListData> => {
-    // inherit parent's discarded at - see DEVELOPER.md
-    let discardedAt = this.discardedAt;
-    if (!discardedAt) {
-      const scriptTemplate =
-        this.scriptTemplate ||
-        (await getRepository(ScriptTemplate).findOneOrFail(
-          this.scriptTemplateId
-        ));
-      discardedAt = scriptTemplate.discardedAt;
-    }
-
+  getData = (): QuestionTemplateData => {
     return {
       ...this.getBase(),
-      discardedAt,
-      scriptTemplateId: this.scriptTemplateId,
+      displayPage: this.displayPage,
+      leftOffset: this.leftOffset,
       name: this.name,
-      score: this.score,
+      pageCovered: this.pageCovered,
       parentQuestionTemplateId: this.parentQuestionTemplateId,
-      topOffset: this.topOffset,
-      leftOffset: this.leftOffset
-    };
-  };
-
-  getData = async (): Promise<QuestionTemplateData> => {
-    const pageTemplates = await this.getPageTemplates();
-    const childQuestionTemplates = await Promise.all(
-      (
-        this.childQuestionTemplates ||
-        (await getRepository(QuestionTemplate).find({
-          parentQuestionTemplate: this
-        }))
-      ).map(async child => await child.getListData())
-    );
-
-    return {
-      ...(await this.getListData()),
-      childQuestionTemplates,
-      pageTemplates
+      score: this.score,
+      scriptTemplateId: this.scriptTemplateId,
+      topOffset: this.topOffset
     };
   };
 }

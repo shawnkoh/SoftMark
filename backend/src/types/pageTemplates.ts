@@ -1,6 +1,6 @@
 import {
-  QuestionTemplateListData,
-  isQuestionTemplateListData,
+  QuestionTemplateData,
+  isQuestionTemplateData,
   QuestionTemplateLeafData
 } from "./questionTemplates";
 import { DiscardableData, isDiscardableData } from "./entities";
@@ -12,7 +12,7 @@ export interface PageTemplateListData extends DiscardableData {
 }
 
 export interface PageTemplateData extends PageTemplateListData {
-  questionTemplates: QuestionTemplateListData[];
+  questionTemplates: QuestionTemplateData[];
 }
 
 export interface PageTemplateSetupData {
@@ -31,7 +31,7 @@ export function isPageTemplateListData(
 export function isPageTemplateData(data: any): data is PageTemplateData {
   return (
     data.questionTemplates.every((questionTemplate: any) =>
-      isQuestionTemplateListData(questionTemplate)
+      isQuestionTemplateData(questionTemplate)
     ) && isPageTemplateListData(data)
   );
 }

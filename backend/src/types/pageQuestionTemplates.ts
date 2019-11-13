@@ -1,8 +1,8 @@
 import { DiscardableData, isDiscardableData } from "./entities";
 import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
 import {
-  QuestionTemplateListData,
-  isQuestionTemplateListData
+  QuestionTemplateData,
+  isQuestionTemplateData
 } from "./questionTemplates";
 
 export interface PageQuestionTemplatePostData {
@@ -23,7 +23,7 @@ export interface PageQuestionTemplateListData extends DiscardableData {
 
 export interface PageQuestionTemplateData extends PageQuestionTemplateListData {
   pageTemplate: PageTemplateListData;
-  questionTemplate: QuestionTemplateListData;
+  questionTemplate: QuestionTemplateData;
 }
 
 export function isPageQuestionTemplatePostData(
@@ -59,7 +59,7 @@ export function isPageQuestionTemplateData(
 ): data is PageQuestionTemplateData {
   return (
     isPageTemplateListData(data.pageTemplate) &&
-    isQuestionTemplateListData(data.questionTemplate) &&
+    isQuestionTemplateData(data.questionTemplate) &&
     isPageQuestionTemplateListData(data)
   );
 }
