@@ -87,9 +87,9 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
-  const getScriptViewData = async (questionTemplateId: number) => {
+  const getScriptViewData = async (scriptId: number) => {
     setIsLoading(true);
-    const data = null; // TODO: fetch from GET /scripts/:id/view
+    const data = await api.scripts.viewScript(scriptId);
     setScriptViewData(data);
     setIsLoading(false);
   };
