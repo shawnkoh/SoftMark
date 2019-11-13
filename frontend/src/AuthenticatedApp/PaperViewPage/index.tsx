@@ -77,7 +77,7 @@ const PaperView: React.FC = () => {
           component={ScriptMapping}
         />
         <Route
-          path={`${path}/grading/:questionId`}
+          path={`${path}/grading/:questionTemplateId`}
           component={MarkQuestionPage}
         />
         <Route path={`${path}/setup`}>

@@ -7,6 +7,7 @@ import * as scriptTemplates from "./scriptTemplates";
 import * as scripts from "./scripts";
 import * as questionTemplates from "./questionTemplates";
 import * as users from "./users";
+import * as marks from "./marks";
 
 const api = {
   allocations,
@@ -17,7 +18,8 @@ const api = {
   scriptTemplates,
   scripts,
   questionTemplates,
-  users
+  users,
+  marks
 };
 
 Object.freeze(api);
