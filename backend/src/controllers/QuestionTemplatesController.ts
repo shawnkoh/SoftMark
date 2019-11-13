@@ -392,10 +392,13 @@ export async function rootQuestionTemplates(
         .getRawMany();
       const questionIds = questions.map(question => question.id);
 
-      const markCount = await getRepository(Mark)
-        .createQueryBuilder("mark")
-        .where("mark.questionId IN (:...ids)", { ids: questionIds })
-        .getCount();
+      const markCount =
+        questionIds.length > 0
+          ? await getRepository(Mark)
+              .createQueryBuilder("mark")
+              .where("mark.questionId IN (:...ids)", { ids: questionIds })
+              .getCount()
+          : 0;
       totalMarkCount += markCount;
 
       const root: QuestionTemplateRootData = {
