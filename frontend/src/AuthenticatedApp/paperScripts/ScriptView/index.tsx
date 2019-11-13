@@ -9,12 +9,15 @@ import {
   AppBar,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
+  Avatar,
+  Chip
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { lightBlue } from "@material-ui/core/colors";
 
 import TogglePageComponent from "../../../components/misc/TogglePageComponent";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -53,9 +56,13 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       margin: "0 auto"
     },
-    questionsBar: {
+    questionBar: {
+      backgroundColor: lightBlue[50],
       top: "auto",
       bottom: 0
+    },
+    questionBarItem: {
+      marginRight: theme.spacing(1)
     }
   })
 );
@@ -69,8 +76,12 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   const [script, setScript] = useState<ScriptData | null>(null);
 
   const [viewPageNo, setViewPageNo] = useState(1);
-  const incrementViewPageNo = () => setViewPageNo(viewPageNo + 1);
-  const decrementViewPageNo = () => setViewPageNo(viewPageNo - 1);
+  const incrementViewPageNo = () =>
+    setViewPageNo(prevPageNo =>
+      Math.min(script ? script.pages.length : 1, prevPageNo + 1)
+    );
+  const decrementViewPageNo = () =>
+    setViewPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
 
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
@@ -100,7 +111,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   }
 
   const currentPageQuestions = [
-    { name: "Q1", score: 5 },
+    { name: "Q1", score: 5.5 },
     { name: "Q2", score: 2 },
     { name: "Q3", score: null }
   ];
@@ -128,23 +139,40 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
           </div>
         );
       })}
-      <AppBar position="fixed" color="primary" className={classes.questionsBar}>
+      <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          {currentPageQuestions.map(question => (
-            <Button color="inherit">
-              {question.name}: {question.score || "no score"}
-            </Button>
-          ))}
+          <Typography variant="button" className={classes.questionBarItem}>
+            A0180340U Page {viewPageNo} of {script.pages.length}
+          </Typography>
+          {currentPageQuestions.map(question =>
+            question.score ? (
+              <Chip
+                avatar={<Avatar>{question.score || "-"}</Avatar>}
+                label={question.name}
+                color="primary"
+                className={classes.questionBarItem}
+              />
+            ) : (
+              <Chip
+                avatar={<Avatar>-</Avatar>}
+                label={question.name}
+                color="inherit"
+                className={classes.questionBarItem}
+              />
+            )
+          )}
         </Toolbar>
       </AppBar>
-      <IconButton
-        onClick={decrementViewPageNo}
-        className={classes.prevPageButton}
-        color="inherit"
-        aria-label="previous page"
-      >
-        <ArrowLeftIcon />
-      </IconButton>
+      {viewPageNo !== 1 && (
+        <IconButton
+          onClick={decrementViewPageNo}
+          className={classes.prevPageButton}
+          color="inherit"
+          aria-label="previous page"
+        >
+          <ArrowLeftIcon />
+        </IconButton>
+      )}
       <Typography
         variant="button"
         gutterBottom
@@ -154,14 +182,16 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
       >
         {`Page ${viewPageNo}`}
       </Typography>
-      <IconButton
-        onClick={incrementViewPageNo}
-        className={classes.nextPageButton}
-        color="inherit"
-        aria-label="next page"
-      >
-        <ArrowRightIcon />
-      </IconButton>
+      {viewPageNo !== script.pages.length && (
+        <IconButton
+          onClick={incrementViewPageNo}
+          className={classes.nextPageButton}
+          color="inherit"
+          aria-label="next page"
+        >
+          <ArrowRightIcon />
+        </IconButton>
+      )}
     </div>
   );
 };

@@ -17,12 +17,15 @@ import {
   Button,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
+  Chip,
+  Avatar
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { lightBlue } from "@material-ui/core/colors";
 
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import Annotator from "./Annotator";
@@ -63,9 +66,13 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       margin: "0 auto"
     },
-    questionsBar: {
+    questionBar: {
+      backgroundColor: lightBlue[50],
       top: "auto",
       bottom: 0
+    },
+    questionBarItem: {
+      marginRight: theme.spacing(1)
     }
   })
 );
@@ -143,7 +150,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     const incrementPageNo = () =>
       setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
     const decrementPageNo = () =>
-      setPageNo(prevPageNo => Math.max(0, prevPageNo - 1));
+      setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
 
     const {
       matriculationNumber,
@@ -178,26 +185,53 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           ))}
         <AppBar
           position="fixed"
-          color="primary"
-          className={classes.questionsBar}
+          color="inherit"
+          className={classes.questionBar}
         >
           <Toolbar>
-            {currentPageQuestions.map(question => (
-              <Button color="inherit">
-                {question.name}: {question.score || "no score"}
-              </Button>
-            ))}
+            <Typography variant="button" className={classes.questionBarItem}>
+              {matriculationNumber} page {pageNo}
+            </Typography>
+            {currentPageQuestions.map(question =>
+              question.score ? (
+                <Chip
+                  avatar={<Avatar>{question.score || "-"}</Avatar>}
+                  label={question.name}
+                  color="primary"
+                  className={classes.questionBarItem}
+                />
+              ) : (
+                <Chip
+                  avatar={<Avatar>-</Avatar>}
+                  label={question.name}
+                  color="inherit"
+                  className={classes.questionBarItem}
+                />
+              )
+            )}
           </Toolbar>
         </AppBar>
-        <IconButton
-          onClick={decrementPageNo}
-          className={classes.prevPageButton}
-          color="inherit"
-          aria-label="previous page"
-        >
-          <ArrowLeftIcon />
-        </IconButton>
-        <Typography
+        {pageNo !== 1 && (
+          <IconButton
+            onClick={decrementPageNo}
+            className={classes.prevPageButton}
+            color="inherit"
+            aria-label="previous page"
+          >
+            <ArrowLeftIcon />
+          </IconButton>
+        )}
+        {pageNo !== pages.length && (
+          <IconButton
+            onClick={incrementPageNo}
+            className={classes.nextPageButton}
+            color="inherit"
+            aria-label="next page"
+          >
+            <ArrowRightIcon />
+          </IconButton>
+        )}
+        {/*<Typography
           variant="button"
           gutterBottom
           align="center"
@@ -206,14 +240,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         >
           {`Page ${pageNo} of ${pages.length}`}
         </Typography>
-        <IconButton
-          onClick={incrementPageNo}
-          className={classes.nextPageButton}
-          color="inherit"
-          aria-label="next page"
-        >
-          <ArrowRightIcon />
-        </IconButton>
+        */}
       </div>
     );
   }
@@ -221,7 +248,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   return (
     <div className={classes.container}>
       <Header />
-      <Typography variant="subtitle1">The script does not exist.</Typography>
+      <Typography variant="subtitle1">An error occurred.</Typography>
     </div>
   );
 };
