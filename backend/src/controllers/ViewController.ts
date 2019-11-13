@@ -94,7 +94,8 @@ function getPagesData(questionIds: number[]) {
     .addSelect("page.imageUrl", "imageUrl")
     .leftJoin("page.annotations", "annotation")
     .addSelect("annotation.id", "annotationId")
-    .addSelect("annotation.layer", "layer");
+    .addSelect("annotation.layer", "layer")
+    .addSelect("pageQuestion.questionId", "questionId");
 }
 
 function getPages(pagesData: any): PageViewData[] {
