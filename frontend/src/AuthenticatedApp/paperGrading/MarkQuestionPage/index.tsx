@@ -95,15 +95,21 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
+  const getScriptViewData = async (questionTemplateId: number) => {
+    setIsLoading(true);
+    const data = await api.questionTemplates.getQuestionToMark(
+      questionTemplateId
+    );
+    setScriptViewData(data);
+    setIsLoading(false);
+  };
+
+  const putMarkData = async (questionId: number, score: number) => {
+    await api.marks.replaceMark(questionId, { score });
+    return score;
+  };
+
   useEffect(() => {
-    const getScriptViewData = async (questionTemplateId: number) => {
-      setIsLoading(true);
-      const data = await api.questionTemplates.getQuestionToMark(
-        questionTemplateId
-      );
-      setScriptViewData(data);
-      setIsLoading(false);
-    };
     getScriptViewData(questionTemplateId);
   }, [refreshFlag]);
 
@@ -159,10 +165,18 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       pages
     } = scriptViewData;
 
-    const currentPage = pages.find(page => page.pageNo === pageNo)!;
-    const currentPageQuestions = descendantQuestions
-      .concat(rootQuestion)
-      .filter(question => currentPage.questionIds.includes(question.id));
+    const getCurrentPageQuestions = () => {
+      const currentPage = pages.find(page => page.pageNo === pageNo)!;
+      const currentPageQuestions =
+        descendantQuestions === undefined ||
+        descendantQuestions === null ||
+        descendantQuestions.length == 0
+          ? [rootQuestion]
+          : descendantQuestions.filter(question =>
+              currentPage.questionIds.includes(question.id)
+            );
+      return currentPageQuestions;
+    };
 
     return (
       <div className={classes.container}>
@@ -192,7 +206,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
             <Typography variant="button" className={classes.questionBarItem}>
               {matriculationNumber} page {pageNo}
             </Typography>
-            {currentPageQuestions.map(question =>
+            {getCurrentPageQuestions().map(question =>
               question.score ? (
                 <Chip
                   avatar={<Avatar>{question.score || "-"}</Avatar>}
