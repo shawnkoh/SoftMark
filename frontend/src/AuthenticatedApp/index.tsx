@@ -8,6 +8,8 @@ import PaperView from "./PaperViewPage";
 import ScriptView from "./paperScripts/ScriptView";
 import theme from "./theme";
 
+import { CanvasWithToolbar } from "../components/Canvas";
+
 const AuthenticatedApp: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
@@ -17,6 +19,17 @@ const AuthenticatedApp: React.FC = () => {
         <Route exact path="/papers" component={PaperIndex} />
         <Route path="/papers/:paper_id" component={PaperView} />
         <Route path="/scripts/:script_id" component={ScriptView} />
+        <Route path="/canvas">
+          <div
+            style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}
+          >
+            <CanvasWithToolbar
+              drawable
+              foregroundAnnotation={[]}
+              backgroundImageSource="https://sscportal.in/sites/default/files/SSC-CGL-Tier-1-Exam-Paper-9-8-2015-morning%20(1).jpeg"
+            />
+          </div>
+        </Route>
         <Route>
           <NotFoundPage isAuthenticated />
         </Route>
