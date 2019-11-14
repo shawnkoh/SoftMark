@@ -133,6 +133,9 @@ const createCanvasStateReducer = ({
       });
       console.log(nextState);
       */
+      nextState = produce(state, draftState => {
+        draftState.lastDist = action.payload.lastDist;
+      });
       onViewChange(action.payload.stagePosition, action.payload.stageScale);
       break;
     case CanvasActionType.SetDraggable:
