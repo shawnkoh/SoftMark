@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import isEqual from "lodash.isequal";
+import isEqual from "lodash/isEqual";
 import clsx from "clsx";
 
 import { Annotation } from "backend/src/types/annotations";
@@ -12,7 +12,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Slider from "@material-ui/core/Slider";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
@@ -92,7 +91,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const defaultScale = 1.0;
   const [scale, setScale] = useState<number>(defaultScale);
   const handleViewChange = (position: Point, scale: number) => {
-    //setPosition(position);
+    setPosition(position);
     setScale(scale);
   };
   const handleZoomOutClick = event =>
