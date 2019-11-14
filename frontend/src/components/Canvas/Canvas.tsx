@@ -1,4 +1,10 @@
-import React, { useReducer, useCallback, useRef, useEffect } from "react";
+import React, {
+  useReducer,
+  useCallback,
+  useRef,
+  useEffect,
+  useState
+} from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 import isEqual from "lodash.isequal";
@@ -235,20 +241,28 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const stageRef = useRef<any>(null);
 
+  const [isPointerDown, setIsPointerDown] = useState(false);
+  const pointerDown = () => setIsPointerDown(true);
+  const pointerUp = () => setIsPointerDown(false);
+
   const handleMouseDown = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.BeginLine });
     } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
       dispatch({ type: CanvasActionType.BeginErase });
-    } else if ((mode as CanvasMode) === CanvasMode.View) {
-      dispatch({
-        type: CanvasActionType.SetDraggable,
-        payload: true
-      });
     }
+
+    dispatch({
+      type: CanvasActionType.SetDraggable,
+      payload: true
+    });
   };
 
   const handleMouseMove = event => {
+    dispatch({
+      type: CanvasActionType.SetDraggable,
+      payload: true
+    });
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       const currentStageRef = stageRef.current;
       if (currentStageRef) {
@@ -256,84 +270,76 @@ const Canvas: React.FC<CanvasProps> = ({
         const point = getRelativePointerPosition(stage);
         dispatch({ type: CanvasActionType.ContinueLine, payload: point });
       }
-    } else if ((mode as CanvasMode) === CanvasMode.View) {
-      dispatch({
-        type: CanvasActionType.SetDraggable,
-        payload: true
-      });
-    }
+    } 
   };
 
   const handleMouseUp = event => {
+    console.log("handle mouse up");
     if ((mode as CanvasMode) === CanvasMode.Pen) {
       dispatch({ type: CanvasActionType.EndLine });
     } else if ((mode as CanvasMode) === CanvasMode.Eraser) {
       dispatch({ type: CanvasActionType.EndErase });
-    } else if ((mode as CanvasMode) === CanvasMode.View) {
-      dispatch({
-        type: CanvasActionType.SetDraggable,
-        payload: true
-      });
-    }
+    } 
   };
 
   const handleMouseWheel = event => {
+    console.log("handle mouse wheel");
     event.evt.preventDefault();
     const currentStageRef = stageRef.current;
     if (currentStageRef) {
-      if ((mode as CanvasMode) === CanvasMode.View) {
-        const stage: any = currentStageRef.getStage();
+      const stage: any = currentStageRef.getStage();
 
-        // adapted from Inspoboard code courtesy of Jian Jie @liaujianjie
-        if (event.evt.ctrlKey) {
-          const oldScale = stage.scaleX();
+      // adapted from Inspoboard code courtesy of Jian Jie @liaujianjie
 
-          const mousePointTo = {
-            x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-            y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
-          };
+      if (event.evt.ctrlKey) {
+        const oldScale = stage.scaleX();
 
-          const unboundedNewScale = oldScale - event.evt.deltaY * 0.01;
-          let newScale = unboundedNewScale;
-          if (unboundedNewScale < 0.1) {
-            newScale = 0.1;
-          } else if (unboundedNewScale > 10.0) {
-            newScale = 10.0;
-          }
+        const mousePointTo = {
+          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+        };
 
-          const newPosition = {
-            x:
-              -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
-              newScale,
-            y:
-              -(mousePointTo.y - stage.getPointerPosition().y / newScale) *
-              newScale
-          };
-
-          dispatch({
-            type: CanvasActionType.PanZoom,
-            payload: {
-              stageScale: newScale,
-              stagePosition: newPosition,
-              lastDist: canvasState.lastDist
-            }
-          });
-        } else {
-          const dragDistanceScale = 0.75;
-          const newPosition = {
-            x: position.x - dragDistanceScale * event.evt.deltaX,
-            y: position.y - dragDistanceScale * event.evt.deltaY
-          };
-
-          dispatch({
-            type: CanvasActionType.PanZoom,
-            payload: {
-              stageScale: scale,
-              stagePosition: newPosition,
-              lastDist: canvasState.lastDist
-            }
-          });
+        const unboundedNewScale = oldScale - event.evt.deltaY * 0.01;
+        let newScale = unboundedNewScale;
+        if (unboundedNewScale < 0.1) {
+          newScale = 0.1;
+        } else if (unboundedNewScale > 10.0) {
+          newScale = 10.0;
         }
+
+        const newPosition = {
+          x:
+            -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
+            newScale,
+          y:
+            -(mousePointTo.y - stage.getPointerPosition().y / newScale) *
+            newScale
+        };
+
+        dispatch({
+          type: CanvasActionType.PanZoom,
+          payload: {
+            stageScale: newScale,
+            stagePosition: newPosition,
+            lastDist: canvasState.lastDist
+          }
+        });
+      } else {
+        const dragDistanceScale = 0.75;
+
+        const newPosition = {
+          x: position.x - dragDistanceScale * event.evt.deltaX,
+          y: position.y - dragDistanceScale * event.evt.deltaY
+        };
+
+        dispatch({
+          type: CanvasActionType.PanZoom,
+          payload: {
+            stageScale: scale,
+            stagePosition: newPosition,
+            lastDist: canvasState.lastDist
+          }
+        });
       }
     }
   };
@@ -444,6 +450,7 @@ const Canvas: React.FC<CanvasProps> = ({
   };
 
   const handleDrag = event => {
+    console.log("handle drag");
     dispatch({
       type: CanvasActionType.Drag,
       payload: { x: event.target.x(), y: event.target.y() }
