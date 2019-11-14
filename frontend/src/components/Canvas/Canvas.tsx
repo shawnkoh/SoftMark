@@ -1,6 +1,7 @@
 import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
+import isEqual from "lodash.isequal";
 
 import { AnnotationLine, Annotation } from "backend/src/types/annotations";
 import { Point, CanvasMode, CanvasProps } from "./types";
@@ -43,8 +44,6 @@ type CanvasAction =
 interface CanvasState {
   lines: AnnotationLine[];
   isDrawing: boolean;
-  stageScale: number;
-  stagePosition: Point;
   lastDist: number;
   draggable: boolean;
 }
@@ -53,10 +52,15 @@ const createCanvasStateReducer = ({
   penColor,
   penWidth,
   onForegroundAnnotationChange,
-  onViewChange
+  onViewChange,
+  scale
 }: Pick<
   CanvasProps,
-  "penColor" | "penWidth" | "onForegroundAnnotationChange" | "onViewChange"
+  | "penColor"
+  | "penWidth"
+  | "onForegroundAnnotationChange"
+  | "onViewChange"
+  | "scale"
 >) => (state: CanvasState, action: CanvasAction): CanvasState => {
   let nextState = state;
   let hasForegroundAnnotationChanged = false;
@@ -113,17 +117,26 @@ const createCanvasStateReducer = ({
       hasForegroundAnnotationChanged = true;
       break;
     case CanvasActionType.Drag:
+      /*
       nextState = produce(state, draftState => {
         draftState.stagePosition = action.payload;
       });
+      */
+      onViewChange(action.payload, scale);
       break;
     case CanvasActionType.PanZoom:
+      /*
       nextState = produce(state, draftState => {
         draftState.stageScale = action.payload.stageScale;
         draftState.stagePosition = action.payload.stagePosition;
         draftState.lastDist = action.payload.lastDist;
       });
-      onViewChange(nextState.stagePosition, nextState.stageScale);
+      console.log(nextState);
+      */
+      nextState = produce(state, draftState => {
+        draftState.lastDist = action.payload.lastDist;
+      });
+      onViewChange(action.payload.stagePosition, action.payload.stageScale);
       break;
     case CanvasActionType.SetDraggable:
       nextState = {
@@ -157,8 +170,6 @@ const Canvas: React.FC<CanvasProps> = ({
   const initialCanvasState = {
     lines: foregroundAnnotation,
     isDrawing: false,
-    stageScale: scale,
-    stagePosition: position,
     lastDist: 0,
     draggable: false
   };
@@ -168,9 +179,10 @@ const Canvas: React.FC<CanvasProps> = ({
       penColor,
       penWidth,
       onForegroundAnnotationChange,
-      onViewChange
+      onViewChange,
+      scale
     }),
-    [penColor, penWidth, onForegroundAnnotationChange]
+    [penColor, penWidth, onForegroundAnnotationChange, onViewChange]
   );
 
   const [canvasState, dispatch] = useReducer(
@@ -179,7 +191,9 @@ const Canvas: React.FC<CanvasProps> = ({
   );
 
   useEffect(() => {
-    if (foregroundAnnotation !== canvasState.lines) {
+    console.log("foregroundAnnotation effect raised");
+    if (!isEqual(foregroundAnnotation, canvasState.lines)) {
+      console.log("foregroundAnnotation effect dispatches");
       dispatch({
         type: CanvasActionType.ReplaceForegroundAnnotation,
         payload: foregroundAnnotation
@@ -187,21 +201,37 @@ const Canvas: React.FC<CanvasProps> = ({
     }
   }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
 
+  /*
   useEffect(() => {
-    if (
-      position !== canvasState.stagePosition ||
-      scale !== canvasState.stageScale
-    ) {
+    console.log("position effect raised");
+    if (!(isEqual(position, canvasState.stagePosition))) {
+      console.log("position effect dispatches");
       dispatch({
         type: CanvasActionType.PanZoom,
         payload: {
           stagePosition: position,
+          stageScale: canvasState.stageScale,
+          lastDist: canvasState.lastDist
+        }
+      });
+    }
+  }, [position]); // Ignore warning - do not change dependency array!
+
+  useEffect(() => {
+    console.log("scale effect raised");
+    if (!(isEqual(scale, canvasState.stageScale))) {
+      console.log(`scale effect dispatches, scale:${scale}, stageScale:${canvasState.stageScale}`);
+      dispatch({
+        type: CanvasActionType.PanZoom,
+        payload: {
+          stagePosition: canvasState.stagePosition,
           stageScale: scale,
           lastDist: canvasState.lastDist
         }
       });
     }
-  }, [position, scale]); // Ignore warning - do not change dependency array!
+  }, [scale]); // Ignore warning - do not change dependency array!
+  */
 
   const stageRef = useRef<any>(null);
 
@@ -291,17 +321,14 @@ const Canvas: React.FC<CanvasProps> = ({
         } else {
           const dragDistanceScale = 0.75;
           const newPosition = {
-            x:
-              canvasState.stagePosition.x -
-              dragDistanceScale * event.evt.deltaX,
-            y:
-              canvasState.stagePosition.y - dragDistanceScale * event.evt.deltaY
+            x: position.x - dragDistanceScale * event.evt.deltaX,
+            y: position.y - dragDistanceScale * event.evt.deltaY
           };
 
           dispatch({
             type: CanvasActionType.PanZoom,
             payload: {
-              stageScale: canvasState.stageScale,
+              stageScale: scale,
               stagePosition: newPosition,
               lastDist: canvasState.lastDist
             }
@@ -350,8 +377,8 @@ const Canvas: React.FC<CanvasProps> = ({
             dispatch({
               type: CanvasActionType.PanZoom,
               payload: {
-                stageScale: canvasState.stageScale,
-                stagePosition: canvasState.stagePosition,
+                stageScale: scale,
+                stagePosition: position,
                 lastDist: dist
               }
             });
@@ -404,8 +431,8 @@ const Canvas: React.FC<CanvasProps> = ({
       dispatch({
         type: CanvasActionType.PanZoom,
         payload: {
-          stageScale: canvasState.stageScale,
-          stagePosition: canvasState.stagePosition,
+          stageScale: scale,
+          stagePosition: position,
           lastDist: 0
         }
       });
@@ -440,10 +467,10 @@ const Canvas: React.FC<CanvasProps> = ({
       ref={stageRef}
       width={width}
       height={height}
-      scaleX={canvasState.stageScale}
-      scaleY={canvasState.stageScale}
-      x={canvasState.stagePosition.x}
-      y={canvasState.stagePosition.y}
+      scaleX={scale}
+      scaleY={scale}
+      x={position.x}
+      y={position.y}
       draggable={
         (mode as CanvasMode) === CanvasMode.View && canvasState.draggable
       }

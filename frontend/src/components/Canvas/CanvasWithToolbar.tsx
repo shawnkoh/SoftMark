@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import isEqual from "lodash.isequal";
+import clsx from "clsx";
 
 import { Annotation } from "backend/src/types/annotations";
+import { Point, CanvasMode, CanvasProps } from "./types";
 
-import clsx from "clsx";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import AppBar from "@material-ui/core/AppBar";
@@ -23,7 +25,6 @@ import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 
 import CanvasContainer from "./CanvasContainer";
-import { Point, CanvasMode, CanvasProps } from "./types";
 
 type DrilledProps = Partial<
   Pick<
@@ -71,11 +72,15 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const [thisForegroundAnnotation, setThisForegroundAnnotation] = useState<
     Annotation
   >(foregroundAnnotation);
+
   useEffect(() => {
-    if (foregroundAnnotation !== thisForegroundAnnotation) {
+    console.log("toolbar effect raised");
+    if (!isEqual(foregroundAnnotation, thisForegroundAnnotation)) {
+      console.log("toolbar effect dispatched");
       setThisForegroundAnnotation(foregroundAnnotation);
     }
   }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
+
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state
     onForegroundAnnotationChange(annotation); // callback upwards
