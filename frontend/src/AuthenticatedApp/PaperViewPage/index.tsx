@@ -16,6 +16,7 @@ import ScriptsSubpage from "./subpages/Scripts";
 import ScriptMapping from "../paperSetup/ScriptMapping";
 import ScriptTemplateView from "../paperSetup/ScriptTemplateView";
 import { MarkQuestionPage } from "../paperGrading";
+import { ScriptViewPage } from "../paperScripts";
 import QuestionAllocationPage from "AuthenticatedApp/QuestionAllocationPage";
 
 const SETUP = "setup";
@@ -80,6 +81,7 @@ const PaperView: React.FC = () => {
           path={`${path}/grading/:questionTemplateId`}
           component={MarkQuestionPage}
         />
+        <Route path={`${path}/scripts/:scriptId`} component={ScriptViewPage} />
         <Route path={`${path}/setup`}>
           {(routeProps: RouteComponentProps) => (
             <>

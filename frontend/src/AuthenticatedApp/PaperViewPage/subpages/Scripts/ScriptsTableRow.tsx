@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { Link } from "react-router-dom";
 
 import * as Yup from "yup";
 import { PaperUserListData } from "../../../../types/paperUsers";
@@ -41,7 +42,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
       <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
       <TableCell>
         <Tooltip title={`View script of ${matriculationNumber}`}>
-          <IconButton onClick={() => props.history.push(`scripts/${id}/view`)}>
+          <IconButton component={Link} to={`scripts/${id}`}>
             <RightArrow />
           </IconButton>
         </Tooltip>

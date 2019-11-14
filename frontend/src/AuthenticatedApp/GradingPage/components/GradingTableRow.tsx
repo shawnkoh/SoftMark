@@ -1,4 +1,4 @@
-import { IconButton, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import { Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
 import { Link } from "react-router-dom";
 import { RouteComponentProps, withRouter } from "react-router";
@@ -43,12 +43,12 @@ const GradingTableRow: React.FC<Props> = props => {
       </TableCell>
       <TableCell>
         <Tooltip title={`Continue grading`}>
-          <Link
+          <Button
+            component={Link}
             to={`/papers/${paperId}/grading/${questionTemplate.id}`}
-            style={{ textDecoration: "none" }}
           >
-            <IconButton>Grade</IconButton>
-          </Link>
+            Grade
+          </Button>
         </Tooltip>
       </TableCell>
     </TableRow>

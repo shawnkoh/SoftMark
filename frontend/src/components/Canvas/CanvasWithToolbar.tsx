@@ -92,7 +92,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const defaultScale = 1.0;
   const [scale, setScale] = useState<number>(defaultScale);
   const handleViewChange = (position: Point, scale: number) => {
-    setPosition(position);
+    //setPosition(position);
     setScale(scale);
   };
   const handleZoomOutClick = event =>
