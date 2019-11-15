@@ -19,6 +19,7 @@ import {
   InviteTokenSignedPayload
 } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import { sendInviteEmail } from "../utils/sendgrid";
 import { sortByMatricNo, sortPaperUserByName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
@@ -44,25 +45,19 @@ export async function create(request: Request, response: Response) {
 
     const user =
       (await getRepository(User).findOne({ email, discardedAt: IsNull() })) ||
-      new User(email);
+      new User(email, undefined, name);
     const paperUser =
       (await getRepository(PaperUser).findOne({
         user,
         role,
         discardedAt: Not(IsNull())
-      })) || new PaperUser(paper, user, role);
+      })) || new PaperUser(paper, user, role, false, matriculationNumber);
 
-    if (name) {
-      user.name = name;
-    }
     const userErrors = await validate(user);
     if (userErrors.length > 0) {
       return response.sendStatus(400);
     }
 
-    if (matriculationNumber) {
-      paperUser.matriculationNumber = matriculationNumber.toUpperCase();
-    }
     paperUser.discardedAt = null;
     const errors = await validate(paperUser);
     if (errors.length > 0) {
@@ -76,7 +71,11 @@ export async function create(request: Request, response: Response) {
     });
 
     const data = await paperUser.getData();
-    //sendNewPaperUserEmail(paperUser); to be added later
+
+    if (role === PaperUserRole.Marker) {
+      sendInviteEmail(paperUser, "7d");
+    }
+
     return response.status(201).json({ paperUser: data });
   } catch (error) {
     return response.sendStatus(400);
