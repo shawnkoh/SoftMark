@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { PaperUserRole, isPaperUserListData } from "../types/paperUsers";
 import { PaperData } from "../types/papers";
+import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
