@@ -1,14 +1,25 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getManager, getRepository, IsNull, Not } from "typeorm";
+import {
+  createQueryBuilder,
+  getManager,
+  getRepository,
+  IsNull,
+  Not
+} from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
+import { selectPaperData } from "../selectors/papers";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
-import { AccessTokenSignedPayload } from "../types/tokens";
+import {
+  AccessTokenSignedPayload,
+  InviteTokenSignedPayload
+} from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
-import { sortPaperUserByName, sortByMatricNo } from "../utils/sorts";
+import { sortByMatricNo, sortPaperUserByName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -309,4 +320,69 @@ export async function undiscard(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(400);
   }
+}
+
+export async function checkInvite(request: Request, response: Response) {
+  const payload = response.locals.payload as InviteTokenSignedPayload;
+  const { paperUserId } = payload;
+
+  const data = await getRepository(PaperUser)
+    .createQueryBuilder("paperUser")
+    .where("paperUser.id = :paperUserId", { paperUserId })
+    .andWhere("paperUser.discardedAt IS NULL")
+    .innerJoin("paperUser.user", "user", "user.discardedAt IS NULL")
+    .select("user.name", "name")
+    .getOne();
+
+  if (!data) {
+    response.sendStatus(404);
+    return;
+  }
+
+  response.status(200).json({ invite: data });
+}
+
+export async function replyInvite(request: Request, response: Response) {
+  const payload = response.locals.payload as InviteTokenSignedPayload;
+  const { paperUserId } = payload;
+  const {
+    name,
+    accepted
+  }: { name: string | null; accepted: boolean } = request.body;
+
+  if (name) {
+    await createQueryBuilder(User, "user")
+      .innerJoin(
+        "user.paperUsers",
+        "paperUser",
+        "paperUser.id = :paperUserId AND paperUser.discardedAt IS NULL",
+        { paperUserId }
+      )
+      .update()
+      .set({ name })
+      .execute();
+  }
+
+  const partial: QueryDeepPartialEntity<PaperUser> = accepted
+    ? { acceptedInvite: true }
+    : { discardedAt: new Date() };
+
+  await getRepository(PaperUser).update(paperUserId, partial);
+
+  // PaperData
+  const data = await selectPaperData()
+    .innerJoin(
+      "paper.paperUsers",
+      "paperUser",
+      "paperUser.discardedAt IS NULL AND paperUser.id = :paperUserId",
+      { paperUserId }
+    )
+    .getOne();
+
+  if (!data) {
+    response.sendStatus(404);
+    return;
+  }
+
+  response.status(200).json({ invite: data });
 }
