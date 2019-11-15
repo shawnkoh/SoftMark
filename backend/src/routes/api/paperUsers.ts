@@ -6,6 +6,18 @@ import { BearerTokenType } from "../../types/tokens";
 
 export const router = Router();
 
+router.get(
+  "/invite",
+  [checkBearerToken(BearerTokenType.InviteToken)],
+  PaperUsersController.checkInvite
+);
+
+router.post(
+  "/invite",
+  [checkBearerToken(BearerTokenType.InviteToken)],
+  PaperUsersController.replyInvite
+);
+
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.patch("/:id/students", PaperUsersController.updateStudent);
 router.patch("/:id", PaperUsersController.update);
