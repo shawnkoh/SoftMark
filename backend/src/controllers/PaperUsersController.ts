@@ -12,7 +12,6 @@ import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
-import { selectPaperData } from "../selectors/papers";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
 import {
   AccessTokenSignedPayload,
@@ -368,20 +367,20 @@ export async function replyInvite(request: Request, response: Response) {
 
   await getRepository(PaperUser).update(paperUserId, partial);
 
-  // PaperData
-  const data = await selectPaperData()
+  const user = await createQueryBuilder(User, "user")
     .innerJoin(
-      "paper.paperUsers",
+      "user.paperUsers",
       "paperUser",
-      "paperUser.discardedAt IS NULL AND paperUser.id = :paperUserId",
+      "paperUser.id = :paperUserId AND paperUser.discardedAt IS NULL",
       { paperUserId }
     )
     .getOne();
 
-  if (!data) {
+  if (!user) {
     response.sendStatus(404);
     return;
   }
 
-  response.status(200).json({ invite: data });
+  const data = user.createAuthenticationTokens();
+  response.status(200).json(data);
 }
