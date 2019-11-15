@@ -37,7 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     canvasContainer: {
       flexGrow: 1,
-      backgroundColor: "grey"
+      backgroundColor: "grey",
+      touchAction: "none"
     }
   })
 );

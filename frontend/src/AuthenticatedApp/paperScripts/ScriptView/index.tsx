@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: "100vh",
       minWidth: "100vw",
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+      touchAction: "none"
     },
     grow: {
       display: "flex",
