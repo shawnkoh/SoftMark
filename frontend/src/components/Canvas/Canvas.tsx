@@ -1,7 +1,7 @@
 import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
-import isEqual from "lodash.isequal";
+import isEqual from "lodash/isEqual";
 
 import { AnnotationLine, Annotation } from "backend/src/types/annotations";
 import { Point, CanvasMode, CanvasProps } from "./types";
