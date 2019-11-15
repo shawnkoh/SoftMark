@@ -85,13 +85,13 @@ export async function discardPaperUser(id: number): Promise<AxiosResponse> {
 }
 
 export async function checkInvite(token: string) {
-  return client.get<{ invite: InviteData }>("invite", {
+  return client.get<{ invite: InviteData }>(`${URL}/invite`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 }
 
 export async function replyInvite(token: string, data: InvitePostData) {
-  return client.post<AuthenticationData>("invite", data, {
+  return client.post<AuthenticationData>(`${URL}/invite`, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
 }

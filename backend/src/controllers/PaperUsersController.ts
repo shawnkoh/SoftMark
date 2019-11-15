@@ -330,7 +330,7 @@ export async function checkInvite(request: Request, response: Response) {
     .andWhere("paperUser.discardedAt IS NULL")
     .innerJoin("paperUser.user", "user", "user.discardedAt IS NULL")
     .select("user.name", "name")
-    .getOne();
+    .getRawOne();
 
   if (!data) {
     response.sendStatus(404);
