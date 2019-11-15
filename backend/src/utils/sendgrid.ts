@@ -17,6 +17,8 @@ const AUTH_PASSWORDLESS_URL = `${APP_URL}/auth/passwordless`;
 const USERS_PASSWORD_RESET_URL = `${APP_URL}/users/reset_password`;
 const VERIFY_EMAIL_URL = `${APP_URL}/users/verify_email`;
 
+const INVITE_URL = `${APP_URL}/invite`;
+
 function send(user: User, subject: string, message: string) {
   if (!process.env.SENDGRID_API_KEY) {
     return;
@@ -52,17 +54,17 @@ export function sendPasswordlessLoginEmail(user: User) {
   send(user, `[${APP_NAME}] Passwordless Login`, message);
 }
 
-export function sendNewPaperUserEmail(paperUser: PaperUser) {
+export function sendInviteEmail(paperUser: PaperUser, expiresIn: string) {
   const { paper, user } = paperUser;
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = user.createNewPaperUserToken();
+  const token = paperUser.createInviteToken("14d");
 
   const message =
     `<p>You have been invited as a ${paperUser.role} to ${paper.name}</p>` +
     "<br />" +
-    `<p>You may view it by visiting this link ${LOGIN_URL}/${token}</p>`;
+    `<p>You may view it by visiting this link ${INVITE_URL}/${token}</p>`;
 
   send(user, `[${APP_NAME}] Invitation to join`, message);
 }
@@ -87,14 +89,14 @@ export function sendScriptEmail(paperUser: PaperUser) {
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = user.createNewPaperUserToken();
+  const token = paperUser.createInviteToken("7d"); // TODO: change this
 
   const message =
     `<p>Dear ${user.name || "User"}</p>` +
     `<p>You may view your [${paper.name}] script here.</p>` +
     "<br />" +
     `<p>You may view it by <a href='${APP_URL}/scripts/${token}'>clicking on this link</a></p>` +
-    `<p>Alternatively, you may log into your email at ...URL... to view the script</p>`;
+    `<p>Alternatively, you may log into your email at ${LOGIN_URL} to view the script</p>`;
 
-  send(user, `[${APP_NAME}] View your [Paper] marks here!`, message);
+  send(user, `[${APP_NAME}] View your ${paper.name} marks here!`, message);
 }
