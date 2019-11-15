@@ -64,7 +64,7 @@ export function sendInviteEmail(paperUser: PaperUser, expiresIn: string) {
   const message =
     `<p>You have been invited as a ${paperUser.role} to ${paper.name}</p>` +
     "<br />" +
-    `<p>You may view it by visiting this link ${INVITE_URL}/${token}</p>`;
+    `<p>You may view it by <a href='${INVITE_URL}/${token}'>visiting this link</a></p>`;
 
   send(user, `[${APP_NAME}] Invitation to join`, message);
 }
