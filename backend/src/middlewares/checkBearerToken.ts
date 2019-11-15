@@ -45,6 +45,7 @@ export const checkBearerToken = (type: BearerTokenType) => (
         res.sendStatus(401);
         return;
       }
+      break;
 
     case BearerTokenType.PasswordlessToken:
       if (!isPasswordlessTokenSignedPayload(payload)) {
