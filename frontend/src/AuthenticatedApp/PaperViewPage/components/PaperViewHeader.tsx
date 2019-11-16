@@ -40,7 +40,7 @@ const PaperViewHeader: React.FC = () => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h5" className={classes.grow}>
+        <Typography variant="h6" className={classes.grow}>
           {name}
         </Typography>
         <EditPaperModal

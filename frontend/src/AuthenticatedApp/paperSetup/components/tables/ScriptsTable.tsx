@@ -7,7 +7,8 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { ScriptListData } from "backend/src/types/scripts";
@@ -25,9 +26,10 @@ import ScriptsTableRow from "./ScriptTableRow";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
-    overflowX: "auto",
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
+    overflowX: "auto"
+  },
+  margin: {
+    marginBottom: theme.spacing(1)
   }
 }));
 
@@ -131,6 +133,7 @@ const ScriptsTable: React.FC = () => {
         justify="center"
         alignItems="center"
         spacing={1}
+        className={classes.margin}
       >
         <Grid item>
           <SearchBar
@@ -167,7 +170,11 @@ const ScriptsTable: React.FC = () => {
             />
           </Tooltip>
         </Grid>
-        <Grid item>Total scripts: {scripts.length}</Grid>
+        <Grid item>
+          <Typography variant="subtitle1">
+            Total scripts: {scripts.length}
+          </Typography>
+        </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>

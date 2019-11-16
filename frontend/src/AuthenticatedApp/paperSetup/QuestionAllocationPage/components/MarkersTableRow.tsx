@@ -19,11 +19,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { sumArray } from "utils/arrays";
-import api from "../../../api";
-import { getUser } from "../../../store/auth/selectors";
-import { PaperUserListData } from "../../../types/paperUsers";
+import api from "../../../../api";
+import { getUser } from "../../../../store/auth/selectors";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
-import ReversedChip from "../../../components/ReversedChip";
+import ReversedChip from "../../../../components/ReversedChip";
 
 const useStyles = makeStyles(theme => ({
   green: {
@@ -68,7 +68,7 @@ const MarkersTableRow: React.FC<Props> = props => {
     false
   );
   const toggleCanSeeAllocatedQuestions = () =>
-    setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions); 
+    setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions);
 
   const [allocations, setAllocations] = useState<AllocationListData[]>([]);
 

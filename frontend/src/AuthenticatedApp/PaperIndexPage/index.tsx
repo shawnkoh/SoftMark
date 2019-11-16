@@ -6,6 +6,7 @@ import {
   Container,
   Grid,
   IconButton,
+  Hidden,
   Typography,
   Chip
 } from "@material-ui/core";
@@ -19,18 +20,26 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import RoundedButton from "../../components/buttons/RoundedButton";
 import AddPaperModal from "./components/AddPaperModal";
 import Header from "./components/PaperIndexHeader";
 
 const useStyles = makeStyles(theme => ({
-  margin: {
-    marginTop: theme.spacing(4)
+  container: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
+  },
+  marginSmall: {
+    marginTop: theme.spacing(2)
   },
   grow: {
     flexGrow: 1
   },
   cardItem: {
     margin: theme.spacing(2)
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1)
   }
 }));
 
@@ -63,22 +72,38 @@ const PaperIndex: React.FC<Props> = props => {
     <>
       <Header />
       <main>
-        <Container maxWidth={false}>
-          <Box display="flex" alignItems="center" className={classes.margin}>
+        <Container maxWidth={false} className={classes.container}>
+          <Box display="flex" alignItems="center">
             <Typography variant="h4" className={classes.grow}>
               Your Papers
             </Typography>
-            <Button
-              onClick={toggleOpenAddPaperDialog}
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<AddIcon />}
-            >
-              Add Paper
-            </Button>
+            <Hidden smDown>
+              <RoundedButton
+                onClick={toggleOpenAddPaperDialog}
+                variant="outlined"
+                color="primary"
+                size="large"
+                startIcon={<AddIcon />}
+              >
+                Add Paper
+              </RoundedButton>
+            </Hidden>
           </Box>
-          <Grid container spacing={2} className={classes.margin}>
+          <Grid container spacing={2} className={classes.marginSmall}>
+            <Hidden mdUp>
+              <Grid item xs={12}>
+                <RoundedButton
+                  onClick={toggleOpenAddPaperDialog}
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  fullWidth
+                  startIcon={<AddIcon />}
+                >
+                  Add Paper
+                </RoundedButton>
+              </Grid>
+            </Hidden>
             {papers.map(paper => (
               <Grid key={paper.id} item xs={12}>
                 <Card>
@@ -95,15 +120,17 @@ const PaperIndex: React.FC<Props> = props => {
                         {paper.name}
                       </Typography>
                       <Chip color="primary" label={paper.role} />
-                      <Typography
-                        variant="subtitle1"
-                        className={classes.cardItem}
-                      >
-                        {`Created on ${format(
-                          new Date(paper.createdAt),
-                          "d MMM yyyy"
-                        )}`}
-                      </Typography>
+                      <Hidden smDown>
+                        <Typography
+                          variant="subtitle1"
+                          className={classes.cardItem}
+                        >
+                          {`Created on ${format(
+                            new Date(paper.createdAt),
+                            "d MMM yyyy"
+                          )}`}
+                        </Typography>
+                      </Hidden>
                       <IconButton
                         color="primary"
                         edge="end"

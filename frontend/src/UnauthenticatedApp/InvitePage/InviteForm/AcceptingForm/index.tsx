@@ -3,6 +3,7 @@ import { InviteData } from "backend/src/types/paperUsers";
 import { Form, Formik } from "formik";
 import React from "react";
 import * as Yup from "yup";
+import RoundedButton from "../../../../components/buttons/RoundedButton";
 
 interface Props {
   inviteData: InviteData;
@@ -63,7 +64,7 @@ const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
             </Grid>
 
             <Grid item>
-              <Button
+              <RoundedButton
                 color="primary"
                 disabled={isSubmitting}
                 fullWidth
@@ -71,7 +72,7 @@ const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
                 variant="contained"
               >
                 Go
-              </Button>
+              </RoundedButton>
             </Grid>
           </Grid>
         </Form>

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Container,
   Paper,
   Table,
   TableBody,
@@ -9,30 +10,38 @@ import {
   TableRow,
   TableSortLabel
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../api";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import { TableColumn } from "../../components/tables/TableTypes";
-import usePaper from "../../contexts/PaperContext";
-import { PaperUserListData } from "../../types/paperUsers";
-import Header from "../paperSetup/components/PaperSetupHeader";
+import api from "../../../api";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import { TableColumn } from "../../../components/tables/TableTypes";
+import usePaper from "../../../contexts/PaperContext";
+import { PaperUserListData } from "../../../types/paperUsers";
+import Header from "../components/PaperSetupHeader";
 import AddMarkerModal from "./components/AddMarkerModal";
 import MarkersTableRow from "./components/MarkersTableRow";
 
-const useStyles = makeStyles(theme => ({
-  margin: {
-    marginTop: theme.spacing(4)
-  },
-  tableWrapper: {
-    overflowX: "auto",
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      marginTop: theme.spacing(4),
+      marginBottom: theme.spacing(4)
+    },
+    margin: {
+      marginTop: theme.spacing(1)
+    },
+    tableWrapper: {
+      overflowX: "auto"
+    },
+    button: {
+      borderRadius: 48
+    }
+  })
+);
 
 type Props = RouteComponentProps;
 
@@ -106,70 +115,73 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   return (
     <>
       <Header title="Question allocation" />
-      <Paper className={classes.tableWrapper}>
-        Marking team
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columns.map((column, index) => (
-                <TableCell key={index}>
-                  {column.isSortable ? (
-                    <TableSortLabel
-                      active={true}
-                      direction={"desc"}
-                      onClick={() => {}}
-                    >
-                      {column.name}
-                    </TableSortLabel>
-                  ) : (
-                    column.name
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {markers.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={columns.length}>
-                  <br />
-                  <div style={{ textAlign: "center" }}>No students found.</div>
-                  <br />
-                </TableCell>
-              </TableRow>
-            )}
-            {markers.map((marker: PaperUserListData, index: number) => {
-              return (
-                <MarkersTableRow
-                  key={marker.id}
-                  columns={columns.length}
-                  questionTemplates={questionTemplates}
-                  index={index + 1}
-                  marker={marker}
-                  refreshMarkers={refreshMarkers}
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
+      <Container maxWidth={false} className={classes.container}>
         <AddMarkerModal
           paperId={paper.id}
           refreshMarkers={refreshMarkers}
           render={toggleModal => (
-            <Box display="flex" alignItems="center" className={classes.margin}>
+            <Box display="flex" justifyContent="center">
               <Button
                 onClick={toggleModal}
+                variant="contained"
                 color="primary"
-                size="large"
-                fullWidth
                 startIcon={<AddIcon />}
+                className={classes.button}
               >
                 Add Marker
               </Button>
             </Box>
           )}
         />
-      </Paper>
+        <Paper className={clsx(classes.margin, classes.tableWrapper)}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {columns.map((column, index) => (
+                  <TableCell key={index}>
+                    {column.isSortable ? (
+                      <TableSortLabel
+                        active={true}
+                        direction={"desc"}
+                        onClick={() => {}}
+                      >
+                        {column.name}
+                      </TableSortLabel>
+                    ) : (
+                      column.name
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {markers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={columns.length}>
+                    <br />
+                    <div style={{ textAlign: "center" }}>
+                      No students found.
+                    </div>
+                    <br />
+                  </TableCell>
+                </TableRow>
+              )}
+              {markers.map((marker: PaperUserListData, index: number) => {
+                return (
+                  <MarkersTableRow
+                    key={marker.id}
+                    columns={columns.length}
+                    questionTemplates={questionTemplates}
+                    index={index + 1}
+                    marker={marker}
+                    refreshMarkers={refreshMarkers}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Container>
     </>
   );
 };

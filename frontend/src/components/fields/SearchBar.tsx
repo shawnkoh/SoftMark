@@ -253,7 +253,11 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
 
     return (
       <div className={className}>
-        <Paper className={`${classes.root} search-bar`} style={style}>
+        <Paper
+          className={`${classes.root} search-bar`}
+          style={style}
+          elevation={2}
+        >
           <div className={classes.searchContainer}>
             <Autosuggest
               {...autosuggestProps}

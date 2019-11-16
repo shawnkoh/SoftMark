@@ -1,15 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 
-import * as Yup from "yup";
-import { PaperUserListData } from "../../../../types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { IconButton, TableRow, TableCell, Tooltip } from "@material-ui/core";
-import Rig from "@material-ui/icons/Search";
-import RightArrow from "@material-ui/icons/ArrowForwardIos";
+import { Button, TableRow, TableCell, Tooltip } from "@material-ui/core";
 
 interface OwnProps {
   script: ScriptListData;
@@ -42,9 +37,14 @@ const ScriptsTableRow: React.FC<Props> = props => {
       <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
       <TableCell>
         <Tooltip title={`View script of ${matriculationNumber}`}>
-          <IconButton component={Link} to={`scripts/${id}`}>
-            <RightArrow />
-          </IconButton>
+          <Button
+            component={Link}
+            to={`scripts/${id}`}
+            variant="contained"
+            color="primary"
+          >
+            View
+          </Button>
         </Tooltip>
       </TableCell>
     </TableRow>

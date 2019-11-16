@@ -14,7 +14,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
 
 import { OptionsType } from "../../utils/options";
-import { RoundedButton } from "../buttons/StyledButtons";
+import RoundedButton from "../buttons/RoundedButton";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,6 +22,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       alignItems: "center"
+    },
+    button: {
+      marginLeft: theme.spacing(1),
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1)
     }
   })
 );
@@ -250,6 +255,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                         variant="outlined"
                         size="medium"
                         onClick={onCancel}
+                        className={classes.button}
                       >
                         Cancel
                       </RoundedButton>
@@ -261,6 +267,7 @@ const SimpleForm: React.FC<Props<any>> = ({
                         disabled={!isValid || isSubmitting}
                         size="medium"
                         color="primary"
+                        className={classes.button}
                       >
                         Submit
                       </RoundedButton>
