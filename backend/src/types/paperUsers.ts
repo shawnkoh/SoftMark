@@ -34,7 +34,8 @@ export interface PaperUserListData extends DiscardableData {
 }
 
 export interface InviteData {
-  name: string | null;
+  paperName: string;
+  userName: string | null;
 }
 
 export interface InvitePostData {
