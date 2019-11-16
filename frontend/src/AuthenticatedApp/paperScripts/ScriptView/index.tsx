@@ -24,6 +24,7 @@ import { lightBlue } from "@material-ui/core/colors";
 
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import LoadingSpinner from "../../../components/LoadingSpinner";
+import ReversedChip from "../../../components/ReversedChip";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -189,7 +190,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
               {matriculationNumber} Page {pageNo} of {pages.length}
             </Typography>
             {getCurrentPageQuestions().map(question => (
-              <Chip
+              <ReversedChip
                 key={question.id}
                 avatar={<Avatar>{question.score || "-"}</Avatar>}
                 label={question.name}
