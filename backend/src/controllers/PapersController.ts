@@ -18,7 +18,12 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const paperUser = new PaperUser(paper, requesterUserId, PaperUserRole.Owner);
+  const paperUser = new PaperUser(
+    paper,
+    requesterUserId,
+    PaperUserRole.Owner,
+    true
+  );
   const paperUserErrors = await validate(paperUser);
   if (paperUserErrors.length > 0) {
     response.sendStatus(400);
