@@ -6,7 +6,8 @@ import {
   Container,
   Grid,
   IconButton,
-  Typography
+  Typography,
+  Chip
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -93,6 +94,7 @@ const PaperIndex: React.FC<Props> = props => {
                       >
                         {paper.name}
                       </Typography>
+                      <Chip color="primary" label={paper.role} />
                       <Typography
                         variant="subtitle1"
                         className={classes.cardItem}
