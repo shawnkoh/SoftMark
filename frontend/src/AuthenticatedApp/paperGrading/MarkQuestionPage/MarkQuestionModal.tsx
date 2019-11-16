@@ -32,7 +32,7 @@ type Props = OwnProps;
 const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   const classes = useStyles();
 
-  const {name, score, maxScore, topOffset, leftOffset } = question;
+  const { name, score, maxScore, topOffset, leftOffset } = question;
 
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -57,7 +57,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
 
   const handleSave = event => {
     putMarkData(question.id, localScore);
-  }; 
+  };
 
   return (
     <>
@@ -70,7 +70,10 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score: {actualScore !== null ? `${actualScore} / ${maxScore}` : "no score yet"}
+            Current score:{" "}
+            {actualScore !== null
+              ? `${actualScore} / ${maxScore}`
+              : "no score yet"}
           </Typography>
           <div className={classes.slider}>
             <Slider
