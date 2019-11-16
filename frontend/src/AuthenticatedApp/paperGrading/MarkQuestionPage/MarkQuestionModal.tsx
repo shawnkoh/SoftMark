@@ -32,13 +32,16 @@ type Props = OwnProps;
 const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   const classes = useStyles();
 
+  const {name, score, maxScore, topOffset, leftOffset } = question;
+
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const [actualScore, setActualScore] = useState<number | null>(question.score);
-  const [localScore, setLocalScore] = useState<number>(question.score || 0);
+  const [actualScore, setActualScore] = useState<number | null>(score);
+  const [localScore, setLocalScore] = useState<number>(score || 0);
   const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
     setLocalScore(newValue as number);
+    setActualScore(newValue as number);
   };
 
   const putMarkData = async (questionId: number, score: number) => {
@@ -54,7 +57,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
 
   const handleSave = event => {
     putMarkData(question.id, localScore);
-  };
+  }; 
 
   return (
     <>
@@ -63,11 +66,11 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
           id="customized-dialog-title"
           onClose={toggleVisibility}
         >
-          Mark {question.name}
+          Marks for Q{question.name} {maxScore && `(Total marks: ${maxScore})`}
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score: {actualScore || "no score yet"}
+            Current score: {actualScore !== null ? `${actualScore} / ${maxScore}` : "no score yet"}
           </Typography>
           <div className={classes.slider}>
             <Slider
