@@ -47,18 +47,58 @@ const ScriptsSubpage: React.FC = () => {
 
   useEffect(getScripts, [refreshScriptsFlag]);
 
-  const refreshScripts = () => {
-    setTimeout(() => {
-      setRefreshScriptsFlag(refreshScriptsFlag + 1);
-    }, 2500);
-  };
-  const callbackScripts = () => {
-    setTimeout(() => {
-      getScripts();
-    }, 2000);
+  const [searchText, setSearchText] = useState("");
+
+  const ASC = "asc";
+  const DESC = "desc";
+  const [order, setOrder] = React.useState(DESC);
+  const [orderBy, setOrderBy] = React.useState("script");
+  const flag = order + orderBy;
+
+  const tableComparator = (a: ScriptListData, b: ScriptListData) => {
+    let res = 0;
+    const studentA = a.student;
+    const studentB = b.student;
+
+    if (orderBy === "script") {
+      const filenameA = a.filename.toLowerCase();
+      const filenameB = b.filename.toLowerCase();
+      res = filenameA.localeCompare(filenameB);
+    } else if (orderBy === "matric") {
+      const matriculationNumberA = (studentA && studentA.matriculationNumber
+        ? studentA.matriculationNumber
+        : ""
+      ).toLowerCase();
+      const matriculationNumberB = (studentB && studentB.matriculationNumber
+        ? studentB.matriculationNumber
+        : ""
+      ).toLowerCase();
+      res = matriculationNumberA.localeCompare(matriculationNumberB);
+    } else if (orderBy === "score") {
+      res = a.awardedMarks - b.awardedMarks;
+    }
+    if (order === DESC) {
+      res *= -1;
+    }
+    return res;
   };
 
-  const [searchText, setSearchText] = useState("");
+  const sortTable = () => {
+    setScripts(scripts.sort(tableComparator));
+  };
+
+  const sortBy = (str: string) => {
+    if (str === orderBy) {
+      setOrder(order === ASC ? DESC : ASC);
+    } else {
+      setOrder(DESC);
+    }
+    setOrderBy(str);
+  }; 
+
+  useEffect(() => {
+    setTimeout(sortTable, 1000)
+  }, [flag]);
 
   if (isLoadingScripts) {
     return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
@@ -67,11 +107,13 @@ const ScriptsSubpage: React.FC = () => {
   const columns: TableColumn[] = [
     {
       name: "Script (File name)",
-      key: "script"
+      key: "script",
+      isSortable: true
     },
     {
       name: "Student matriculation number",
-      key: "matric"
+      key: "matric",
+      isSortable: true
     },
     {
       name: "Name / Email",
@@ -79,7 +121,8 @@ const ScriptsSubpage: React.FC = () => {
     },
     {
       name: "Score",
-      key: "score"
+      key: "score",
+      isSortable: true
     },
     {
       name: "",
@@ -130,9 +173,11 @@ const ScriptsSubpage: React.FC = () => {
                 <TableCell key={index}>
                   {column.isSortable ? (
                     <TableSortLabel
-                      active={true}
-                      direction={"desc"}
-                      onClick={() => {}}
+                      active={orderBy === column.key}
+                      direction={order === ASC ? ASC : DESC}
+                      onClick={() => {
+                        sortBy(column.key);
+                      }}
                     >
                       {column.name}
                     </TableSortLabel>

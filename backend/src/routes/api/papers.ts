@@ -28,7 +28,10 @@ router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
 
 router.get("/:id/question_templates", QuestionTemplatesController.index);
-router.get("/:id/root_question_templates", QuestionTemplatesController.getRootQuestionTemplates);
+router.get(
+  "/:id/root_question_templates",
+  QuestionTemplatesController.getRootQuestionTemplates
+);
 
 router.post("/:id/script_templates", ScriptTemplatesController.create);
 router.get(
