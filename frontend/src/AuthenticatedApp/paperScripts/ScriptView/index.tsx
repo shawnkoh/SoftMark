@@ -134,38 +134,46 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     );
   }
 
-  if (scriptViewData) {
-    console.log(scriptViewData);
-
-    const incrementPageNo = () =>
-      setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
-    const decrementPageNo = () =>
-      setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
-
-    const {
-      matriculationNumber,
-      rootQuestion,
-      descendantQuestions,
-      pages
-    } = scriptViewData;
-
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
-      const currentPageQuestions =
-        descendantQuestions === undefined ||
-        descendantQuestions === null ||
-        descendantQuestions.length == 0
-          ? [rootQuestion]
-          : descendantQuestions.filter(question =>
-              currentPage.questionIds.includes(question.id)
-            );
-      return currentPageQuestions;
-    };
-
+  if (!scriptViewData) {
     return (
       <div className={classes.container}>
         <Header />
-        {pages.map((page, index) => {
+        <Typography variant="subtitle1">An error occurred.</Typography>
+      </div>
+    );
+  }
+
+  console.log(scriptViewData);
+
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+
+  const {
+    matriculationNumber,
+    rootQuestion,
+    descendantQuestions,
+    pages
+  } = scriptViewData;
+
+  const getCurrentPageQuestions = () => {
+    const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const currentPageQuestions =
+      descendantQuestions === undefined ||
+      descendantQuestions === null ||
+      descendantQuestions.length == 0
+        ? [rootQuestion]
+        : descendantQuestions.filter(question =>
+            currentPage.questionIds.includes(question.id)
+          );
+    return currentPageQuestions;
+  };
+
+  return (
+    <div className={classes.container}>
+      <Header />
+      {pages.map((page, index) => {
           return (
             <div className={classes.grow}>
               {page.pageNo === pageNo && (
@@ -220,14 +228,6 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
             <ArrowRightIcon />
           </IconButton>
         )}
-      </div>
-    );
-  }
-
-  return (
-    <div className={classes.container}>
-      <Header />
-      <Typography variant="subtitle1">An error occurred.</Typography>
     </div>
   );
 };

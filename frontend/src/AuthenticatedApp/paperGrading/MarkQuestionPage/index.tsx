@@ -188,12 +188,9 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       <Header />
       {pages
         .filter(page => page.pageNo === pageNo)
-        .map(page => {
-          console.log(page.imageUrl);
-          return (
+        .map(page =>  (
             <div className={classes.grow}>
               {page.pageNo === pageNo && (
-                <>
                   <Annotator
                     key={page.id}
                     pageId={page.id}
@@ -204,12 +201,9 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
                         : []
                     }
                   />
-                  image
-                  <img src={page.imageUrl} />
-                </>
               )}
             </div>
-          );
+          ))
         })}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>

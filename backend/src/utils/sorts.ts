@@ -49,7 +49,7 @@ export function sortAllocationsByQuestionNameThenPaperUserName(
 ) {
   const questionNameA = a.questionTemplate.name.toLocaleUpperCase();
   const questionNameB = b.questionTemplate.name.toLocaleUpperCase();
-  
+
   const paperUserNameA = (a.paperUser.user.name
     ? a.paperUser.user.name
     : ""
