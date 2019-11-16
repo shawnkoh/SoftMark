@@ -1,10 +1,10 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useHistory, useParams } from "react-router";
-import { toast } from "react-toastify";
-import api from "../../api";
 import softmarkLogo from "../../assets/softmark-logo.svg";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import InviteForm from "./InviteForm";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -17,31 +17,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const InvitePage: React.FC = () => {
   const classes = useStyles();
-  const history = useHistory();
   const { token } = useParams();
-  const [name, setName] = useState<string | null>(null);
+  const history = useHistory();
 
-  const checkInvite = async () => {
-    if (!token) {
-      toast.error("No token provided");
-      history.push("/");
-      return;
-    }
-
-    try {
-      const response = await api.paperUsers.checkInvite(token);
-      // TODO: this api call should log them in too
-      const { invite } = response.data;
-      setName(invite.name);
-    } catch (error) {
-      toast.error("Expired invite");
-      history.push("/");
-    }
-  };
-
-  useEffect(() => {
-    checkInvite();
-  }, [token]);
+  if (!token) {
+    history.push("/");
+    return <LoadingSpinner />;
+  }
 
   return (
     <Grid
@@ -54,16 +36,12 @@ const InvitePage: React.FC = () => {
       className={classes.container}
     >
       <Grid item>
-        <img src={softmarkLogo} />
+        <img src={softmarkLogo} alt={"Softmark Logo"} />
       </Grid>
 
       <Grid item>
-        <Typography component="h1" variant="h5">
-          Sign In
-        </Typography>
+        <InviteForm token={token} />
       </Grid>
-
-      <Grid item>invite form</Grid>
     </Grid>
   );
 };
