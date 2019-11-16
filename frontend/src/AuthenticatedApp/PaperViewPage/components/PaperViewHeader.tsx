@@ -1,13 +1,13 @@
 import { AppBar, IconButton, Toolbar, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import EditIcon from "@material-ui/icons/EditOutlined";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/EditOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
 import React from "react";
+import { useHistory } from "react-router";
 import usePaper from "../../../contexts/PaperContext";
 import DeletePaperModal from "./DeletePaperModal";
 import EditPaperModal from "./EditPaperModal";
-import { useHistory } from "react-router";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,7 +51,6 @@ const PaperViewHeader: React.FC = () => {
           )}
         />
         <DeletePaperModal
-          paper={paper}
           render={toggleModal => (
             <IconButton onClick={toggleModal} color="inherit">
               <DeleteIcon />

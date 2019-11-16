@@ -10,6 +10,7 @@ import { getRefreshToken } from "../localStorage";
 import { setUser } from "../store/auth/actions";
 import { getUser } from "../store/auth/selectors";
 import ForgotPasswordPage from "./ForgotPasswordPage";
+import InvitePage from "./InvitePage";
 import PasswordlessPage from "./PasswordlessPage";
 import ResetPasswordPage from "./ResetPasswordPage";
 import SignInPage from "./SignInPage";
@@ -83,6 +84,8 @@ const UnauthenticatedApp: React.FC = () => {
           path="/users/verify_email/:token"
           component={VerifyAccountPage}
         />
+
+        <Route exact path="/invite/:token" component={InvitePage} />
 
         <Route component={NotFoundPage} />
       </Switch>

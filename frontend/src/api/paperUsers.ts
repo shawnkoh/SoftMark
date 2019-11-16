@@ -1,12 +1,14 @@
 import { AxiosResponse } from "axios";
-
-import client from "./client";
+import { PaperData } from "backend/src/types/papers";
+import { InviteData, InvitePostData } from "backend/src/types/paperUsers";
 import {
-  PaperUserPostData,
-  PaperUserRole,
+  PaperUserData,
   PaperUserListData,
-  PaperUserData
+  PaperUserPostData,
+  PaperUserRole
 } from "../types/paperUsers";
+import client from "./client";
+import { AuthenticationData } from "backend/src/types/auth";
 
 const URL = "/paper_users";
 
@@ -80,4 +82,16 @@ export async function patchStudent(
 
 export async function discardPaperUser(id: number): Promise<AxiosResponse> {
   return client.delete(`${URL}/${id}`);
+}
+
+export async function checkInvite(token: string) {
+  return client.get<{ invite: InviteData }>(`${URL}/invite`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+export async function replyInvite(token: string, data: InvitePostData) {
+  return client.post<AuthenticationData>(`${URL}/invite`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }

@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../../api";
 import {
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
   TextField
 } from "@material-ui/core";
-import { PaperListData } from "backend/src/types/papers";
+import React, { useEffect, useState } from "react";
+import { RouteComponentProps, withRouter } from "react-router";
 import { toast } from "react-toastify";
+import api from "../../../api";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
+import usePaper from "../../../contexts/PaperContext";
 
 interface OwnProps {
-  paper: PaperListData;
   render: any;
 }
 
 type Props = OwnProps & RouteComponentProps;
 
 const DeletePaperModal: React.FC<Props> = props => {
-  const { paper, render } = props;
+  const { render } = props;
+  const paper = usePaper();
   const { id, name } = paper;
 
   const [isOpen, setIsOpen] = useState(false);

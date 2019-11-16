@@ -4,6 +4,7 @@ import {
   BearerTokenType,
   isAccessTokenSignedPayload,
   isBearerToken,
+  isInviteTokenSignedPayload,
   isPasswordlessTokenSignedPayload,
   isRefreshTokenSignedPayload,
   isResetPasswordTokenSignedPayload,
@@ -34,6 +35,13 @@ export const checkBearerToken = (type: BearerTokenType) => (
   switch (type) {
     case BearerTokenType.AccessToken:
       if (!isAccessTokenSignedPayload(payload)) {
+        res.sendStatus(401);
+        return;
+      }
+      break;
+
+    case BearerTokenType.InviteToken:
+      if (!isInviteTokenSignedPayload(payload)) {
         res.sendStatus(401);
         return;
       }

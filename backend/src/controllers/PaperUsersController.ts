@@ -1,14 +1,25 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getManager, getRepository, IsNull, Not } from "typeorm";
+import {
+  createQueryBuilder,
+  getManager,
+  getRepository,
+  IsNull,
+  Not
+} from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
 import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
-import { AccessTokenSignedPayload } from "../types/tokens";
+import {
+  AccessTokenSignedPayload,
+  InviteTokenSignedPayload
+} from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
-import { sortPaperUserByName, sortByMatricNo } from "../utils/sorts";
+import { sendInviteEmail } from "../utils/sendgrid";
+import { sortByMatricNo, sortPaperUserByName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -33,26 +44,24 @@ export async function create(request: Request, response: Response) {
 
     const user =
       (await getRepository(User).findOne({ email, discardedAt: IsNull() })) ||
-      new User(email);
+      new User(email, undefined, name);
     const paperUser =
-      (await getRepository(PaperUser).findOne({
-        user,
-        role,
-        discardedAt: Not(IsNull())
-      })) || new PaperUser(paper, user, role);
+      (await getRepository(PaperUser).findOne(
+        {
+          user,
+          role,
+          discardedAt: Not(IsNull())
+        },
+        { relations: ["user", "paper"] }
+      )) || new PaperUser(paper, user, role, false, matriculationNumber);
 
-    if (name) {
-      user.name = name;
-    }
     const userErrors = await validate(user);
     if (userErrors.length > 0) {
       return response.sendStatus(400);
     }
 
-    if (matriculationNumber) {
-      paperUser.matriculationNumber = matriculationNumber.toUpperCase();
-    }
     paperUser.discardedAt = null;
+    paperUser.acceptedInvite = false;
     const errors = await validate(paperUser);
     if (errors.length > 0) {
       return response.sendStatus(400);
@@ -65,9 +74,14 @@ export async function create(request: Request, response: Response) {
     });
 
     const data = await paperUser.getData();
-    //sendNewPaperUserEmail(paperUser); to be added later
+
+    if (role === PaperUserRole.Marker) {
+      sendInviteEmail(paperUser, "7d");
+    }
+
     return response.status(201).json({ paperUser: data });
   } catch (error) {
+    console.error(error);
     return response.sendStatus(400);
   }
 }
@@ -309,4 +323,69 @@ export async function undiscard(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(400);
   }
+}
+
+export async function checkInvite(request: Request, response: Response) {
+  const payload = response.locals.payload as InviteTokenSignedPayload;
+  const { paperUserId } = payload;
+
+  const data = await getRepository(PaperUser)
+    .createQueryBuilder("paperUser")
+    .where("paperUser.id = :paperUserId", { paperUserId })
+    .andWhere("paperUser.discardedAt IS NULL")
+    .andWhere("paperUser.acceptedInvite = false")
+    .innerJoin("paperUser.user", "user", "user.discardedAt IS NULL")
+    .innerJoin("paperUser.paper", "paper", "paper.discardedAt IS NULL")
+    .select("user.name", "userName")
+    .addSelect("paper.name", "paperName")
+    .getRawOne();
+
+  if (!data) {
+    response.sendStatus(404);
+    return;
+  }
+
+  response.status(200).json({ invite: data });
+}
+
+export async function replyInvite(request: Request, response: Response) {
+  const payload = response.locals.payload as InviteTokenSignedPayload;
+  const { paperUserId } = payload;
+  const {
+    name,
+    accepted
+  }: { name: string | null; accepted: boolean } = request.body;
+
+  if (name) {
+    await createQueryBuilder(User, "user")
+      .innerJoin(
+        "user.paperUsers",
+        "paperUser",
+        "paperUser.id = :paperUserId AND paperUser.discardedAt IS NULL",
+        { paperUserId }
+      )
+      .update()
+      .set({ name })
+      .execute();
+  }
+
+  const partial: QueryDeepPartialEntity<PaperUser> = accepted
+    ? { acceptedInvite: true }
+    : { discardedAt: new Date() };
+
+  await getRepository(PaperUser).update(paperUserId, partial);
+
+  const user = await createQueryBuilder(User, "user")
+    .innerJoin("user.paperUsers", "paperUser", "paperUser.id = :paperUserId", {
+      paperUserId
+    })
+    .getOne();
+
+  if (!user) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const data = user.createAuthenticationTokens();
+  response.status(200).json(data);
 }
