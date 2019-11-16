@@ -67,9 +67,6 @@ export class User extends Discardable {
     return { accessToken, refreshToken };
   };
 
-  createNewPaperUserToken = () =>
-    this.createBearerToken(BearerTokenType.PasswordlessToken, "7 days");
-
   createPasswordlessToken = () =>
     this.createBearerToken(BearerTokenType.PasswordlessToken, "3h");
 

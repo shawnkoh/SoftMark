@@ -23,6 +23,7 @@ import api from "../../../../api";
 import { getUser } from "../../../../store/auth/selectors";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
+import ReversedChip from "../../../components/ReversedChip";
 
 const useStyles = makeStyles(theme => ({
   green: {
@@ -74,8 +75,7 @@ const MarkersTableRow: React.FC<Props> = props => {
   const getAllocations = () => {
     api.allocations
       .getAllocationsOfMarker(marker.id)
-      .then(res => setAllocations(res.data.allocations))
-      .catch(() => toast.error("Question allocation could not be made."));
+      .then(res => setAllocations(res.data.allocations));
   };
 
   const deleteAllocation = (allocationId: number) => {
@@ -156,7 +156,7 @@ const MarkersTableRow: React.FC<Props> = props => {
                 questionTemplate.id
               );
               return (
-                <Chip
+                <ReversedChip
                   variant="outlined"
                   avatar={<Avatar>{questionTemplate.score}</Avatar>}
                   label={"Q" + questionTemplate.name}

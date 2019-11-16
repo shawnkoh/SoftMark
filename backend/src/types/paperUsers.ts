@@ -33,6 +33,16 @@ export interface PaperUserListData extends DiscardableData {
   bookmarkCount: number;
 }
 
+export interface InviteData {
+  paperName: string;
+  userName: string | null;
+}
+
+export interface InvitePostData {
+  name: string | null;
+  accepted: boolean;
+}
+
 export interface PaperUserData extends PaperUserListData {}
 
 export function isPaperUserListData(data: any): data is PaperUserListData {

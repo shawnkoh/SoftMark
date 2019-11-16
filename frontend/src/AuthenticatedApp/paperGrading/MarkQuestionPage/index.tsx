@@ -188,29 +188,21 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       <Header />
       {pages
         .filter(page => page.pageNo === pageNo)
-        .map(page => {
-          console.log(page.imageUrl);
-          return (
-            <div className={classes.grow}>
-              {page.pageNo === pageNo && (
-                <>
-                  <Annotator
-                    key={page.id}
-                    pageId={page.id}
-                    backgroundImageSource={page.imageUrl}
-                    foregroundAnnotation={
-                      page.annotations.length > 0
-                        ? page.annotations[0].layer
-                        : []
-                    }
-                  />
-                  image
-                  <img src={page.imageUrl} />
-                </>
-              )}
-            </div>
-          );
-        })}
+        .map(page => (
+          <div className={classes.grow}>
+            {page.pageNo === pageNo && (
+              <Annotator
+                key={page.id}
+                pageId={page.id}
+                backgroundImageSource={page.imageUrl}
+                foregroundAnnotation={
+                  page.annotations.length > 0 ? page.annotations[0].layer : []
+                }
+              />
+            )}
+          </div>
+        ))}
+      )}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
           <Typography variant="button" className={classes.questionBarItem}>

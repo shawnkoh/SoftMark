@@ -72,7 +72,9 @@ export async function index(request: Request, response: Response) {
 
   const allocations = await getActiveAllocationsByPaperId(paperId);
 
-  const data = await Promise.all(allocations.map(allocation => allocation.getListData()));
+  const data = await Promise.all(
+    allocations.map(allocation => allocation.getListData())
+  );
   response.status(200).json({ allocations: data });
 }
 
@@ -89,8 +91,9 @@ export async function getRootAllocations(request: Request, response: Response) {
     return response.sendStatus(404);
   }
 
-  const data = (await Promise.all(allocations
-    .map(allocation => allocation.getData())))
+  const data = (await Promise.all(
+    allocations.map(allocation => allocation.getData())
+  ))
     .filter(allocation => !allocation.questionTemplate.parentQuestionTemplateId)
     .sort(sortAllocationsByQuestionNameThenPaperUserName);
   response.status(200).json({ allocations: data });
@@ -152,13 +155,14 @@ export async function destroy(request: Request, response: Response) {
 }
 
 /** helper functions */
-async function getActiveScriptTemplate(paperId: number){
+async function getActiveScriptTemplate(paperId: number) {
   return await getRepository(ScriptTemplate).findOneOrFail({
-    paperId, discardedAt: IsNull()
-  })
+    paperId,
+    discardedAt: IsNull()
+  });
 }
 
-async function getActiveQuestionTemplates(paperId: number){
+async function getActiveQuestionTemplates(paperId: number) {
   const activeScriptTemplate = await getActiveScriptTemplate(paperId);
   return await getRepository(QuestionTemplate).find({
     scriptTemplateId: activeScriptTemplate.id,
@@ -166,29 +170,44 @@ async function getActiveQuestionTemplates(paperId: number){
   });
 }
 
-async function getAllocationsByQuestionTemplateIds(questionTemplateIds: number[]){
-  return await getRepository(Allocation)
-  .createQueryBuilder("allocation")
-  .where("allocation.questionTemplateId IN (:...ids)", {
-    ids: questionTemplateIds
-  }).getMany();
+async function getAllocationsByQuestionTemplateIds(
+  questionTemplateIds: number[]
+) {
+  return questionTemplateIds.length > 0
+    ? await getRepository(Allocation)
+        .createQueryBuilder("allocation")
+        .where("allocation.questionTemplateId IN (:...ids)", {
+          ids: questionTemplateIds
+        })
+        .getMany()
+    : [];
 }
 
-async function getActiveRootAllocationsByPaperId(paperId: number){
+async function getActiveRootAllocationsByPaperId(paperId: number) {
   const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
-  const activeRootQuestionTemplates = activeQuestionTemplates.filter(x => !x.parentQuestionTemplateId);
-  const activeRootQuestionTemplateIds = activeRootQuestionTemplates.map(q => q.id);
-  return await getAllocationsByQuestionTemplateIds(activeRootQuestionTemplateIds);
+  const activeRootQuestionTemplates = activeQuestionTemplates.filter(
+    x => !x.parentQuestionTemplateId
+  );
+  const activeRootQuestionTemplateIds = activeRootQuestionTemplates.map(
+    q => q.id
+  );
+  return await getAllocationsByQuestionTemplateIds(
+    activeRootQuestionTemplateIds
+  );
 }
 
-async function getActiveAllocationsByPaperId(paperId: number){
+async function getActiveAllocationsByPaperId(paperId: number) {
   const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
   const activeQuestionTemplateIds = activeQuestionTemplates.map(q => q.id);
   return await getAllocationsByQuestionTemplateIds(activeQuestionTemplateIds);
 }
 
-async function getActiveAllocationsByPaperUserId(paperUserId: number){
+async function getActiveAllocationsByPaperUserId(paperUserId: number) {
   const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
-  const activeAllocations = await getActiveAllocationsByPaperId(paperUser.paperId);
-  return activeAllocations.filter(allocation => allocation.paperUserId === paperUserId);
+  const activeAllocations = await getActiveAllocationsByPaperId(
+    paperUser.paperId
+  );
+  return activeAllocations.filter(
+    allocation => allocation.paperUserId === paperUserId
+  );
 }

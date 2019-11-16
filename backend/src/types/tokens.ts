@@ -2,6 +2,7 @@ export type BearerToken = string;
 
 export enum BearerTokenType {
   AccessToken,
+  InviteToken,
   PasswordlessToken,
   RefreshToken,
   ResetPasswordToken,
@@ -21,6 +22,11 @@ export type AccessTokenPayload = Payload<BearerTokenType.AccessToken> & {
   userId: number;
 };
 export type AccessTokenSignedPayload = AccessTokenPayload & TokenLifespan;
+
+export type InviteTokenPayload = Payload<BearerTokenType.InviteToken> & {
+  paperUserId: number;
+};
+export type InviteTokenSignedPayload = InviteTokenPayload & TokenLifespan;
 
 export type PasswordlessTokenPayload = Payload<
   BearerTokenType.PasswordlessToken
@@ -81,6 +87,21 @@ export function isAccessTokenSignedPayload(
   payload: any
 ): payload is AccessTokenSignedPayload {
   return isAccessTokenPayload(payload) && hasTokenLifespan(payload);
+}
+
+export function isInviteTokenPayload(
+  payload: any
+): payload is InviteTokenPayload {
+  return (
+    typeof payload.paperUserId === "number" &&
+    isPayload(payload, BearerTokenType.InviteToken)
+  );
+}
+
+export function isInviteTokenSignedPayload(
+  payload: any
+): payload is InviteTokenSignedPayload {
+  return isInviteTokenPayload(payload) && hasTokenLifespan(payload);
 }
 
 export function isPasswordlessTokenPayload(

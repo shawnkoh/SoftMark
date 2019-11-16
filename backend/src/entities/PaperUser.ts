@@ -1,12 +1,24 @@
-import { IsNotEmpty, IsEnum, IsString, IsOptional } from "class-validator";
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString
+} from "class-validator";
 import {
   Column,
   Entity,
+  getRepository,
   ManyToOne,
   OneToMany,
-  getRepository,
   Unique
 } from "typeorm";
+import {
+  PaperUserData,
+  PaperUserListData,
+  PaperUserRole
+} from "../types/paperUsers";
+import { BearerTokenType, InviteTokenPayload } from "../types/tokens";
 import { Allocation } from "./Allocation";
 import { Annotation } from "./Annotation";
 import { Bookmark } from "./Bookmark";
@@ -17,11 +29,7 @@ import { Paper } from "./Paper";
 import { Question } from "./Question";
 import { Script } from "./Script";
 import { User } from "./User";
-import {
-  PaperUserRole,
-  PaperUserListData,
-  PaperUserData
-} from "../types/paperUsers";
+import { sign } from "jsonwebtoken";
 
 @Entity()
 @Unique(["paper", "user"])
@@ -32,6 +40,7 @@ export class PaperUser extends Discardable {
     paper: Paper | number,
     user: User | number,
     role: PaperUserRole,
+    acceptedInvite: boolean = false,
     matriculationNumber?: string | null
   ) {
     super();
@@ -46,6 +55,7 @@ export class PaperUser extends Discardable {
       this.user = user;
     }
     this.role = role;
+    this.acceptedInvite = acceptedInvite;
     this.matriculationNumber = matriculationNumber
       ? matriculationNumber.toUpperCase()
       : null;
@@ -76,6 +86,10 @@ export class PaperUser extends Discardable {
   @IsString()
   matriculationNumber: string | null;
 
+  @Column()
+  @IsBoolean()
+  acceptedInvite: boolean;
+
   @OneToMany(type => Allocation, allocation => allocation.paperUser)
   allocations?: Allocation[];
 
@@ -96,6 +110,15 @@ export class PaperUser extends Discardable {
 
   @OneToMany(type => Question, question => question.currentMarker)
   questionsBeingMarked?: Question[];
+
+  createInviteToken = (expiresIn: string) => {
+    const payload: InviteTokenPayload = {
+      tokenType: BearerTokenType.InviteToken,
+      paperUserId: this.id
+    };
+    const token = sign(payload, process.env.JWT_SECRET!, { expiresIn });
+    return token;
+  };
 
   getListData = async (): Promise<PaperUserListData> => ({
     ...this.getBase(),

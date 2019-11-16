@@ -134,100 +134,96 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     );
   }
 
-  if (scriptViewData) {
-    console.log(scriptViewData);
-
-    const incrementPageNo = () =>
-      setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
-    const decrementPageNo = () =>
-      setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
-
-    const {
-      matriculationNumber,
-      rootQuestion,
-      descendantQuestions,
-      pages
-    } = scriptViewData;
-
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
-      const currentPageQuestions =
-        descendantQuestions === undefined ||
-        descendantQuestions === null ||
-        descendantQuestions.length == 0
-          ? [rootQuestion]
-          : descendantQuestions.filter(question =>
-              currentPage.questionIds.includes(question.id)
-            );
-      return currentPageQuestions;
-    };
-
+  if (!scriptViewData) {
     return (
       <div className={classes.container}>
         <Header />
-        {pages.map((page, index) => {
-          return (
-            <div className={classes.grow}>
-              {page.pageNo === pageNo && (
-                <CanvasWithToolbar
-                  key={page.id}
-                  backgroundImageSource={page.imageUrl}
-                  backgroundAnnotations={page.annotations.map(
-                    annotation => annotation["layer"]
-                  )}
-                />
-              )}
-            </div>
-          );
-        })}
-        <AppBar
-          position="fixed"
-          color="inherit"
-          className={classes.questionBar}
-        >
-          <Toolbar>
-            <Typography variant="button" className={classes.questionBarItem}>
-              {matriculationNumber} Page {pageNo} of {pages.length}
-            </Typography>
-            {getCurrentPageQuestions().map(question => (
-              <ReversedChip
-                key={question.id}
-                avatar={<Avatar>{question.score || "-"}</Avatar>}
-                label={question.name}
-                color={question.score ? "primary" : "inherit"}
-                className={classes.questionBarItem}
-              />
-            ))}
-          </Toolbar>
-        </AppBar>
-        {pageNo !== 1 && (
-          <IconButton
-            onClick={decrementPageNo}
-            className={classes.prevPageButton}
-            color="inherit"
-            aria-label="previous page"
-          >
-            <ArrowLeftIcon />
-          </IconButton>
-        )}
-        {pageNo !== pages.length && (
-          <IconButton
-            onClick={incrementPageNo}
-            className={classes.nextPageButton}
-            color="inherit"
-            aria-label="next page"
-          >
-            <ArrowRightIcon />
-          </IconButton>
-        )}
+        <Typography variant="subtitle1">An error occurred.</Typography>
       </div>
     );
   }
 
+  console.log(scriptViewData);
+
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+
+  const {
+    matriculationNumber,
+    rootQuestion,
+    descendantQuestions,
+    pages
+  } = scriptViewData;
+
+  const getCurrentPageQuestions = () => {
+    const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const currentPageQuestions =
+      descendantQuestions === undefined ||
+      descendantQuestions === null ||
+      descendantQuestions.length == 0
+        ? [rootQuestion]
+        : descendantQuestions.filter(question =>
+            currentPage.questionIds.includes(question.id)
+          );
+    return currentPageQuestions;
+  };
+
   return (
     <div className={classes.container}>
       <Header />
-      <Typography variant="subtitle1">An error occurred.</Typography>
+      {pages.map((page, index) => {
+        return (
+          <div className={classes.grow}>
+            {page.pageNo === pageNo && (
+              <CanvasWithToolbar
+                key={page.id}
+                backgroundImageSource={page.imageUrl}
+                backgroundAnnotations={page.annotations.map(
+                  annotation => annotation["layer"]
+                )}
+              />
+            )}
+          </div>
+        );
+      })}
+      <AppBar position="fixed" color="inherit" className={classes.questionBar}>
+        <Toolbar>
+          <Typography variant="button" className={classes.questionBarItem}>
+            {matriculationNumber} Page {pageNo} of {pages.length}
+          </Typography>
+          {getCurrentPageQuestions().map(question => (
+            <ReversedChip
+              key={question.id}
+              avatar={<Avatar>{question.score || "-"}</Avatar>}
+              label={question.name}
+              color={question.score ? "primary" : "inherit"}
+              className={classes.questionBarItem}
+            />
+          ))}
+        </Toolbar>
+      </AppBar>
+      {pageNo !== 1 && (
+        <IconButton
+          onClick={decrementPageNo}
+          className={classes.prevPageButton}
+          color="inherit"
+          aria-label="previous page"
+        >
+          <ArrowLeftIcon />
+        </IconButton>
+      )}
+      {pageNo !== pages.length && (
+        <IconButton
+          onClick={incrementPageNo}
+          className={classes.nextPageButton}
+          color="inherit"
+          aria-label="next page"
+        >
+          <ArrowRightIcon />
+        </IconButton>
+      )}
     </div>
   );
 };
