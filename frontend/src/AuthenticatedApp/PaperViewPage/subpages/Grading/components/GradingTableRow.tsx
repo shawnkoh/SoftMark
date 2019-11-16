@@ -46,6 +46,8 @@ const GradingTableRow: React.FC<Props> = props => {
           <Button
             component={Link}
             to={`/papers/${paperId}/grading/${questionTemplate.id}`}
+            variant="contained"
+            color="primary"
           >
             Grade
           </Button>

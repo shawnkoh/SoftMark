@@ -1,6 +1,6 @@
 import {
   Box,
-  Divider,
+  Container,
   LinearProgress,
   Paper,
   Table,
@@ -12,17 +12,18 @@ import {
   Typography
 } from "@material-ui/core";
 import {
-  QuestionTemplateRootData,
-  QuestionTemplateGradingListData
+  QuestionTemplateGradingListData,
+  QuestionTemplateRootData
 } from "backend/src/types/questionTemplates";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { UserListData } from "backend/src/types/users";
+import clsx from "clsx";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import api from "../../api";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import { TableColumn } from "../../components/tables/TableTypes";
-import usePaper from "../../contexts/PaperContext";
+import api from "../../../../api";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
+import BorderLinearProgress from "../../../../components/BorderLinearProgress";
+import { TableColumn } from "../../../../components/tables/TableTypes";
+import usePaper from "../../../../contexts/PaperContext";
 import GradingTableRow from "./components/GradingTableRow";
 import useStyles from "./styles";
 
@@ -92,7 +93,7 @@ const GradingSubpage: React.FC = () => {
 
   const columns: TableColumn[] = [
     {
-      name: "",
+      name: "Question",
       key: ""
     },
     {
@@ -114,18 +115,20 @@ const GradingSubpage: React.FC = () => {
   ];
 
   return (
-    <>
-      <Typography variant="h6">Marking</Typography>
-      <Divider />
-      <Box justifyContent="center">
-        <LinearProgress
+    <Container maxWidth={false} className={classes.container}>
+      <Typography variant="h4">Marking</Typography>
+      <Box justifyContent="center" className={classes.margin}>
+        <Typography variant="subtitle2" className={classes.margin}>
+          {`${rootQuestionTemplates.length}`} question(s) in total
+        </Typography>
+        <BorderLinearProgress
           value={totalMarkCount / totalQuestionCount}
           color="secondary"
           variant="determinate"
+          className={classes.margin}
         />
-        {`${rootQuestionTemplates.length}`} questions
       </Box>
-      <Paper className={classes.tableWrapper}>
+      <Paper className={clsx(classes.margin, classes.tableWrapper)}>
         <Table>
           <TableHead>
             <TableRow>
@@ -173,7 +176,7 @@ const GradingSubpage: React.FC = () => {
           </TableBody>
         </Table>
       </Paper>
-    </>
+    </Container>
   );
 };
 

@@ -14,7 +14,8 @@ import {
   Box,
   IconButton,
   Card,
-  CardActionArea
+  CardActionArea,
+  Hidden
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
@@ -25,14 +26,21 @@ import Header from "./components/PaperIndexHeader";
 import AddPaperModal from "./components/AddPaperModal";
 
 const useStyles = makeStyles(theme => ({
-  margin: {
-    marginTop: theme.spacing(4)
+  container: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
+  },
+  marginSmall: {
+    marginTop: theme.spacing(2)
   },
   grow: {
     flexGrow: 1
   },
   cardItem: {
     margin: theme.spacing(2)
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1)
   }
 }));
 
@@ -65,22 +73,38 @@ const PaperIndex: React.FC<Props> = props => {
     <>
       <Header />
       <main>
-        <Container maxWidth={false}>
-          <Box display="flex" alignItems="center" className={classes.margin}>
+        <Container maxWidth={false} className={classes.container}>
+          <Box display="flex" alignItems="center">
             <Typography variant="h4" className={classes.grow}>
               Your Papers
             </Typography>
-            <Button
-              onClick={toggleOpenAddPaperDialog}
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<AddIcon />}
-            >
-              Add Paper
-            </Button>
+            <Hidden smDown>
+              <Button
+                onClick={toggleOpenAddPaperDialog}
+                variant="outlined"
+                color="primary"
+                size="large"
+                startIcon={<AddIcon />}
+              >
+                Add Paper
+              </Button>
+            </Hidden>
           </Box>
-          <Grid container spacing={2} className={classes.margin}>
+          <Grid container spacing={2} className={classes.marginSmall}>
+            <Hidden mdUp>
+              <Grid item xs={12}>
+                <Button
+                  onClick={toggleOpenAddPaperDialog}
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  fullWidth
+                  startIcon={<AddIcon />}
+                >
+                  Add Paper
+                </Button>
+              </Grid>
+            </Hidden>
             {papers.map(paper => (
               <Grid key={paper.id} item xs={12}>
                 <Card>

@@ -10,14 +10,14 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 import useStyles from "./styles";
 import PaperViewHeader from "./components/PaperViewHeader";
 import SetupSubpage from "./subpages/Setup";
-import GradingSubpage from "../GradingPage";
+import GradingSubpage from "./subpages/Grading";
 import ScriptsSubpage from "./subpages/Scripts";
 
-import ScriptMapping from "../paperSetup/ScriptMapping";
+import ScriptMapping from "../paperSetup/ScriptMappingPage";
 import ScriptTemplateView from "../paperSetup/ScriptTemplateView";
+import QuestionAllocationPage from "../paperSetup/QuestionAllocationPage";
 import { MarkQuestionPage } from "../paperGrading";
 import { ScriptViewPage } from "../paperScripts";
-import QuestionAllocationPage from "AuthenticatedApp/QuestionAllocationPage";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -49,7 +49,7 @@ const PaperView: React.FC = () => {
         component={Link}
         to={`${url}/${GRADING}`}
         value={GRADING}
-        label="Grading"
+        label="Marking"
         icon={<Check />}
       />
       <BottomNavigationAction

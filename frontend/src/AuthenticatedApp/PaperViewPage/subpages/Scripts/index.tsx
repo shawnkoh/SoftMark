@@ -1,15 +1,17 @@
 import {
-  Grid,
+  Container,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
+  Typography
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { ScriptListData } from "backend/src/types/scripts";
+import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import api from "../../../../api";
 import SearchBar from "../../../../components/fields/SearchBar";
@@ -18,13 +20,20 @@ import { TableColumn } from "../../../../components/tables/TableTypes";
 import usePaper from "../../../../contexts/PaperContext";
 import ScriptsTableRow from "./ScriptsTableRow";
 
-const useStyles = makeStyles(theme => ({
-  tableWrapper: {
-    overflowX: "auto",
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      marginTop: theme.spacing(4),
+      marginBottom: theme.spacing(4)
+    },
+    margin: {
+      marginTop: theme.spacing(2)
+    },
+    tableWrapper: {
+      overflowX: "auto"
+    }
+  })
+);
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
@@ -105,24 +114,18 @@ const ScriptsSubpage: React.FC = () => {
   });
 
   return (
-    <>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-        spacing={1}
-      >
-        <Grid item>
-          <SearchBar
-            value={""}
-            placeholder="Search..."
-            onChange={str => setSearchText(str)}
-          />
-        </Grid>
-        <Grid item>Total scripts: {scripts.length}</Grid>
-      </Grid>
-      <Paper className={classes.tableWrapper}>
+    <Container maxWidth={false} className={classes.container}>
+      <Typography variant="h4">Scripts</Typography>
+      <Typography variant="subtitle2" className={classes.margin}>
+        {scripts.length} scripts in total
+      </Typography>
+      <SearchBar
+        value={""}
+        placeholder="Search..."
+        onChange={str => setSearchText(str)}
+        className={classes.margin}
+      />
+      <Paper className={clsx(classes.margin, classes.tableWrapper)}>
         <Table>
           <TableHead>
             <TableRow>
@@ -159,7 +162,7 @@ const ScriptsSubpage: React.FC = () => {
           </TableBody>
         </Table>
       </Paper>
-    </>
+    </Container>
   );
 };
 

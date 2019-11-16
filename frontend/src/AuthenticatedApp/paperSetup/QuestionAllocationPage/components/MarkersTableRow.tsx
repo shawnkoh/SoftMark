@@ -19,9 +19,9 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { sumArray } from "utils/arrays";
-import api from "../../../api";
-import { getUser } from "../../../store/auth/selectors";
-import { PaperUserListData } from "../../../types/paperUsers";
+import api from "../../../../api";
+import { getUser } from "../../../../store/auth/selectors";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
 
 const useStyles = makeStyles(theme => ({

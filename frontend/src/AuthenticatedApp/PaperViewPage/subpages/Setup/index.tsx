@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(4),
       marginBottom: theme.spacing(4)
     },
+    grid: {
+      marginTop: theme.spacing(2)
+    },
     grow: {
       flexGrow: 1
     }
@@ -142,8 +145,8 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Map student scripts to student list / nominal roll" +
-        (scripts.length === 0 ? " (Upload student scripts first)" : ""),
+        "Map scripts to students" +
+        (scripts.length === 0 ? " (Upload scripts first)" : ""),
       button: (
         <Button
           component={Link}
@@ -158,7 +161,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Set up marking template" +
+        "Set up questions" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
@@ -191,13 +194,9 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   ];
 
   return (
-    <Container maxWidth={false}>
-      <Grid container spacing={4} className={classes.container}>
-        <Grid item xs={12}>
-          <Typography variant="h4" component="h2">
-            Setup
-          </Typography>
-        </Grid>
+    <Container maxWidth={false} className={classes.container}>
+      <Typography variant="h4">Setup</Typography>
+      <Grid container spacing={4} className={classes.grid}>
         {rowDetails.map(row => createGridRow(row))}
       </Grid>
     </Container>

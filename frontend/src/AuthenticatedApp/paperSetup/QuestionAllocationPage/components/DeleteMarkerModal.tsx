@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import * as Yup from "yup";
-import { PaperUserListData } from "../../../types/paperUsers";
+import { PaperUserListData } from "../../../../types/paperUsers";
 import { UserPatchData } from "backend/src/types/users";
-import { discardPaperUser } from "../../../api/paperUsers";
+import { discardPaperUser } from "../../../../api/paperUsers";
 
 import { toast } from "react-toastify";
-import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
+import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 interface OwnProps {
   marker: PaperUserListData;

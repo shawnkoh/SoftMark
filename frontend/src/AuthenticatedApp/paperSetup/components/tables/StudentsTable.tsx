@@ -6,7 +6,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
+  Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
@@ -24,9 +25,10 @@ import StudentsTableRow from "./StudentsTableRow";
 
 const useStyles = makeStyles(theme => ({
   tableWrapper: {
-    overflowX: "auto",
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
+    overflowX: "auto"
+  },
+  margin: {
+    marginBottom: theme.spacing(1)
   }
 }));
 
@@ -111,6 +113,7 @@ const StudentsTable: React.FC = () => {
         justify="center"
         alignItems="center"
         spacing={1}
+        className={classes.margin}
       >
         <Grid item>
           <SearchBar
@@ -136,7 +139,11 @@ const StudentsTable: React.FC = () => {
         <Grid item>
           <AddStudentModal paperId={paper.id} refreshStudents={getStudents} />
         </Grid>
-        <Grid item>Total students: {students.length}</Grid>
+        <Grid item>
+          <Typography variant="subtitle1">
+            Total students: {students.length}
+          </Typography>
+        </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>
