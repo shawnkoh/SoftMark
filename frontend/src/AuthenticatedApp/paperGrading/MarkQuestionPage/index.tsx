@@ -28,6 +28,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { lightBlue } from "@material-ui/core/colors";
 
 import LoadingSpinner from "../../../components/LoadingSpinner";
+import ReversedChip from "../../../components/ReversedChip";
 import Annotator from "./Annotator";
 import MarkQuestionModal from "./MarkQuestionModal";
 
@@ -190,23 +191,26 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         .map(page => {
           console.log(page.imageUrl);
           return (
-          <div className={classes.grow}>
-            {page.pageNo === pageNo && (
-              <>
-              <Annotator
-                key={page.id}
-                pageId={page.id}
-                backgroundImageSource={page.imageUrl}
-                foregroundAnnotation={
-                  page.annotations.length > 0 ? page.annotations[0].layer : []
-                }
-              />
-              image
-              <img src={page.imageUrl}/>
-              </>
-            )}
-          </div>
-        )})}
+            <div className={classes.grow}>
+              {page.pageNo === pageNo && (
+                <>
+                  <Annotator
+                    key={page.id}
+                    pageId={page.id}
+                    backgroundImageSource={page.imageUrl}
+                    foregroundAnnotation={
+                      page.annotations.length > 0
+                        ? page.annotations[0].layer
+                        : []
+                    }
+                  />
+                  image
+                  <img src={page.imageUrl} />
+                </>
+              )}
+            </div>
+          );
+        })}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
           <Typography variant="button" className={classes.questionBarItem}>
@@ -217,7 +221,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
               key={question.id}
               question={question}
               render={(toggleVisibility, score, name) => (
-                <Chip
+                <ReversedChip
                   onClick={toggleVisibility}
                   label={"Q" + name}
                   avatar={<Avatar>{score || "-"}</Avatar>}

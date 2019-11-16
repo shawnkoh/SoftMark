@@ -254,14 +254,7 @@ const Canvas: React.FC<CanvasProps> = ({
           y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
         };
 
-        const unboundedNewScale = oldScale - event.evt.deltaY * 0.01;
-        let newScale = unboundedNewScale;
-        if (unboundedNewScale < 0.1) {
-          newScale = 0.1;
-        } else if (unboundedNewScale > 10.0) {
-          newScale = 10.0;
-        }
-
+        const newScale = oldScale - event.evt.deltaY * 0.01;
         const newPosition = {
           x:
             -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
@@ -368,7 +361,6 @@ const Canvas: React.FC<CanvasProps> = ({
           });
         }
         if (!canvasState.lastPointerPosition) {
-          // canvasState.lastPointerPosition = { x: currX, y: currY };
           dispatch({
             type: CanvasActionType.PanZoom,
             payload: {
