@@ -34,7 +34,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       return SETUP;
     } else if (pathname.includes(GRADING)) {
       return GRADING;
-    } else if (pathname.includes(GRADING)) {
+    } else if (pathname.includes(SCRIPTS)) {
       return SCRIPTS;
     } else {
       return SETUP;
