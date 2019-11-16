@@ -147,100 +147,109 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     );
   }
 
-  if (scriptViewData) {
-    console.log(scriptViewData);
-
-    const incrementPageNo = () =>
-      setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
-    const decrementPageNo = () =>
-      setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
-
-    const {
-      matriculationNumber,
-      rootQuestion,
-      descendantQuestions,
-      pages
-    } = scriptViewData;
-
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
-      const currentPageQuestions =
-        descendantQuestions === undefined ||
-        descendantQuestions === null ||
-        descendantQuestions.length == 0
-          ? [rootQuestion]
-          : descendantQuestions.filter(question =>
-              currentPage.questionIds.includes(question.id)
-            );
-      return currentPageQuestions;
-    };
-
+  if (!scriptViewData) {
     return (
       <div className={classes.container}>
         <Header />
-        {pages
-          .filter(page => page.pageNo === pageNo)
-          .map(page => (
-            <div className={classes.grow}>
-              {page.pageNo === pageNo && (
-                <Annotator
-                  key={page.id}
-                  pageId={page.id}
-                  backgroundImageSource={page.imageUrl}
-                  foregroundAnnotation={
-                    page.annotations.length > 0 ? page.annotations[0].layer : []
-                  }
+        <Typography variant="subtitle1">An error occurred.</Typography>
+      </div>
+    );
+  }
+  console.log(scriptViewData);
+
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+
+  const {
+    matriculationNumber,
+    rootQuestion,
+    descendantQuestions,
+    pages
+  } = scriptViewData;
+
+  const getCurrentPageQuestions = () => {
+    const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const currentPageQuestions =
+      descendantQuestions === undefined ||
+      descendantQuestions === null ||
+      descendantQuestions.length == 0
+        ? [rootQuestion]
+        : descendantQuestions.filter(question =>
+            currentPage.questionIds.includes(question.id)
+          );
+    return currentPageQuestions;
+  };
+
+  return (
+    <div className={classes.container}>
+      <Header />
+      {pages
+        .filter(page => page.pageNo === pageNo)
+        .map(page => {
+          console.log(page.imageUrl);
+          return (
+          <div className={classes.grow}>
+            {page.pageNo === pageNo && (
+              <>
+              <Annotator
+                key={page.id}
+                pageId={page.id}
+                backgroundImageSource={page.imageUrl}
+                foregroundAnnotation={
+                  page.annotations.length > 0 ? page.annotations[0].layer : []
+                }
+              />
+              image
+              <img src={page.imageUrl}/>
+              </>
+            )}
+          </div>
+        )})}
+      <AppBar position="fixed" color="inherit" className={classes.questionBar}>
+        <Toolbar>
+          <Typography variant="button" className={classes.questionBarItem}>
+            {matriculationNumber} page {pageNo}
+          </Typography>
+          {getCurrentPageQuestions().map(question => (
+            <MarkQuestionModal
+              key={question.id}
+              question={question}
+              render={(toggleVisibility, score, name) => (
+                <Chip
+                  onClick={toggleVisibility}
+                  label={"Q" + name}
+                  avatar={<Avatar>{score || "-"}</Avatar>}
+                  color={score ? "primary" : "default"}
+                  className={classes.questionBarItem}
                 />
               )}
-            </div>
+            />
           ))}
-        <AppBar
-          position="fixed"
+        </Toolbar>
+      </AppBar>
+      {pageNo !== 1 && (
+        <IconButton
+          onClick={decrementPageNo}
+          className={classes.prevPageButton}
           color="inherit"
-          className={classes.questionBar}
+          aria-label="previous page"
         >
-          <Toolbar>
-            <Typography variant="button" className={classes.questionBarItem}>
-              {matriculationNumber} page {pageNo}
-            </Typography>
-            {getCurrentPageQuestions().map(question => (
-              <MarkQuestionModal
-                key={question.id}
-                question={question}
-                render={(toggleVisibility, score, name) => (
-                  <Chip
-                    onClick={toggleVisibility}
-                    label={name}
-                    avatar={<Avatar>{score || "-"}</Avatar>}
-                    color={score ? "primary" : "inherit"}
-                    className={classes.questionBarItem}
-                  />
-                )}
-              />
-            ))}
-          </Toolbar>
-        </AppBar>
-        {pageNo !== 1 && (
-          <IconButton
-            onClick={decrementPageNo}
-            className={classes.prevPageButton}
-            color="inherit"
-            aria-label="previous page"
-          >
-            <ArrowLeftIcon />
-          </IconButton>
-        )}
-        {pageNo !== pages.length && (
-          <IconButton
-            onClick={incrementPageNo}
-            className={classes.nextPageButton}
-            color="inherit"
-            aria-label="next page"
-          >
-            <ArrowRightIcon />
-          </IconButton>
-        )}
-        {/*<Typography
+          <ArrowLeftIcon />
+        </IconButton>
+      )}
+      {pageNo !== pages.length && (
+        <IconButton
+          onClick={incrementPageNo}
+          className={classes.nextPageButton}
+          color="inherit"
+          aria-label="next page"
+        >
+          <ArrowRightIcon />
+        </IconButton>
+      )}
+      {/*<Typography
           variant="button"
           gutterBottom
           align="center"
@@ -250,14 +259,6 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           {`Page ${pageNo} of ${pages.length}`}
         </Typography>
         */}
-      </div>
-    );
-  }
-
-  return (
-    <div className={classes.container}>
-      <Header />
-      <Typography variant="subtitle1">An error occurred.</Typography>
     </div>
   );
 };
