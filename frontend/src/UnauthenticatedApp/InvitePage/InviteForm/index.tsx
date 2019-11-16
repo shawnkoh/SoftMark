@@ -10,6 +10,7 @@ import { setAuthenticationTokens } from "../../../api/client";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { setUser } from "../../../store/auth/actions";
 import AcceptingForm from "./AcceptingForm";
+import InvalidInviteSvg from "./undraw_feeling_blue_4b7q.svg";
 
 interface Props {
   token: string;
@@ -48,8 +49,41 @@ const InviteForm: React.FC<Props> = ({ token }) => {
   }
 
   if (!inviteData) {
-    toast.error("Invalid invite");
-    return <p>Invalid invite</p>;
+    return (
+      <Grid
+        container
+        direction="column"
+        justify="center"
+        alignItems="center"
+        spacing={2}
+      >
+        <Grid item>
+          <img
+            src={InvalidInviteSvg}
+            width={260}
+            height={191.78}
+            alt="Invalid Invite SVG"
+          />
+        </Grid>
+
+        <Grid item>
+          <Typography>Invite Invalid</Typography>
+        </Grid>
+
+        <Grid item>
+          <Typography>
+            This invite may be expired, or you might not have permission to
+            join.
+          </Typography>
+        </Grid>
+
+        <Grid item>
+          <Button onClick={() => history.push("/")}>
+            Continue to SoftMark
+          </Button>
+        </Grid>
+      </Grid>
+    );
   }
 
   const { paperName, userName } = inviteData;
@@ -138,7 +172,7 @@ const InviteForm: React.FC<Props> = ({ token }) => {
                   color="primary"
                   disabled={isSubmitting}
                 >
-                  No thanks
+                  No Thanks
                 </Button>
               </Grid>
             </Grid>
