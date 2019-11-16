@@ -46,6 +46,7 @@ client.interceptors.response.use(
         client.defaults.headers.common.Authorization;
       return axios(originalRequest);
     }
+    return axios(error);
   }
 );
 

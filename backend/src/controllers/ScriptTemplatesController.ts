@@ -35,8 +35,7 @@ export async function create(request: Request, response: Response) {
     PaperUserRole.Owner
   );
   if (!allowed) {
-    response.sendStatus(404);
-    return;
+    return response.sendStatus(404);
   }
 
   const activeScriptTemplate = await getRepository(ScriptTemplate).findOne({
@@ -54,8 +53,7 @@ export async function create(request: Request, response: Response) {
     existingScriptTemplate &&
     activeScriptTemplate.id === existingScriptTemplate.id
   ) {
-    response.sendStatus(204);
-    return;
+    return response.sendStatus(204);
   }
 
   if (activeScriptTemplate) {
