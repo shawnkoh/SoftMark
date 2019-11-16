@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
-import { PaperData } from "../types/papers";
+import { selectPaperData } from "../selectors/papers";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -28,21 +28,24 @@ export async function create(request: Request, response: Response) {
   await getRepository(Paper).save(paper);
   await getRepository(PaperUser).save(paperUser);
 
-  const data = await paper.getData(paperUser.role);
+  const data = paper.getData(paperUser.role);
   response.status(201).json({ paper: data });
 }
 
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const paperUsers = await getRepository(PaperUser).find({
-    relations: ["paper"],
-    where: { userId: payload.userId }
-  });
+  const { userId } = payload;
 
-  const data = paperUsers
-    .map(paperUser => paperUser.paper!.getListData(paperUser.role))
-    .filter(paperUserListData => !paperUserListData.discardedAt);
-  response.status(200).json({ paper: data });
+  const data = await selectPaperData()
+    .innerJoin(
+      "paper.paperUsers",
+      "paperUser",
+      "paperUser.userId = :userId AND paperUser.discardedAt IS NULL",
+      { userId }
+    )
+    .getRawMany();
+
+  response.status(200).json({ papers: data });
 }
 
 export async function show(request: Request, response: Response) {
@@ -58,16 +61,7 @@ export async function show(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  let data: PaperData;
-  // TODO: Student check is not tested - waiting for paperUser
-  if (requester.role === PaperUserRole.Student) {
-    data = {
-      ...paper.getListData(requester.role),
-      paperUsers: [await requester.getListData()]
-    };
-  } else {
-    data = await paper.getData(requester.role);
-  }
+  const data = paper.getData(requester.role);
   response.status(200).json({ paper: data });
 }
 

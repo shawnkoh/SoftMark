@@ -1,28 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import clsx from "clsx";
-import { format } from "date-fns";
-
-import api from "../../api";
-import { PaperListData } from "backend/src/types/papers";
-
 import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
   Container,
   Grid,
-  Typography,
-  Button,
-  Box,
   IconButton,
-  Card,
-  CardActionArea
+  Typography
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import { makeStyles } from "@material-ui/core/styles";
-
+import { PaperData } from "backend/src/types/papers";
+import clsx from "clsx";
+import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { RouteComponentProps, withRouter } from "react-router";
+import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import Header from "./components/PaperIndexHeader";
 import AddPaperModal from "./components/AddPaperModal";
+import Header from "./components/PaperIndexHeader";
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -43,7 +40,7 @@ const PaperIndex: React.FC<Props> = props => {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const toggleRefreshFlag = () => setRefreshFlag(refreshFlag + 1);
-  const [papers, setPapers] = useState<PaperListData[]>([]);
+  const [papers, setPapers] = useState<PaperData[]>([]);
   const [isOpenAddPaperDialog, setOpenAddPaperDialog] = useState(false);
   const toggleOpenAddPaperDialog = () =>
     setOpenAddPaperDialog(!isOpenAddPaperDialog);
@@ -52,7 +49,7 @@ const PaperIndex: React.FC<Props> = props => {
     api.papers
       .getPapers()
       .then(resp => {
-        setPapers(resp.data.paper);
+        setPapers(resp.data.papers);
       })
       .finally(() => setIsLoading(false));
   }, [refreshFlag]);

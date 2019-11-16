@@ -1,13 +1,11 @@
 import { AxiosResponse } from "axios";
 import {
-  PaperListData,
   PaperData,
   PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
-
-import client from "./client";
 import { PaperUserData, PaperUserPostData } from "../types/paperUsers";
+import client from "./client";
 
 const URL = "/papers";
 
@@ -18,7 +16,7 @@ export async function createPaper(
 }
 
 export async function getPapers(): Promise<
-  AxiosResponse<{ paper: PaperListData[] }>
+  AxiosResponse<{ papers: PaperData[] }>
 > {
   return client.get(`${URL}`);
 }
