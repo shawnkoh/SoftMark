@@ -46,11 +46,14 @@ export async function create(request: Request, response: Response) {
       (await getRepository(User).findOne({ email, discardedAt: IsNull() })) ||
       new User(email, undefined, name);
     const paperUser =
-      (await getRepository(PaperUser).findOne({
-        user,
-        role,
-        discardedAt: Not(IsNull())
-      })) || new PaperUser(paper, user, role, false, matriculationNumber);
+      (await getRepository(PaperUser).findOne(
+        {
+          user,
+          role,
+          discardedAt: Not(IsNull())
+        },
+        { relations: ["user", "paper"] }
+      )) || new PaperUser(paper, user, role, false, matriculationNumber);
 
     const userErrors = await validate(user);
     if (userErrors.length > 0) {
@@ -58,6 +61,7 @@ export async function create(request: Request, response: Response) {
     }
 
     paperUser.discardedAt = null;
+    paperUser.acceptedInvite = false;
     const errors = await validate(paperUser);
     if (errors.length > 0) {
       return response.sendStatus(400);
@@ -77,6 +81,7 @@ export async function create(request: Request, response: Response) {
 
     return response.status(201).json({ paperUser: data });
   } catch (error) {
+    console.error(error);
     return response.sendStatus(400);
   }
 }
