@@ -333,6 +333,7 @@ export async function checkInvite(request: Request, response: Response) {
     .createQueryBuilder("paperUser")
     .where("paperUser.id = :paperUserId", { paperUserId })
     .andWhere("paperUser.discardedAt IS NULL")
+    .andWhere("paperUser.acceptedInvite = false")
     .innerJoin("paperUser.user", "user", "user.discardedAt IS NULL")
     .innerJoin("paperUser.paper", "paper", "paper.discardedAt IS NULL")
     .select("user.name", "userName")

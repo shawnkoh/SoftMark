@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from "@material-ui/core";
+import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import { InviteData } from "backend/src/types/paperUsers";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -20,7 +20,7 @@ const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
     <Formik
       validateOnBlur={false}
       initialValues={{
-        name: paperName
+        name: userName
       }}
       onSubmit={async (values, { setSubmitting }) => {
         const { name } = values;
@@ -29,7 +29,14 @@ const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
       }}
       validationSchema={validationSchema}
     >
-      {props => (
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        isSubmitting
+      }) => (
         <Form>
           <Grid
             container
@@ -43,7 +50,28 @@ const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
             </Grid>
 
             <Grid item>
-              <Button>Go</Button>
+              <TextField
+                fullWidth
+                id="name"
+                label="Name"
+                onChange={handleChange}
+                required
+                value={values.name}
+                variant="outlined"
+                onBlur={handleBlur}
+              />
+            </Grid>
+
+            <Grid item>
+              <Button
+                color="primary"
+                disabled={isSubmitting}
+                fullWidth
+                type="submit"
+                variant="contained"
+              >
+                Go
+              </Button>
             </Grid>
           </Grid>
         </Form>

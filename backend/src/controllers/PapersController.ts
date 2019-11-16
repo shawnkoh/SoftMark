@@ -40,7 +40,7 @@ export async function index(request: Request, response: Response) {
     .innerJoin(
       "paper.paperUsers",
       "paperUser",
-      "paperUser.userId = :userId AND paperUser.discardedAt IS NULL",
+      "paperUser.userId = :userId AND paperUser.discardedAt IS NULL AND paperUser.acceptedInvite = true",
       { userId }
     )
     .getRawMany();

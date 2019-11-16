@@ -22,7 +22,7 @@ const InviteForm: React.FC<Props> = ({ token }) => {
 
   const [isCheckingInvite, setIsCheckingInvite] = useState(true);
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
-  const [isAccepting, setIsAccepting] = useState(false);
+  const [isAccepting, setAccepting] = useState(false);
 
   useEffect(() => {
     const checkInvite = async () => {
@@ -86,7 +86,7 @@ const InviteForm: React.FC<Props> = ({ token }) => {
     );
   }
 
-  const { paperName, userName } = inviteData;
+  const { paperName } = inviteData;
 
   const replyInvite = async (accepted: boolean, name: string | null) => {
     const postData: InvitePostData = {
@@ -114,12 +114,10 @@ const InviteForm: React.FC<Props> = ({ token }) => {
     <Formik
       validateOnBlur={false}
       initialValues={{
-        accepted: false,
-        name: ""
+        accepted: false
       }}
       onSubmit={async (values, { setSubmitting }) => {
-        const { accepted, name } = values;
-        await replyInvite(accepted, name);
+        await replyInvite(false, null);
         setSubmitting(false);
       }}
     >
@@ -153,12 +151,14 @@ const InviteForm: React.FC<Props> = ({ token }) => {
 
               <Grid item>
                 <Button
-                  type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
                   className="form-submit-btn"
                   disabled={isSubmitting}
+                  onClick={() => {
+                    setAccepting(true);
+                  }}
                 >
                   Join {paperName}
                 </Button>
