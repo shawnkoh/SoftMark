@@ -7,7 +7,7 @@ const APP_NAME = "SoftMark";
 const APP_URL =
   process.env.NODE_ENV === "production"
     ? "https://softmark.io"
-    : "localhost:3000";
+    : "http://localhost:3000";
 
 const LOGIN_URL = `${APP_URL}/login`;
 const PASSWORD_RESET_URL = `${APP_URL}/reset_password`;
