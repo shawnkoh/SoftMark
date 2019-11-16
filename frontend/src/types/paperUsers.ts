@@ -1,6 +1,6 @@
 import { AllocationListData } from "backend/src/types/allocations";
 import { DiscardableData } from "backend/src/types/entities";
-import { UserData } from "backend/src/types//users";
+import { UserData } from "backend/src/types/users";
 
 export enum PaperUserRole {
   Owner = "OWNER",
@@ -31,6 +31,16 @@ export interface PaperUserListData extends DiscardableData {
   allocations: AllocationListData[]; // intentionally nested
   markCount: number;
   bookmarkCount: number;
+}
+
+export interface InviteData {
+  paperName: string;
+  userName: string | null;
+}
+
+export interface InvitePostData {
+  name: string | null;
+  accepted: boolean;
 }
 
 export interface PaperUserData extends PaperUserListData {}
