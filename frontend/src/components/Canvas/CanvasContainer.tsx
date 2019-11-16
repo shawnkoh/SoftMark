@@ -37,7 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     canvasContainer: {
       flexGrow: 1,
-      backgroundColor: "grey"
+      backgroundColor: "grey",
+      touchAction: "none"
     }
   })
 );
@@ -60,21 +61,20 @@ const CanvasContainer: React.FC<Props> = ({
   const [height, setHeight] = useState(0);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
 
-  const checkSize = () => {
-    const currentCanvasContainerRef = canvasContainerRef.current;
-    if (currentCanvasContainerRef) {
-      const width = currentCanvasContainerRef.offsetWidth;
-      const height = currentCanvasContainerRef.offsetHeight;
-      setWidth(width);
-      setHeight(height);
-    }
-  };
-
   useEffect(() => {
+    const checkSize = () => {
+      const currentCanvasContainerRef = canvasContainerRef.current;
+      if (currentCanvasContainerRef) {
+        const width = currentCanvasContainerRef.offsetWidth;
+        const height = currentCanvasContainerRef.offsetHeight;
+        setWidth(width);
+        setHeight(height);
+      }
+    };
     checkSize();
     window.addEventListener("resize", checkSize);
-    return window.removeEventListener("resize", checkSize);
-  });
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
 
   return (
     <div ref={canvasContainerRef} className={classes.canvasContainer}>

@@ -47,7 +47,8 @@ const useStyles = makeStyles((theme: Theme) =>
     container: {
       display: "flex",
       flexDirection: "column",
-      width: "100%"
+      width: "100%",
+      touchAction: "none"
     },
     padding: {
       marginRight: theme.spacing(2)
@@ -73,9 +74,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   >(foregroundAnnotation);
 
   useEffect(() => {
-    console.log("toolbar effect raised");
     if (!isEqual(foregroundAnnotation, thisForegroundAnnotation)) {
-      console.log("toolbar effect dispatched");
       setThisForegroundAnnotation(foregroundAnnotation);
     }
   }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
@@ -103,7 +102,9 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setScale(defaultScale);
   };
 
-  const [canvasMode, setCanvasMode] = useState<CanvasMode>(CanvasMode.View);
+  const [canvasMode, setCanvasMode] = useState<CanvasMode>(
+    drawable ? CanvasMode.Pen : CanvasMode.View
+  );
   const handleCanvasMode = (event: any, newCanvasMode: CanvasMode) => {
     setCanvasMode(newCanvasMode);
   };
@@ -128,14 +129,14 @@ const CanvasWithToolbar: React.FC<Props> = ({
               aria-label="canvas mode"
               className={classes.padding}
             >
-              <ToggleButton value={CanvasMode.View} aria-label="view">
-                <PanIcon />
-              </ToggleButton>
               <ToggleButton value={CanvasMode.Pen} aria-label="pen">
                 <PenIcon />
               </ToggleButton>
               <ToggleButton value={CanvasMode.Eraser} aria-label="eraser">
                 <EraserIcon />
+              </ToggleButton>
+              <ToggleButton value={CanvasMode.View} aria-label="view">
+                <PanIcon />
               </ToggleButton>
             </ToggleButtonGroup>
           )}

@@ -17,6 +17,8 @@ import SignUpPage from "./SignUpPage";
 import theme from "./theme";
 import VerifyAccountPage from "./VerifyAccountPage";
 
+import { CanvasWithToolbar } from "../components/Canvas";
+
 const UnauthenticatedApp: React.FC = () => {
   const user = useSelector(getUser);
   const dispatch = useDispatch();
@@ -50,6 +52,17 @@ const UnauthenticatedApp: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
+        <Route exact path="/canvas">
+          <div
+            style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}
+          >
+            <CanvasWithToolbar
+              drawable
+              foregroundAnnotation={[]}
+              backgroundImageSource="https://sscportal.in/sites/default/files/SSC-CGL-Tier-1-Exam-Paper-9-8-2015-morning%20(1).jpeg"
+            />
+          </div>
+        </Route>
         <Route exact path="/" component={SignInPage} />
         <Route exact path="/login" component={SignInPage} />
         <Route exact path="/signup" component={SignUpPage} />

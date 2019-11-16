@@ -34,7 +34,7 @@ export default class URLImage extends React.Component {
   };
   render() {
     return (
-      <Image
+      <Image 
         x={this.props.x}
         y={this.props.y}
         image={this.state.image}
