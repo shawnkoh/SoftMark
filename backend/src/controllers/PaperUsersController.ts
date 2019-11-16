@@ -370,12 +370,9 @@ export async function replyInvite(request: Request, response: Response) {
   await getRepository(PaperUser).update(paperUserId, partial);
 
   const user = await createQueryBuilder(User, "user")
-    .innerJoin(
-      "user.paperUsers",
-      "paperUser",
-      "paperUser.id = :paperUserId AND paperUser.discardedAt IS NULL",
-      { paperUserId }
-    )
+    .innerJoin("user.paperUsers", "paperUser", "paperUser.id = :paperUserId", {
+      paperUserId
+    })
     .getOne();
 
   if (!user) {
