@@ -329,7 +329,9 @@ export async function checkInvite(request: Request, response: Response) {
     .where("paperUser.id = :paperUserId", { paperUserId })
     .andWhere("paperUser.discardedAt IS NULL")
     .innerJoin("paperUser.user", "user", "user.discardedAt IS NULL")
-    .select("user.name", "name")
+    .innerJoin("paperUser.paper", "paper", "paper.discardedAt IS NULL")
+    .select("user.name", "userName")
+    .addSelect("paper.name", "paperName")
     .getRawOne();
 
   if (!data) {
