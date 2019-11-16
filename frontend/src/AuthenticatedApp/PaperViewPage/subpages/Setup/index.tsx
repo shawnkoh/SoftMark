@@ -9,7 +9,6 @@ import usePaper from "../../../../contexts/PaperContext";
 
 import { Button, Box, Container, Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { RoundedButton } from "../../../../components/buttons/StyledButtons";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
@@ -26,6 +25,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     grow: {
       flexGrow: 1
+    },
+    button: {
+      borderRadius: 24
     }
   })
 );
@@ -107,7 +109,11 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           paperId={paper.id}
           setScriptTemplate={setScriptTemplate}
         >
-          <Button color="primary" variant="contained">
+          <Button
+            color="primary"
+            variant="contained"
+            className={classes.button}
+          >
             {scriptTemplate ? "Re-Upload" : "Upload"}
           </Button>
         </UploadScriptTemplateWrapper>
@@ -124,7 +130,11 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           paperId={paper.id}
           refreshScripts={refreshScripts}
         >
-          <Button color="primary" variant="contained">
+          <Button
+            color="primary"
+            variant="contained"
+            className={classes.button}
+          >
             Upload
           </Button>
         </UploadScriptsWrapper>
@@ -137,7 +147,11 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           paperId={paper.id}
           clickable={!isLoadingScriptTemplate}
         >
-          <Button color="primary" variant="contained">
+          <Button
+            color="primary"
+            variant="contained"
+            className={classes.button}
+          >
             {false ? "Re-Upload" : "Upload"}
           </Button>
         </UploadNominalRollWrapper>
@@ -154,6 +168,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           color="primary"
           variant="contained"
           disabled={scripts.length === 0}
+          className={classes.button}
         >
           Map
         </Button>
@@ -170,6 +185,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
+          className={classes.button}
         >
           Set up
         </Button>
@@ -186,6 +202,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
+          className={classes.button}
         >
           Allocate
         </Button>

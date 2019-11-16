@@ -20,6 +20,7 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import RoundedButton from "../../components/buttons/RoundedButton";
 import AddPaperModal from "./components/AddPaperModal";
 import Header from "./components/PaperIndexHeader";
 
@@ -77,7 +78,7 @@ const PaperIndex: React.FC<Props> = props => {
               Your Papers
             </Typography>
             <Hidden smDown>
-              <Button
+              <RoundedButton
                 onClick={toggleOpenAddPaperDialog}
                 variant="outlined"
                 color="primary"
@@ -85,13 +86,13 @@ const PaperIndex: React.FC<Props> = props => {
                 startIcon={<AddIcon />}
               >
                 Add Paper
-              </Button>
+              </RoundedButton>
             </Hidden>
           </Box>
           <Grid container spacing={2} className={classes.marginSmall}>
             <Hidden mdUp>
               <Grid item xs={12}>
-                <Button
+                <RoundedButton
                   onClick={toggleOpenAddPaperDialog}
                   variant="outlined"
                   color="primary"
@@ -100,7 +101,7 @@ const PaperIndex: React.FC<Props> = props => {
                   startIcon={<AddIcon />}
                 >
                   Add Paper
-                </Button>
+                </RoundedButton>
               </Grid>
             </Hidden>
             {papers.map(paper => (
@@ -119,15 +120,17 @@ const PaperIndex: React.FC<Props> = props => {
                         {paper.name}
                       </Typography>
                       <Chip color="primary" label={paper.role} />
-                      <Typography
-                        variant="subtitle1"
-                        className={classes.cardItem}
-                      >
-                        {`Created on ${format(
-                          new Date(paper.createdAt),
-                          "d MMM yyyy"
-                        )}`}
-                      </Typography>
+                      <Hidden smDown>
+                        <Typography
+                          variant="subtitle1"
+                          className={classes.cardItem}
+                        >
+                          {`Created on ${format(
+                            new Date(paper.createdAt),
+                            "d MMM yyyy"
+                          )}`}
+                        </Typography>
+                      </Hidden>
                       <IconButton
                         color="primary"
                         edge="end"

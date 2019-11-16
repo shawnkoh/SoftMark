@@ -17,6 +17,7 @@ import * as yup from "yup";
 import api from "../../../api";
 import { setUser } from "../../../store/auth/actions";
 import MailSentSvg from "./undraw_Mail_sent_qwwx.svg";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -175,7 +176,7 @@ const SignInForm = () => {
               )}
 
               <Grid item>
-                <Button
+                <RoundedButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -183,7 +184,7 @@ const SignInForm = () => {
                   disabled={isSubmitting}
                 >
                   Log In
-                </Button>
+                </RoundedButton>
               </Grid>
 
               <Grid item>

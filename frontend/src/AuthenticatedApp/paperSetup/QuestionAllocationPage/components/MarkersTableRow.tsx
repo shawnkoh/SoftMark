@@ -23,7 +23,7 @@ import api from "../../../../api";
 import { getUser } from "../../../../store/auth/selectors";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
-import ReversedChip from "../../../components/ReversedChip";
+import ReversedChip from "../../../../components/ReversedChip";
 
 const useStyles = makeStyles(theme => ({
   green: {

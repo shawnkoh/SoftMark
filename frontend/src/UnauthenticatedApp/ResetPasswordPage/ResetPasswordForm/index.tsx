@@ -12,6 +12,7 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../api";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 
 interface Props {
   token: string;
@@ -119,7 +120,7 @@ const ResetPasswordForm: React.FC<Props> = ({ token }) => {
                 </FormControl>
               </Grid>
               <Grid item>
-                <Button
+                <RoundedButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -128,7 +129,7 @@ const ResetPasswordForm: React.FC<Props> = ({ token }) => {
                   disabled={isSubmitting}
                 >
                   Submit
-                </Button>
+                </RoundedButton>
               </Grid>
               <Grid item>
                 <Link href="/login" variant="body2">

@@ -11,6 +11,7 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 import { setUser } from "../../../store/auth/actions";
 import AcceptingForm from "./AcceptingForm";
 import InvalidInviteSvg from "./undraw_feeling_blue_4b7q.svg";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 
 interface Props {
   token: string;
@@ -78,9 +79,9 @@ const InviteForm: React.FC<Props> = ({ token }) => {
         </Grid>
 
         <Grid item>
-          <Button onClick={() => history.push("/")}>
+          <RoundedButton onClick={() => history.push("/")}>
             Continue to SoftMark
-          </Button>
+          </RoundedButton>
         </Grid>
       </Grid>
     );
@@ -150,7 +151,7 @@ const InviteForm: React.FC<Props> = ({ token }) => {
               </Grid>
 
               <Grid item>
-                <Button
+                <RoundedButton
                   fullWidth
                   variant="contained"
                   color="primary"
@@ -161,11 +162,11 @@ const InviteForm: React.FC<Props> = ({ token }) => {
                   }}
                 >
                   Join {paperName}
-                </Button>
+                </RoundedButton>
               </Grid>
 
               <Grid item>
-                <Button
+                <RoundedButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -173,7 +174,7 @@ const InviteForm: React.FC<Props> = ({ token }) => {
                   disabled={isSubmitting}
                 >
                   No Thanks
-                </Button>
+                </RoundedButton>
               </Grid>
             </Grid>
           </form>

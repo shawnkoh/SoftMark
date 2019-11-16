@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import api from "../../../api";
 import { setUser } from "../../../store/auth/actions";
 import { setAuthenticationTokens } from "../../../api/client";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -119,7 +120,7 @@ const SignUpForm: React.FC = () => {
               </Grid>
 
               <Grid item>
-                <Button
+                <RoundedButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -128,7 +129,7 @@ const SignUpForm: React.FC = () => {
                   disabled={isSubmitting}
                 >
                   Register
-                </Button>
+                </RoundedButton>
               </Grid>
 
               <Grid item>

@@ -4,6 +4,7 @@ import React from "react";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import api from "../../../api";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -70,7 +71,7 @@ const ForgotPasswordForm: React.FC = () => {
                 />
               </Grid>
               <Grid item>
-                <Button
+                <RoundedButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -79,7 +80,7 @@ const ForgotPasswordForm: React.FC = () => {
                   disabled={isSubmitting}
                 >
                   Submit
-                </Button>
+                </RoundedButton>
               </Grid>
               <Grid item>
                 <Link href="/login" variant="body2">
