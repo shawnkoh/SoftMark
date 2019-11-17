@@ -35,8 +35,8 @@ const useStyles = makeStyles(theme => ({
   grow: {
     flexGrow: 1
   },
-  cardItem: {
-    margin: theme.spacing(2)
+  cardGrid: {
+    padding: theme.spacing(2)
   },
   extendedIcon: {
     marginRight: theme.spacing(1)
@@ -112,34 +112,38 @@ const PaperIndex: React.FC<Props> = props => {
                       props.history.push(`/papers/${paper.id}/setup`);
                     }}
                   >
-                    <Box display="flex" alignItems="center" flexWrap="wrap">
-                      <Typography
-                        variant="h6"
-                        className={clsx(classes.cardItem, classes.grow)}
-                      >
-                        {paper.name}
-                      </Typography>
-                      <Chip color="primary" label={paper.role} />
-                      <Hidden smDown>
-                        <Typography
-                          variant="subtitle1"
-                          className={classes.cardItem}
-                        >
+                    <Grid
+                      container
+                      direction="row"
+                      justify="space-between"
+                      alignItems="center"
+                      spacing={2}
+                      className={classes.cardGrid}
+                    >
+                      <Grid item className={classes.grow}>
+                        <Typography variant="h6">{paper.name}</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Chip color="primary" label={paper.role} />
+                      </Grid>
+                      <Grid item>
+                        <Typography variant="subtitle1">
                           {`Created on ${format(
                             new Date(paper.createdAt),
                             "d MMM yyyy"
                           )}`}
                         </Typography>
-                      </Hidden>
-                      <IconButton
-                        color="primary"
-                        edge="end"
-                        className={classes.cardItem}
-                        aria-label={`go to ${paper.name}`}
-                      >
-                        <ArrowForwardIcon />
-                      </IconButton>
-                    </Box>
+                      </Grid>
+                      <Grid item>
+                        <IconButton
+                          color="primary"
+                          edge="end"
+                          aria-label={`go to ${paper.name}`}
+                        >
+                          <ArrowForwardIcon />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
                   </CardActionArea>
                 </Card>
               </Grid>
