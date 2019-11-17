@@ -112,7 +112,7 @@ const PaperIndex: React.FC<Props> = props => {
                       props.history.push(`/papers/${paper.id}/setup`);
                     }}
                   >
-                    <Box display="flex" alignItems="center">
+                    <Box display="flex" alignItems="center" flexWrap="wrap">
                       <Typography
                         variant="h6"
                         className={clsx(classes.cardItem, classes.grow)}
