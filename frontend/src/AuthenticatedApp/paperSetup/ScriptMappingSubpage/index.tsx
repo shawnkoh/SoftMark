@@ -13,8 +13,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2)
     },
-    root: {
-      flexGrow: 1
+    tabContainer: {
+      flexGrow: 1,
+      borderRadius: 0
     }
   })
 );
@@ -28,9 +29,14 @@ const ScriptMapping: React.FC = () => {
   return (
     <>
       <Header title="Map scripts to students" />
-      <Paper className={classes.root}>
+      <Paper className={classes.tabContainer}>
         <Container maxWidth={false}>
-          <Tabs value={tabValue} onChange={handleChange}>
+          <Tabs
+            value={tabValue}
+            onChange={handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+          >
             <Tab label="Scripts" />
             <Tab label="Students" />
           </Tabs>

@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
 import UploadIcon from "@material-ui/icons/Publish";
-import MatchIcon from "@material-ui/icons/CallMerge";
+import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import React, { useEffect, useState } from "react";
@@ -121,7 +121,7 @@ const ScriptsTable: React.FC = () => {
 
   return (
     <>
-      <Typography variant="subtitle1" className={classes.margin}>
+      <Typography variant="overline" className={classes.margin}>
         {scripts.length} script(s) in total
       </Typography>
       <Grid

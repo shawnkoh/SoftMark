@@ -5,6 +5,16 @@ import EditIcon from "@material-ui/icons/Edit";
 import { Formik, FormikProps } from "formik";
 import React, { useState } from "react";
 import { ObjectSchema } from "yup";
+import red from "@material-ui/core/colors/red";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    red: {
+      color: red[500]
+    }
+  })
+);
 
 interface OwnProps {
   // The initial values of the form.
@@ -26,6 +36,8 @@ const SingleTextfieldForm: React.FC<Props> = ({
   validationSchema,
   onSubmit
 }) => {
+  const classes = useStyles();
+
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(initialText);
   const initialValues = {};
@@ -118,6 +130,7 @@ const SingleTextfieldForm: React.FC<Props> = ({
                       handleReset(event);
                       setIsEditing(false);
                     }}
+                    className={classes.red}
                   >
                     <CancelIcon />
                   </IconButton>

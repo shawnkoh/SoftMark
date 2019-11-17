@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from "@material-ui/core/styles";
+import red from "@material-ui/core/colors/red";
 import Delete from "@material-ui/icons/Delete";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -26,24 +27,11 @@ import DeleteMarkerModal from "./DeleteMarkerModal";
 import ReversedChip from "../../../../components/ReversedChip";
 
 const useStyles = makeStyles(theme => ({
-  green: {
-    color: "green"
-  },
   red: {
-    color: "red"
-  },
-  grey: {
-    color: "grey"
-  },
-  black: {
-    color: "black"
+    color: red[500]
   },
   chip: {
     marginRight: theme.spacing(2)
-  },
-  unallocatedChip: {
-    marginRight: theme.spacing(2),
-    opacity: 0.4
   }
 }));
 
@@ -160,9 +148,7 @@ const MarkersTableRow: React.FC<Props> = props => {
                   variant="outlined"
                   avatar={<Avatar>{questionTemplate.score}</Avatar>}
                   label={"Q" + questionTemplate.name}
-                  className={
-                    allocationId ? classes.chip : classes.unallocatedChip
-                  }
+                  color={allocationId ? "primary" : "default"}
                   onClick={() => {
                     allocationId
                       ? deleteAllocation(allocationId)

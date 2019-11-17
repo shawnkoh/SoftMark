@@ -1,8 +1,9 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import React, { useState, ReactNode } from "react";
+import { Dialog, DialogContent } from "@material-ui/core";
+import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../../api";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
@@ -52,13 +53,15 @@ const AddStudentModal: React.FC<Props> = props => {
   return (
     <>
       <Dialog open={isOpen} fullWidth onClose={toggleVisibility}>
-        <DialogTitle>Add new student</DialogTitle>
-        <DialogContent>
+        <CustomDialogTitle id="add-student-modal" onClose={toggleVisibility}>
+          Add new student
+        </CustomDialogTitle>
+        <DialogContent dividers>
           <SimpleForm
             initialValues={values}
             formMetadata={formMetadata}
             validationSchema={validationSchema}
-            includeReset={true}
+            includeReset={false}
             onCancel={toggleVisibility}
             onSubmit={(newValues: any) =>
               api.paperUsers

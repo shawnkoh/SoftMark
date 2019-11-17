@@ -98,7 +98,7 @@ const StudentsTable: React.FC = () => {
 
   return (
     <>
-      <Typography variant="subtitle1" className={classes.margin}>
+      <Typography variant="overline" className={classes.margin}>
         {students.length} student(s) in total
       </Typography>
       <Grid
