@@ -140,7 +140,7 @@ describe("PATCH /question_templates/:id", () => {
     const patchData: QuestionTemplatePatchData = {
       name: "3",
       score: 100,
-      parentName: q2Template.name
+      parentQuestionTemplateId: q2Template.id
     };
     const response = await request(server.server)
       .patch(`${fixtures.api}/question_templates/${q1aTemplate.id}`)
