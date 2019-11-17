@@ -236,7 +236,10 @@ export async function update(request: Request, response: Response) {
 
   try {
     if (parentQuestionTemplateId) {
-      questionTemplate.parentQuestionTemplateId = parentQuestionTemplateId;
+      // TypeORM supports assigning parentQuestionTemplate = id
+      // Cannot use questionTemplate.parentQuestionTemplateId because it will throw
+      // a multiple assignment error
+      questionTemplate.parentQuestionTemplate = (parentQuestionTemplateId as unknown) as QuestionTemplate;
     }
     if (questionTemplate.scriptTemplate && pageCovered) {
       const pageTemplates = questionTemplate.scriptTemplate.pageTemplates;
@@ -255,6 +258,7 @@ export async function update(request: Request, response: Response) {
     const data = questionTemplate.getData();
     response.status(200).json({ questionTemplate: data });
   } catch (error) {
+    console.error(error);
     response.sendStatus(400);
   }
 }

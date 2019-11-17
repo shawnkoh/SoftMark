@@ -1,28 +1,19 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
-import { Allocation } from "../../entities/Allocation";
-import { Mark } from "../../entities/Mark";
-import { PaperUserRole } from "../../types/paperUsers";
-import { Question } from "../../entities/Question";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
-import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import {
   AllocationData,
-  isAllocationData,
-  AllocationPostData
+  AllocationPostData,
+  isAllocationData
 } from "../../types/allocations";
 import {
-  QuestionTemplatePatchData,
+  isQuestionTemplateData,
   QuestionTemplateData,
-  isQuestionTemplateData
+  QuestionTemplatePatchData
 } from "../../types/questionTemplates";
-import { isQuestionData, QuestionData } from "../../types/questions";
-import { PaperUser } from "../../entities/PaperUser";
-import { addMinutes } from "date-fns";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
