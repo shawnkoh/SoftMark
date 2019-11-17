@@ -164,7 +164,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       button: (
         <Button
           component={Link}
-          to={`${match.url}/script_mapping`}
+          to={`${match.url}/map`}
           color="primary"
           variant="contained"
           disabled={scripts.length === 0}
@@ -181,7 +181,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       button: (
         <Button
           component={Link}
-          to={`${match.url}/script_template`}
+          to={`${match.url}/template`}
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
@@ -198,7 +198,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       button: (
         <Button
           component={Link}
-          to={`${match.url}/question_allocation`}
+          to={`${match.url}/allocate`}
           color="primary"
           variant="contained"
           disabled={isLoadingScriptTemplate || !scriptTemplate}
