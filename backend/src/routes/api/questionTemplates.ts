@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as AllocationsController from "../../controllers/AllocationsController";
-import * as ViewController from "../../controllers/ViewController";
 import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
+import * as ViewController from "../../controllers/ViewController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
 

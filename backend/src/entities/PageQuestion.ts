@@ -1,9 +1,8 @@
-import { Entity, ManyToOne, Column, getRepository } from "typeorm";
-
+import { Column, Entity, getRepository, ManyToOne } from "typeorm";
+import { PageQuestionData, PageQuestionListData } from "../types/pageQuestions";
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
 import { Question } from "./Question";
-import { PageQuestionListData, PageQuestionData } from "../types/pageQuestions";
 
 @Entity()
 export class PageQuestion extends Discardable {

@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import * as PageQuestionTemplatesController from "../../controllers/PageQuestionTemplatesController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";

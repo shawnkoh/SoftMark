@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import allocations from "./allocations";
 import annotations from "./annotations";
 import auth from "./auth";

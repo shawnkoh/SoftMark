@@ -1,6 +1,6 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { PaperUserListData, isPaperUserListData } from "./paperUsers";
-import { QuestionListData, isQuestionListData } from "./questions";
+import { isPaperUserListData, PaperUserListData } from "./paperUsers";
+import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface MarkPutData {
   score: number;

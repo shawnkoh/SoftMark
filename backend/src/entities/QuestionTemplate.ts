@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Validate
-} from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import {
   Column,
   Entity,
@@ -13,10 +7,8 @@ import {
   OneToMany,
   Tree,
   TreeChildren,
-  TreeParent,
-  Unique
+  TreeParent
 } from "typeorm";
-import IsUniqueQuestionTemplateName from "../constraints/IsUniqueQuestionTemplateName";
 import { PageTemplateListData } from "../types/pageTemplates";
 import { QuestionTemplateData } from "../types/questionTemplates";
 import { Allocation } from "./Allocation";
@@ -27,7 +19,6 @@ import { Question } from "./Question";
 import { ScriptTemplate } from "./ScriptTemplate";
 
 @Entity()
-@Unique(["scriptTemplate", "name"])
 @Tree("materialized-path")
 export class QuestionTemplate extends Discardable {
   entityName = "QuestionTemplate";
@@ -40,7 +31,7 @@ export class QuestionTemplate extends Discardable {
     displayPage?: number | null,
     topOffset?: number | null,
     leftOffset?: number | null,
-    parentQuestionTemplate?: QuestionTemplate | null
+    parentQuestionTemplate?: QuestionTemplate | number | null
   ) {
     super();
     this.scriptTemplate = scriptTemplate;
@@ -50,7 +41,11 @@ export class QuestionTemplate extends Discardable {
     this.topOffset = topOffset || null;
     this.leftOffset = leftOffset || null;
     this.pageCovered = pageCovered || null;
-    this.parentQuestionTemplate = parentQuestionTemplate || null;
+    if (typeof parentQuestionTemplate === "number") {
+      this.parentQuestionTemplateId = parentQuestionTemplate;
+    } else {
+      this.parentQuestionTemplate = parentQuestionTemplate || null;
+    }
   }
 
   @Column()
@@ -101,7 +96,6 @@ export class QuestionTemplate extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
-  @Validate(IsUniqueQuestionTemplateName)
   name: string;
 
   @Column({ type: "double precision", nullable: true })

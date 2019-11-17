@@ -1,17 +1,16 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
-import { PageTemplate } from "../../entities/PageTemplate";
 import { PageQuestionTemplate } from "../../entities/PageQuestionTemplate";
+import { PageTemplate } from "../../entities/PageTemplate";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
 import {
   isPageQuestionTemplateData,
-  PageQuestionTemplatePatchData,
-  PageQuestionTemplateData
+  PageQuestionTemplateData,
+  PageQuestionTemplatePatchData
 } from "../../types/pageQuestionTemplates";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
