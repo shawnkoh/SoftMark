@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import * as PageQuestionTemplatesController from "../../controllers/PageQuestionTemplatesController";
 import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
 import * as ScriptTemplatesController from "../../controllers/ScriptTemplatesController";
@@ -22,7 +21,5 @@ router.get(
   "/:id/root_question_templates",
   QuestionTemplatesController.rootQuestionTemplates
 );
-
-router.get("/:id/setup", ScriptTemplatesController.getSetupData);
 
 export default router;
