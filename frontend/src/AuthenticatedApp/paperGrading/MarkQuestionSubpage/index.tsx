@@ -185,13 +185,19 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   }
 
   const pageNos = pages.map(page => page.pageNo);
-  setPageNo(pageNos[0]);
+  const lastPageNo = pageNos[pageNos.length - 1];
+  const firstPageNo = pageNos[0];
+  setPageNo(firstPageNo);
   const incrementPageNo = () =>
-    setPageNo(prevPageNo =>
-      Math.min(pageNos[pageNos.length - 1], prevPageNo + 1)
-    );
+    setPageNo(prevPageNo => {
+      const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) + 1];
+      return Math.min(lastPageNo, isNaN(nextPageNo) ? Infinity : nextPageNo);
+    });
   const decrementPageNo = () =>
-    setPageNo(prevPageNo => Math.max(pageNos[0], prevPageNo - 1));
+    setPageNo(prevPageNo => {
+      const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) - 1];
+      return Math.max(firstPageNo, isNaN(nextPageNo) ? -Infinity : nextPageNo);
+    });
 
   const getCurrentPageQuestions = () => {
     const currentPage = pages.find(page => page.pageNo === pageNo)!;
