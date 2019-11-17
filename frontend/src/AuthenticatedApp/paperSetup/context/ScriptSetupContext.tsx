@@ -36,7 +36,7 @@ export const ScriptSetupProvider: React.FC = props => {
 
   const getScriptTemplateSetupData = async () => {
     try {
-      const { data } = await api.scriptTemplates.getScriptTemplateSetupData(
+      const { data } = await api.papers.getScriptTemplateSetupData(
         Number(paper_id)
       );
       setScriptTemplateSetupData(data);

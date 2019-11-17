@@ -83,7 +83,8 @@ const QuestionEditDialog: React.FC<Props> = props => {
         await api.questionTemplates.createQuestionTemplate(
           scriptTemplateSetupData.id,
           {
-            name: values.title
+            name: values.title,
+            parentName: values.parentName === "" ? undefined : values.parentName
           }
         );
       } else if (mode === "create") {
@@ -183,30 +184,18 @@ const QuestionEditDialog: React.FC<Props> = props => {
                         onChange={() => setIsParent(!isParent)}
                       />
                     }
-                    label="Is Parent?"
+                    label="Is Question Group?"
                   />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>Parent Question:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <QuestionTemplateSelect container={node => node.parentNode} />
                 </Grid>
                 {!isParent && (
                   <>
-                    <Grid item xs={3}>
-                      <Typography>ParentName:</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Field name="parentName">
-                        {({ form }: FieldProps<NewQuestionTemplateValues>) => (
-                          <QuestionTemplateSelect
-                            initialValue={form.initialValues.parentName}
-                            onChange={(value: string) =>
-                              form.setValues({
-                                ...form.values,
-                                parentName: value
-                              })
-                            }
-                            container={node => node.parentNode}
-                          />
-                        )}
-                      </Field>
-                    </Grid>
                     <Grid item xs={6}>
                       <Field name="score">
                         {({
