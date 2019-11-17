@@ -196,7 +196,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   const decrementPageNo = () =>
     setPageNo(prevPageNo => {
       const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) - 1];
-      return Math.max(pageNos[0], isNaN(nextPageNo) ? -Infinity : nextPageNo);
+      return Math.max(firstPageNo, isNaN(nextPageNo) ? -Infinity : nextPageNo);
     });
 
   const getCurrentPageQuestions = () => {
