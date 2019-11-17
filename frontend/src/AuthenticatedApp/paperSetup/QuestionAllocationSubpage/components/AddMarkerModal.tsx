@@ -41,14 +41,14 @@ const AddMarkerModal: React.FC<Props> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={toggleVisibility} fullWidth>
+      <Dialog open={isOpen} onClose={toggleVisibility}>
         <CustomDialogTitle
           id="customized-dialog-title"
           onClose={toggleVisibility}
         >
           Add new marker
         </CustomDialogTitle>
-        <DialogContent>
+        <DialogContent dividers>
           <SimpleForm
             initialValues={values}
             formMetadata={formMetadata}

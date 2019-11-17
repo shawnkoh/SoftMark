@@ -103,6 +103,9 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
+  const [pageNo, setPageNo] = useState<number>(0);
+  const [pageNos, setPageNos] = useState<number[]>([0]);
+
   const getScriptViewData = async (questionTemplateId: number) => {
     setIsLoading(true);
     const data = await api.questionTemplates.getQuestionToMark(
@@ -116,7 +119,15 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     getScriptViewData(questionTemplateId);
   }, [refreshFlag]);
 
-  const [pageNo, setPageNo] = useState(0);
+  useEffect(() => {
+    if (scriptViewData && scriptViewData.pages.length) {
+      setPageNos(scriptViewData.pages.map(page => page.pageNo));
+    }
+  }, [scriptViewData]);
+
+  useEffect(() => {
+    if (pageNos.length) setPageNo(pageNos[0]);
+  }, [pageNos]);
 
   const Header = () => (
     <AppBar position="static" color="primary" elevation={1}>
@@ -184,10 +195,8 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     );
   }
 
-  const pageNos = pages.map(page => page.pageNo);
   const lastPageNo = pageNos[pageNos.length - 1];
   const firstPageNo = pageNos[0];
-  setPageNo(firstPageNo);
   const incrementPageNo = () =>
     setPageNo(prevPageNo => {
       const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) + 1];
@@ -229,7 +238,6 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
             />
           </div>
         ))}
-      )}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
           <Typography variant="button" className={classes.questionBarItem}>

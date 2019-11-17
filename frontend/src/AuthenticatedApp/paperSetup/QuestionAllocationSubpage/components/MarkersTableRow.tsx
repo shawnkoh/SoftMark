@@ -145,10 +145,10 @@ const MarkersTableRow: React.FC<Props> = props => {
               );
               return (
                 <ReversedChip
-                  variant="outlined"
                   avatar={<Avatar>{questionTemplate.score}</Avatar>}
                   label={"Q" + questionTemplate.name}
                   color={allocationId ? "primary" : "default"}
+                  className={classes.chip}
                   onClick={() => {
                     allocationId
                       ? deleteAllocation(allocationId)

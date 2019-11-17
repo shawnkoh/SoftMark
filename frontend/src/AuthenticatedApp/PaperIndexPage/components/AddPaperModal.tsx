@@ -52,7 +52,7 @@ const AddPaperModal: React.FC<Props> = ({
       >
         Add new paper
       </CustomDialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <SimpleForm
           initialValues={values}
           formMetadata={formMetadata}
