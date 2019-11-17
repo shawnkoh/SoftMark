@@ -9,7 +9,7 @@ export interface QuestionTemplatePostData {
   displayPage?: number | null;
   topOffset?: number | null;
   leftOffset?: number | null;
-  parentName?: string | null;
+  parentQuestionTemplateId?: number | null;
 }
 
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;
