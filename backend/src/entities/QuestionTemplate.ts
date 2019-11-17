@@ -41,11 +41,14 @@ export class QuestionTemplate extends Discardable {
     this.topOffset = topOffset || null;
     this.leftOffset = leftOffset || null;
     this.pageCovered = pageCovered || null;
-    if (typeof parentQuestionTemplate === "number") {
-      this.parentQuestionTemplateId = parentQuestionTemplate;
-    } else {
-      this.parentQuestionTemplate = parentQuestionTemplate || null;
-    }
+    this.parentQuestionTemplateId =
+      typeof parentQuestionTemplate === "number"
+        ? parentQuestionTemplate
+        : null;
+    this.parentQuestionTemplate =
+      typeof parentQuestionTemplate !== "number"
+        ? parentQuestionTemplate
+        : null;
   }
 
   @Column()

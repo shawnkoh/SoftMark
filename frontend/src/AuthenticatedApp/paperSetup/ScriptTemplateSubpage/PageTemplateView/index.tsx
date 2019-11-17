@@ -4,7 +4,6 @@ import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
 import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
-import update from "immutability-helper";
 import React, { useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
 import api from "../../../../api";
@@ -12,38 +11,39 @@ import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog
 import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
 import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
+import { toast } from "react-toastify";
 
 type DragItem = QuestionTemplateLeafData & { type: string; index: number };
 
-const ScriptTemplatePanel: React.FC<{
+const PageTemplateView: React.FC<{
   pageTemplate: PageTemplateSetupData;
 }> = props => {
   const classes = useStyles();
   const { pageTemplate } = props;
-  const { currentPageNo, pageCount, goPage } = useScriptSetup();
+  const { currentPageNo, pageCount, goPage, refresh } = useScriptSetup();
 
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [boxes, setBoxes] = useState<QuestionTemplateLeafData[]>(
-    pageTemplate.questionTemplates.filter(q => q.displayPage === currentPageNo)
-  );
 
   const [, drop] = useDrop({
     accept: "questionBox",
-    drop(item: DragItem, monitor) {
+    async drop(item: DragItem, monitor) {
       const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
       const leftOffset = Math.round(item.leftOffset! + delta.x);
       const topOffset = Math.round(item.topOffset! + delta.y);
-      api.questionTemplates.editQuestionTemplate(item.id, {
-        topOffset,
-        leftOffset
-      });
-      moveBox(item.index, leftOffset, topOffset);
+      try {
+        await api.questionTemplates.editQuestionTemplate(item.id, {
+          topOffset,
+          leftOffset
+        });
+        toast.success(`${item.name}'s position successfully updated`);
+        refresh();
+      } catch (error) {
+        toast.error(`Failed to move ${item.name}`);
+      }
+
       return undefined;
     }
   });
-  const moveBox = (index: number, leftOffset: number, topOffset: number) => {
-    setBoxes(update(boxes, { [index]: { $merge: { topOffset, leftOffset } } }));
-  };
 
   return (
     <Typography
@@ -72,13 +72,15 @@ const ScriptTemplatePanel: React.FC<{
         </IconButton>
         <div ref={drop} className={classes.container}>
           <img className={classes.scriptImage} src={pageTemplate.imageUrl} />
-          {boxes.map((questionTemplate, index) => (
-            <ScriptTemplateQuestion
-              key={questionTemplate.id}
-              index={index}
-              questionTemplate={questionTemplate}
-            />
-          ))}
+          {pageTemplate.questionTemplates
+            .filter(q => q.displayPage === currentPageNo)
+            .map((questionTemplate, index) => (
+              <ScriptTemplateQuestion
+                key={questionTemplate.id}
+                index={index}
+                questionTemplate={questionTemplate}
+              />
+            ))}
         </div>
         <IconButton
           onClick={() => goPage(currentPageNo + 1)}
@@ -91,4 +93,4 @@ const ScriptTemplatePanel: React.FC<{
   );
 };
 
-export default ScriptTemplatePanel;
+export default PageTemplateView;

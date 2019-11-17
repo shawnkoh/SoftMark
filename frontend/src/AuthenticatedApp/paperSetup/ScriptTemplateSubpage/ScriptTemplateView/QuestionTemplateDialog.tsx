@@ -12,8 +12,6 @@ import {
   Typography
 } from "@material-ui/core";
 import api from "api";
-import { AxiosResponse } from "axios";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import {
   Field,
   FieldProps,
@@ -33,7 +31,7 @@ export interface NewQuestionTemplateValues {
   title: string;
   score: number;
   pageCovered: string;
-  parentName: string;
+  parentQuestionTemplateId?: string;
 }
 
 interface SharedProps {
@@ -63,8 +61,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
     initialValues = {
       title: "",
       score: 0,
-      pageCovered: "",
-      parentName: ""
+      pageCovered: ""
     }
   } = props;
   const {
@@ -84,7 +81,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
           scriptTemplateSetupData.id,
           {
             name: values.title,
-            parentName: values.parentName === "" ? undefined : values.parentName
+            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
           }
         );
       } else if (mode === "create") {
@@ -95,7 +92,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
             score: values.score,
             pageCovered: values.pageCovered,
             displayPage: currentPageNo,
-            parentName: values.parentName
+            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
           }
         );
       } else {
@@ -105,10 +102,11 @@ const QuestionEditDialog: React.FC<Props> = props => {
             name: values.title,
             score: values.score,
             pageCovered: values.pageCovered,
-            parentName: values.parentName
+            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
           }
         );
       }
+      toast.success("Question successfully created");
       refresh();
       handleClose();
     } catch (error) {
@@ -116,11 +114,26 @@ const QuestionEditDialog: React.FC<Props> = props => {
       // TODO: Handle this better
     }
   };
-  const handleDelete = () =>
-    api.questionTemplates.discardQuestionTemplate(
-      (props as QuestionEditDialogProps).questionTemplateId
-    );
-
+  const handleDelete = async () => {
+    try {
+      await api.questionTemplates.discardQuestionTemplate(
+        (props as QuestionEditDialogProps).questionTemplateId
+      );
+      toast.success(
+        `${
+          (props as QuestionEditDialogProps).initialValues.title
+        } successfully deleted`
+      );
+      refresh();
+      handleClose();
+    } catch (error) {
+      toast.error(
+        `Failed to delete ${
+          (props as QuestionEditDialogProps).initialValues.title
+        }`
+      );
+    }
+  };
   return (
     <Dialog open={open} onClose={handleClose}>
       <Formik
@@ -135,7 +148,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
           const errors: FormikErrors<NewQuestionTemplateValues> = {};
           if (isParent) return errors;
           if (values.score < 0) errors.score = "Score should be non-negative";
-          if (!values.parentName) errors.parentName = "Required";
           errors.pageCovered = isPageValid(
             values.pageCovered,
             currentPageNo,
@@ -267,7 +279,8 @@ const QuestionEditDialog: React.FC<Props> = props => {
                   if (isParent) {
                     formikProps.setValues({
                       title: formikProps.values.title,
-                      parentName: "",
+                      parentQuestionTemplateId:
+                        formikProps.values.parentQuestionTemplateId,
                       score: 1,
                       pageCovered: "1"
                     });

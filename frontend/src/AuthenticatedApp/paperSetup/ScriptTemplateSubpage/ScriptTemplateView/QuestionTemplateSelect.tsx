@@ -20,7 +20,7 @@ const GenerateTreeData = (
   questionTemplateTree: QuestionTemplateTreeData
 ): TreeData => {
   return {
-    value: questionTemplateTree.name,
+    value: "" + questionTemplateTree.id,
     title: questionTemplateTree.name,
     key: "" + questionTemplateTree.id,
     children: questionTemplateTree.childQuestionTemplates.map(e =>
@@ -30,9 +30,8 @@ const GenerateTreeData = (
 };
 
 const QuestionTemplateSelect: React.FC<SelectTreeProps> = props => {
-  const { values, setFieldValue } = useFormikContext<
-    NewQuestionTemplateValues
-  >();
+  const [parentName, setParentName] = React.useState("");
+  const { setFieldValue } = useFormikContext<NewQuestionTemplateValues>();
   const { scriptTemplateSetupData } = useScriptSetup();
   const treeData = scriptTemplateSetupData.questionTemplates.map(d =>
     GenerateTreeData(d)
@@ -41,13 +40,13 @@ const QuestionTemplateSelect: React.FC<SelectTreeProps> = props => {
     <TreeSelect
       showSearch
       style={{ width: "100%" }}
-      value={values.parentName}
+      value={parentName}
       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
       placeholder="Please select"
       allowClear
-      treeDefaultExpandAll
-      onChange={(v: string) => {
-        setFieldValue("parentName", v);
+      onChange={(v: string, l: string) => {
+        setFieldValue("parentQuestionTemplateId", v);
+        setParentName(l);
       }}
       treeData={treeData}
       getPopupContainer={props.container}

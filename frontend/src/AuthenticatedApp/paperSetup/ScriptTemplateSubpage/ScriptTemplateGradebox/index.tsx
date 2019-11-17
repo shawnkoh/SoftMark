@@ -31,18 +31,15 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
   return (
     <>
       <QuestionTemplateDialog
-        isParent={questionTemplate.displayPage === null}
+        isParent={false}
         mode="edit"
         questionTemplateId={questionTemplate.id}
         open={editOpen}
         handleClose={() => setEditOpen(false)}
         initialValues={{
           title: questionTemplate.name,
-          score: questionTemplate.score ? questionTemplate.score : 0,
+          score: questionTemplate.score,
           pageCovered: questionTemplate.pageCovered
-            ? questionTemplate.pageCovered
-            : "",
-          parentName: questionTemplate.name
         }}
       />
       <Fab
@@ -50,14 +47,8 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
         ref={drag}
         className={classes.fab}
         style={{
-          top:
-            questionTemplate.topOffset != null
-              ? questionTemplate.topOffset
-              : 50,
-          left:
-            questionTemplate.leftOffset != null
-              ? questionTemplate.leftOffset
-              : 50
+          top: questionTemplate.topOffset,
+          left: questionTemplate.leftOffset
         }}
         color="primary"
         onClick={() => setEditOpen(true)}
