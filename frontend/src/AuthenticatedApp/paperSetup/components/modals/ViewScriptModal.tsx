@@ -46,7 +46,6 @@ const ViewScriptModal: React.FC<Props> = props => {
           {`Viewing script ${script.filename}`}
         </DialogTitleWithCloseButton>
         <DialogContent dividers>
-          {`Script id: ${script.id} (for debugging; remove in ViewScriptModal)`}
           {isLoading && (
             <LoadingSpinner loadingMessage="Loading script template..." />
           )}

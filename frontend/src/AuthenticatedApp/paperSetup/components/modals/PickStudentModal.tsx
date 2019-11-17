@@ -9,8 +9,9 @@ import { toast } from "react-toastify";
 import {
   Button,
   Dialog,
-  DialogContent,
   DialogTitle,
+  DialogContent,
+  DialogActions,
   TextField,
   Typography
 } from "@material-ui/core";
@@ -50,10 +51,9 @@ const PickStudentModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>{`Pick student for script "${script.filename}".`}</DialogTitle>
+      <Dialog open={isOpen} onClose={toggleVisibility}>
+        <DialogTitle>{`Select student for script "${script.filename}"`}</DialogTitle>
         <DialogContent>
-          <Typography>Matched student:</Typography>
           <Autocomplete
             clearOnEscape
             defaultValue={chosenStudent}
@@ -68,11 +68,12 @@ const PickStudentModal: React.FC<Props> = props => {
                 : option.user.email;
             }}
             onChange={(event: object, value: any) => setChosenStudent(value)}
-            style={{ width: 300 }}
             renderInput={params => (
-              <TextField {...params} margin="normal" fullWidth />
+              <TextField {...params} variant="outlined" fullWidth />
             )}
           />
+        </DialogContent>
+        <DialogActions>
           <Button
             color="primary"
             onClick={() => {
@@ -92,6 +93,7 @@ const PickStudentModal: React.FC<Props> = props => {
                 .patchScript(script.id, scriptPatchData)
                 .then(resp => {
                   callbackScript(resp.data.script);
+                  toggleVisibility();
                   toast(
                     `Script ${script.filename} has been updated successfully.`
                   );
@@ -105,7 +107,7 @@ const PickStudentModal: React.FC<Props> = props => {
           >
             Select
           </Button>
-        </DialogContent>
+        </DialogActions>
       </Dialog>
       {render(toggleVisibility)}
     </>

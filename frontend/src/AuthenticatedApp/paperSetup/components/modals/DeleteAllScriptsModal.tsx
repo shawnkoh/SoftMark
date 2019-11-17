@@ -1,34 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../../../api";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Grid
-} from "@material-ui/core";
 import { ScriptListData } from "backend/src/types/scripts";
+import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
+import api from "../../../../api";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 interface OwnProps {
   scripts: ScriptListData[];
   refreshScripts?: () => void;
+  render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const DeleteAllScriptsModal: React.FC<Props> = props => {
-  const { scripts, children, refreshScripts } = props;
+  const { scripts, refreshScripts, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
   return (
     <>
       <ConfirmationDialog
-        title={`Delete all scripts.`}
+        title={`Delete all scripts`}
         message={`This action is irreversible. Do you still want to delete?`}
         open={isOpen}
         handleClose={toggleVisibility}
@@ -55,7 +47,7 @@ const DeleteAllScriptsModal: React.FC<Props> = props => {
           toggleVisibility();
         }}
       />
-      <ThemedButton label="Clear" filled onClick={toggleVisibility} />
+      {render(toggleVisibility)}
     </>
   );
 };

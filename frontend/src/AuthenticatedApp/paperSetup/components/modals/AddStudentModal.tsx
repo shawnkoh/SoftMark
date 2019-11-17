@@ -51,7 +51,7 @@ const AddStudentModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
+      <Dialog open={isOpen} fullWidth onClose={toggleVisibility}>
         <DialogTitle>Add new student</DialogTitle>
         <DialogContent>
           <SimpleForm

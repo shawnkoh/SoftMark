@@ -1,10 +1,13 @@
 import { IconButton, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import red from "@material-ui/core/colors/red";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/DeleteForever";
 import EditIcon from "@material-ui/icons/Edit";
 import React, { useState } from "react";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteStudentModal from "../modals/DeleteStudentModal";
 import EditStudentModal from "../modals/EditStudentModal";
+import useStyles from "./styles";
 
 interface OwnProps {
   student: PaperUserListData;
@@ -14,6 +17,8 @@ interface OwnProps {
 type Props = OwnProps;
 
 const StudentsTableRow: React.FC<Props> = props => {
+  const classes = useStyles();
+
   const { refreshStudents } = props;
   const [student, setStudent] = useState(props.student);
   const { matriculationNumber, user } = student;
@@ -41,7 +46,7 @@ const StudentsTableRow: React.FC<Props> = props => {
           student={student}
           render={toggleVisibility => (
             <Tooltip title={"Delete student"}>
-              <IconButton onClick={toggleVisibility} color="secondary">
+              <IconButton onClick={toggleVisibility} className={classes.red}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>

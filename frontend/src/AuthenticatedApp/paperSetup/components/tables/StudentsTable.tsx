@@ -1,5 +1,4 @@
 import {
-  Box,
   Grid,
   Paper,
   Table,
@@ -26,18 +25,7 @@ import { PaperUserListData } from "../../../../types/paperUsers";
 import AddStudentModal from "../modals/AddStudentModal";
 import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
 import StudentsTableRow from "./StudentsTableRow";
-
-const useStyles = makeStyles(theme => ({
-  tableWrapper: {
-    overflowX: "auto"
-  },
-  margin: {
-    marginBottom: theme.spacing(1)
-  },
-  grow: {
-    flexGrow: 1
-  }
-}));
+import useStyles from "./styles";
 
 const StudentsTable: React.FC = () => {
   const paper = usePaper();
@@ -110,6 +98,9 @@ const StudentsTable: React.FC = () => {
 
   return (
     <>
+      <Typography variant="subtitle1" className={classes.margin}>
+        {students.length} student(s) in total
+      </Typography>
       <Grid
         container
         direction="row"
@@ -118,7 +109,7 @@ const StudentsTable: React.FC = () => {
         spacing={1}
         className={classes.margin}
       >
-        <Grid item>
+        <Grid item className={classes.grow}>
           <SearchBar
             value={""}
             placeholder="Search..."
@@ -163,18 +154,13 @@ const StudentsTable: React.FC = () => {
               <RoundedButton
                 onClick={toggleVisibility}
                 variant="contained"
-                color="secondary"
                 startIcon={<DeleteAllIcon />}
+                className={classes.redButton}
               >
                 Delete All
               </RoundedButton>
             )}
           />
-        </Grid>
-        <Grid item>
-          <Typography variant="subtitle1">
-            Total students: {students.length}
-          </Typography>
         </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>

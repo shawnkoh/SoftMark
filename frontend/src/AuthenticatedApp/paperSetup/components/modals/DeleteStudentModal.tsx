@@ -22,7 +22,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
   return (
     <>
       <ConfirmationDialog
-        title={`Delete student ${name} (${matriculationNumber})`}
+        title={`Delete student "${name} (${matriculationNumber})"?`}
         message={`This action is irreversible. Do you still want to delete?`}
         open={isOpen}
         handleClose={toggleVisibility}
