@@ -1,8 +1,7 @@
 import { BookmarkListData, isBookmarkListData } from "./bookmarks";
-import { CommentListData } from "./comments";
 import { DiscardableData, isDiscardableData } from "./entities";
-import { MarkListData, isMarkListData } from "./marks";
-import { PageQuestionListData, isPageQuestionListData } from "./pageQuestions";
+import { isMarkListData, MarkListData } from "./marks";
+import { isPageQuestionListData, PageQuestionListData } from "./pageQuestions";
 
 export interface QuestionPostData {}
 

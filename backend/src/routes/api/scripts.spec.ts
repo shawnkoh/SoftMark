@@ -1,10 +1,9 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
 import { Script } from "../../entities/Script";
 import { ApiServer } from "../../server";
 import { PaperUserRole } from "../../types/paperUsers";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;

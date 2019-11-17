@@ -1,14 +1,15 @@
-import { IsOptional, IsNotEmpty, IsString, Validate } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import {
+  Column,
   Entity,
+  getRepository,
+  IsNull,
   ManyToOne,
   OneToMany,
-  Column,
-  getRepository,
-  Unique,
-  IsNull
+  Unique
 } from "typeorm";
-
+import { ScriptData, ScriptListData } from "../types/scripts";
+import { sortByPageNo } from "../utils/sorts";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
 import { Page } from "./Page";
@@ -16,11 +17,6 @@ import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { QuestionTemplate } from "./QuestionTemplate";
-import { User } from "./User";
-import { ScriptData, ScriptListData } from "../types/scripts";
-import { sortByPageNo } from "../utils/sorts";
-import IsUniqueFilename from "../constraints/IsUniqueFilename";
-import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 import { ScriptTemplate } from "./ScriptTemplate";
 
 @Entity()

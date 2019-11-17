@@ -1,9 +1,9 @@
+import { DiscardableData, isDiscardableData } from "./entities";
 import {
-  QuestionTemplateData,
   isQuestionTemplateData,
+  QuestionTemplateData,
   QuestionTemplateLeafData
 } from "./questionTemplates";
-import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface PageTemplateListData extends DiscardableData {
   scriptTemplateId: number;

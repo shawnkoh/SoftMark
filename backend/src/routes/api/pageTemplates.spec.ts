@@ -1,6 +1,5 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
 import { PageTemplate } from "../../entities/PageTemplate";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";

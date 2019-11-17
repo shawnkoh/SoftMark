@@ -1,14 +1,13 @@
 import { IsNotEmpty } from "class-validator";
-import { Entity, ManyToOne, Column, getRepository } from "typeorm";
-
+import { Column, Entity, getRepository, ManyToOne } from "typeorm";
+import {
+  AnnotationData,
+  AnnotationLine,
+  AnnotationListData
+} from "../types/annotations";
 import { Base } from "./Base";
 import { Page } from "./Page";
 import { PaperUser } from "./PaperUser";
-import {
-  AnnotationLine,
-  AnnotationListData,
-  AnnotationData
-} from "../types/annotations";
 
 @Entity()
 export class Annotation extends Base {

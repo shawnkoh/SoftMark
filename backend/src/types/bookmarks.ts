@@ -1,6 +1,6 @@
-import { QuestionListData, isQuestionListData } from "./questions";
-import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 import { BaseData, isBaseData } from "./entities";
+import { isPaperUserListData, PaperUserListData } from "./paperUsers";
+import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface BookmarkPostData {
   paperUserId: number;

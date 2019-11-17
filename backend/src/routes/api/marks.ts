@@ -1,8 +1,8 @@
 import { Router } from "express";
 import * as MarksController from "../../controllers/MarksController";
+import { canModifyMark } from "../../middlewares/canModifyMark";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
-import { canModifyMark } from "../../middlewares/canModifyMark";
 
 export const router = Router();
 

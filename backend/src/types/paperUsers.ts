@@ -1,6 +1,6 @@
 import { AllocationListData, isAllocationListData } from "./allocations";
 import { DiscardableData } from "./entities";
-import { UserData, isUserData } from "./users";
+import { isUserData, UserData } from "./users";
 
 export enum PaperUserRole {
   Owner = "OWNER",

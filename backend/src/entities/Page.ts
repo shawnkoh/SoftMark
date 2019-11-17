@@ -1,9 +1,9 @@
-import { Entity, ManyToOne, OneToMany, Column, getRepository } from "typeorm";
+import { Column, Entity, getRepository, ManyToOne, OneToMany } from "typeorm";
+import { PageData, PageListData } from "../types/pages";
 import { Annotation } from "./Annotation";
 import { Discardable } from "./Discardable";
 import { PageQuestion } from "./PageQuestion";
 import { Script } from "./Script";
-import { PageListData, PageData } from "../types/pages";
 
 @Entity()
 export class Page extends Discardable {

@@ -1,6 +1,5 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
 import { Allocation } from "../../entities/Allocation";
 import { Mark } from "../../entities/Mark";
 import { Question } from "../../entities/Question";
@@ -8,9 +7,9 @@ import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
-import { MarkPatchData, MarkData, isMarkData } from "../../types/marks";
+import { isMarkData, MarkData, MarkPatchData } from "../../types/marks";
 import { PaperUserRole } from "../../types/paperUsers";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;

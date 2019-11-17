@@ -4,21 +4,21 @@ import _ from "lodash";
 import {
   getManager,
   getRepository,
-  IsNull,
   getTreeRepository,
+  IsNull,
   SelectQueryBuilder
 } from "typeorm";
 import { PageTemplate } from "../entities/PageTemplate";
+import QuestionTemplate from "../entities/QuestionTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
+import { QuestionTemplateTreeData } from "../types/questionTemplates";
 import {
   ScriptTemplatePostData,
   ScriptTemplateSetupData
 } from "../types/scriptTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
-import QuestionTemplate from "../entities/QuestionTemplate";
-import { QuestionTemplateTreeData } from "../types/questionTemplates";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;

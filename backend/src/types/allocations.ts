@@ -1,9 +1,9 @@
 import { BaseData, isBaseData } from "./entities";
+import { isPaperUserListData, PaperUserListData } from "./paperUsers";
 import {
-  QuestionTemplateData,
-  isQuestionTemplateData
+  isQuestionTemplateData,
+  QuestionTemplateData
 } from "./questionTemplates";
-import { PaperUserListData, isPaperUserListData } from "./paperUsers";
 
 export interface AllocationPostData {
   paperUserId: number;
