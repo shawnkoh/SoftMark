@@ -198,20 +198,23 @@ export async function undiscard(request: Request, response: Response) {
 export async function getSetupData(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = Number(payload.userId);
-  const scriptTemplateId = Number(request.params.id);
-  const scriptTemplate = await getRepository(ScriptTemplate)
-    .createQueryBuilder("scriptTemplate")
-    .where("scriptTemplate.id = :id", { id: scriptTemplateId })
-    .andWhere("scriptTemplate.discardedAt IS NULL")
-    .innerJoin("scriptTemplate.paper", "paper", "paper.discardedAt IS NULL")
-    .select("paper.id", "paperId")
-    .getRawOne();
-  const { paperId } = scriptTemplate;
+  const paperId = Number(request.params.id);
   const allowed = await allowedRequester(
     requesterId,
     paperId,
     PaperUserRole.Owner
   );
+  const scriptTemplate = await getRepository(ScriptTemplate)
+    .createQueryBuilder("scriptTemplate")
+    .where("scriptTemplate.discardedAt IS NULL")
+    .innerJoin("scriptTemplate.paper", "paper", "paper.discardedAt IS NULL")
+    .andWhere("paper.id = :paperId", { paperId })
+    .getOne();
+  if (!scriptTemplate) {
+    response.sendStatus(404);
+    return;
+  }
+  const scriptTemplateId = scriptTemplate.id;
   if (!allowed) {
     response.sendStatus(404);
     return;

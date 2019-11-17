@@ -46,4 +46,9 @@ router.patch("/:id/scripts/match", ScriptsController.match);
 router.get("/:id/allocations", AllocationsController.index);
 router.get("/:id/root_allocations", AllocationsController.getRootAllocations);
 
+router.get(
+  "/:id/script_template/setup",
+  ScriptTemplatesController.getSetupData
+);
+
 export default router;
