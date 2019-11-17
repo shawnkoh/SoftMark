@@ -49,7 +49,7 @@ export async function create(request: Request, response: Response) {
 
   const scriptTemplate = await getRepository(ScriptTemplate).findOne(
     scriptTemplateId,
-    { where: { discardedAt: IsNull() } }
+    { where: { discardedAt: IsNull() }, relations: ["pageTemplates"] }
   );
   if (!scriptTemplate) {
     response.sendStatus(404);
@@ -66,6 +66,17 @@ export async function create(request: Request, response: Response) {
   }
   const { paper } = allowed;
 
+  let parentQuestionTemplate = null;
+  if (parentQuestionTemplateId) {
+    parentQuestionTemplate = await getRepository(QuestionTemplate).findOne(
+      parentQuestionTemplateId
+    );
+    if (!parentQuestionTemplate) {
+      response.sendStatus(404);
+      return;
+    }
+  }
+
   const questionTemplate = new QuestionTemplate(
     scriptTemplate,
     name,
@@ -74,7 +85,7 @@ export async function create(request: Request, response: Response) {
     displayPage,
     50,
     50,
-    parentQuestionTemplateId
+    parentQuestionTemplate
   );
   const errors = await validate(questionTemplate);
   if (errors.length > 0) {
@@ -88,20 +99,25 @@ export async function create(request: Request, response: Response) {
     script => new Question(script, questionTemplate)
   );
 
+  let pageQuestionTemplates: PageQuestionTemplate[] = [];
   if (
-    postData.pageCovered &&
+    pageCovered &&
     scriptTemplate.pageTemplates &&
-    isPageValid(postData.pageCovered, scriptTemplate.pageTemplates.length)
+    isPageValid(pageCovered, scriptTemplate.pageTemplates.length)
   ) {
-    const pageNos = generatePages(postData.pageCovered);
-    questionTemplate.pageQuestionTemplates = scriptTemplate.pageTemplates
-      .filter(value => pageNos.has(value.pageNo))
-      .map(value => new PageQuestionTemplate(value, questionTemplate));
+    const pageNos = generatePages(pageCovered);
+    const coveredPageTemplates = scriptTemplate.pageTemplates.filter(value =>
+      pageNos.has(value.pageNo)
+    );
+    pageQuestionTemplates = coveredPageTemplates.map(
+      v => new PageQuestionTemplate(v, questionTemplate)
+    );
   }
 
   await getManager().transaction(async manager => {
     await manager.save(questionTemplate);
     await manager.save(questions);
+    await manager.save(pageQuestionTemplates);
   });
 
   const data = questionTemplate.getData();
@@ -215,6 +231,17 @@ export async function update(request: Request, response: Response) {
     topOffset
   } = patchData;
 
+  let parentQuestionTemplate = null;
+  if (parentQuestionTemplateId) {
+    parentQuestionTemplate = await getRepository(QuestionTemplate).findOne(
+      parentQuestionTemplateId
+    );
+    if (!parentQuestionTemplate) {
+      response.sendStatus(404);
+      return;
+    }
+  }
+
   let questionTemplate: QuestionTemplate;
   try {
     questionTemplate = await getRepository(QuestionTemplate).findOneOrFail(
@@ -235,22 +262,24 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-    if (parentQuestionTemplateId) {
-      // TypeORM supports assigning parentQuestionTemplate = id
-      // Cannot use questionTemplate.parentQuestionTemplateId because it will throw
-      // a multiple assignment error
-      questionTemplate.parentQuestionTemplate = (parentQuestionTemplateId as unknown) as QuestionTemplate;
-    }
+    if (name) questionTemplate.name = name;
+    if (topOffset) questionTemplate.topOffset = topOffset;
+    if (leftOffset) questionTemplate.leftOffset = leftOffset;
+    if (score) questionTemplate.score = score;
+    if (parentQuestionTemplate)
+      questionTemplate.parentQuestionTemplate = parentQuestionTemplate;
     if (questionTemplate.scriptTemplate && pageCovered) {
       const pageTemplates = questionTemplate.scriptTemplate.pageTemplates;
       if (pageTemplates && isPageValid(pageCovered, pageTemplates.length)) {
         const pageNos = generatePages(pageCovered);
-        questionTemplate.pageQuestionTemplates = pageTemplates
-          .filter(value => pageNos.has(value.pageNo))
-          .map(value => new PageQuestionTemplate(value, questionTemplate));
+        const coveredPageTemplates = pageTemplates.filter(value =>
+          pageNos.has(value.pageNo)
+        );
+        questionTemplate.pageQuestionTemplates = coveredPageTemplates.map(
+          v => new PageQuestionTemplate(v, questionTemplate)
+        );
       }
     }
-    Object.assign(questionTemplate, patchData);
     await validateOrReject(questionTemplate);
 
     await getRepository(QuestionTemplate).save(questionTemplate);

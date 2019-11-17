@@ -1,3 +1,6 @@
+import QuestionTemplate from "../entities/QuestionTemplate";
+import { QuestionTemplateTreeData } from "questionTemplates";
+
 const PAGE_REGEX: RegExp = new RegExp(
   "^(?:(?:[0-9]+|[0-9+]-[0-9]+)+(?:s*,s*))+$"
 );
@@ -76,4 +79,26 @@ export function cleanPage(pages: string) {
     }
   }
   return cleanedPage.slice(0, -1);
+}
+
+/**
+ * Recursively traverse trees to _.pick only the relevant fields
+ * @param root note that the roots should be active
+ */
+export function cleanTrees(
+  roots: QuestionTemplate[]
+): QuestionTemplateTreeData[] {
+  return roots
+    .filter(t => !t.discardedAt)
+    .map(root => {
+      return {
+        id: root.id,
+        name: root.name,
+        score: root.score,
+        displayPage: root.displayPage,
+        childQuestionTemplates: root.childQuestionTemplates
+          ? cleanTrees(root.childQuestionTemplates)
+          : []
+      };
+    });
 }

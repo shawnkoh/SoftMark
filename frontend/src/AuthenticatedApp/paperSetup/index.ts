@@ -1,7 +1,7 @@
 import SetupPage from "./SetupPage";
 import QuestionAllocationSubpage from "./QuestionAllocationSubpage";
 import ScriptMappingSubpage from "./ScriptMappingSubpage";
-import ScriptTemplateSubpage from "./ScriptTemplateView";
+import ScriptTemplateSubpage from "./ScriptTemplateSubpage";
 
 export {
   QuestionAllocationSubpage,
