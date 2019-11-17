@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Formik, FormikProps, FieldArray, Field } from "formik";
+import { Grid, IconButton, TextField, Tooltip } from "@material-ui/core";
+import CancelIcon from "@material-ui/icons/Clear";
+import DoneIcon from "@material-ui/icons/Done";
+import EditIcon from "@material-ui/icons/Edit";
+import { Formik, FormikProps } from "formik";
+import React, { useState } from "react";
 import { ObjectSchema } from "yup";
+import red from "@material-ui/core/colors/red";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { makeStyles } from "@material-ui/core/styles";
-import {
-  Button,
-  Grid,
-  IconButton,
-  TextField,
-  Tooltip
-} from "@material-ui/core";
-import Clear from "@material-ui/icons/Clear";
-import Edit from "@material-ui/icons/Edit";
-import ResetIcon from "@material-ui/icons/SettingsBackupRestoreRounded";
-import Save from "@material-ui/icons/Save";
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    red: {
+      color: red[500]
+    }
+  })
+);
 
 interface OwnProps {
   // The initial values of the form.
@@ -36,6 +36,8 @@ const SingleTextfieldForm: React.FC<Props> = ({
   validationSchema,
   onSubmit
 }) => {
+  const classes = useStyles();
+
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(initialText);
   const initialValues = {};
@@ -83,13 +85,8 @@ const SingleTextfieldForm: React.FC<Props> = ({
 
         return (
           <form onSubmit={handleSubmit}>
-            <Grid
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-            >
-              <Grid item xs={6}>
+            <Grid container direction="row" alignItems="center">
+              <Grid item style={{ flexGrow: 1 }}>
                 <TextField
                   id={fieldName}
                   key={fieldName}
@@ -100,25 +97,21 @@ const SingleTextfieldForm: React.FC<Props> = ({
                   variant="filled"
                   margin="dense"
                   disabled={isSubmitting}
+                  label="Filename"
+                  fullWidth
                 />
               </Grid>
-              <Grid
-                item
-                xs={6}
-                container
-                direction="row"
-                justify="flex-end"
-                alignItems="center"
-              >
-                <Tooltip title="Save">
+              <Grid item>
+                <Tooltip title="Done">
                   <IconButton
                     type="submit"
                     color="primary"
                     disabled={!isValid || isSubmitting}
                   >
-                    <Save />
+                    <DoneIcon />
                   </IconButton>
                 </Tooltip>
+                {/*
                 <Tooltip title="Reset">
                   <IconButton
                     type="button"
@@ -130,9 +123,18 @@ const SingleTextfieldForm: React.FC<Props> = ({
                     <ResetIcon />
                   </IconButton>
                 </Tooltip>
-                <IconButton onClick={() => setIsEditing(false)}>
-                  <Clear />
-                </IconButton>
+                */}
+                <Tooltip title="Cancel">
+                  <IconButton
+                    onClick={event => {
+                      handleReset(event);
+                      setIsEditing(false);
+                    }}
+                    className={classes.red}
+                  >
+                    <CancelIcon />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             </Grid>
           </form>
@@ -140,11 +142,11 @@ const SingleTextfieldForm: React.FC<Props> = ({
       }}
     </Formik>
   ) : (
-    <Grid container direction="row" justify="space-between" alignItems="center">
+    <Grid container direction="row" alignItems="center">
       {initialText}
       <Tooltip title="Edit" onClick={() => setIsEditing(true)}>
         <IconButton>
-          <Edit />
+          <EditIcon />
         </IconButton>
       </Tooltip>
     </Grid>

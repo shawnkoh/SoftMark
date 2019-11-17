@@ -20,7 +20,7 @@ const DeleteScriptModal: React.FC<Props> = props => {
   return (
     <>
       <ConfirmationDialog
-        title={`Delete script "${script.filename}".`}
+        title={`Delete script "${script.filename}"?`}
         message={`This action is irreversible. Do you still want to delete?`}
         open={isOpen}
         handleClose={toggleVisibility}

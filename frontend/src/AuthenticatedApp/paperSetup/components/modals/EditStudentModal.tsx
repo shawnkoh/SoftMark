@@ -1,32 +1,24 @@
-import React, { useState, useEffect, Dispatch } from "react";
+import { Dialog, DialogContent } from "@material-ui/core";
+import React, { Dispatch, ReactNode, useState } from "react";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../../api";
-import { PaperUserListData } from "../../../../types/paperUsers";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip
-} from "@material-ui/core";
-import Edit from "@material-ui/icons/Edit";
+import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import { UserPatchData } from "backend/src/types/users";
-import { PaperUserPatchData } from "backend/src/types/paperUsers";
-import { toast } from "react-toastify";
+import { PaperUserListData } from "../../../../types/paperUsers";
 
 interface OwnProps {
   student: PaperUserListData;
   callbackStudentData: Dispatch<any>;
+  render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const EditStudentModal: React.FC<Props> = props => {
-  const { student, children, callbackStudentData } = props;
+  const { student, callbackStudentData, render } = props;
   const { matriculationNumber, user } = student;
   const { name, email } = user;
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +32,7 @@ const EditStudentModal: React.FC<Props> = props => {
 
   const formMetadata: FormMetadataType<any> = {
     matriculationNumber: {
-      label: "Matric no.",
+      label: "Matriculation number",
       required: true,
       options: null,
       xs: 12,
@@ -61,14 +53,16 @@ const EditStudentModal: React.FC<Props> = props => {
 
   return (
     <>
-      <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>Student data</DialogTitle>
-        <DialogContent>
+      <Dialog open={isOpen} fullWidth onClose={toggleVisibility}>
+        <CustomDialogTitle id="edit-student-modal" onClose={toggleVisibility}>
+          Edit student
+        </CustomDialogTitle>
+        <DialogContent dividers>
           <SimpleForm
             initialValues={values}
             formMetadata={formMetadata}
             validationSchema={validationSchema}
-            includeReset={true}
+            includeReset={false}
             onCancel={toggleVisibility}
             onSubmit={(newValues: any) =>
               api.paperUsers
@@ -86,11 +80,7 @@ const EditStudentModal: React.FC<Props> = props => {
           />
         </DialogContent>
       </Dialog>
-      <Tooltip title={"Edit student"}>
-        <IconButton onClick={toggleVisibility}>
-          <Edit />
-        </IconButton>
-      </Tooltip>
+      {render(toggleVisibility)}
     </>
   );
 };

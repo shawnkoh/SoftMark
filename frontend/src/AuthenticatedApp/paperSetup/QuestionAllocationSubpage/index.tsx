@@ -8,7 +8,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
+  Typography
 } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(4)
     },
     margin: {
-      marginTop: theme.spacing(1)
+      marginTop: theme.spacing(2)
     },
     tableWrapper: {
       overflowX: "auto"
@@ -120,7 +121,10 @@ const QuestionAllocationPage: React.FC<Props> = () => {
           paperId={paper.id}
           refreshMarkers={refreshMarkers}
           render={toggleModal => (
-            <Box display="flex" justifyContent="center">
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="overline">
+                {markers.length} marker(s) in total
+              </Typography>
               <Button
                 onClick={toggleModal}
                 variant="contained"

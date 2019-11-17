@@ -1,5 +1,5 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { lightBlue } from "@material-ui/core/colors";
+import blue from "@material-ui/core/colors/blue";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -7,7 +7,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       position: "fixed",
       bottom: 0,
-      backgroundColor: lightBlue[50]
+      backgroundColor: blue[50]
+    },
+    grow: {
+      flexGrow: 1
     }
   })
 );

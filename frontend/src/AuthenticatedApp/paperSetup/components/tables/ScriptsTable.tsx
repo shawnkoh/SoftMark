@@ -10,12 +10,14 @@ import {
   Tooltip,
   Typography
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import DeleteAllIcon from "@material-ui/icons/DeleteForever";
+import UploadIcon from "@material-ui/icons/Publish";
+import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import React, { useEffect, useState } from "react";
 import api from "../../../../api";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
+import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import { TableColumn } from "../../../../components/tables/TableTypes";
@@ -23,15 +25,7 @@ import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadSc
 import usePaper from "../../../../contexts/PaperContext";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
-
-const useStyles = makeStyles(theme => ({
-  tableWrapper: {
-    overflowX: "auto"
-  },
-  margin: {
-    marginBottom: theme.spacing(1)
-  }
-}));
+import useStyles from "./styles";
 
 const ScriptsTable: React.FC = () => {
   const paper = usePaper();
@@ -92,7 +86,7 @@ const ScriptsTable: React.FC = () => {
 
   const columns: TableColumn[] = [
     {
-      name: "Scripts (File name)",
+      name: "Script (filename)",
       key: "scripts"
     },
     {
@@ -104,7 +98,7 @@ const ScriptsTable: React.FC = () => {
       key: "students"
     },
     {
-      name: "Script to student verification",
+      name: "Correct mapping verification",
       key: "verified"
     },
     {
@@ -127,6 +121,9 @@ const ScriptsTable: React.FC = () => {
 
   return (
     <>
+      <Typography variant="overline" className={classes.margin}>
+        {scripts.length} script(s) in total
+      </Typography>
       <Grid
         container
         direction="row"
@@ -135,7 +132,7 @@ const ScriptsTable: React.FC = () => {
         spacing={1}
         className={classes.margin}
       >
-        <Grid item>
+        <Grid item className={classes.grow}>
           <SearchBar
             value={""}
             placeholder="Search..."
@@ -147,33 +144,47 @@ const ScriptsTable: React.FC = () => {
             paperId={paper.id}
             refreshScripts={callbackScripts}
           >
-            <ThemedButton label="Upload" filled />
+            <RoundedButton
+              variant="contained"
+              color="primary"
+              startIcon={<UploadIcon />}
+            >
+              Upload
+            </RoundedButton>
           </UploadScriptsWrapper>
         </Grid>
         <Grid item>
-          <DeleteAllScriptsModal
-            scripts={scripts}
-            refreshScripts={callbackScripts}
-          />
-        </Grid>
-        <Grid item>
           <Tooltip title="Match students to scripts">
-            <ThemedButton
-              label="Match"
-              filled
+            <RoundedButton
+              variant="contained"
+              color="primary"
+              startIcon={<MatchIcon />}
               onClick={() => {
                 api.scripts.matchScriptsToPaperUsers(paper.id).then(resp => {
                   setScripts([]);
                   getScripts();
                 });
               }}
-            />
+            >
+              Match
+            </RoundedButton>
           </Tooltip>
         </Grid>
         <Grid item>
-          <Typography variant="subtitle1">
-            Total scripts: {scripts.length}
-          </Typography>
+          <DeleteAllScriptsModal
+            scripts={scripts}
+            refreshScripts={callbackScripts}
+            render={toggleModal => (
+              <RoundedButton
+                onClick={toggleModal}
+                variant="contained"
+                startIcon={<DeleteAllIcon />}
+                className={classes.redButton}
+              >
+                Delete All
+              </RoundedButton>
+            )}
+          />
         </Grid>
       </Grid>
       <Paper className={classes.tableWrapper}>

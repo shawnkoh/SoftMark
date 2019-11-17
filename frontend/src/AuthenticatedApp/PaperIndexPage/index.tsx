@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   Container,
@@ -11,6 +10,7 @@ import {
   Chip
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import blue from "@material-ui/core/colors/blue";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { PaperData } from "backend/src/types/papers";
@@ -112,7 +112,7 @@ const PaperIndex: React.FC<Props> = props => {
                       props.history.push(`/papers/${paper.id}/setup`);
                     }}
                   >
-                    <Box display="flex" alignItems="center">
+                    <Box display="flex" alignItems="center" flexWrap="wrap">
                       <Typography
                         variant="h6"
                         className={clsx(classes.cardItem, classes.grow)}

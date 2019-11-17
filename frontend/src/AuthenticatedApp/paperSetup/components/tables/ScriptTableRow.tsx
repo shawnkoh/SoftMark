@@ -1,45 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-
-import api from "../../../../api";
-import * as Yup from "yup";
-import { ScriptListData } from "backend/src/types/scripts";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
-  Button,
   Grid,
   IconButton,
-  TableRow,
   TableCell,
+  TableRow,
   Tooltip,
-  Typography,
-  Paper
+  Typography
 } from "@material-ui/core";
-import Change from "@material-ui/icons/Autorenew";
-import Delete from "@material-ui/icons/Delete";
-import Edit from "@material-ui/icons/Edit";
-import View from "@material-ui/icons/Search";
+import DeleteIcon from "@material-ui/icons/DeleteForever";
+import EditIcon from "@material-ui/icons/Edit";
+import { ScriptListData } from "backend/src/types/scripts";
+import ViewIcon from "mdi-material-ui/FileFind";
+import React, { useState } from "react";
+import { RouteComponentProps, withRouter } from "react-router";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
+import api from "../../../../api";
+import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
 import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
-import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
-import { toast } from "react-toastify";
-
-const useStyles = makeStyles(() => ({
-  green: {
-    color: "green"
-  },
-  red: {
-    color: "red"
-  },
-  grey: {
-    color: "grey"
-  },
-  black: {
-    color: "black"
-  }
-}));
+import useStyles from "./styles";
+import VerificationSwitch from "./VerificationSwitch";
 
 interface OwnProps {
   script: ScriptListData;
@@ -83,59 +64,47 @@ const ScriptsTableRow: React.FC<Props> = props => {
           onSubmit={patchScript}
         />
       </TableCell>
-      <TableCell align="center">
+      <TableCell>
         <Typography
           className={
-            pagesCount === scriptTemplatePagesCount
-              ? classes.black
-              : classes.red
+            pagesCount === scriptTemplatePagesCount ? undefined : classes.red
           }
         >
           {pagesCount}
         </Typography>
       </TableCell>
       <TableCell>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-        >
-          {student ? student.matriculationNumber : "No match found"}
-          <PickStudentModal
-            callbackScript={setScript}
-            script={script}
-            render={toggleModal => (
-              <Tooltip title={"Change student"}>
-                <IconButton onClick={toggleModal}>
-                  <Change />
-                </IconButton>
-              </Tooltip>
-            )}
-          />
-        </Grid>
+        {student ? student.matriculationNumber : "No match found"}
+        <PickStudentModal
+          callbackScript={setScript}
+          script={script}
+          render={toggleModal => (
+            <Tooltip title={"Change student"}>
+              <IconButton onClick={toggleModal}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        />
       </TableCell>
       <TableCell>
-        <Grid
-          container
-          direction="column"
-          justify="space-between"
-          alignItems="center"
-        >
-          <Button onClick={() => patchScript({ hasVerifiedStudent: true })}>
-            <Typography
-              className={hasVerifiedStudent ? classes.green : classes.grey}
-            >
-              Verified
-            </Typography>
-          </Button>
-          <Button onClick={() => patchScript({ hasVerifiedStudent: false })}>
-            <Typography
-              className={hasVerifiedStudent ? classes.grey : classes.red}
-            >
-              Unverified
-            </Typography>
-          </Button>
+        <Grid component="label" container alignItems="center" spacing={1}>
+          <Grid item className={hasVerifiedStudent ? undefined : classes.red}>
+            Unverified
+          </Grid>
+          <Grid item>
+            <VerificationSwitch
+              color="primary"
+              checked={hasVerifiedStudent}
+              onChange={event =>
+                patchScript({ hasVerifiedStudent: event.target.checked })
+              }
+              value="verified"
+            />
+          </Grid>
+          <Grid item className={hasVerifiedStudent ? classes.green : undefined}>
+            Verified
+          </Grid>
         </Grid>
       </TableCell>
       <TableCell>
@@ -143,8 +112,8 @@ const ScriptsTableRow: React.FC<Props> = props => {
           script={script}
           render={toggleModal => (
             <Tooltip title={"View script"}>
-              <IconButton className={classes.black} onClick={toggleModal}>
-                <View />
+              <IconButton color="default" onClick={toggleModal}>
+                <ViewIcon />
               </IconButton>
             </Tooltip>
           )}
@@ -154,8 +123,8 @@ const ScriptsTableRow: React.FC<Props> = props => {
           refreshScripts={refreshScripts}
           render={toggleModal => (
             <Tooltip title={"Delete script"}>
-              <IconButton className={classes.red} onClick={toggleModal}>
-                <Delete />
+              <IconButton onClick={toggleModal} className={classes.red}>
+                <DeleteIcon />
               </IconButton>
             </Tooltip>
           )}
