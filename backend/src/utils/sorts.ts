@@ -1,6 +1,6 @@
-import { PaperUser } from "../entities/PaperUser";
 import { AllocationData } from "allocations";
 import { PaperUserListData } from "paperUsers";
+import { PaperUser } from "../entities/PaperUser";
 
 interface withPageNo {
   pageNo: number;

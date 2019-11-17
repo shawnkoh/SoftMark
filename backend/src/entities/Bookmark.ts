@@ -1,8 +1,8 @@
-import { Entity, ManyToOne, Column, getRepository } from "typeorm";
+import { Column, Entity, getRepository, ManyToOne } from "typeorm";
+import { BookmarkData, BookmarkListData } from "../types/bookmarks";
 import { Base } from "./Base";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
-import { BookmarkData, BookmarkListData } from "../types/bookmarks";
 
 @Entity()
 export class Bookmark extends Base {

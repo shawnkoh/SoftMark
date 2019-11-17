@@ -1,6 +1,6 @@
 import { BaseData, isBaseData } from "./entities";
-import { PageListData, isPageListData } from "./pages";
-import { PaperUserListData, isPaperUserListData } from "./paperUsers";
+import { isPageListData, PageListData } from "./pages";
+import { isPaperUserListData, PaperUserListData } from "./paperUsers";
 
 export interface AnnotationLine {
   points: number[];

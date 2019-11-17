@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Entity, ManyToOne, Column } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";

@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString
 } from "class-validator";
+import { sign } from "jsonwebtoken";
 import {
   Column,
   Entity,
@@ -29,7 +30,6 @@ import { Paper } from "./Paper";
 import { Question } from "./Question";
 import { Script } from "./Script";
 import { User } from "./User";
-import { sign } from "jsonwebtoken";
 
 @Entity()
 @Unique(["paper", "user"])

@@ -1,7 +1,7 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { QuestionListData, isQuestionListData } from "./questions";
-import { PageListData, isPageListData } from "./pages";
+import { isPageListData, PageListData } from "./pages";
 import { PaperUserListData } from "./paperUsers";
+import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface ScriptPostData {
   filename: string;
