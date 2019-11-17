@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouteMatch, RouteComponentProps } from "react-router";
+import { RouteComponentProps } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
 
 import { PaperProvider } from "../../contexts/PaperContext";
@@ -9,15 +9,13 @@ import { Check, People, Person, Settings } from "@material-ui/icons";
 
 import useStyles from "./styles";
 import PaperViewHeader from "./components/PaperViewHeader";
-import SetupSubpage from "./subpages/Setup";
-import GradingSubpage from "./subpages/Grading";
-import ScriptsSubpage from "./subpages/Scripts";
-
-import ScriptMapping from "../paperSetup/ScriptMappingPage";
-import ScriptTemplateView from "../paperSetup/ScriptTemplateView";
-import QuestionAllocationPage from "../paperSetup/QuestionAllocationPage";
-import { MarkQuestionPage } from "../paperGrading";
-import { ScriptViewPage } from "../paperScripts";
+import SetupPage, {
+  ScriptMappingSubpage,
+  QuestionAllocationSubpage,
+  ScriptTemplateSubpage
+} from "../paperSetup";
+import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
+import ScriptsPage, { ScriptViewSubpage } from "../paperScripts";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -79,30 +77,27 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     <PaperProvider>
       <Switch>
         <Route
-          path={`${path}/${SETUP}/question_allocation`}
-          component={QuestionAllocationPage}
+          path={`${path}/${SETUP}/allocate`}
+          component={QuestionAllocationSubpage}
         />
         <Route
-          path={`${path}/${SETUP}/script_template`}
-          component={ScriptTemplateView}
+          path={`${path}/${SETUP}/template`}
+          component={ScriptTemplateSubpage}
         />
-        <Route
-          path={`${path}/${SETUP}/script_mapping`}
-          component={ScriptMapping}
-        />
+        <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
         <Route
           path={`${path}/${GRADING}/:questionTemplateId`}
-          component={MarkQuestionPage}
+          component={MarkQuestionSubpage}
         />
         <Route
           path={`${path}/${SCRIPTS}/:scriptId`}
-          component={ScriptViewPage}
+          component={ScriptViewSubpage}
         />
         <Route path={`${path}/${SETUP}`}>
           {(routeProps: RouteComponentProps) => (
             <>
               <PaperViewHeader />
-              <SetupSubpage {...routeProps} />
+              <SetupPage {...routeProps} />
               <BottomNav />
             </>
           )}
@@ -111,7 +106,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {(routeProps: RouteComponentProps) => (
             <>
               <PaperViewHeader />
-              <GradingSubpage />
+              <GradingPage />
               <BottomNav />
             </>
           )}
@@ -120,7 +115,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {(routeProps: RouteComponentProps) => (
             <>
               <PaperViewHeader />
-              <ScriptsSubpage />
+              <ScriptsPage />
               <BottomNav />
             </>
           )}

@@ -1,3 +1,5 @@
-import ScriptViewPage from "./ScriptView";
+import ScriptsPage from "./ScriptsPage";
+import ScriptViewSubpage from "./ScriptViewSubpage";
 
-export { ScriptViewPage };
+export { ScriptViewSubpage };
+export default ScriptsPage;

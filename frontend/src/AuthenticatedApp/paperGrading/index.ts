@@ -1,3 +1,5 @@
-import MarkQuestionPage from "./MarkQuestionPage";
+import GradingPage from "./GradingPage";
+import MarkQuestionSubpage from "./MarkQuestionSubpage";
 
-export { MarkQuestionPage };
+export { MarkQuestionSubpage };
+export default GradingPage;

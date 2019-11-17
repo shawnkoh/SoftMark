@@ -4,15 +4,15 @@ import { Route, Switch } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import api from "../../../../api";
-import usePaper from "../../../../contexts/PaperContext";
+import api from "../../../api";
+import usePaper from "../../../contexts/PaperContext";
 
 import { Button, Box, Container, Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
-import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
-import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
-import UploadScriptTemplateWrapper from "../../../../components/uploadWrappers/UploadScriptTemplateWrapper";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
+import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
+import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
