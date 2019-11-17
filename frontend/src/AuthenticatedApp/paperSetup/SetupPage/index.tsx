@@ -62,11 +62,12 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
 
   const getScripts = async (paperId: number) => {
-    const data = await api.scripts.getScripts(paperId);
-    if (data) {
-      setScripts(data);
-    }
-    setIsLoadingScripts(false);
+    api.scripts
+      .getScripts(paperId)
+      .then(res => {
+        setScripts(res.data.scripts);
+      })
+      .finally(() => setIsLoadingScripts(false));
   };
 
   const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);

@@ -7,6 +7,7 @@ import InvitePage from "../UnauthenticatedApp/InvitePage";
 import PaperIndex from "./PaperIndexPage";
 import PaperView from "./PaperViewPage";
 import theme from "./theme";
+import { PaperProvider } from "contexts/PaperContext";
 
 const AuthenticatedApp: React.FC = () => {
   return (
@@ -15,7 +16,11 @@ const AuthenticatedApp: React.FC = () => {
       <Switch>
         <Route exact path="/" component={PaperIndex} />
         <Route exact path="/papers" component={PaperIndex} />
-        <Route path="/papers/:paper_id" component={PaperView} />
+        <Route path="/papers/:paper_id">
+          <PaperProvider>
+            <PaperView />
+          </PaperProvider>
+        </Route>
         <Route exact path="/invite/:token" component={InvitePage} />
         <Route>
           <NotFoundPage isAuthenticated />

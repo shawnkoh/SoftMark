@@ -23,6 +23,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import RoundedButton from "../../components/buttons/RoundedButton";
 import AddPaperModal from "./components/AddPaperModal";
 import Header from "./components/PaperIndexHeader";
+import { PaperUserRole } from "../../types/paperUsers";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -109,7 +110,17 @@ const PaperIndex: React.FC<Props> = props => {
                 <Card>
                   <CardActionArea
                     onClick={() => {
-                      props.history.push(`/papers/${paper.id}/setup`);
+                      switch (paper.role) {
+                        case PaperUserRole.Owner:
+                          props.history.push(`/papers/${paper.id}/setup`);
+                          break;
+                        case PaperUserRole.Marker:
+                          props.history.push(`/papers/${paper.id}/grading`);
+                          break;
+                        case PaperUserRole.Student:
+                          props.history.push(`/papers/${paper.id}`);
+                          break;
+                      }
                     }}
                   >
                     <Grid

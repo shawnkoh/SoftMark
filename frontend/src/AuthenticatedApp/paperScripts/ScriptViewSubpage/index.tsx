@@ -8,13 +8,11 @@ import { ScriptViewData } from "backend/src/types/view";
 
 import {
   Grid,
-  Button,
   AppBar,
   IconButton,
   Toolbar,
   Typography,
-  Avatar,
-  Chip
+  Avatar
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
@@ -87,7 +85,6 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
   const getScriptViewData = async (scriptId: number) => {
     setIsLoading(true);
@@ -143,8 +140,6 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     );
   }
 
-  console.log(scriptViewData);
-
   const incrementPageNo = () =>
     setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
   const decrementPageNo = () =>
@@ -162,7 +157,7 @@ const ScriptView: React.FC<Props> = ({ match: { params } }) => {
     const currentPageQuestions =
       descendantQuestions === undefined ||
       descendantQuestions === null ||
-      descendantQuestions.length == 0
+      descendantQuestions.length === 0
         ? [rootQuestion]
         : descendantQuestions.filter(question =>
             currentPage.questionIds.includes(question.id)

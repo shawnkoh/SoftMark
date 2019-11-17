@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import * as Yup from "yup";
 import { PaperUserListData } from "../../../../types/paperUsers";
-import { UserPatchData } from "backend/src/types/users";
 import { discardPaperUser } from "../../../../api/paperUsers";
 
 import { toast } from "react-toastify";

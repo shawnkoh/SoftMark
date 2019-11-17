@@ -47,9 +47,7 @@ const ScriptsSubpage: React.FC = () => {
     api.scripts
       .getScripts(paper.id)
       .then(resp => {
-        if (resp !== null) {
-          setScripts(resp);
-        }
+        setScripts(resp.data.scripts);
       })
       .finally(() => setIsLoadingScripts(false));
   };
@@ -62,7 +60,6 @@ const ScriptsSubpage: React.FC = () => {
   const DESC = "desc";
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState("script");
-  const flag = order + orderBy;
 
   const tableComparator = (a: ScriptListData, b: ScriptListData) => {
     let res = 0;
@@ -106,8 +103,10 @@ const ScriptsSubpage: React.FC = () => {
   };
 
   useEffect(() => {
-    setTimeout(sortTable, 1000);
-  }, [flag]);
+    if (!isLoadingScripts) {
+      setTimeout(sortTable, 1000);
+    }
+  }, [order, orderBy]);
 
   if (isLoadingScripts) {
     return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
