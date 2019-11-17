@@ -1,25 +1,24 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
 import { PageQuestionTemplate } from "../../entities/PageQuestionTemplate";
 import { PageTemplate } from "../../entities/PageTemplate";
+import { Paper } from "../../entities/Paper";
+import { Question } from "../../entities/Question";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
+import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
 import {
-  PageQuestionTemplatePostData,
-  isPageQuestionTemplateData
+  isPageQuestionTemplateData,
+  PageQuestionTemplatePostData
 } from "../../types/pageQuestionTemplates";
-import {
-  QuestionTemplatePostData,
-  isQuestionTemplateData,
-  QuestionTemplateData
-} from "../../types/questionTemplates";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
-import { Script } from "../../entities/Script";
 import { PaperUserRole } from "../../types/paperUsers";
-import { Question } from "../../entities/Question";
-import { Paper } from "../../entities/Paper";
+import {
+  isQuestionTemplateData,
+  QuestionTemplateData,
+  QuestionTemplatePostData
+} from "../../types/questionTemplates";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 beforeAll(async () => {

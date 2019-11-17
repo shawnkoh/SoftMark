@@ -1,6 +1,5 @@
 import { DiscardableData, isDiscardableData } from "./entities";
 import { UserListData } from "./users";
-import { PaperUserListData } from "./paperUsers";
 
 export interface QuestionTemplatePostData {
   name: string;
@@ -9,7 +8,7 @@ export interface QuestionTemplatePostData {
   displayPage?: number | null;
   topOffset?: number | null;
   leftOffset?: number | null;
-  parentName?: string | null;
+  parentQuestionTemplateId?: number | null;
 }
 
 export type QuestionTemplatePatchData = Partial<QuestionTemplatePostData>;

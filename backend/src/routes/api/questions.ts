@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import * as BookmarksController from "../../controllers/BookmarksController";
 import * as MarksController from "../../controllers/MarksController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";

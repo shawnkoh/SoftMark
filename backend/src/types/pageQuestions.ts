@@ -1,6 +1,6 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { PageListData, isPageListData } from "./pages";
-import { QuestionListData, isQuestionListData } from "./questions";
+import { isPageListData, PageListData } from "./pages";
+import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface PageQuestionPostData {}
 

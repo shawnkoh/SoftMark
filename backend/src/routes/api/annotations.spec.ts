@@ -1,17 +1,16 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
 import { Annotation } from "../../entities/Annotation";
 import { Page } from "../../entities/Page";
 import { Script } from "../../entities/Script";
 import { ApiServer } from "../../server";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import {
-  isAnnotationData,
-  AnnotationPatchData,
   AnnotationData,
-  AnnotationLine
+  AnnotationLine,
+  AnnotationPatchData,
+  isAnnotationData
 } from "../../types/annotations";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 const exampleAnnotation: AnnotationLine[] = [
   {

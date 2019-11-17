@@ -1,13 +1,13 @@
 import { IsOptional } from "class-validator";
 import {
+  Column,
   Entity,
+  getRepository,
   ManyToOne,
   OneToMany,
-  Column,
-  Unique,
-  getRepository
+  Unique
 } from "typeorm";
-
+import { QuestionData, QuestionListData } from "../types/questions";
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
@@ -16,7 +16,6 @@ import { PageQuestion } from "./PageQuestion";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
-import { QuestionListData, QuestionData } from "../types/questions";
 
 @Entity()
 @Unique(["script", "questionTemplate"])

@@ -1,8 +1,8 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { PageTemplateListData, isPageTemplateListData } from "./pageTemplates";
+import { isPageTemplateListData, PageTemplateListData } from "./pageTemplates";
 import {
-  QuestionTemplateData,
-  isQuestionTemplateData
+  isQuestionTemplateData,
+  QuestionTemplateData
 } from "./questionTemplates";
 
 export interface PageQuestionTemplatePostData {

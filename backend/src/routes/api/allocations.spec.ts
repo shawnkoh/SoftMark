@@ -1,11 +1,10 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-
-import { ScriptTemplate } from "../../entities/ScriptTemplate";
-import { QuestionTemplate } from "../../entities/QuestionTemplate";
-import { ApiServer } from "../../server";
-import { synchronize, loadFixtures, Fixtures } from "../../utils/tests";
 import { Allocation } from "../../entities/Allocation";
+import { QuestionTemplate } from "../../entities/QuestionTemplate";
+import { ScriptTemplate } from "../../entities/ScriptTemplate";
+import { ApiServer } from "../../server";
+import { Fixtures, loadFixtures, synchronize } from "../../utils/tests";
 
 let server: ApiServer;
 let fixtures: Fixtures;
