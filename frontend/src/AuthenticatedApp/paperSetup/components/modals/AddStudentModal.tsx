@@ -1,33 +1,23 @@
-import React, { useState, useEffect, Dispatch } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
+import React, { useState, ReactNode } from "react";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../../api";
-import { PaperUserListData } from "../../../../types/paperUsers";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip
-} from "@material-ui/core";
-import Edit from "@material-ui/icons/Edit";
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import { UserPatchData } from "backend/src/types/users";
 import { PaperUserPostData, PaperUserRole } from "../../../../types/paperUsers";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
-import { toast } from "react-toastify";
 
 interface OwnProps {
   paperId: number;
   refreshStudents: () => void;
+  render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const AddStudentModal: React.FC<Props> = props => {
-  const { refreshStudents, paperId } = props;
+  const { paperId, refreshStudents, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -62,7 +52,7 @@ const AddStudentModal: React.FC<Props> = props => {
   return (
     <>
       <Dialog open={isOpen} fullWidth onBackdropClick={toggleVisibility}>
-        <DialogTitle>Student data</DialogTitle>
+        <DialogTitle>Add new student</DialogTitle>
         <DialogContent>
           <SimpleForm
             initialValues={values}
@@ -88,7 +78,7 @@ const AddStudentModal: React.FC<Props> = props => {
           />
         </DialogContent>
       </Dialog>
-      <ThemedButton label="Add" filled onClick={toggleVisibility} />
+      {render(toggleVisibility)}
     </>
   );
 };

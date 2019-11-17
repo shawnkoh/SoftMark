@@ -1,4 +1,5 @@
 import {
+  Box,
   Grid,
   Paper,
   Table,
@@ -10,9 +11,12 @@ import {
   Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import DeleteAllIcon from "@material-ui/icons/DeleteForever";
+import UploadIcon from "@material-ui/icons/Publish";
+import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useEffect, useState } from "react";
 import api from "../../../../api";
-import ThemedButton from "../../../../components/buttons/ThemedButton";
+import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import { TableColumn } from "../../../../components/tables/TableTypes";
@@ -29,6 +33,9 @@ const useStyles = makeStyles(theme => ({
   },
   margin: {
     marginBottom: theme.spacing(1)
+  },
+  grow: {
+    flexGrow: 1
   }
 }));
 
@@ -70,12 +77,8 @@ const StudentsTable: React.FC = () => {
 
   const columns: TableColumn[] = [
     {
-      name: "Student matriculation number",
+      name: "Matriculation number",
       key: "matric"
-    },
-    {
-      name: "Pages",
-      key: "pages"
     },
     {
       name: "Name",
@@ -87,7 +90,7 @@ const StudentsTable: React.FC = () => {
     },
     {
       name: "",
-      key: ""
+      key: "actions"
     }
   ];
 
@@ -127,17 +130,46 @@ const StudentsTable: React.FC = () => {
             paperId={paper.id}
             refreshStudents={getStudents}
           >
-            <ThemedButton label="Upload" filled />
+            <RoundedButton
+              variant="contained"
+              color="primary"
+              startIcon={<UploadIcon />}
+            >
+              Upload
+            </RoundedButton>
           </UploadNominalRollWrapper>
+        </Grid>
+        <Grid item>
+          <AddStudentModal
+            paperId={paper.id}
+            refreshStudents={getStudents}
+            render={toggleVisibility => (
+              <RoundedButton
+                onClick={toggleVisibility}
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+              >
+                Add
+              </RoundedButton>
+            )}
+          />
         </Grid>
         <Grid item>
           <DeleteAllStudentsModal
             students={students}
             refreshStudents={callbackStudents}
+            render={toggleVisibility => (
+              <RoundedButton
+                onClick={toggleVisibility}
+                variant="contained"
+                color="secondary"
+                startIcon={<DeleteAllIcon />}
+              >
+                Delete All
+              </RoundedButton>
+            )}
           />
-        </Grid>
-        <Grid item>
-          <AddStudentModal paperId={paper.id} refreshStudents={getStudents} />
         </Grid>
         <Grid item>
           <Typography variant="subtitle1">

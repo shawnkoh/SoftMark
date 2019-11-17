@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../../../api";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Grid
-} from "@material-ui/core";
-import Clear from "@material-ui/icons/Clear";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
+import api from "../../../../api";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
+import { PaperUserListData } from "../../../../types/paperUsers";
 
 interface OwnProps {
   student: PaperUserListData;
   refreshStudents?: () => void;
+  render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const DeleteStudentModal: React.FC<Props> = props => {
-  const { student, children, refreshStudents } = props;
+  const { student, refreshStudents, render } = props;
   const { user, matriculationNumber } = student;
   const { name } = user;
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +22,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
   return (
     <>
       <ConfirmationDialog
-        title={`Delete student "${name}" (Matric no: ${matriculationNumber}).`}
+        title={`Delete student ${name} (${matriculationNumber})`}
         message={`This action is irreversible. Do you still want to delete?`}
         open={isOpen}
         handleClose={toggleVisibility}
@@ -50,9 +41,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
           toggleVisibility();
         }}
       />
-      <IconButton onClick={toggleVisibility}>
-        <Clear />
-      </IconButton>
+      {render(toggleVisibility)}
     </>
   );
 };
