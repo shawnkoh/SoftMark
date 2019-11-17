@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps, withRouter } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
 
-import { PaperProvider } from "../../contexts/PaperContext";
+import usePaper from "contexts/PaperContext";
 
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import Check from "@material-ui/icons/Check";
@@ -28,6 +28,8 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   // https://reacttraining.com/react-router/web/example/nesting
   const { path, url } = match;
   const { pathname } = location;
+
+  const paper = usePaper();
 
   const getTabValueFromPathname = pathname => {
     if (pathname.includes(SETUP)) {
@@ -76,55 +78,53 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   );
 
   return (
-    <PaperProvider>
-      <Switch>
-        <Route
-          path={`${path}/${SETUP}/allocate`}
-          component={QuestionAllocationSubpage}
-        />
-        <Route
-          path={`${path}/${SETUP}/template`}
-          component={ScriptTemplateSubpage}
-        />
-        <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
-        <Route
-          path={`${path}/${GRADING}/:questionTemplateId`}
-          component={MarkQuestionSubpage}
-        />
-        <Route
-          path={`${path}/${SCRIPTS}/:scriptId`}
-          component={ScriptViewSubpage}
-        />
-        <Route path={`${path}/${SETUP}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <SetupPage {...routeProps} />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-        <Route path={`${path}/${GRADING}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <GradingPage />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-        <Route path={`${path}/${SCRIPTS}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <ScriptsPage />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-      </Switch>
-    </PaperProvider>
+    <Switch>
+      <Route
+        path={`${path}/${SETUP}/allocate`}
+        component={QuestionAllocationSubpage}
+      />
+      <Route
+        path={`${path}/${SETUP}/template`}
+        component={ScriptTemplateSubpage}
+      />
+      <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
+      <Route
+        path={`${path}/${GRADING}/:questionTemplateId`}
+        component={MarkQuestionSubpage}
+      />
+      <Route
+        path={`${path}/${SCRIPTS}/:scriptId`}
+        component={ScriptViewSubpage}
+      />
+      <Route path={`${path}/${SETUP}`}>
+        {(routeProps: RouteComponentProps) => (
+          <>
+            <PaperViewHeader />
+            <SetupPage {...routeProps} />
+            <BottomNav />
+          </>
+        )}
+      </Route>
+      <Route path={`${path}/${GRADING}`}>
+        {(routeProps: RouteComponentProps) => (
+          <>
+            <PaperViewHeader />
+            <GradingPage />
+            <BottomNav />
+          </>
+        )}
+      </Route>
+      <Route path={`${path}/${SCRIPTS}`}>
+        {(routeProps: RouteComponentProps) => (
+          <>
+            <PaperViewHeader />
+            <ScriptsPage />
+            <BottomNav />
+          </>
+        )}
+      </Route>
+    </Switch>
   );
 };
 
-export default PaperView;
+export default withRouter(PaperView);
