@@ -32,7 +32,7 @@ type Props = OwnProps;
 const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   const classes = useStyles();
 
-  const { name, score, maxScore, topOffset, leftOffset } = question;
+  const { id, name, score, maxScore, topOffset, leftOffset } = question;
 
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -56,7 +56,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   };
 
   const handleSave = event => {
-    putMarkData(question.id, localScore);
+    putMarkData(id, localScore);
   };
 
   return (
@@ -66,14 +66,14 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
           id="customized-dialog-title"
           onClose={toggleVisibility}
         >
-          Marks for Q{question.name} {maxScore && `(Total marks: ${maxScore})`}
+          Marks for Q{name} {maxScore && ` (Maximum: ${maxScore})`}
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score:{" "}
+            Current score:
             {actualScore !== null
-              ? `${actualScore} / ${maxScore}`
-              : "no score yet"}
+              ? ` ${actualScore} / ${maxScore}`
+              : " no score yet"}
           </Typography>
           <div className={classes.slider}>
             <Slider
@@ -82,7 +82,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
               step={0.5}
               marks
               min={0}
-              max={question.maxScore || 100}
+              max={maxScore || 100}
               valueLabelDisplay="on"
             />
           </div>
@@ -96,7 +96,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {render(toggleVisibility, actualScore, question.name)}
+      {render(toggleVisibility, actualScore, name)}
     </>
   );
 };

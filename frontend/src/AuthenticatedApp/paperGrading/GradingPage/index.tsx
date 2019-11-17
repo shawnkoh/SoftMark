@@ -19,11 +19,11 @@ import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { UserListData } from "backend/src/types/users";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
-import api from "../../../../api";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
-import BorderLinearProgress from "../../../../components/BorderLinearProgress";
-import { TableColumn } from "../../../../components/tables/TableTypes";
-import usePaper from "../../../../contexts/PaperContext";
+import api from "../../../api";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import BorderLinearProgress from "../../../components/BorderLinearProgress";
+import { TableColumn } from "../../../components/tables/TableTypes";
+import usePaper from "../../../contexts/PaperContext";
 import GradingTableRow from "./GradingTableRow";
 import useStyles from "./styles";
 

@@ -12,6 +12,7 @@ import {
 } from "backend/src/types/view";
 
 import {
+  Container,
   Grid,
   AppBar,
   Button,
@@ -40,6 +41,10 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       touchAction: "none"
+    },
+    innerContainer: {
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2)
     },
     grow: {
       display: "flex",
@@ -111,7 +116,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     getScriptViewData(questionTemplateId);
   }, [refreshFlag]);
 
-  const [pageNo, setPageNo] = useState(1);
+  const [pageNo, setPageNo] = useState(0);
 
   const Header = () => (
     <AppBar position="static" color="primary" elevation={1}>
@@ -152,16 +157,12 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     return (
       <div className={classes.container}>
         <Header />
-        <Typography variant="subtitle1">An error occurred.</Typography>
+        <Container maxWidth={false} className={classes.innerContainer}>
+          <Typography variant="subtitle1">An error occurred.</Typography>
+        </Container>
       </div>
     );
   }
-  console.log(scriptViewData);
-
-  const incrementPageNo = () =>
-    setPageNo(prevPageNo => Math.min(pages.length, prevPageNo + 1));
-  const decrementPageNo = () =>
-    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
 
   const {
     matriculationNumber,
@@ -169,6 +170,28 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     descendantQuestions,
     pages
   } = scriptViewData;
+
+  console.log(scriptViewData); // for debugging
+
+  if (!pages) {
+    return (
+      <div className={classes.container}>
+        <Header />
+        <Container maxWidth={false} className={classes.innerContainer}>
+          <Typography variant="subtitle1">No pages to display.</Typography>
+        </Container>
+      </div>
+    );
+  }
+
+  const pageNos = pages.map(page => page.pageNo);
+  setPageNo(pageNos[0]);
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo =>
+      Math.min(pageNos[pageNos.length - 1], prevPageNo + 1)
+    );
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(pageNos[0], prevPageNo - 1));
 
   const getCurrentPageQuestions = () => {
     const currentPage = pages.find(page => page.pageNo === pageNo)!;
@@ -190,16 +213,14 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         .filter(page => page.pageNo === pageNo)
         .map(page => (
           <div className={classes.grow}>
-            {page.pageNo === pageNo && (
-              <Annotator
-                key={page.id}
-                pageId={page.id}
-                backgroundImageSource={page.imageUrl}
-                foregroundAnnotation={
-                  page.annotations.length > 0 ? page.annotations[0].layer : []
-                }
-              />
-            )}
+            <Annotator
+              key={page.id}
+              pageId={page.id}
+              backgroundImageSource={page.imageUrl || ""}
+              foregroundAnnotation={
+                page.annotations.length > 0 ? page.annotations[0].layer : []
+              }
+            />
           </div>
         ))}
       )}
@@ -225,7 +246,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           ))}
         </Toolbar>
       </AppBar>
-      {pageNo !== 1 && (
+      {pageNo !== pageNos[0] && (
         <IconButton
           onClick={decrementPageNo}
           className={classes.prevPageButton}
@@ -235,7 +256,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           <ArrowLeftIcon />
         </IconButton>
       )}
-      {pageNo !== pages.length && (
+      {pageNo !== pageNos[pageNos.length - 1] && (
         <IconButton
           onClick={incrementPageNo}
           className={classes.nextPageButton}
@@ -245,16 +266,6 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
           <ArrowRightIcon />
         </IconButton>
       )}
-      {/*<Typography
-          variant="button"
-          gutterBottom
-          align="center"
-          color="primary"
-          className={classes.pageLabel}
-        >
-          {`Page ${pageNo} of ${pages.length}`}
-        </Typography>
-        */}
     </div>
   );
 };

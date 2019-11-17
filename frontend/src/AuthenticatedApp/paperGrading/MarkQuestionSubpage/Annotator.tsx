@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-import { saveAnnotation, getOwnAnnotation } from "../../../api/annotations";
+import { saveAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 
 import { CanvasWithToolbar } from "../../../components/Canvas";

@@ -2,10 +2,10 @@ import React, { useState } from "react";
 
 import { Paper, Container, Tab, Tabs } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import TabPanel from "../../components/tables/TabPanel";
-import ScriptsTable from "./components/tables/ScriptsTable";
-import Header from "./components/PaperSetupHeader";
-import StudentsTable from "./components/tables/StudentsTable";
+import TabPanel from "../../../components/tables/TabPanel";
+import ScriptsTable from "../components/tables/ScriptsTable";
+import Header from "../components/PaperSetupHeader";
+import StudentsTable from "../components/tables/StudentsTable";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -6,6 +6,7 @@ import { Route, Switch } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../api";
 import NotFoundPage from "../App/NotFoundPage";
+import { CanvasWithToolbar } from "../components/Canvas";
 import { getRefreshToken } from "../localStorage";
 import { setUser } from "../store/auth/actions";
 import { getUser } from "../store/auth/selectors";
@@ -17,8 +18,6 @@ import SignInPage from "./SignInPage";
 import SignUpPage from "./SignUpPage";
 import theme from "./theme";
 import VerifyAccountPage from "./VerifyAccountPage";
-
-import { CanvasWithToolbar } from "../components/Canvas";
 
 const UnauthenticatedApp: React.FC = () => {
   const user = useSelector(getUser);
