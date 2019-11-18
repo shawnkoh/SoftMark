@@ -1,19 +1,14 @@
 import { AnnotationListData, isAnnotationListData } from "./annotations";
 import { DiscardableData, isDiscardableData } from "./entities";
-import { isPageQuestionListData, PageQuestionListData } from "./pageQuestions";
-
-export interface PagePostData {}
 
 export interface PageListData extends DiscardableData {
   scriptId: number;
   pageNo: number;
-  pageQuestionsCount: number;
   annotationsCount: number;
   imageUrl: string;
 }
 
 export interface PageData extends PageListData {
-  pageQuestions: PageQuestionListData[];
   annotations: AnnotationListData[];
 }
 
@@ -28,12 +23,8 @@ export function isPageListData(data: any): data is PageListData {
 
 export function isPageData(data: any): data is PageData {
   return (
-    data.pageQuestions.every((pageQuestion: any) =>
-      isPageQuestionListData(pageQuestion)
-    ) &&
     data.annotations.every((annotation: any) =>
       isAnnotationListData(annotation)
-    ) &&
-    isPageListData(data)
+    ) && isPageListData(data)
   );
 }

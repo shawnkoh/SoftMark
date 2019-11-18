@@ -7,12 +7,11 @@ import {
   OneToMany,
   Unique
 } from "typeorm";
-import { QuestionData, QuestionListData } from "../types/questions";
+import { QuestionListData } from "../types/questions";
 import { Bookmark } from "./Bookmark";
 import { Comment } from "./Comment";
 import { Discardable } from "./Discardable";
 import { Mark } from "./Mark";
-import { PageQuestion } from "./PageQuestion";
 import { PaperUser } from "./PaperUser";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { Script } from "./Script";
@@ -57,9 +56,6 @@ export class Question extends Discardable {
   @IsOptional()
   currentMarkerUpdatedAt!: Date | null;
 
-  @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.question)
-  pageQuestions?: PageQuestion[];
-
   @OneToMany(type => Mark, mark => mark.question)
   marks?: Mark[];
 
@@ -88,9 +84,6 @@ export class Question extends Discardable {
       scriptId: this.scriptId,
       currentMarkerId: this.currentMarkerId,
       currentMarkerUpdatedAt: this.currentMarkerUpdatedAt,
-      pageQuestionsCount: this.pageQuestions
-        ? this.pageQuestions.length
-        : await getRepository(PageQuestion).count({ questionId: this.id }),
       marksCount: this.marks
         ? this.marks.length
         : await getRepository(Mark).count({ questionId: this.id }),
@@ -99,16 +92,4 @@ export class Question extends Discardable {
         : await getRepository(Bookmark).count({ questionId: this.id })
     };
   };
-
-  getData = async (): Promise<QuestionData> => ({
-    ...(await this.getListData()),
-    pageQuestions:
-      this.pageQuestions ||
-      (await getRepository(PageQuestion).find({ questionId: this.id })),
-    marks:
-      this.marks || (await getRepository(Mark).find({ questionId: this.id })),
-    bookmarks:
-      this.bookmarks ||
-      (await getRepository(Bookmark).find({ questionId: this.id }))
-  });
 }
