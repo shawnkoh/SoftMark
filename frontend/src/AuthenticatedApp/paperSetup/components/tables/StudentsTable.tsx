@@ -148,7 +148,6 @@ const StudentsTable: React.FC = () => {
         </Grid>
         <Grid item>
           <DeleteAllStudentsModal
-            students={students}
             refreshStudents={callbackStudents}
             render={toggleVisibility => (
               <RoundedButton

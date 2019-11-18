@@ -45,10 +45,14 @@ const Header: React.FC<Props> = props => {
         </IconButton>
         <Grid container className={classes.grow}>
           <Grid item xs={12}>
-            <Typography variant="h6">{name}</Typography>
+            <Typography variant="h6" color="inherit">
+              {name}
+            </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle1">{title}</Typography>
+            <Typography variant="subtitle1" color="inherit">
+              {title}
+            </Typography>
           </Grid>
         </Grid>
       </Toolbar>

@@ -295,7 +295,6 @@ export async function update(request: Request, response: Response) {
     const data = questionTemplate.getData();
     response.status(200).json({ questionTemplate: data });
   } catch (error) {
-    console.error(error);
     response.sendStatus(400);
   }
 }

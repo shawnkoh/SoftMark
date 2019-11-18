@@ -19,6 +19,7 @@ router.get(
   PaperUsersController.getUnmatchedStudents
 );
 router.post("/:id/users", PaperUsersController.create);
+router.delete("/:id/all_students", PaperUsersController.discardStudents);
 
 router.post("/", PapersController.create);
 router.get("/", PapersController.index);
@@ -42,6 +43,7 @@ router.get(
 router.post("/:id/scripts", ScriptsController.create);
 router.get("/:id/scripts", ScriptsController.index);
 router.patch("/:id/scripts/match", ScriptsController.match);
+router.delete("/:id/all_scripts", ScriptsController.discardScripts);
 
 router.get("/:id/allocations", AllocationsController.index);
 router.get("/:id/root_allocations", AllocationsController.getRootAllocations);

@@ -18,7 +18,9 @@ export async function createScript(
   id: number,
   scriptPostData: ScriptPostData
 ): Promise<AxiosResponse<{ script: ScriptData }>> {
-  return client.post(`/papers/${id}/scripts`, scriptPostData);
+  return client.post(`/papers/${id}/scripts`, scriptPostData, {
+    timeout: 120000
+  });
 }
 export async function matchScriptsToPaperUsers(
   id: number
@@ -61,6 +63,10 @@ export async function discardScript(id: number): Promise<AxiosResponse> {
   return client.delete(`${URL}/${id}`);
 }
 
+export async function discardScripts(paperId: number): Promise<AxiosResponse> {
+  return client.delete(`/papers/${paperId}/all_scripts`);
+}
+
 export async function undiscardScript(
   id: number
 ): Promise<AxiosResponse<{ script: ScriptData }>> {
@@ -72,7 +78,8 @@ export async function postScript(
   filename: string,
   file: File,
   onSuccess: () => void,
-  onFail: () => void
+  onFail: () => void,
+  atLoadEnd: () => void
 ) {
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -91,8 +98,9 @@ export async function postScript(
         .then(res => {
           onSuccess();
         })
-        .catch(() => onFail());
+        .catch(() => onFail())
+        .finally(atLoadEnd);
     });
   };
-  reader.readAsDataURL(file);
+  await reader.readAsDataURL(file);
 }

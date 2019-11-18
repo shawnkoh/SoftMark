@@ -170,7 +170,6 @@ const ScriptsTable: React.FC = () => {
         </Grid>
         <Grid item>
           <DeleteAllScriptsModal
-            scripts={scripts}
             refreshScripts={callbackScripts}
             render={toggleModal => (
               <RoundedButton

@@ -3,9 +3,10 @@ import api from "../../../../api";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
+import LoadingSpinner from "components/LoadingSpinner";
+import usePaper from "contexts/PaperContext";
 
 interface OwnProps {
-  students: PaperUserListData[];
   refreshStudents?: () => void;
   render: (toggleVisibility: () => void) => ReactNode;
 }
@@ -13,7 +14,8 @@ interface OwnProps {
 type Props = OwnProps;
 
 const DeleteAllStudentsModal: React.FC<Props> = props => {
-  const { students, refreshStudents, render } = props;
+  const paper = usePaper();
+  const { refreshStudents, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -25,26 +27,21 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
         open={isOpen}
         handleClose={toggleVisibility}
         handleConfirm={async () => {
-          await Promise.all(
-            students.map(student => {
-              api.paperUsers
-                .discardPaperUser(student.id)
-                .then(() => {
-                  toast.success(
-                    `Student ${student.user.name} has been deleted successfully.`
-                  );
-                })
-                .catch(errors => {
-                  toast.error(
-                    `Script ${student.user.name} could not be deleted.`
-                  );
-                });
-            })
-          );
-          if (refreshStudents) {
-            refreshStudents();
-          }
           toggleVisibility();
+          toast(`Attempting to delete all students...`);
+          await api.paperUsers
+            .discardStudentsOfPaper(paper.id)
+            .then(() => {
+              toast.success(`Students have been deleted successfully.`);
+            })
+            .catch(errors => {
+              toast.error(`Students could not be deleted.`);
+            })
+            .finally(() => {
+              if (refreshStudents) {
+                setTimeout(refreshStudents, 4000);
+              }
+            });
         }}
       />
       {render(toggleVisibility)}

@@ -31,8 +31,7 @@ export async function create(request: Request, response: Response) {
       PaperUserRole.Owner
     );
     if (!allowed) {
-      response.sendStatus(404);
-      return;
+      return response.sendStatus(404);
     }
     const { paper } = allowed;
     const {
@@ -81,7 +80,6 @@ export async function create(request: Request, response: Response) {
 
     return response.status(201).json({ paperUser: data });
   } catch (error) {
-    console.error(error);
     return response.sendStatus(400);
   }
 }
@@ -388,4 +386,35 @@ export async function replyInvite(request: Request, response: Response) {
 
   const data = user.createAuthenticationTokens();
   response.status(200).json(data);
+}
+
+export async function discardStudents(request: Request, response: Response) {
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const userId = payload.userId;
+    const paperId = Number(request.params.id);
+    const allowed = await allowedRequester(
+      userId,
+      paperId,
+      PaperUserRole.Owner
+    );
+    if (!allowed) {
+      return response.sendStatus(404);
+    }
+
+    const students = await getRepository(PaperUser).find({
+      where: { paperId, role: PaperUserRole.Student, discardedAt: IsNull()}
+    });
+
+    await getManager().transaction(async manager => {
+      await Promise.all(students.map(async student => {
+        await getRepository(PaperUser).update(student.id, {
+          discardedAt: new Date()
+        });
+      }));
+    });
+    response.sendStatus(204);
+  } catch (error) {
+    response.sendStatus(400);
+  }
 }
