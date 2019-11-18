@@ -155,19 +155,19 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {questionAllocationRoute}
           {setupScriptTemplateRoute}
           {scriptMappingRoute}
+          {scriptViewRoute}
+          {markQuestionRoute}
           {setupRoute}
           {gradingRoute}
-          {markQuestionRoute}
           {scriptsListingRoute}
-          {scriptViewRoute}
         </Switch>
       )}
       {role === PaperUserRole.Marker && (
         <Switch>
-          {gradingRoute}
           {markQuestionRoute}
-          {scriptsListingRoute}
           {scriptViewRoute}
+          {gradingRoute}
+          {scriptsListingRoute}
         </Switch>
       )}
       {role === PaperUserRole.Student && (
