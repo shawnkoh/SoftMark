@@ -152,10 +152,10 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     <>
       {role === PaperUserRole.Owner && (
         <Switch>
-          {setupRoute}
           {questionAllocationRoute}
           {setupScriptTemplateRoute}
           {scriptMappingRoute}
+          {setupRoute}
           {gradingRoute}
           {markQuestionRoute}
           {scriptsListingRoute}
