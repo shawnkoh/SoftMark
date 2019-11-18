@@ -31,18 +31,10 @@ const ViewScriptModal: React.FC<Props> = props => {
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !scriptData) {
       getScript(script.id);
     }
   }, [isOpen]);
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!script) {
-    return <div />;
-  }
 
   return (
     <>
@@ -57,6 +49,7 @@ const ViewScriptModal: React.FC<Props> = props => {
           {isLoading && (
             <LoadingSpinner loadingMessage="Loading script template..." />
           )}
+          {isLoading && <LoadingSpinner />}
           {!scriptData && <>This script does not exist</>}
           {scriptData &&
             scriptData.pages.map((page, index) => {
