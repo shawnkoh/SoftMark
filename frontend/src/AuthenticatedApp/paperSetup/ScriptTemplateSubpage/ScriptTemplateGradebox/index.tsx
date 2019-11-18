@@ -1,7 +1,8 @@
-import { Fab } from "@material-ui/core";
+import { Avatar } from "@material-ui/core";
 import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
+import ReversedChip from "../../../../components/ReversedChip";
 import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
 import useStyles from "./useStyles";
 
@@ -41,22 +42,18 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
           pageCovered: questionTemplate.pageCovered
         }}
       />
-      <Fab
-        variant="extended"
+      <ReversedChip
         ref={drag}
-        className={classes.fab}
+        avatar={<Avatar>{questionTemplate.score || "-"}</Avatar>}
+        label={"Q" + questionTemplate.name}
+        onClick={() => setEditOpen(true)}
+        color="primary"
+        className={classes.chip}
         style={{
           top: questionTemplate.topOffset,
           left: questionTemplate.leftOffset
         }}
-        color="primary"
-        onClick={() => setEditOpen(true)}
-      >
-        {questionTemplate.name}
-        <div className={classes.score}>
-          {questionTemplate.score ? questionTemplate.score : "n/a"}
-        </div>
-      </Fab>
+      />
     </>
   );
 };

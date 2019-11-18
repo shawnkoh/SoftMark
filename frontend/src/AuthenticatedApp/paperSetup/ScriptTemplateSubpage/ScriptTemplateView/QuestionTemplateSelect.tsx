@@ -1,9 +1,13 @@
 import React from "react";
-import TreeSelect, { TreeNode } from "antd/lib/tree-select";
+import TreeSelect, { TreeNode } from "antd/es/tree-select";
 import { QuestionTemplateTreeData } from "backend/src/types/questionTemplates";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { useFormikContext } from "formik";
 import { NewQuestionTemplateValues } from "./QuestionTemplateDialog";
+
+import "antd/es/tree-select/style/index.css";
+import "antd/es/select/style/index.css";
+import "antd/es/empty/style/index.css";
 
 interface SelectTreeProps {
   container: (triggerNode: any) => any;
