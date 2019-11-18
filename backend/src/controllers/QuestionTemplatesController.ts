@@ -6,7 +6,8 @@ import {
   getRepository,
   getTreeRepository,
   IsNull,
-  Not
+  Not,
+  createQueryBuilder
 } from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { Mark } from "../entities/Mark";
@@ -269,12 +270,19 @@ export async function update(request: Request, response: Response) {
     if (parentQuestionTemplate)
       questionTemplate.parentQuestionTemplate = parentQuestionTemplate;
     if (questionTemplate.scriptTemplate && pageCovered) {
+      questionTemplate.pageCovered = pageCovered;
       const pageTemplates = questionTemplate.scriptTemplate.pageTemplates;
       if (pageTemplates && isPageValid(pageCovered, pageTemplates.length)) {
         const pageNos = generatePages(pageCovered);
         const coveredPageTemplates = pageTemplates.filter(value =>
           pageNos.has(value.pageNo)
         );
+        await createQueryBuilder(PageQuestionTemplate, "pqt")
+          .delete()
+          .where("questionTemplateId = :questionTemplateId", {
+            questionTemplateId: questionTemplate.id
+          })
+          .execute();
         questionTemplate.pageQuestionTemplates = coveredPageTemplates.map(
           v => new PageQuestionTemplate(v, questionTemplate)
         );
@@ -317,7 +325,16 @@ export async function discard(request: Request, response: Response) {
     return;
   }
 
-  await getRepository(QuestionTemplate).update(questionTemplateId, {
+  const descendants = await getTreeRepository(QuestionTemplate).findDescendants(
+    questionTemplate
+  );
+  descendants.forEach(async d => {
+    await getRepository(QuestionTemplate).update(d.id, {
+      discardedAt: new Date()
+    });
+  });
+
+  await getRepository(QuestionTemplate).update(questionTemplate.id, {
     discardedAt: new Date()
   });
 

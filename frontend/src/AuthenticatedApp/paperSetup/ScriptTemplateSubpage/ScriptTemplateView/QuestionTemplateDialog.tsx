@@ -29,8 +29,8 @@ import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupConte
 
 export interface NewQuestionTemplateValues {
   title: string;
-  score: number;
-  pageCovered: string;
+  score?: number;
+  pageCovered?: string;
   parentQuestionTemplateId?: string;
 }
 
@@ -38,13 +38,13 @@ interface SharedProps {
   open: boolean;
   handleClose: (e?: any) => void;
   initialValues?: NewQuestionTemplateValues;
+  questionTemplateId?: number;
 }
 
 export interface QuestionEditDialogProps extends SharedProps {
-  mode: "edit";
+  mode: "editLeaf" | "editTree";
   questionTemplateId: number;
   initialValues: NewQuestionTemplateValues;
-  isParent: boolean;
 }
 
 export interface QuestionCreateDialogProps extends SharedProps {
@@ -55,55 +55,56 @@ type Props = QuestionEditDialogProps | QuestionCreateDialogProps;
 
 const QuestionEditDialog: React.FC<Props> = props => {
   const {
+    scriptTemplateSetupData,
+    currentPageNo,
+    pageCount,
+    refresh
+  } = useScriptSetup();
+  const {
     open,
     mode,
     handleClose,
     initialValues = {
       title: "",
       score: 0,
-      pageCovered: ""
+      pageCovered: `${currentPageNo}`
     }
   } = props;
-  const {
-    scriptTemplateSetupData,
-    currentPageNo,
-    pageCount,
-    refresh
-  } = useScriptSetup();
   const [deleteWarning, setDeleteWarning] = React.useState(false);
-  const [isParent, setIsParent] = React.useState(
-    mode === "edit" && (props as QuestionEditDialogProps).isParent
-  );
+  const [isParent, setIsParent] = React.useState(false);
   const onSubmit = async (values: NewQuestionTemplateValues) => {
     try {
-      if (isParent) {
+      if (mode === "create") {
+        const postData = isParent
+          ? {
+              name: values.title,
+              parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
+            }
+          : {
+              name: values.title,
+              score: values.score,
+              pageCovered: values.pageCovered,
+              displayPage: currentPageNo,
+              parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
+            };
         await api.questionTemplates.createQuestionTemplate(
           scriptTemplateSetupData.id,
-          {
-            name: values.title,
-            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
-          }
-        );
-      } else if (mode === "create") {
-        await api.questionTemplates.createQuestionTemplate(
-          scriptTemplateSetupData.id,
-          {
-            name: values.title,
-            score: values.score,
-            pageCovered: values.pageCovered,
-            displayPage: currentPageNo,
-            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
-          }
+          postData
         );
       } else {
+        const postData =
+          mode === "editLeaf"
+            ? {
+                name: values.title,
+                score: values.score,
+                pageCovered: values.pageCovered
+              }
+            : {
+                name: values.title
+              };
         await api.questionTemplates.editQuestionTemplate(
           (props as QuestionEditDialogProps).questionTemplateId,
-          {
-            name: values.title,
-            score: values.score,
-            pageCovered: values.pageCovered,
-            parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
-          }
+          postData
         );
       }
       toast.success("Question successfully created");
@@ -147,18 +148,20 @@ const QuestionEditDialog: React.FC<Props> = props => {
         validate={values => {
           const errors: FormikErrors<NewQuestionTemplateValues> = {};
           if (isParent) return errors;
-          if (values.score < 0) errors.score = "Score should be non-negative";
-          errors.pageCovered = isPageValid(
-            values.pageCovered,
+          if (values.score! < 0) errors.score = "Score should be non-negative";
+          const pageError = isPageValid(
+            values.pageCovered!,
             currentPageNo,
             pageCount
           );
+          if (pageError) errors.pageCovered = pageError;
+          return errors;
         }}
       >
         {(formikProps: FormikProps<NewQuestionTemplateValues>) => (
           <Form>
             <DialogTitle>
-              {mode === "edit"
+              {mode !== "create"
                 ? `Editing ${initialValues.title}`
                 : "Add Question"}
             </DialogTitle>
@@ -169,7 +172,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                 alignItems="center"
                 spacing={2}
               >
-                <Grid item xs={6}>
+                <Grid item xs={mode !== "create" ? 12 : 6}>
                   <Field name="title" validate={value => !value && "Required"}>
                     {({
                       field,
@@ -181,32 +184,41 @@ const QuestionEditDialog: React.FC<Props> = props => {
                         margin="dense"
                         label="Title"
                         helperText={meta.error || "e.g. Q1a"}
-                        required={mode === "create"}
+                        required
                         fullWidth
                         {...field}
                       />
                     )}
                   </Field>
                 </Grid>
-                <Grid item xs={6}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={isParent}
-                        onChange={() => setIsParent(!isParent)}
+                {mode === "create" && (
+                  <>
+                    <Grid item xs={6}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={isParent}
+                            onChange={() => setIsParent(!isParent)}
+                          />
+                        }
+                        label="Is Parent Question?"
                       />
-                    }
-                    label="Is Question Group?"
-                  />
-                </Grid>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography>Parent: </Typography>
+                    </Grid>
+                    <Grid item xs={9}>
+                      <QuestionTemplateSelect
+                        selfId={
+                          mode !== "create" ? props.questionTemplateId! : null
+                        }
+                        container={node => node.parentNode}
+                      />
+                    </Grid>
+                  </>
+                )}
 
-                <Grid item xs={3}>
-                  <Typography>Parent Question:</Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <QuestionTemplateSelect container={node => node.parentNode} />
-                </Grid>
-                {!isParent && (
+                {((mode === "create" && !isParent) || mode === "editLeaf") && (
                   <>
                     <Grid item xs={6}>
                       <Field name="score">
@@ -220,7 +232,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                             label="Score"
                             helperText={meta.error}
                             type="number"
-                            required={mode === "create" && !isParent}
+                            required
                             fullWidth
                             {...field}
                           />
@@ -239,7 +251,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                             label="Page Covered"
                             helperText={meta.error}
                             placeholder="1, 2, 4-5"
-                            required={mode === "create" && !isParent}
+                            required
                             fullWidth
                             {...field}
                           />
@@ -251,7 +263,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
               </Grid>
             </DialogContent>
             <DialogActions>
-              {mode === "edit" && (
+              {mode !== "create" && (
                 <>
                   <Button
                     onClick={() => setDeleteWarning(true)}
@@ -263,7 +275,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                     open={deleteWarning}
                     handleClose={() => setDeleteWarning(false)}
                     title={`Deleting ${initialValues.title}?`}
-                    message={`This question will be removed from the script.`}
+                    message={`The children of the question will also be removed from the script.`}
                     handleConfirm={() => {
                       handleDelete();
                       refresh();
@@ -276,15 +288,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
               </Button>
               <Button
                 onClick={() => {
-                  if (isParent) {
-                    formikProps.setValues({
-                      title: formikProps.values.title,
-                      parentQuestionTemplateId:
-                        formikProps.values.parentQuestionTemplateId,
-                      score: 1,
-                      pageCovered: "1"
-                    });
-                  }
                   formikProps.validateForm();
                   formikProps.submitForm();
                 }}
