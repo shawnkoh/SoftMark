@@ -26,6 +26,7 @@ import usePaper from "../../../../contexts/PaperContext";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
+import { toast } from "react-toastify";
 
 const ScriptsTable: React.FC = () => {
   const paper = usePaper();
@@ -158,10 +159,14 @@ const ScriptsTable: React.FC = () => {
               color="primary"
               startIcon={<MatchIcon />}
               onClick={() => {
+                toast("Attempting to match scripts to students...");
                 api.scripts.matchScriptsToPaperUsers(paper.id).then(resp => {
                   setScripts([]);
                   getScripts();
-                });
+                  toast.success("Matching algorithm ran successfully");
+                }).catch(() => {
+                  toast.error("An error occurred when matching.");
+                })
               }}
             >
               Match
