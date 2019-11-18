@@ -49,7 +49,6 @@ const ViewScriptModal: React.FC<Props> = props => {
           {isLoading && (
             <LoadingSpinner loadingMessage="Loading script template..." />
           )}
-          {isLoading && <LoadingSpinner />}
           {!scriptData && <>This script does not exist</>}
           {scriptData &&
             scriptData.pages.map((page, index) => {
