@@ -94,11 +94,12 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  // create Question for all the Paper's Scripts
-  const scripts = await getRepository(Script).find({ paper });
-  const questions = scripts.map(
-    script => new Question(script, questionTemplate)
-  );
+  // create Question for all the Paper's Scripts if the questionTemplate is a leaf
+  let questions: Question[] = [];
+  if (displayPage) {
+    const scripts = await getRepository(Script).find({ paper });
+    questions = scripts.map(script => new Question(script, questionTemplate));
+  }
 
   let pageQuestionTemplates: PageQuestionTemplate[] = [];
   if (

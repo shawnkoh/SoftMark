@@ -66,7 +66,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
     handleClose,
     initialValues = {
       title: "",
-      score: 0,
+      score: 1,
       pageCovered: `${currentPageNo}`
     }
   } = props;
@@ -148,7 +148,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
         validate={values => {
           const errors: FormikErrors<NewQuestionTemplateValues> = {};
           if (isParent) return errors;
-          if (values.score! < 0) errors.score = "Score should be non-negative";
+          if (values.score! <= 0) errors.score = "Score should be positive";
           const pageError = isPageValid(
             values.pageCovered!,
             currentPageNo,
