@@ -32,9 +32,6 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
             if (refreshStudents) {
               refreshStudents();
             }
-            if (refreshScripts) {
-              refreshScripts();
-            }
           };
           const onSuccess = (name: string) => {
             toast.success(`Account for student ${name} created successfully.`);

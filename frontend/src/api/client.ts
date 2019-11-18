@@ -30,7 +30,7 @@ client.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
-    if (!isRefreshing && error.response.status === 401) {
+    if (!isRefreshing && error.response && error.response.status === 401) {
       const refreshToken = getRefreshToken();
       if (!refreshToken) {
         return Promise.reject(error);

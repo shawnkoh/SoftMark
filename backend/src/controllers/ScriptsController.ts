@@ -360,3 +360,35 @@ export async function undiscard(request: Request, response: Response) {
   const data = await script.getData();
   response.status(200).json({ script: data });
 }
+
+export async function discardScripts(request: Request, response: Response) {
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const userId = payload.userId;
+    const paperId = Number(request.params.id);
+    const allowed = await allowedRequester(
+      userId,
+      paperId,
+      PaperUserRole.Owner
+    );
+    if (!allowed) {
+      return response.sendStatus(404);
+    }
+
+    const scripts = await getRepository(Script).find({
+      where: { paperId, discardedAt: IsNull()}
+    });
+
+    await getManager().transaction(async manager => {
+      await Promise.all(scripts.map(async script => {
+        await getRepository(Script).update(script.id, {
+          discardedAt: new Date()
+        });
+      }));
+    });
+    
+    response.sendStatus(204);
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}

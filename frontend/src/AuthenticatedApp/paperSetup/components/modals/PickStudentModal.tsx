@@ -39,14 +39,16 @@ const PickStudentModal: React.FC<Props> = props => {
   >([]);
 
   useEffect(() => {
-    api.paperUsers.getUnmatchedStudents(script.paperId).then(resp => {
-      const options: Array<PaperUserListData | null> = resp.data.paperUsers;
-      if (chosenStudent) {
-        options.push(chosenStudent);
-      }
-      options.push(null);
-      setUnmatchedStudents(options);
-    });
+    if (isOpen) {
+      api.paperUsers.getUnmatchedStudents(script.paperId).then(resp => {
+        const options: Array<PaperUserListData | null> = resp.data.paperUsers;
+        if (chosenStudent) {
+          options.push(chosenStudent);
+        }
+        options.push(null);
+        setUnmatchedStudents(options);
+      });
+    }
   }, [isOpen]);
 
   return (

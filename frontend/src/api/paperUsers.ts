@@ -9,6 +9,7 @@ import {
 } from "../types/paperUsers";
 import client from "./client";
 import { AuthenticationData } from "backend/src/types/auth";
+import { timeout } from "q";
 
 const URL = "/paper_users";
 
@@ -22,28 +23,49 @@ export async function postStudents(
   const reader = new FileReader();
   reader.onloadend = async (e: any) => {
     const rows: string[] = e.target.result.split("\n");
-    await Promise.all(
-      rows.map(row => {
-        if (row) {
-          const cells = row.split("\r")[0].split(",");
-          if (cells.length >= 3) {
-            const name = cells[1];
-            const paperUserPostData: PaperUserPostData = {
-              matriculationNumber: cells[0],
-              name: name,
-              email: cells[2],
-              role: PaperUserRole.Student
-            };
-            return createPaperUser(paperId, paperUserPostData)
-              .then(() => {
-                onSuccess(name);
-              })
-              .catch(() => onFail(name));
-          }
+    let studentsUploaded = 0;
+    let studentsLeft = rows.length;
+    const asynchronousPostStudent = async (index: number, limit: number) => {
+      if (index < limit) {
+        const row = rows[index];
+        const cells = row.split("\r")[0].split(",");
+        if (cells.length >= 3) {
+          const name = cells[1];
+          const paperUserPostData: PaperUserPostData = {
+            matriculationNumber: cells[0],
+            name: name,
+            email: cells[2],
+            role: PaperUserRole.Student
+          };
+          return createPaperUser(paperId, paperUserPostData)
+            .then(() => {
+              onSuccess(name);
+              studentsUploaded++;
+              if (studentsUploaded % 100 === 0) {
+                setTimeout(refresh, 5000);
+              }
+              asynchronousPostStudent(index + 1, limit);
+            })
+            .catch(() => onFail(name))
+            .finally(() => {
+              studentsLeft--;
+              if (studentsLeft <= 3) {
+                setTimeout(refresh, 4000);
+              }
+            });
         }
-      })
-    );
-    refresh();
+      }
+    };
+    const threads = 8;
+    let prevUpperLimitForIndex = 0;
+    let upperLimitForIndex = 0;
+    for (let i = 1; i <= threads; i++) {
+      upperLimitForIndex = Math.floor((i / threads) * rows.length);
+      if (prevUpperLimitForIndex !== upperLimitForIndex) {
+        asynchronousPostStudent(prevUpperLimitForIndex, upperLimitForIndex);
+        prevUpperLimitForIndex = upperLimitForIndex;
+      }
+    }
   };
   reader.readAsText(file);
 }
@@ -82,6 +104,12 @@ export async function patchStudent(
 
 export async function discardPaperUser(id: number): Promise<AxiosResponse> {
   return client.delete(`${URL}/${id}`);
+}
+
+export async function discardStudentsOfPaper(
+  paperId: number
+): Promise<AxiosResponse> {
+  return client.delete(`papers/${paperId}/all_students`, { timeout: 500000 });
 }
 
 export async function checkInvite(token: string) {
