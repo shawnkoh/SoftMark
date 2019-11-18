@@ -245,7 +245,7 @@ export async function getSetupData(request: Request, response: Response) {
         .innerJoin(
           "questionTemplate.pageQuestionTemplates",
           "pageQuestionTemplate",
-          "pageQuestionTemplate.discardedAt IS NULL AND pageQuestionTemplate.pageTemplateId = :id",
+          "pageQuestionTemplate.pageTemplateId = :id",
           { id: pageTemplate.id }
         );
 

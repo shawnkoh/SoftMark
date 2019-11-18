@@ -31,8 +31,7 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
   return (
     <>
       <QuestionTemplateDialog
-        isParent={false}
-        mode="edit"
+        mode="editLeaf"
         questionTemplateId={questionTemplate.id}
         open={editOpen}
         handleClose={() => setEditOpen(false)}
