@@ -44,13 +44,10 @@ export async function viewScript(id: number): Promise<ScriptViewData | null> {
   }
 }
 
-export async function getScripts(id: number): Promise<ScriptListData[] | null> {
-  try {
-    const response = await client.get(`/papers/${id}/scripts`);
-    return response.data.scripts;
-  } catch (error) {
-    return null;
-  }
+export async function getScripts(
+  id: number
+): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
+  return client.get(`/papers/${id}/scripts`);
 }
 
 export async function patchScript(
