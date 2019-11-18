@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   addFab: {
     position: "absolute",
     right: theme.spacing(2),
-    bottom: theme.spacing(2)
+    bottom: theme.spacing(2),
+    zIndex: 1
   }
 }));
 

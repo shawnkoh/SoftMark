@@ -224,6 +224,7 @@ describe("POST /script_templates/:id/question_templates", () => {
     const postData: QuestionTemplatePostData = {
       name: "1",
       score: 7,
+      displayPage: 1,
       topOffset: 50,
       leftOffset: 50
     };

@@ -94,11 +94,12 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  // create Question for all the Paper's Scripts
-  const scripts = await getRepository(Script).find({ paper });
-  const questions = scripts.map(
-    script => new Question(script, questionTemplate)
-  );
+  // create Question for all the Paper's Scripts if the questionTemplate is a leaf
+  let questions: Question[] = [];
+  if (displayPage) {
+    const scripts = await getRepository(Script).find({ paper });
+    questions = scripts.map(script => new Question(script, questionTemplate));
+  }
 
   let pageQuestionTemplates: PageQuestionTemplate[] = [];
   if (
@@ -324,13 +325,34 @@ export async function discard(request: Request, response: Response) {
     return;
   }
 
+  const { paper } = allowed;
+  const scripts = await getRepository(Script).find({ paper });
   const descendants = await getTreeRepository(QuestionTemplate).findDescendants(
     questionTemplate
   );
+
+  // Delete descedant question templates and the questions linked to them.
   descendants.forEach(async d => {
+    scripts.forEach(async script => {
+      await getRepository(Question).update(
+        { script, questionTemplate: d },
+        {
+          discardedAt: new Date()
+        }
+      );
+    });
     await getRepository(QuestionTemplate).update(d.id, {
       discardedAt: new Date()
     });
+  });
+
+  scripts.forEach(async script => {
+    await getRepository(Question).update(
+      { script, questionTemplate },
+      {
+        discardedAt: new Date()
+      }
+    );
   });
 
   await getRepository(QuestionTemplate).update(questionTemplate.id, {

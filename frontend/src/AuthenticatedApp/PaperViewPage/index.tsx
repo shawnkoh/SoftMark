@@ -85,7 +85,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   );
 
   const setupRoute = (
-    <Route path={`${path}/${SETUP}`}>
+    <Route exact path={`${path}/${SETUP}`}>
       {(routeProps: RouteComponentProps) => (
         <>
           <PaperViewHeader />
