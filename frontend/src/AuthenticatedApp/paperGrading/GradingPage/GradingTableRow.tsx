@@ -1,7 +1,9 @@
 import { Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RouteComponentProps, withRouter } from "react-router";
+import { getUser } from "../../../store/auth/selectors";
 import usePaper from "contexts/PaperContext";
 
 interface OwnProps {
@@ -11,6 +13,7 @@ interface OwnProps {
 type Props = OwnProps & RouteComponentProps;
 
 const GradingTableRow: React.FC<Props> = props => {
+  const currentUser = useSelector(getUser);
   const paper = usePaper();
   const paperId = paper.id;
 
@@ -25,7 +28,7 @@ const GradingTableRow: React.FC<Props> = props => {
 
   return (
     <TableRow>
-      <TableCell>Q{name}</TableCell>
+      <TableCell>Q: {name}</TableCell>
       <TableCell>{totalScore}</TableCell>
       <TableCell>
         {markers.map(marker => {
@@ -42,16 +45,18 @@ const GradingTableRow: React.FC<Props> = props => {
         {Math.round((markCount / questionCount) * 100).toFixed(2)}%
       </TableCell>
       <TableCell>
-        <Tooltip title={`Continue grading`}>
-          <Button
-            component={Link}
-            to={`/papers/${paperId}/grading/${questionTemplate.id}`}
-            variant="contained"
-            color="primary"
-          >
-            Grade
-          </Button>
-        </Tooltip>
+        {currentUser && markers.some(marker => marker.id === currentUser.id) && (
+          <Tooltip title={`Continue grading`}>
+            <Button
+              component={Link}
+              to={`/papers/${paperId}/grading/${questionTemplate.id}`}
+              variant="contained"
+              color="primary"
+            >
+              Grade
+            </Button>
+          </Tooltip>
+        )}
       </TableCell>
     </TableRow>
   );

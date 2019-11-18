@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { RouteComponentProps } from "react-router";
+import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
+import React, { useState, useEffect } from "react";
+import { RouteComponentProps, withRouter, Redirect } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
+import api from "../../api";
 
-import { PaperProvider } from "../../contexts/PaperContext";
+import usePaper from "contexts/PaperContext";
 
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import Check from "@material-ui/icons/Check";
@@ -18,6 +20,8 @@ import SetupPage, {
 } from "../paperSetup";
 import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
 import ScriptsPage, { ScriptViewSubpage } from "../paperScripts";
+import { PaperUserRole } from "../../types/paperUsers";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -28,6 +32,9 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   // https://reacttraining.com/react-router/web/example/nesting
   const { path, url } = match;
   const { pathname } = location;
+
+  const paper = usePaper();
+  const { role } = paper;
 
   const getTabValueFromPathname = pathname => {
     if (pathname.includes(SETUP)) {
@@ -51,13 +58,15 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       }}
       showLabels // removing this prop is sufficient to remove labels for unselected tabs
     >
-      <BottomNavigationAction
-        component={Link}
-        to={`${url}/${SETUP}`}
-        value={SETUP}
-        label="Setup"
-        icon={<Settings />}
-      />
+      {role === PaperUserRole.Owner && (
+        <BottomNavigationAction
+          component={Link}
+          to={`${url}/${SETUP}`}
+          value={SETUP}
+          label="Setup"
+          icon={<Settings />}
+        />
+      )}
       <BottomNavigationAction
         component={Link}
         to={`${url}/${GRADING}`}
@@ -75,56 +84,136 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     </BottomNavigation>
   );
 
+  const setupRoute = (
+    <Route path={`${path}/${SETUP}`}>
+      {(routeProps: RouteComponentProps) => (
+        <>
+          <PaperViewHeader />
+          <SetupPage {...routeProps} />
+          <BottomNav />
+        </>
+      )}
+    </Route>
+  );
+  const questionAllocationRoute = (
+    <Route
+      path={`${path}/${SETUP}/allocate`}
+      component={QuestionAllocationSubpage}
+    />
+  );
+  const setupScriptTemplateRoute = (
+    <Route
+      path={`${path}/${SETUP}/template`}
+      component={ScriptTemplateSubpage}
+    />
+  );
+  const scriptMappingRoute = (
+    <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
+  );
+  const markQuestionRoute = (
+    <Route
+      path={`${path}/${GRADING}/:questionTemplateId`}
+      component={MarkQuestionSubpage}
+    />
+  );
+  const scriptViewRoute = (
+    <Route
+      path={`${path}/${SCRIPTS}/:scriptId`}
+      component={ScriptViewSubpage}
+    />
+  );
+  const gradingRoute = (
+    <Route path={`${path}/${GRADING}`}>
+      {(routeProps: RouteComponentProps) => (
+        <>
+          <PaperViewHeader />
+          <GradingPage />
+          <BottomNav />
+        </>
+      )}
+    </Route>
+  );
+  const scriptsListingRoute = (
+    <Route path={`${path}/${SCRIPTS}`}>
+      {(routeProps: RouteComponentProps) => (
+        <>
+          <PaperViewHeader />
+          <ScriptsPage />
+          <BottomNav />
+        </>
+      )}
+    </Route>
+  );
+  const studentRedirectRoute = (
+    <Route path={`${path}`} component={StudentRedirectToScriptView} />
+  );
+
   return (
-    <PaperProvider>
-      <Switch>
-        <Route
-          path={`${path}/${SETUP}/allocate`}
-          component={QuestionAllocationSubpage}
-        />
-        <Route
-          path={`${path}/${SETUP}/template`}
-          component={ScriptTemplateSubpage}
-        />
-        <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
-        <Route
-          path={`${path}/${GRADING}/:questionTemplateId`}
-          component={MarkQuestionSubpage}
-        />
-        <Route
-          path={`${path}/${SCRIPTS}/:scriptId`}
-          component={ScriptViewSubpage}
-        />
-        <Route path={`${path}/${SETUP}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <SetupPage {...routeProps} />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-        <Route path={`${path}/${GRADING}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <GradingPage />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-        <Route path={`${path}/${SCRIPTS}`}>
-          {(routeProps: RouteComponentProps) => (
-            <>
-              <PaperViewHeader />
-              <ScriptsPage />
-              <BottomNav />
-            </>
-          )}
-        </Route>
-      </Switch>
-    </PaperProvider>
+    <>
+      {role === PaperUserRole.Owner && (
+        <Switch>
+          {questionAllocationRoute}
+          {setupScriptTemplateRoute}
+          {scriptMappingRoute}
+          {setupRoute}
+          {gradingRoute}
+          {markQuestionRoute}
+          {scriptsListingRoute}
+          {scriptViewRoute}
+        </Switch>
+      )}
+      {role === PaperUserRole.Marker && (
+        <Switch>
+          {gradingRoute}
+          {markQuestionRoute}
+          {scriptsListingRoute}
+          {scriptViewRoute}
+        </Switch>
+      )}
+      {role === PaperUserRole.Student && (
+        <Switch>
+          {scriptViewRoute}
+          {studentRedirectRoute}
+        </Switch>
+      )}
+    </>
   );
 };
 
-export default PaperView;
+export default withRouter(PaperView);
+
+const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
+  match
+}) => {
+  const { path } = match;
+  const paper = usePaper();
+  const role = paper.role;
+  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
+
+  const [
+    scriptTemplate,
+    setScriptTemplate
+  ] = useState<ScriptTemplateData | null>(null);
+
+  const getScriptTemplate = async () => {
+    const scriptTemplate = await api.scriptTemplates.getScriptTemplate(
+      paper.id
+    );
+    setScriptTemplate(scriptTemplate);
+    setIsLoadingScriptTemplate(false);
+  };
+
+  useEffect(() => {
+    getScriptTemplate();
+  }, []);
+
+  if (isLoadingScriptTemplate) {
+    return <LoadingSpinner />;
+  }
+
+  return role === PaperUserRole.Student && scriptTemplate ? (
+    <Redirect to={`${path}/${SCRIPTS}/`} />
+  ) : (
+    <div />
+  );
+};

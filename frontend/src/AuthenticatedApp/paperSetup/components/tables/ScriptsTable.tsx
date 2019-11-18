@@ -61,9 +61,7 @@ const ScriptsTable: React.FC = () => {
     api.scripts
       .getScripts(paper.id)
       .then(resp => {
-        if (resp !== null) {
-          setScripts(resp);
-        }
+        setScripts(resp.data.scripts);
       })
       .finally(() => setIsLoadingScripts(false));
   };
