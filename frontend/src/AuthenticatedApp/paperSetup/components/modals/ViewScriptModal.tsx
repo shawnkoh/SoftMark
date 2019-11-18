@@ -24,14 +24,25 @@ const ViewScriptModal: React.FC<Props> = props => {
   const [isLoading, setIsLoading] = useState(true);
 
   const getScript = async (scriptId: number) => {
+    setIsLoading(true);
     const data = await api.scripts.getScript(scriptId);
     setScriptData(data);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    getScript(script.id);
-    setIsLoading(false);
-  }, []);
+    if (isOpen) {
+      getScript(script.id);
+    }
+  }, [isOpen]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!script) {
+    return <div />;
+  }
 
   return (
     <>
