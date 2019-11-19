@@ -189,10 +189,17 @@ export async function questionToMark(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const questionTemplateId = Number(request.params.id);
-  const questionTemplate = await getRepository(QuestionTemplate).findOne(
-    questionTemplateId,
-    { relations: ["scriptTemplate"] }
-  );
+  const questionTemplate = await getRepository(QuestionTemplate)
+    .createQueryBuilder("questionTemplate")
+    .where("questionTemplate.id = :questionTemplateId", { questionTemplateId })
+    .andWhere("questionTemplate.discardedAt IS NULL")
+    .innerJoinAndMapOne(
+      "questionTemplate.scriptTemplate",
+      "questionTemplate.scriptTemplate",
+      "scriptTemplate",
+      "scriptTemplate.discardedAt IS NULL"
+    )
+    .getOne();
   if (!questionTemplate) {
     response.sendStatus(404);
     return;
@@ -233,9 +240,9 @@ export async function questionToMark(request: Request, response: Response) {
   const descendantQuestionTemplates = await getTreeRepository(
     QuestionTemplate
   ).findDescendants(rootQuestionTemplate);
-  const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
-    descendant => descendant.id
-  );
+  const descendantQuestionTemplateIds = descendantQuestionTemplates
+    .filter(descendant => !descendant.discardedAt)
+    .map(descendant => descendant.id);
 
   // Objective here is to pick a script to mark that has an unmarked leaf question based on the descendant question templates
   // Once we have the scriptId, we can then load the script's question template's leaves.
@@ -298,9 +305,16 @@ export async function questionToMark(request: Request, response: Response) {
 
   const questions = await selectQuestionViewData(questionsQuery).getRawMany();
   // Lock all the script's questions for the root template's descendants
-  questionsQuery
+  // Can't use questionsQuery because of the joins and the different syntax required (no using question.)
+  await getRepository(Question)
+    .createQueryBuilder("question")
     .update()
     .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
+    .where("discardedAt IS NULL")
+    .andWhere("scriptId = :id", { id })
+    .andWhere("questionTemplateId IN (:...ids)", {
+      ids: descendantQuestionTemplateIds
+    })
     .execute();
 
   const pageNosData = await getRepository(PageTemplate)
@@ -310,9 +324,18 @@ export async function questionToMark(request: Request, response: Response) {
     .andWhere("pageQuestionTemplate.questionTemplateId IN (:...ids)", {
       ids: descendantQuestionTemplateIds
     })
+    .innerJoin(
+      "pageQuestionTemplate.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    )
     .select("pageTemplate.pageNo", "pageNo")
+    .addSelect("questionTemplate.id", "questionTemplateId")
     .getRawMany();
+  console.log(pageNosData);
   const pageNos = pageNosData.map(pageNo => pageNo.pageNo);
+
+  // TODO: USE THE JOINED PAGE NOS TO GET THE PAGE QUESTIION IDS!
 
   const pagesData = await getRepository(Page)
     .createQueryBuilder("page")
