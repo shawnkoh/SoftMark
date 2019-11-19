@@ -7,14 +7,15 @@ import {
   getTreeRepository,
   SelectQueryBuilder
 } from "typeorm";
-import { PageQuestion } from "../entities/PageQuestion";
-import { PaperUser } from "../entities/PaperUser";
+import { Page } from "../entities/Page";
+import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { PageViewData, QuestionViewData, ScriptViewData } from "../types/view";
+import { AnnotationViewData } from "../types/view";
 import { allowedRequester } from "../utils/papers";
+import { generatePages } from "../utils/questionTemplate";
 
 function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
   return queryBuilder
@@ -26,179 +27,55 @@ function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
     .addSelect("questionTemplate.leftOffset", "leftOffset");
 }
 
-function getRootQuestion(scriptId: number) {
-  const queryBuilder = getRepository(Question)
-    .createQueryBuilder("question")
-    .where("question.discardedAt IS NULL")
-    .innerJoin(
-      "question.script",
-      "script",
-      "script.id = :id AND script.discardedAt IS NULL",
-      { id: scriptId }
-    )
-    // It is not necessary for a script to be tagged to a student - see below
-    .leftJoin("script.student", "student", "student.discardedAt IS NULL")
-    .innerJoin(
-      "question.questionTemplate",
-      "questionTemplate",
-      "questionTemplate.discardedAt IS NULL AND questionTemplate.parentQuestionTemplateId IS NULL"
-    )
-    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL");
-
-  return selectQuestionViewData(queryBuilder)
-    .addSelect("student.id", "studentId")
-    .addSelect("student.matriculationNumber", "matriculationNumber")
-    .addSelect("script.paperId", "paperId")
-    .addSelect("questionTemplate.id", "questionTemplateId");
-
-  // consider showing all the root questions
-  // TODO: select proper first question
-}
-
-function getDescendantQuestionTemplates(
-  questionTemplate: QuestionTemplate | number
-) {
-  return getTreeRepository(QuestionTemplate)
-    .createDescendantsQueryBuilder(
-      "questionTemplate",
-      "questionTemplateClosure",
-      questionTemplate as QuestionTemplate // providing a number works too
-    )
-    .andWhere("questionTemplate.discardedAt IS NULL")
-    .andWhere("questionTemplate.parentQuestionTemplateId IS NOT NULL");
-}
-
-function getDescendantQuestions(descendantQuestionTemplateIds: number[]) {
-  const queryBuilder = getRepository(Question)
-    .createQueryBuilder("question")
-    .where("question.questionTemplateId IN (:...ids)", {
-      ids: descendantQuestionTemplateIds
-    })
-    .andWhere("question.discardedAt IS NULL")
-    .innerJoin(
-      "question.questionTemplate",
-      "questionTemplate",
-      "questionTemplate.discardedAt IS NULL"
-    )
-    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL");
-
-  return selectQuestionViewData(queryBuilder);
-}
-
-function getPagesData(questionIds: number[]) {
-  return getRepository(PageQuestion)
-    .createQueryBuilder("pageQuestion")
-    .where("pageQuestion.discardedAt IS NULL")
-    .andWhere("pageQuestion.questionId IN (:...ids)", { ids: questionIds })
-    .innerJoin("pageQuestion.page", "page")
-    .select("page.id", "id")
-    .addSelect("page.pageNo", "pageNo")
-    .addSelect("page.imageUrl", "imageUrl")
-    .leftJoin("page.annotations", "annotation")
-    .addSelect("annotation.id", "annotationId")
-    .addSelect("annotation.layer", "layer")
-    .addSelect("pageQuestion.questionId", "questionId");
-}
-
-function getPages(pagesData: any): PageViewData[] {
-  return _.chain(pagesData)
-    .uniqBy("id")
-    .groupBy("id")
-    .map((array, id) => {
-      const questionIds = Array.from(
-        new Set(array.map(element => element["questionId"]))
-      );
-      const annotations = array
-        .filter(
-          element =>
-            "annotationId" in element &&
-            "layer" in element &&
-            element["annotationId"] !== null &&
-            element["annotationId"] !== undefined &&
-            element["layer"] !== null &&
-            element["layer"] !== undefined
-        )
-        .map(element => ({
-          id: element["annotationId"],
-          layer: element["layer"]
-        }));
-      return {
-        id: parseInt(id),
-        pageNo: array[0].pageNo,
-        imageUrl: array[0].imageUrl,
-        questionIds,
-        annotations
-      };
-    })
-    .value();
-}
-
-function lockQuestion(requester: PaperUser, questionId: number) {
-  return getRepository(Question)
-    .createQueryBuilder("question")
-    .update()
-    .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
-    .where("id = :id", { id: questionId });
-}
-
 export async function viewScript(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
-  const scriptId = Number(request.params.id);
-
-  const rootQuestionData = await getRootQuestion(scriptId).getRawOne();
-  if (!rootQuestionData) {
-    response.sendStatus(404);
-    return;
-  }
-  const {
-    paperId,
-    studentId,
-    matriculationNumber,
-    questionTemplateId,
-    ...rootQuestion
-  } = rootQuestionData;
-  const allowed = await allowedRequester(
-    requesterId,
-    paperId,
-    PaperUserRole.Student
-  );
-  if (!allowed) {
-    response.sendStatus(404);
-    return;
-  }
-
-  const descendantQuestionTemplates = await getDescendantQuestionTemplates(
-    questionTemplateId
-  ).getMany();
-
-  const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
-    descendant => descendant.id
-  );
-
-  let descendantQuestions = [];
-  if (descendantQuestionTemplateIds.length > 0) {
-    descendantQuestions = await getDescendantQuestions(
-      descendantQuestionTemplateIds
-    ).getRawMany();
-  }
-
-  const questionIds = descendantQuestions.map(descendant => descendant.id);
-  questionIds.push(rootQuestion.id);
-
-  const pagesData = await getPagesData(questionIds).getRawMany();
-
-  const pages = getPages(pagesData);
-
-  const data: ScriptViewData = {
-    rootQuestion,
-    studentId,
-    matriculationNumber,
-    descendantQuestions,
-    pages
-  };
-
-  response.status(200).json(data);
+  //   const payload = response.locals.payload as AccessTokenSignedPayload;
+  //   const requesterId = payload.userId;
+  //   const scriptId = Number(request.params.id);
+  //   const rootQuestionData = await getRootQuestion(scriptId).getRawOne();
+  //   if (!rootQuestionData) {
+  //     response.sendStatus(404);
+  //     return;
+  //   }
+  //   const {
+  //     paperId,
+  //     studentId,
+  //     matriculationNumber,
+  //     questionTemplateId,
+  //     ...rootQuestion
+  //   } = rootQuestionData;
+  //   const allowed = await allowedRequester(
+  //     requesterId,
+  //     paperId,
+  //     PaperUserRole.Student
+  //   );
+  //   if (!allowed) {
+  //     response.sendStatus(404);
+  //     return;
+  //   }
+  //   const descendantQuestionTemplates = await getDescendantQuestionTemplates(
+  //     questionTemplateId
+  //   ).getMany();
+  //   const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
+  //     descendant => descendant.id
+  //   );
+  //   let descendantQuestions = [];
+  //   if (descendantQuestionTemplateIds.length > 0) {
+  //     descendantQuestions = await getDescendantQuestions(
+  //       descendantQuestionTemplateIds
+  //     ).getRawMany();
+  //   }
+  //   const questionIds = descendantQuestions.map(descendant => descendant.id);
+  //   questionIds.push(rootQuestion.id);
+  //   const pagesData = await getPagesData(questionIds).getRawMany();
+  //   const pages = getPages(pagesData);
+  //   const data: ScriptViewData = {
+  //     rootQuestion,
+  //     studentId,
+  //     matriculationNumber,
+  //     descendantQuestions,
+  //     pages
+  //   };
+  //   response.status(200).json(data);
 }
 
 /**
@@ -245,7 +122,7 @@ export async function questionToMark(request: Request, response: Response) {
       "questionTemplate.allocations",
       "allocation",
       "allocation.paperUserId = :id",
-      { id: requester.id }
+      { id: requesterId }
     )
     .getOne();
   if (!rootQuestionTemplate) {
@@ -253,92 +130,152 @@ export async function questionToMark(request: Request, response: Response) {
     return;
   }
 
-  // prettier-ignore
-  const rootQuestionData = await getRepository(Question)
-    .createQueryBuilder("question")
-    .where("question.discardedAt IS NULL")
-    .innerJoin("question.questionTemplate", "questionTemplate", "questionTemplate.id = :id", { id: rootQuestionTemplate.id })
-    // Ensure that the question is tagged to a script
-    .innerJoin("question.script", "script", "script.discardedAt IS NULL")
-    // It is not necessary for the script to have a mapped student
-    // In a physical setting, leftover scripts lying around are definitely something to take action on
-    .leftJoin("script.student", "student", "student.discardedAt IS NULL")
-    // Ensure that there are no active marks
-    .leftJoin("question.marks", "mark")
-    .andWhere(
-      new Brackets(qb => {
-        qb.where("mark IS NULL")
-        .orWhere("mark.discardedAt IS NOT NULL");
-      })
-    )
-    // Prevent race condition
-    .andWhere(
-      new Brackets(qb => {
-        qb.where("question.currentMarker IS NULL")
-        .orWhere("question.currentMarkerId = :id", { id: requester.id })
-        // Prevent other markers from accessing this route for the next 30 minutes
-        .orWhere("question.currentMarkerUpdatedAt < :date", { date: addMinutes(new Date(), -30) });
-      })
-    )
-    .select("question.id", "id")
-    .addSelect("questionTemplate.name", "name")
-    .addSelect("NULL", "score")
-    .addSelect("questionTemplate.score", "maxScore")
-    .addSelect("questionTemplate.topOffset", "topOffset")
-    .addSelect("questionTemplate.leftOffset", "leftOffset")
-    .addSelect("student.id", "studentId")
-    .addSelect("student.matriculationNumber", "matriculationNumber")
-    .getRawOne();
+  const descendantQuestionTemplates = await getTreeRepository(
+    QuestionTemplate
+  ).findDescendants(rootQuestionTemplate);
+  const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
+    descendant => descendant.id
+  );
 
-  if (!rootQuestionData) {
+  // Objective here is to pick a script to mark that has an unmarked leaf question based on the descendant question templates
+  // Once we have the scriptId, we can then load the script's question template's leaves.
+  // Assumes that questionTemplates with displayPage are leaves
+  // Assumes that questions are always leaves
+  // TODO: This is extremely inefficient because it loads almost all questions
+  let script: any = null;
+  if (descendantQuestionTemplateIds.length > 0) {
+    script = await getRepository(Question)
+      .createQueryBuilder("question")
+      .where("question.discardedAt IS NULL")
+      .andWhere("question.questionTemplateId IN (:...ids)", {
+        ids: descendantQuestionTemplateIds
+      })
+      // Prevent race condition
+      .andWhere(
+        new Brackets(qb => {
+          qb.where("question.currentMarker IS NULL")
+            .orWhere("question.currentMarkerId = :id", { id: requesterId })
+            // Prevent other markers from accessing this route for the next 30 minutes
+            .orWhere("question.currentMarkerUpdatedAt < :date", {
+              date: addMinutes(new Date(), -30)
+            });
+        })
+      )
+      .innerJoin("question.script", "script", "script.discardedAt IS NULL")
+      .leftJoin("script.student", "student", "student.discardedAt IS NULL")
+      .innerJoin(
+        "question.questionTemplate",
+        "questionTemplate",
+        "questionTemplate.discardedAt IS NULL"
+      )
+      .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+      .andWhere("mark IS NULL")
+      .select("script.id", "id")
+      .addSelect("student.id", "studentId")
+      .addSelect("student.matriculationNumber", "matriculationNumber")
+      .getRawOne();
+  }
+  if (!script) {
     response.sendStatus(204);
     return;
   }
 
-  // Prevent other markers from accessing this route for the next 30 minutes
-  await lockQuestion(requester, rootQuestionData.id).execute();
+  const { id, studentId, matriculationNumber } = script;
 
-  const {
-    studentId,
-    matriculationNumber,
-    ...rootQuestion
-  }: {
-    studentId: number | null;
-    matriculationNumber: string | null;
-  } & QuestionViewData = rootQuestionData;
-
-  const descendantQuestionTemplates = await getDescendantQuestionTemplates(
-    rootQuestionTemplate
-  ).getMany();
-
-  let descendantQuestions: QuestionViewData[];
-  if (descendantQuestionTemplates.length === 0) {
-    descendantQuestions = [];
-  } else {
-    const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
-      descendant => descendant.id
-    );
-    descendantQuestions = await getDescendantQuestions(
-      descendantQuestionTemplateIds
-    ).getRawMany();
-  }
-
-  const questionIds = descendantQuestions.map(child => child.id);
-  questionIds.push(rootQuestion.id);
-
-  const pagesData = await getPagesData(questionIds)
-    .andWhere("annotation.id IS NULL OR annotation.paperUserId = :id", {
-      id: requester.id
+  const questionsQuery = getRepository(Question)
+    .createQueryBuilder("question")
+    .where("question.discardedAt IS NULL")
+    .andWhere("question.scriptId = :id", { id: script.id })
+    .andWhere("question.questionTemplateId IN (:...ids)", {
+      ids: descendantQuestionTemplateIds
     })
+    .innerJoin(
+      "question.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    )
+    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL");
+
+  const questions = await selectQuestionViewData(questionsQuery).getRawMany();
+  // Lock all the script's questions for the root template's descendants
+  questionsQuery
+    .update()
+    .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
+    .execute();
+
+  const descendantPageNos = descendantQuestionTemplates
+    .filter(descendant => !!descendant.pageCovered)
+    .map(descendant => generatePages(descendant.pageCovered!));
+
+  // Merge all the pageNos
+  const pageNoSet = new Set<Number>();
+  descendantPageNos.forEach(descendant =>
+    descendant.forEach(pageNo => pageNoSet.add(pageNo))
+  );
+  const pageNos = Array.from(pageNoSet);
+
+  const pagesData = await getRepository(Page)
+    .createQueryBuilder("page")
+    .where("page.discardedAt IS NULL")
+    .andWhere("page.scriptId = :id", { id })
+    .andWhere("page.pageNo IN (:...pageNos)", { pageNos })
+    .leftJoin(
+      "page.annotations",
+      "annotation",
+      "annotation.paperUserId = :requesterId",
+      { requesterId }
+    )
+    .select("page.id", "id")
+    .addSelect("page.pageNo", "pageNo")
+    .addSelect("page.imageUrl", "imageUrl")
+    .addSelect("annotation.id", "annotationId")
+    .addSelect("annotation.layer", "layer")
     .getRawMany();
 
-  const pages: PageViewData[] = getPages(pagesData);
+  // Array-ize annotations
+  const pagesWithAnnotations = _.chain(pagesData)
+    .groupBy("id")
+    .map((value, index) => {
+      const annotations: AnnotationViewData[] = _.map(value, value =>
+        _.pick(value, "annotationId", "layer")
+      )
+        .filter(annotation => !!annotation.annotationId && !!annotation.layer)
+        .map(annotation => ({
+          id: annotation.annotationId,
+          layer: annotation.layer
+        }));
 
-  const data: ScriptViewData = {
+      return { ..._.pick(value[0], "id", "pageNo", "imageUrl"), annotations };
+    })
+    .value();
+
+  const pageQuestionTemplatesData = await getRepository(PageQuestionTemplate)
+    .createQueryBuilder("pageQuestionTemplate")
+    .where("pageQuestionTemplate.questionTemplateId IN (:...ids)", {
+      ids: descendantQuestionTemplateIds
+    })
+    .innerJoin("pageQuestionTemplate.pageTemplate", "pageTemplate")
+    .select("pageTemplate.pageNo", "pageNo")
+    .addSelect("pageQuestionTemplate.questionTemplateId", "questionTemplateId")
+    .getRawMany();
+
+  const questionTemplateIdsByPageNo = _.chain(pageQuestionTemplatesData)
+    .groupBy("pageNo")
+    .mapValues(value => value.map(value => value.questionTemplateId))
+    .value();
+
+  const pages = pagesWithAnnotations.map(page => ({
+    ...page,
+    questionIds: questionTemplateIdsByPageNo[page.id]
+  }));
+
+  // const data: ScriptViewData = {
+  const data = {
+    id,
     studentId,
     matriculationNumber,
-    rootQuestion,
-    descendantQuestions,
+    rootQuestionTemplate,
+    questions,
     pages
   };
 
