@@ -40,7 +40,9 @@ const GradingTableRow: React.FC<Props> = props => {
         })}
       </TableCell>
       <TableCell>
-        {Math.round((markCount / questionCount) * 100).toFixed(2)}%
+        {(markCount / questionCount).toLocaleString(undefined, {
+          style: "percent"
+        })}
       </TableCell>
       <TableCell>
         {currentUser && markers.some(marker => marker.id === currentUser.id) && (
