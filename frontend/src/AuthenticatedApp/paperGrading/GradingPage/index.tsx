@@ -117,15 +117,20 @@ const GradingSubpage: React.FC = () => {
   return (
     <Container maxWidth={false} className={classes.container}>
       <Typography variant="h4">Marking</Typography>
-      <Box justifyContent="center" className={classes.margin}>
-        <Typography variant="subtitle2" className={classes.margin}>
-          {`${rootQuestionTemplates.length}`} question(s) in total
+      <Typography variant="subtitle2" className={classes.margin}>
+        {`${rootQuestionTemplates.length}`} question(s) in total
+      </Typography>
+      <Box display="flex" alignItems="center" className={classes.margin}>
+        <Typography variant="subtitle1" className={classes.marginRight}>
+          {(totalMarkCount / totalQuestionCount).toLocaleString(undefined, {
+            style: "percent"
+          })}
         </Typography>
         <BorderLinearProgress
           value={totalMarkCount / totalQuestionCount}
           color="secondary"
           variant="determinate"
-          className={classes.margin}
+          className={classes.grow}
         />
       </Box>
       <Paper className={clsx(classes.margin, classes.tableWrapper)}>
