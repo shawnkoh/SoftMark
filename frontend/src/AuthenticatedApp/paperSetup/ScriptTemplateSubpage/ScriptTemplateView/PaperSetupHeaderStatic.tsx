@@ -9,7 +9,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import React from "react";
 import { Link } from "react-router-dom";
-import usePaper from "../../../contexts/PaperContext";
+import usePaper from "../../../../contexts/PaperContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,12 +36,7 @@ const Header: React.FC<Props> = props => {
   const { name } = paper;
 
   return (
-    <AppBar
-      position="sticky"
-      color="primary"
-      elevation={1}
-      className={classes.appBar}
-    >
+    <AppBar color="primary" elevation={1} className={classes.appBar}>
       <Toolbar>
         <IconButton
           component={Link}

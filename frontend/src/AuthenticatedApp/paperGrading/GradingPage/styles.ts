@@ -9,8 +9,14 @@ const useStyles = makeStyles((theme: Theme) =>
     margin: {
       marginTop: theme.spacing(2)
     },
+    marginRight: {
+      marginRight: theme.spacing(1)
+    },
     tableWrapper: {
       overflowX: "auto"
+    },
+    grow: {
+      flexGrow: 1
     }
   })
 );
