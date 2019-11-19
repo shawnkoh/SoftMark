@@ -45,7 +45,8 @@ const useStyles = makeStyles((theme: Theme) =>
     questionBar: {
       backgroundColor: lightBlue[50],
       top: "auto",
-      bottom: 0
+      bottom: 0,
+      overflowX: "auto"
     },
     questionBarItem: {
       marginRight: theme.spacing(1)

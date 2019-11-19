@@ -78,13 +78,16 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     if (pageNos.length) setPageNo(pageNos[0]);
   }, [pageNos]);
 
-  const Header = () => (
+  interface HeaderProps {
+    subtitle: string;
+  }
+  const Header: React.FC<HeaderProps> = ({ subtitle }) => (
     <AppBar position="static" color="primary" elevation={1}>
       <Toolbar>
         <IconButton
           color="inherit"
           component={Link}
-          to={`/papers/${paper.id}/setup`}
+          to={`/papers/${paper.id}/grading`}
           className={classes.backButton}
         >
           <ArrowBackIcon />
@@ -94,7 +97,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
             <Typography variant="h6">{paper.name}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle1">{`Marking question template ID ${questionTemplateId}`}</Typography>
+            <Typography variant="subtitle1">{subtitle}</Typography>
           </Grid>
         </Grid>
         <Button color="inherit" onClick={toggleRefreshFlag}>
@@ -107,134 +110,145 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   if (isLoading) {
     return (
       <div className={classes.container}>
-        <Header />
+        <Header
+          subtitle={`Marking question template ID ${questionTemplateId}`}
+        />
         <LoadingSpinner loadingMessage="Loading script..." />
       </div>
     );
   }
 
-  if (!scriptViewData) {
+  if (scriptViewData) {
+    console.log(scriptViewData); // for debugging
+
+    const {
+      matriculationNumber,
+      rootQuestionTemplate,
+      questions,
+      pages
+    } = scriptViewData;
+
+    if (!pages) {
+      return (
+        <div className={classes.container}>
+          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Container maxWidth={false} className={classes.innerContainer}>
+            <Typography variant="subtitle1">No pages to display.</Typography>
+          </Container>
+        </div>
+      );
+    }
+
+    const lastPageNo = pageNos[pageNos.length - 1];
+    const firstPageNo = pageNos[0];
+    const incrementPageNo = () =>
+      setPageNo(prevPageNo => {
+        const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) + 1];
+        return Math.min(lastPageNo, isNaN(nextPageNo) ? Infinity : nextPageNo);
+      });
+    const decrementPageNo = () =>
+      setPageNo(prevPageNo => {
+        const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) - 1];
+        return Math.max(
+          firstPageNo,
+          isNaN(nextPageNo) ? -Infinity : nextPageNo
+        );
+      });
+
+    const getCurrentPageQuestions = () => {
+      /*
+      const currentPage = pages.find(page => page.pageNo === pageNo)!;
+      const currentPageQuestions = questions.filter(question =>
+        currentPage.questionIds.includes(question.id)
+      );
+      return currentPageQuestions;
+      */
+      return questions; // temporary band-aid
+    };
+
     return (
       <div className={classes.container}>
-        <Header />
-        <Container maxWidth={false} className={classes.innerContainer}>
-          <Typography variant="subtitle1">An error occurred.</Typography>
-        </Container>
+        <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+        {pages
+          .filter(page => page.pageNo === pageNo)
+          .map((page, index) => (
+            <div className={classes.grow} key={index}>
+              <Annotator
+                key={page.id}
+                pageId={page.id}
+                backgroundImageSource={page.imageUrl || ""}
+                foregroundAnnotation={
+                  page.annotations.length > 0 ? page.annotations[0].layer : []
+                }
+              />
+            </div>
+          ))}
+        <AppBar
+          position="fixed"
+          color="inherit"
+          className={classes.questionBar}
+        >
+          <Toolbar>
+            <Typography
+              variant="button"
+              className={clsx(classes.grow, classes.questionBarItem)}
+            >
+              {matriculationNumber || "(Unmatched script)"} page {pageNo}
+            </Typography>
+            <Chip
+              label={"Q" + rootQuestionTemplate.name}
+              variant="outlined"
+              className={classes.questionBarItem}
+            />
+            {getCurrentPageQuestions().map(question => (
+              <MarkQuestionModal
+                key={question.id}
+                question={question}
+                render={(toggleVisibility, score, name) => (
+                  <ReversedChip
+                    onClick={toggleVisibility}
+                    label={"Q" + name}
+                    avatar={<Avatar>{score || "-"}</Avatar>}
+                    color={score ? "primary" : "default"}
+                    className={classes.questionBarItem}
+                  />
+                )}
+              />
+            ))}
+          </Toolbar>
+        </AppBar>
+        {pageNo !== pageNos[0] && (
+          <IconButton
+            onClick={decrementPageNo}
+            className={classes.prevPageButton}
+            color="inherit"
+            aria-label="previous page"
+          >
+            <ArrowLeftIcon />
+          </IconButton>
+        )}
+        {pageNo !== pageNos[pageNos.length - 1] && (
+          <IconButton
+            onClick={incrementPageNo}
+            className={classes.nextPageButton}
+            color="inherit"
+            aria-label="next page"
+          >
+            <ArrowRightIcon />
+          </IconButton>
+        )}
       </div>
     );
   }
-
-  const {
-    matriculationNumber,
-    rootQuestionTemplate,
-    questions,
-    pages
-  } = scriptViewData;
-
-  console.log(scriptViewData); // for debugging
-
-  if (!pages) {
-    return (
-      <div className={classes.container}>
-        <Header />
-        <Container maxWidth={false} className={classes.innerContainer}>
-          <Typography variant="subtitle1">No pages to display.</Typography>
-        </Container>
-      </div>
-    );
-  }
-
-  const lastPageNo = pageNos[pageNos.length - 1];
-  const firstPageNo = pageNos[0];
-  const incrementPageNo = () =>
-    setPageNo(prevPageNo => {
-      const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) + 1];
-      return Math.min(lastPageNo, isNaN(nextPageNo) ? Infinity : nextPageNo);
-    });
-  const decrementPageNo = () =>
-    setPageNo(prevPageNo => {
-      const nextPageNo = pageNos[pageNos.indexOf(prevPageNo) - 1];
-      return Math.max(firstPageNo, isNaN(nextPageNo) ? -Infinity : nextPageNo);
-    });
-
-  const getCurrentPageQuestions = () => {
-    /*
-    const currentPage = pages.find(page => page.pageNo === pageNo)!;
-    const currentPageQuestions = questions.filter(question =>
-      currentPage.questionIds.includes(question.id)
-    );
-    return currentPageQuestions;
-    */
-    return questions;
-  };
 
   return (
     <div className={classes.container}>
-      <Header />
-      {pages
-        .filter(page => page.pageNo === pageNo)
-        .map(page => (
-          <div className={classes.grow}>
-            <Annotator
-              key={page.id}
-              pageId={page.id}
-              backgroundImageSource={page.imageUrl || ""}
-              foregroundAnnotation={
-                page.annotations.length > 0 ? page.annotations[0].layer : []
-              }
-            />
-          </div>
-        ))}
-      <AppBar position="fixed" color="inherit" className={classes.questionBar}>
-        <Toolbar>
-          <Typography
-            variant="button"
-            className={clsx(classes.grow, classes.questionBarItem)}
-          >
-            {matriculationNumber} page {pageNo}
-          </Typography>
-          <Chip
-            label={"Q" + rootQuestionTemplate.name}
-            variant="outlined"
-            className={classes.questionBarItem}
-          />
-          {getCurrentPageQuestions().map(question => (
-            <MarkQuestionModal
-              key={question.id}
-              question={question}
-              render={(toggleVisibility, score, name) => (
-                <ReversedChip
-                  onClick={toggleVisibility}
-                  label={"Q" + name}
-                  avatar={<Avatar>{score || "-"}</Avatar>}
-                  color={score ? "primary" : "default"}
-                  className={classes.questionBarItem}
-                />
-              )}
-            />
-          ))}
-        </Toolbar>
-      </AppBar>
-      {pageNo !== pageNos[0] && (
-        <IconButton
-          onClick={decrementPageNo}
-          className={classes.prevPageButton}
-          color="inherit"
-          aria-label="previous page"
-        >
-          <ArrowLeftIcon />
-        </IconButton>
-      )}
-      {pageNo !== pageNos[pageNos.length - 1] && (
-        <IconButton
-          onClick={incrementPageNo}
-          className={classes.nextPageButton}
-          color="inherit"
-          aria-label="next page"
-        >
-          <ArrowRightIcon />
-        </IconButton>
-      )}
+      <Header
+        subtitle={`Error occurred marking question template ID ${questionTemplateId}`}
+      />
+      <Container maxWidth={false} className={classes.innerContainer}>
+        <Typography variant="subtitle1">An error occurred.</Typography>
+      </Container>
     </div>
   );
 };

@@ -17,7 +17,8 @@ import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseB
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     slider: {
-      width: 200
+      width: "100%",
+      marginTop: theme.spacing(6)
     }
   })
 );
@@ -41,7 +42,6 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   const [localScore, setLocalScore] = useState<number>(score || 0);
   const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
     setLocalScore(newValue as number);
-    setActualScore(newValue as number);
   };
 
   const putMarkData = async (questionId: number, score: number) => {
@@ -56,7 +56,9 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   };
 
   const handleSave = event => {
+    setActualScore(localScore); // band-aid, check putMarkData response pending problem
     putMarkData(id, localScore);
+    toggleVisibility();
   };
 
   return (
@@ -70,7 +72,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score:
+            Saved score:
             {actualScore !== null
               ? ` ${actualScore} / ${maxScore}`
               : " no score yet"}
