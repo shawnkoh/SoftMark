@@ -1,24 +1,20 @@
 import { AppBar, Drawer, List, Toolbar, Typography } from "@material-ui/core";
 import React from "react";
 import { DndProvider } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
+import MultiBackend from "react-dnd-multi-backend";
+import HTML5toTouch from "react-dnd-multi-backend/dist/esm/HTML5toTouch";
 import ScriptTemplatePanel from "../PageTemplateView";
 import useStyles from "./useStyles";
 import QuestionTemplateTree from "./QuestionTemplateTree";
 import useScriptSetup from "../../context/ScriptSetupContext";
+import Header from "./PaperSetupHeaderStatic";
 
 const ScriptTemplateView: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplateSetupData, goPage } = useScriptSetup();
   return (
     <div className={classes.root}>
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Script Template Setup
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Header title="Set up question structure" />
       <Drawer
         variant="permanent"
         className={classes.drawer}
@@ -40,7 +36,7 @@ const ScriptTemplateView: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider backend={MultiBackend} options={HTML5toTouch}>
           {scriptTemplateSetupData.pageTemplates.map(pageTemplate => (
             <ScriptTemplatePanel
               key={pageTemplate.id}
