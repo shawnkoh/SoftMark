@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import clsx from "clsx";
 
 import api from "../../../api";
 import usePaper from "../../../contexts/PaperContext";
@@ -25,65 +26,13 @@ import {
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { lightBlue } from "@material-ui/core/colors";
 
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import ReversedChip from "../../../components/ReversedChip";
 import Annotator from "./Annotator";
 import MarkQuestionModal from "./MarkQuestionModal";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      minHeight: "100vh",
-      minWidth: "100vw",
-      display: "flex",
-      flexDirection: "column",
-      touchAction: "none"
-    },
-    innerContainer: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2)
-    },
-    grow: {
-      display: "flex",
-      flexGrow: 1
-    },
-    backButton: {
-      marginRight: theme.spacing(2)
-    },
-    prevPageButton: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      margin: "auto"
-    },
-    nextPageButton: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      right: 0,
-      margin: "auto"
-    },
-    pageLabel: {
-      position: "absolute",
-      bottom: theme.spacing(10),
-      left: 0,
-      right: 0,
-      margin: "0 auto"
-    },
-    questionBar: {
-      backgroundColor: lightBlue[50],
-      top: "auto",
-      bottom: 0
-    },
-    questionBarItem: {
-      marginRight: theme.spacing(1)
-    }
-  })
-);
+import useStyles from "./styles";
 
 type Props = RouteComponentProps;
 
@@ -177,8 +126,8 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
 
   const {
     matriculationNumber,
-    rootQuestion,
-    descendantQuestions,
+    rootQuestionTemplate,
+    questions,
     pages
   } = scriptViewData;
 
@@ -209,16 +158,14 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
     });
 
   const getCurrentPageQuestions = () => {
+    /*
     const currentPage = pages.find(page => page.pageNo === pageNo)!;
-    const currentPageQuestions =
-      descendantQuestions === undefined ||
-      descendantQuestions === null ||
-      descendantQuestions.length == 0
-        ? [rootQuestion]
-        : descendantQuestions.filter(question =>
-            currentPage.questionIds.includes(question.id)
-          );
+    const currentPageQuestions = questions.filter(question =>
+      currentPage.questionIds.includes(question.id)
+    );
     return currentPageQuestions;
+    */
+    return questions;
   };
 
   return (
@@ -240,9 +187,17 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         ))}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          <Typography variant="button" className={classes.questionBarItem}>
+          <Typography
+            variant="button"
+            className={clsx(classes.grow, classes.questionBarItem)}
+          >
             {matriculationNumber} page {pageNo}
           </Typography>
+          <Chip
+            label={"Q" + rootQuestionTemplate.name}
+            variant="outlined"
+            className={classes.questionBarItem}
+          />
           {getCurrentPageQuestions().map(question => (
             <MarkQuestionModal
               key={question.id}

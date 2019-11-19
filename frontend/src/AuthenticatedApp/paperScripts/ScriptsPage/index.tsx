@@ -11,19 +11,18 @@ import {
   Typography
 } from "@material-ui/core";
 import PublishIcon from "@material-ui/icons/Publish";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import useStyles from "./styles";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import api from "../../../api";
+import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
-import ScriptsTableRow from "./ScriptsTableRow";
-import RoundedButton from "../../../components/buttons/RoundedButton";
 import PublishScriptsModal from "./PublishScriptsModal";
+import ScriptsTableRow from "./ScriptsTableRow";
+import useStyles from "./styles";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
