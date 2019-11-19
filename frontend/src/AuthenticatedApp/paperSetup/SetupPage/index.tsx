@@ -177,7 +177,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Set up questions" +
+        "Set up question structure" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
