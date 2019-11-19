@@ -1,5 +1,6 @@
 import {
   Container,
+  Grid,
   Paper,
   Table,
   TableBody,
@@ -9,7 +10,9 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
+import PublishIcon from "@material-ui/icons/Publish";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import useStyles from "./styles";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -19,47 +22,21 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
 import ScriptsTableRow from "./ScriptsTableRow";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      marginTop: theme.spacing(4),
-      marginBottom: theme.spacing(4)
-    },
-    margin: {
-      marginTop: theme.spacing(2)
-    },
-    tableWrapper: {
-      overflowX: "auto"
-    }
-  })
-);
+import RoundedButton from "../../../components/buttons/RoundedButton";
+import PublishScriptsModal from "./PublishScriptsModal";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
 
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
-
-  const getScripts = () => {
-    api.scripts
-      .getScripts(paper.id)
-      .then(resp => {
-        setScripts(resp.data.scripts);
-      })
-      .finally(() => setIsLoadingScripts(false));
-  };
-
-  useEffect(getScripts, [refreshScriptsFlag]);
-
-  const [searchText, setSearchText] = useState("");
-
   const ASC = "asc";
   const DESC = "desc";
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState("script");
+  const resetOrder = () => {
+    setOrder(ASC);
+    setOrderBy("script");
+  };
 
   const tableComparator = (a: ScriptListData, b: ScriptListData) => {
     let res = 0;
@@ -88,6 +65,24 @@ const ScriptsSubpage: React.FC = () => {
     }
     return res;
   };
+
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
+  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
+
+  const getScripts = () => {
+    setIsLoadingScripts(true);
+    api.scripts
+      .getScripts(paper.id)
+      .then(resp => {
+        resetOrder();
+        setScripts(resp.data.scripts);
+      })
+      .finally(() => setIsLoadingScripts(false));
+  };
+
+  useEffect(getScripts, []);
+
+  const [searchText, setSearchText] = useState("");
 
   const sortTable = () => {
     setScripts(scripts.sort(tableComparator));
@@ -133,6 +128,10 @@ const ScriptsSubpage: React.FC = () => {
       isSortable: true
     },
     {
+      name: "Published",
+      key: "published"
+    },
+    {
       name: "",
       key: ""
     }
@@ -158,15 +157,41 @@ const ScriptsSubpage: React.FC = () => {
   return (
     <Container maxWidth={false} className={classes.container}>
       <Typography variant="h4">Scripts</Typography>
-      <Typography variant="subtitle2" className={classes.margin}>
+      <Typography variant="subtitle2" className={classes.marginTop}>
         {scripts.length} scripts in total
       </Typography>
-      <SearchBar
-        value={""}
-        placeholder="Search..."
-        onChange={str => setSearchText(str)}
+
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        spacing={1}
         className={classes.margin}
-      />
+      >
+        <Grid item className={classes.grow}>
+          <SearchBar
+            value={""}
+            placeholder="Search..."
+            onChange={str => setSearchText(str)}
+          />
+        </Grid>
+        <Grid item>
+          <PublishScriptsModal
+            refreshScripts={getScripts}
+            render={toggleModal => (
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                onClick={toggleModal}
+                startIcon={<PublishIcon />}
+              >
+                Publish
+              </RoundedButton>
+            )}
+          />
+        </Grid>
+      </Grid>
       <Paper className={clsx(classes.margin, classes.tableWrapper)}>
         <Table>
           <TableHead>

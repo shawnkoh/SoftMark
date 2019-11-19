@@ -26,6 +26,7 @@ export type AccessTokenSignedPayload = AccessTokenPayload & TokenLifespan;
 export type InviteTokenPayload = Payload<BearerTokenType.InviteToken> & {
   paperUserId: number;
 };
+
 export type InviteTokenSignedPayload = InviteTokenPayload & TokenLifespan;
 
 export type PasswordlessTokenPayload = Payload<

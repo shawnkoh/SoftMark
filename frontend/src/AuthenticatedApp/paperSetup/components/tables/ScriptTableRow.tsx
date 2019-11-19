@@ -20,7 +20,7 @@ import DeleteScriptModal from "../modals/DeleteScriptModal";
 import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import useStyles from "./styles";
-import VerificationSwitch from "./VerificationSwitch";
+import VerificationSwitch from "../../../../components/misc/VerificationSwitch";
 
 interface OwnProps {
   script: ScriptListData;

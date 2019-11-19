@@ -11,6 +11,7 @@ import { PaperUserRole } from "../types/paperUsers";
 import { ScriptListData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import { sendScriptEmail } from "../utils/sendgrid";
 import { sortByFilename } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
@@ -55,6 +56,7 @@ export async function create(request: Request, response: Response) {
   // Case: new script
   const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
+
   if (errors.length > 0) {
     response.sendStatus(400);
     return;
@@ -120,10 +122,11 @@ export async function update(request: Request, response: Response) {
     return;
   }
 
-  const { filename, hasVerifiedStudent, studentId } = pick(
+  const { filename, hasVerifiedStudent, studentId, hasBeenPublished } = pick(
     request.body,
     "filename",
     "hasVerifiedStudent",
+    "hasBeenPublished",
     "studentId"
   );
 
@@ -132,6 +135,9 @@ export async function update(request: Request, response: Response) {
   }
   if (hasVerifiedStudent !== undefined) {
     script.hasVerifiedStudent = hasVerifiedStudent;
+  }
+  if (hasBeenPublished !== undefined) {
+    script.hasBeenPublished = hasBeenPublished;
   }
   if (studentId !== undefined) {
     script.student = studentId
@@ -166,7 +172,6 @@ export async function match(request: Request, response: Response) {
   if (!allowed) {
     return response.sendStatus(404);
   }
-  const { paper, requester } = allowed;
 
   const scripts = await getRepository(Script).find({
     paperId,
@@ -244,12 +249,14 @@ export async function index(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  const scripts = await getRepository(Script).find(
-    requester.role === PaperUserRole.Student
-      ? { paper, student: requester, discardedAt: IsNull() }
-      : { paper, discardedAt: IsNull() }
-  );
-
+  const scripts = await getRepository(Script).find({
+    where:
+      requester.role === PaperUserRole.Student
+        ? { paper, student: requester, discardedAt: IsNull() }
+        : { paper, discardedAt: IsNull() },
+    relations: ["student", "pages", "questions"]
+  });
+  
   const data: ScriptListData[] = await Promise.all(
     scripts.sort(sortByFilename).map(script => script.getListData())
   );
@@ -376,17 +383,62 @@ export async function discardScripts(request: Request, response: Response) {
     }
 
     const scripts = await getRepository(Script).find({
-      where: { paperId, discardedAt: IsNull()}
+      where: { paperId, discardedAt: IsNull() }
     });
 
     await getManager().transaction(async manager => {
-      await Promise.all(scripts.map(async script => {
-        await getRepository(Script).update(script.id, {
-          discardedAt: new Date()
-        });
-      }));
+      await Promise.all(
+        scripts.map(async script => {
+          await getRepository(Script).update(script.id, {
+            discardedAt: new Date()
+          });
+        })
+      );
     });
-    
+
+    response.sendStatus(204);
+  } catch (error) {
+    response.sendStatus(400);
+  }
+}
+
+export async function publishScripts(request: Request, response: Response) {
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const userId = payload.userId;
+    const paperId = Number(request.params.id);
+    const allowed = await allowedRequester(
+      userId,
+      paperId,
+      PaperUserRole.Owner
+    );
+    if (!allowed) {
+      return response.sendStatus(404);
+    }
+
+    const scripts = await getRepository(Script).find({
+      where: {
+        paperId,
+        studentId: Not(IsNull()),
+        hasBeenPublished: false,
+        discardedAt: IsNull()
+      },
+      relations: ["student", "student.user", "student.paper"]
+    });
+
+    await getManager().transaction(async manager => {
+      await Promise.all(
+        scripts.map(async script => {
+          if (script.student) {
+            script.hasVerifiedStudent = true;
+            script.hasBeenPublished = true;
+            sendScriptEmail(script.student);
+            await getRepository(Script).save(script);
+          }
+        })
+      );
+    });
+
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(400);

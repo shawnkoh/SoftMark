@@ -51,12 +51,6 @@ const ScriptsTable: React.FC = () => {
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
-  const refreshScripts = () => {
-    setTimeout(() => {
-      setRefreshScriptsFlag(refreshScriptsFlag + 1);
-    }, 300);
-  };
 
   const getScripts = () => {
     api.scripts
@@ -67,7 +61,7 @@ const ScriptsTable: React.FC = () => {
       .finally(() => setIsLoadingScripts(false));
   };
 
-  useEffect(getScripts, [refreshScriptsFlag]);
+  useEffect(getScripts, []);
 
   const callbackScripts = () => {
     setTimeout(() => {
@@ -160,13 +154,16 @@ const ScriptsTable: React.FC = () => {
               startIcon={<MatchIcon />}
               onClick={() => {
                 toast("Attempting to match scripts to students...");
-                api.scripts.matchScriptsToPaperUsers(paper.id).then(resp => {
-                  setScripts([]);
-                  getScripts();
-                  toast.success("Matching algorithm ran successfully");
-                }).catch(() => {
-                  toast.error("An error occurred when matching.");
-                })
+                api.scripts
+                  .matchScriptsToPaperUsers(paper.id)
+                  .then(resp => {
+                    setScripts([]);
+                    getScripts();
+                    toast.success("Matching algorithm ran successfully");
+                  })
+                  .catch(() => {
+                    toast.error("An error occurred when matching.");
+                  });
               }}
             >
               Match

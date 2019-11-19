@@ -19,6 +19,7 @@ export interface ScriptListData extends DiscardableData {
   paperId: number;
   student: PaperUserListData | null;
   hasVerifiedStudent: boolean;
+  hasBeenPublished: boolean;
   filename: string;
   awardedMarks: number;
   totalMarks: number;

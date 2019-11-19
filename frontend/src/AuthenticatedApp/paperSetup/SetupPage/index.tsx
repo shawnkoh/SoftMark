@@ -135,6 +135,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
             color="primary"
             variant="contained"
             className={classes.button}
+            disabled={!scriptTemplate}
           >
             Upload
           </Button>

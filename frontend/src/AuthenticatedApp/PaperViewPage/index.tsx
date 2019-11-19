@@ -212,7 +212,7 @@ const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
   }
 
   return role === PaperUserRole.Student && scriptTemplate ? (
-    <Redirect to={`${path}/${SCRIPTS}/`} />
+    <Redirect to={`/papers/${paper.id}/${SCRIPTS}`} />
   ) : (
     <div />
   );

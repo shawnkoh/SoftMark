@@ -25,7 +25,7 @@ export async function createScript(
 export async function matchScriptsToPaperUsers(
   id: number
 ): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
-  return client.patch(`/papers/${id}/scripts/match`);
+  return client.patch(`/papers/${id}/scripts/match`, {}, { timeout: 120000 });
 }
 
 export async function getScript(id: number): Promise<ScriptData | null> {
@@ -71,6 +71,10 @@ export async function undiscardScript(
   id: number
 ): Promise<AxiosResponse<{ script: ScriptData }>> {
   return client.patch(`${URL}/${id}/undiscard`);
+}
+
+export async function publishScripts(paperId: number): Promise<AxiosResponse> {
+  return client.patch(`/papers/${paperId}/publish_scripts`);
 }
 
 export async function postScript(
