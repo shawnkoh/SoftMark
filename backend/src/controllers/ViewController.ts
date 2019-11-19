@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Page } from "../entities/Page";
 import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
+import { PageTemplate } from "../entities/PageTemplate";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
@@ -21,7 +22,6 @@ import {
   ScriptViewData
 } from "../types/view";
 import { allowedRequester } from "../utils/papers";
-import { generatePages } from "../utils/questionTemplate";
 
 function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
   return queryBuilder
@@ -285,7 +285,7 @@ export async function questionToMark(request: Request, response: Response) {
   const questionsQuery = getRepository(Question)
     .createQueryBuilder("question")
     .where("question.discardedAt IS NULL")
-    .andWhere("question.scriptId = :id", { id: script.id })
+    .andWhere("question.scriptId = :id", { id })
     .andWhere("question.questionTemplateId IN (:...ids)", {
       ids: descendantQuestionTemplateIds
     })
@@ -303,18 +303,16 @@ export async function questionToMark(request: Request, response: Response) {
     .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
     .execute();
 
-  // TODO: Use PageQuestionTemplate to get all the pageNos instead.
-
-  const descendantPageNos = descendantQuestionTemplates
-    .filter(descendant => !!descendant.pageCovered)
-    .map(descendant => generatePages(descendant.pageCovered!));
-
-  // Merge all the pageNos
-  const pageNoSet = new Set<Number>();
-  descendantPageNos.forEach(descendant =>
-    descendant.forEach(pageNo => pageNoSet.add(pageNo))
-  );
-  const pageNos = Array.from(pageNoSet);
+  const pageNosData = await getRepository(PageTemplate)
+    .createQueryBuilder("pageTemplate")
+    .where("pageTemplate.discardedAt IS NULL")
+    .innerJoin("pageTemplate.pageQuestionTemplates", "pageQuestionTemplate")
+    .andWhere("pageQuestionTemplate.questionTemplateId IN (:...ids)", {
+      ids: descendantQuestionTemplateIds
+    })
+    .select("pageTemplate.pageNo", "pageNo")
+    .getRawMany();
+  const pageNos = pageNosData.map(pageNo => pageNo.pageNo);
 
   const pagesData = await getRepository(Page)
     .createQueryBuilder("page")
