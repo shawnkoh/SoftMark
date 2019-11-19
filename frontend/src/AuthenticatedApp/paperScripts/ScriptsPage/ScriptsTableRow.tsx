@@ -42,6 +42,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             to={`${match.url}/${id}`}
             variant="contained"
             color="primary"
+            style={{ borderRadius: 24 }}
           >
             View
           </Button>

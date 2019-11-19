@@ -50,6 +50,7 @@ const GradingTableRow: React.FC<Props> = props => {
               to={`${match.url}/${questionTemplate.id}`}
               variant="contained"
               color="primary"
+              style={{ borderRadius: 24 }}
             >
               Grade
             </Button>
