@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RouteComponentProps, withRouter } from "react-router";
 import { getUser } from "../../../store/auth/selectors";
-import usePaper from "contexts/PaperContext";
 
 interface OwnProps {
   questionTemplate: any;
@@ -14,10 +13,9 @@ type Props = OwnProps & RouteComponentProps;
 
 const GradingTableRow: React.FC<Props> = props => {
   const currentUser = useSelector(getUser);
-  const paper = usePaper();
-  const paperId = paper.id;
 
-  const { questionTemplate } = props;
+  const { questionTemplate, match } = props;
+
   const {
     name,
     totalScore,
@@ -49,7 +47,7 @@ const GradingTableRow: React.FC<Props> = props => {
           <Tooltip title={`Continue grading`}>
             <Button
               component={Link}
-              to={`/papers/${paperId}/grading/${questionTemplate.id}`}
+              to={`${match.url}/${questionTemplate.id}`}
               variant="contained"
               color="primary"
             >

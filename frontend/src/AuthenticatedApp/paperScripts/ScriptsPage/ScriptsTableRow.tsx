@@ -13,7 +13,7 @@ interface OwnProps {
 type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
-  const { script } = props;
+  const { script, match } = props;
   const { student, filename, id, awardedMarks, totalMarks } = script;
   let matriculationNumber = "-";
   let name = "-";
@@ -39,7 +39,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <Tooltip title={`View script of ${matriculationNumber}`}>
           <Button
             component={Link}
-            to={`scripts/${id}`}
+            to={`${match.url}/${id}`}
             variant="contained"
             color="primary"
           >
