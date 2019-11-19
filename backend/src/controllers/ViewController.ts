@@ -11,9 +11,14 @@ import { Page } from "../entities/Page";
 import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
+import { Script } from "../entities/Script";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { AnnotationViewData } from "../types/view";
+import {
+  AnnotationViewData,
+  QuestionViewData,
+  ScriptViewData
+} from "../types/view";
 import { allowedRequester } from "../utils/papers";
 import { generatePages } from "../utils/questionTemplate";
 
@@ -27,55 +32,109 @@ function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
     .addSelect("questionTemplate.leftOffset", "leftOffset");
 }
 
+function selectPageViewData<T>(
+  query: SelectQueryBuilder<T>,
+  overwrite: boolean = true
+) {
+  const result = overwrite
+    ? query.select("page.id", "id")
+    : query.addSelect("page.id", "id");
+  return (
+    result
+      .addSelect("page.pageNo", "pageNo")
+      // .addSelect("page.imageUrl", "imageUrl")
+      .addSelect("annotation.id", "annotationId")
+      .addSelect("annotation.layer", "layer")
+      .addSelect("question.id", "questionId")
+  );
+}
+
+function selectScriptData<T>(
+  query: SelectQueryBuilder<T>,
+  overwrite: boolean = true
+) {
+  const result = overwrite
+    ? query.select("script.id", "id")
+    : query.addSelect("script.id", "id");
+  return result
+    .addSelect("script.paperId", "paperId")
+    .addSelect("student.id", "studentId")
+    .addSelect("student.matriculationNumber", "matriculationNumber");
+}
+
+/**
+ * Loads everything related to the Script.
+ * Unlike questionToMark, does not filter the pages and questions based on the rootQuestionTemplate
+ * Primary reason: extra pages that are not tagged to a question should still be visible.
+ */
 export async function viewScript(request: Request, response: Response) {
-  //   const payload = response.locals.payload as AccessTokenSignedPayload;
-  //   const requesterId = payload.userId;
-  //   const scriptId = Number(request.params.id);
-  //   const rootQuestionData = await getRootQuestion(scriptId).getRawOne();
-  //   if (!rootQuestionData) {
-  //     response.sendStatus(404);
-  //     return;
-  //   }
-  //   const {
-  //     paperId,
-  //     studentId,
-  //     matriculationNumber,
-  //     questionTemplateId,
-  //     ...rootQuestion
-  //   } = rootQuestionData;
-  //   const allowed = await allowedRequester(
-  //     requesterId,
-  //     paperId,
-  //     PaperUserRole.Student
-  //   );
-  //   if (!allowed) {
-  //     response.sendStatus(404);
-  //     return;
-  //   }
-  //   const descendantQuestionTemplates = await getDescendantQuestionTemplates(
-  //     questionTemplateId
-  //   ).getMany();
-  //   const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
-  //     descendant => descendant.id
-  //   );
-  //   let descendantQuestions = [];
-  //   if (descendantQuestionTemplateIds.length > 0) {
-  //     descendantQuestions = await getDescendantQuestions(
-  //       descendantQuestionTemplateIds
-  //     ).getRawMany();
-  //   }
-  //   const questionIds = descendantQuestions.map(descendant => descendant.id);
-  //   questionIds.push(rootQuestion.id);
-  //   const pagesData = await getPagesData(questionIds).getRawMany();
-  //   const pages = getPages(pagesData);
-  //   const data: ScriptViewData = {
-  //     rootQuestion,
-  //     studentId,
-  //     matriculationNumber,
-  //     descendantQuestions,
-  //     pages
-  //   };
-  //   response.status(200).json(data);
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const scriptId = Number(request.params.id);
+
+  const scriptQuery = getRepository(Script)
+    .createQueryBuilder("script")
+    .where("script.id = :scriptId", { scriptId })
+    .andWhere("script.discardedAt IS NULL");
+
+  const script = await selectScriptData(scriptQuery)
+    .leftJoin("script.student", "student", "student.discardedAt IS NULL")
+    .getRawOne();
+  if (!script) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const { id, studentId, paperId, matriculationNumber } = script;
+  // Only allow the student to get his own script or any marker and above
+  if (
+    requesterId !== studentId &&
+    !allowedRequester(requesterId, paperId, PaperUserRole.Marker)
+  ) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const questionsQuery = scriptQuery
+    .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
+    .innerJoin(
+      "question.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    );
+
+  const questions: QuestionViewData[] = await selectQuestionViewData(
+    questionsQuery
+  )
+    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+    .getRawMany();
+
+  // TODO: Not sure how useful rootQuestionTemplate is in viewScript
+  const rootQuestionTemplate = await questionsQuery
+    .orderBy("questionTemplate.displayPage", "ASC")
+    .select("questionTemplate.id", "id")
+    .addSelect("questionTemplate.name", "name")
+    .getRawOne();
+
+  if (!rootQuestionTemplate) {
+    response.sendStatus(204);
+    return;
+  }
+
+  const pages = await selectPageViewData(questionsQuery)
+    .innerJoin("script.pages", "page", "page.discardedAt IS NULL")
+    .leftJoin("page.annotations", "annotation")
+    .getRawMany();
+
+  const data: ScriptViewData = {
+    id,
+    studentId,
+    matriculationNumber,
+    rootQuestionTemplate,
+    questions,
+    pages
+  };
+  response.status(200).json(data);
 }
 
 /**
@@ -202,6 +261,8 @@ export async function questionToMark(request: Request, response: Response) {
     .update()
     .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
     .execute();
+
+  // TODO: Use PageQuestionTemplate to get all the pageNos instead.
 
   const descendantPageNos = descendantQuestionTemplates
     .filter(descendant => !!descendant.pageCovered)
