@@ -48,6 +48,7 @@ export class Script extends Discardable {
       this.student = student;
     }
     this.hasVerifiedStudent = false;
+    this.hasBeenPublished = false;
   }
 
   @Column()
@@ -78,6 +79,10 @@ export class Script extends Discardable {
   @Column("boolean")
   @IsNotEmpty()
   hasVerifiedStudent!: boolean;
+
+  @Column("boolean")
+  @IsNotEmpty()
+  hasBeenPublished!: boolean;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -119,6 +124,7 @@ export class Script extends Discardable {
       filename: this.filename,
       student: paperUser ? await paperUser.getData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
+      hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
       totalMarks,
       pagesCount: this.pages

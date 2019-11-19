@@ -56,7 +56,7 @@ export async function postStudents(
         }
       }
     };
-    const threads = 8;
+    const threads = 5;
     let prevUpperLimitForIndex = 0;
     let upperLimitForIndex = 0;
     for (let i = 1; i <= threads; i++) {

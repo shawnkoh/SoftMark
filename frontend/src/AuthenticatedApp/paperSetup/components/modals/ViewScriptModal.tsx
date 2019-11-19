@@ -46,9 +46,7 @@ const ViewScriptModal: React.FC<Props> = props => {
           {`Viewing script ${script.filename}`}
         </DialogTitleWithCloseButton>
         <DialogContent dividers>
-          {isLoading && (
-            <LoadingSpinner loadingMessage="Loading script template..." />
-          )}
+          {isLoading && <LoadingSpinner loadingMessage="Loading script..." />}
           {!scriptData && <>This script does not exist</>}
           {scriptData &&
             scriptData.pages.map((page, index) => {

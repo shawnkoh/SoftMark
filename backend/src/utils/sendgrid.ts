@@ -54,7 +54,7 @@ export function sendPasswordlessLoginEmail(user: User) {
   send(user, `[${APP_NAME}] Passwordless Login`, message);
 }
 
-export function sendInviteEmail(paperUser: PaperUser, expiresIn: string) {
+export function sendInviteEmail(paperUser: PaperUser, expiresIn?: string) {
   const { paper, user } = paperUser;
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
@@ -89,13 +89,13 @@ export function sendScriptEmail(paperUser: PaperUser) {
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = paperUser.createInviteToken("7d"); // TODO: change this
+  const token = paperUser.createInviteToken("28d"); // TODO: change this
 
   const message =
     `<p>Dear ${user.name || "User"}</p>` +
     `<p>You may view your [${paper.name}] script here.</p>` +
     "<br />" +
-    `<p>You may view it by <a href='${APP_URL}/scripts/${token}'>clicking on this link</a></p>` +
+    `<p>You may view it by <a href='${APP_URL}/invite/${token}'>clicking on this link</a></p>` +
     `<p>Alternatively, you may log into your email at ${LOGIN_URL} to view the script</p>`;
 
   send(user, `[${APP_NAME}] View your ${paper.name} marks here!`, message);

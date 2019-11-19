@@ -59,6 +59,7 @@ export async function create(request: Request, response: Response) {
       return response.sendStatus(400);
     }
 
+    paperUser.matriculationNumber = matriculationNumber || null;
     paperUser.discardedAt = null;
     paperUser.acceptedInvite = false;
     const errors = await validate(paperUser);
@@ -130,6 +131,7 @@ export async function getStudents(request: Request, response: Response) {
   const data = await Promise.all(
     students.map(async (student: PaperUser) => await student.getListData())
   );
+
   return response.status(200).json({ paperUsers: data });
 }
 
@@ -403,16 +405,30 @@ export async function discardStudents(request: Request, response: Response) {
     }
 
     const students = await getRepository(PaperUser).find({
-      where: { paperId, role: PaperUserRole.Student, discardedAt: IsNull()}
+      where: { paperId, role: PaperUserRole.Student, discardedAt: IsNull() }
     });
 
-    await getManager().transaction(async manager => {
-      await Promise.all(students.map(async student => {
+    const scriptsWithStudents = await getRepository(Script).find({
+      where: { paperId, studentId: Not(IsNull()) }
+    });
+
+    await Promise.all(
+      scriptsWithStudents.map(async script => {
+        await getRepository(Script).update(script.id, {
+          studentId: null,
+          hasVerifiedStudent: false
+        });
+      })
+    );
+
+    await Promise.all(
+      students.map(async student => {
         await getRepository(PaperUser).update(student.id, {
           discardedAt: new Date()
         });
-      }));
-    });
+      })
+    );
+
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(400);

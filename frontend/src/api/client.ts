@@ -13,7 +13,7 @@ const client = axios.create({
     process.env.NODE_ENV === "production"
       ? "https://api.softmark.io/v1"
       : "http://localhost:3001/v1",
-  timeout: 20000,
+  timeout: 30000,
   headers: {
     Accept: "application/json",
     "X-CSRF-Token": csrfToken
