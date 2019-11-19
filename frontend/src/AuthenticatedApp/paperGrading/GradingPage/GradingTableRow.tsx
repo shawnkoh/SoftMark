@@ -26,7 +26,7 @@ const GradingTableRow: React.FC<Props> = props => {
 
   return (
     <TableRow>
-      <TableCell>Q: {name}</TableCell>
+      <TableCell>Q{name}</TableCell>
       <TableCell>{totalScore}</TableCell>
       <TableCell>
         {markers.map(marker => {
