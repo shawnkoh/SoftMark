@@ -117,7 +117,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setCanvasMode(newCanvasMode);
   };
 
-  const [penWidth, setPenWidth] = useState<number>(2);
+  const [penWidth, setPenWidth] = useState<number>(3);
   const handlePenWidthChange = (event: any, newValue: number | number[]) => {
     setPenWidth(newValue as number);
   };
