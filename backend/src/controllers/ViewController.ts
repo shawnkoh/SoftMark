@@ -19,17 +19,13 @@ import { PageViewData, QuestionViewData, ScriptViewData } from "../types/view";
 import { allowedRequester } from "../utils/papers";
 
 function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
-  return (
-    queryBuilder
-      .select("question.id", "id")
-      .addSelect("questionTemplate.name", "name")
-      .addSelect("mark.score", "score")
-      .addSelect("questionTemplate.score", "maxScore")
-      .addSelect("questionTemplate.topOffset", "topOffset")
-      .addSelect("questionTemplate.leftOffset", "leftOffset")
-      // this is not necessary for frontend but its needed to calculate PageViewData
-      .addSelect("questionTemplate.id", "questionTemplateId")
-  );
+  return queryBuilder
+    .select("question.id", "id")
+    .addSelect("questionTemplate.name", "name")
+    .addSelect("mark.score", "score")
+    .addSelect("questionTemplate.score", "maxScore")
+    .addSelect("questionTemplate.topOffset", "topOffset")
+    .addSelect("questionTemplate.leftOffset", "leftOffset");
 }
 
 function selectPageViewData<T>(
@@ -304,7 +300,11 @@ export async function questionToMark(request: Request, response: Response) {
 
   const questions: (QuestionViewData & {
     questionTemplateId: number;
-  })[] = await selectQuestionViewData(questionsQuery).getRawMany();
+  })[] = await selectQuestionViewData(questionsQuery)
+    // this is not necessary for frontend but its needed to calculate PageViewData
+    .addSelect("questionTemplate.id", "questionTemplateId")
+    .getRawMany();
+
   // Lock all the script's questions for the root template's descendants
   // Can't use questionsQuery because of the joins and the different syntax required (no using question.)
   await getRepository(Question)
@@ -364,12 +364,11 @@ export async function questionToMark(request: Request, response: Response) {
     )
     .select("page.id", "id")
     .addSelect("page.pageNo", "pageNo")
-    .addSelect("page.imageUrl", "imageUrl")
+    // .addSelect("page.imageUrl", "imageUrl")
     .addSelect("annotation.id", "annotationId")
     .addSelect("annotation.layer", "layer")
     .getRawMany();
 
-  // Array-ize annotations
   // prettier-ignore
   const pageById = pagesData.reduce<{[id: number]: Pick<PageViewData, "annotations" | "id" | "imageUrl" | "pageNo">}>(
     (collection, { id, pageNo, imageUrl, annotationId, layer }) => {
