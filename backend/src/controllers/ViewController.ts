@@ -347,10 +347,21 @@ export async function questionToMark(request: Request, response: Response) {
     .groupBy("pageNo")
     .mapValues(value => value.map(value => value.questionTemplateId))
     .value();
-  const questionTemplateIdsByDisplayPage = chain(pageNosData)
-    .groupBy("displayPage")
-    .mapValues(value => value.map(value => value.questionTemplateId))
-    .value();
+
+  const questionTemplateIdsByDisplayPage = pageNosData.reduce(
+    (collection, currentValue) => {
+      const { displayPage, questionTemplateId } = currentValue;
+      if (displayPage in collection) {
+        collection[displayPage].add(questionTemplateId);
+      } else {
+        const set = new Set<number>();
+        set.add(questionTemplateId);
+        collection[displayPage] = set;
+      }
+      return collection;
+    },
+    {} as { [key: number]: Set<number> }
+  );
 
   const pagesData: {
     id: number;
@@ -398,11 +409,14 @@ export async function questionToMark(request: Request, response: Response) {
   const pages = Object.values(pageById).map(page => {
     // const questionTemplateIds = questionTemplateIdsByPageNos[page.pageNo];
     const questionTemplateIds = questionTemplateIdsByDisplayPage[page.pageNo];
-    const questionIds = questions
-      .filter(question =>
-        questionTemplateIds.includes(question.questionTemplateId)
-      )
-      .map(question => question.id);
+    const questionIds: number[] = [];
+    if (questionTemplateIds) {
+      questions
+        .filter(question =>
+          questionTemplateIds.has(question.questionTemplateId)
+        )
+        .forEach(question => questionIds.push(question.id));
+    }
     return { ...page, questionIds };
   });
 
