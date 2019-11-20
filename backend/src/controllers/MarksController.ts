@@ -54,7 +54,7 @@ export async function replace(request: Request, response: Response) {
   }
   await getRepository(Mark).save(mark);
 
-  const data = await mark.getData();
+  const data = mark.getData();
   response.status(200).json({ mark: data });
 }
 
@@ -70,7 +70,7 @@ export async function update(request: Request, response: Response) {
   }
   await getRepository(Mark).save(mark);
 
-  const data = await mark.getData();
+  const data = mark.getData();
   response.status(200).json({ mark: data });
 }
 
@@ -99,6 +99,6 @@ export async function undiscard(request: Request, response: Response) {
   }
   await getRepository(Mark).save(mark);
 
-  const data = await mark.getData();
+  const data = mark.getData();
   response.status(200).json({ mark: data });
 }
