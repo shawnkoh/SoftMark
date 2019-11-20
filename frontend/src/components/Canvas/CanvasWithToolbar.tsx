@@ -32,6 +32,7 @@ type DrilledProps = Partial<
     | "backgroundAnnotations"
     | "foregroundAnnotation"
     | "onForegroundAnnotationChange"
+    | "onViewChange"
   >
 >;
 
@@ -48,7 +49,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       width: "100%",
-      touchAction: "none"
+      touchAction: "none",
+      position: "relative"
     },
     padding: {
       marginRight: theme.spacing(2)
@@ -64,6 +66,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   backgroundAnnotations = [[]],
   foregroundAnnotation = [],
   onForegroundAnnotationChange = annotation => {},
+  onViewChange = (position, scale) => {},
   transparentToolbar = false,
   drawable = false
 }: Props) => {
@@ -81,11 +84,13 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state
-    onForegroundAnnotationChange(annotation); // callback upwards
   };
   const handleClearAllClick = event => setThisForegroundAnnotation([]);
+  useEffect(() => onForegroundAnnotationChange(thisForegroundAnnotation), [
+    thisForegroundAnnotation
+  ]);
 
-  const defaultPosition = { x: 32, y: 32 };
+  const defaultPosition = { x: 64, y: 128 };
   const [position, setPosition] = useState<Point>(defaultPosition);
   const defaultScale = 1.0;
   const [scale, setScale] = useState<number>(defaultScale);
@@ -103,6 +108,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setPosition(defaultPosition);
     setScale(defaultScale);
   };
+  useEffect(() => onViewChange(position, scale), [position, scale]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
     drawable ? CanvasMode.Pen : CanvasMode.View
@@ -121,7 +127,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   return (
     <div className={classes.container}>
-      <AppBar position="static" color="inherit">
+      <AppBar position="absolute" color="inherit">
         <Toolbar>
           {drawable && (
             <ToggleButtonGroup

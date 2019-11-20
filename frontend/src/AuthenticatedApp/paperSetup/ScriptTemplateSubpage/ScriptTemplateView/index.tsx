@@ -3,7 +3,7 @@ import React from "react";
 import { DndProvider } from "react-dnd";
 import MultiBackend from "react-dnd-multi-backend";
 import HTML5toTouch from "react-dnd-multi-backend/dist/esm/HTML5toTouch";
-import ScriptTemplatePanel from "../PageTemplateView";
+import PageTemplateView from "../PageTemplateView";
 import useStyles from "./useStyles";
 import QuestionTemplateTree from "./QuestionTemplateTree";
 import useScriptSetup from "../../context/ScriptSetupContext";
@@ -38,7 +38,7 @@ const ScriptTemplateView: React.FC = () => {
         <div className={classes.toolbar} />
         <DndProvider backend={MultiBackend} options={HTML5toTouch}>
           {scriptTemplateSetupData.pageTemplates.map(pageTemplate => (
-            <ScriptTemplatePanel
+            <PageTemplateView
               key={pageTemplate.id}
               pageTemplate={pageTemplate}
             />

@@ -156,14 +156,11 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       });
 
     const getCurrentPageQuestions = () => {
-      /*
       const currentPage = pages.find(page => page.pageNo === pageNo)!;
       const currentPageQuestions = questions.filter(question =>
         currentPage.questionIds.includes(question.id)
       );
       return currentPageQuestions;
-      */
-      return questions; // temporary band-aid
     };
 
     return (
@@ -171,52 +168,19 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
         {pages
           .filter(page => page.pageNo === pageNo)
-          .map((page, index) => (
-            <div className={classes.grow} key={index}>
-              <Annotator
-                key={page.id}
-                pageId={page.id}
-                backgroundImageSource={page.imageUrl || ""}
-                foregroundAnnotation={
-                  page.annotations.length > 0 ? page.annotations[0].layer : []
-                }
-              />
-            </div>
-          ))}
-        <AppBar
-          position="fixed"
-          color="inherit"
-          className={classes.questionBar}
-        >
-          <Toolbar>
-            <Typography
-              variant="button"
-              className={clsx(classes.grow, classes.questionBarItem)}
-            >
-              {matriculationNumber || "(Unmatched script)"} page {pageNo}
-            </Typography>
-            <Chip
-              label={"Q" + rootQuestionTemplate.name}
-              variant="outlined"
-              className={classes.questionBarItem}
-            />
-            {getCurrentPageQuestions().map(question => (
-              <MarkQuestionModal
-                key={question.id}
-                question={question}
-                render={(toggleVisibility, score, name) => (
-                  <ReversedChip
-                    onClick={toggleVisibility}
-                    label={"Q" + name}
-                    avatar={<Avatar>{score || "-"}</Avatar>}
-                    color={score ? "primary" : "default"}
-                    className={classes.questionBarItem}
-                  />
-                )}
-              />
-            ))}
-          </Toolbar>
-        </AppBar>
+          .map((page, index) => {
+            return (
+              <div className={classes.grow} key={index}>
+                <Annotator
+                  key={page.id}
+                  page={page}
+                  questions={getCurrentPageQuestions()}
+                  rootQuestionTemplate={rootQuestionTemplate}
+                  matriculationNumber={matriculationNumber}
+                />
+              </div>
+            );
+          })}
         {pageNo !== pageNos[0] && (
           <IconButton
             onClick={decrementPageNo}

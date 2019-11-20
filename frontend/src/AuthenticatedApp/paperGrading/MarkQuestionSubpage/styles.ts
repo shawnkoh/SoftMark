@@ -54,6 +54,11 @@ const useStyles = makeStyles((theme: Theme) =>
     slider: {
       width: "100%",
       marginTop: theme.spacing(6)
+    },
+    canvasWithToolbarContainer: {
+      position: "relative",
+      display: "flex",
+      flexGrow: 1
     }
   })
 );
