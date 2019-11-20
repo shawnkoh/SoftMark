@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import api from "../../../api";
 import { QuestionViewData } from "backend/src/types/view";
 

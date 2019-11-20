@@ -12,9 +12,11 @@ import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
 import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { toast } from "react-toastify";
-import LoadingSpinner from "components/LoadingSpinner";
 
-type DragItem = QuestionTemplateLeafData & { type: string; index: number };
+export type DragItem = QuestionTemplateLeafData & {
+  type: string;
+  index: number;
+};
 
 const PageTemplateView: React.FC<{
   pageTemplate: PageTemplateSetupData;

@@ -133,9 +133,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
         <div className={classes.container}>
           <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
-            <Typography variant="subtitle1">
-              No pages to display for this script.
-            </Typography>
+            <Typography variant="subtitle1">No pages to display.</Typography>
           </Container>
         </div>
       );
@@ -158,14 +156,11 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
       });
 
     const getCurrentPageQuestions = () => {
-      /*
       const currentPage = pages.find(page => page.pageNo === pageNo)!;
       const currentPageQuestions = questions.filter(question =>
         currentPage.questionIds.includes(question.id)
       );
       return currentPageQuestions;
-      */
-      return questions; // temporary band-aid
     };
 
     return (
@@ -212,11 +207,9 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
 
   return (
     <div className={classes.container}>
-      <Header subtitle={`No scripts to mark`} />
+      <Header subtitle={`Marking question template ID ${questionTemplateId}`} />
       <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">
-          No scripts to mark for question template ID ${questionTemplateId}.
-        </Typography>
+        <Typography variant="subtitle1">No scripts to mark.</Typography>
       </Container>
     </div>
   );

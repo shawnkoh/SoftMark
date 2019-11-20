@@ -1,5 +1,6 @@
 // Material UI
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -107,7 +108,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
           postData
         );
       }
-      toast.success("Question successfully created");
+      toast.success("Question successfully updated");
       refresh();
       handleClose();
     } catch (error) {
@@ -178,16 +179,18 @@ const QuestionEditDialog: React.FC<Props> = props => {
                       field,
                       meta
                     }: FieldProps<NewQuestionTemplateValues>) => (
-                      <TextField
-                        error={!!meta.error}
-                        autoFocus
-                        margin="dense"
-                        label="Title"
-                        helperText={meta.error || "e.g. Q1a"}
-                        required
-                        fullWidth
-                        {...field}
-                      />
+                      <Box display="inline-flex" alignItems="center">
+                        <Typography variant="subtitle1">Q</Typography>
+                        <TextField
+                          error={!!meta.error}
+                          autoFocus
+                          margin="dense"
+                          label="Name"
+                          helperText={meta.error || "e.g. 1a"}
+                          required
+                          {...field}
+                        />
+                      </Box>
                     )}
                   </Field>
                 </Grid>
