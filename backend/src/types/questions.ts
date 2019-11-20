@@ -20,7 +20,6 @@ export function isQuestionListData(data: any): data is QuestionListData {
   return (
     typeof data.questionTemplateId === "number" &&
     typeof data.scriptId === "number" &&
-    typeof data.pageQuestionsCount === "number" &&
     typeof data.marksCount === "number" &&
     typeof data.bookmarksCount === "number" &&
     isDiscardableData(data)

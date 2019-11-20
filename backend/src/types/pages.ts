@@ -15,7 +15,6 @@ export interface PageData extends PageListData {
 export function isPageListData(data: any): data is PageListData {
   return (
     typeof data.scriptId === "number" &&
-    typeof data.pageQuestionsCount === "number" &&
     typeof data.annotationsCount === "number" &&
     isDiscardableData(data)
   );
