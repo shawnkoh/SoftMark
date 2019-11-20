@@ -107,7 +107,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
           postData
         );
       }
-      toast.success("Question successfully created");
+      toast.success("Question successfully updated");
       refresh();
       handleClose();
     } catch (error) {
