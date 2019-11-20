@@ -321,6 +321,7 @@ export async function questionToMark(request: Request, response: Response) {
   const pageNosData: {
     pageNo: number;
     questionTemplateId: number;
+    displayPage: number;
   }[] = await getRepository(PageTemplate)
     .createQueryBuilder("pageTemplate")
     .where("pageTemplate.discardedAt IS NULL")
@@ -335,13 +336,19 @@ export async function questionToMark(request: Request, response: Response) {
     )
     .select("pageTemplate.pageNo", "pageNo")
     .addSelect("questionTemplate.id", "questionTemplateId")
+    .addSelect("questionTemplate.displayPage", "displayPage")
     .getRawMany();
+
   const pageNos = chain(pageNosData)
     .uniqBy("pageNo")
     .map("pageNo")
     .value();
   const questionTemplateIdsByPageNos = chain(pageNosData)
     .groupBy("pageNo")
+    .mapValues(value => value.map(value => value.questionTemplateId))
+    .value();
+  const questionTemplateIdsByDisplayPage = chain(pageNosData)
+    .groupBy("displayPage")
     .mapValues(value => value.map(value => value.questionTemplateId))
     .value();
 
@@ -389,7 +396,8 @@ export async function questionToMark(request: Request, response: Response) {
   }, {});
 
   const pages = Object.values(pageById).map(page => {
-    const questionTemplateIds = questionTemplateIdsByPageNos[page.pageNo];
+    // const questionTemplateIds = questionTemplateIdsByPageNos[page.pageNo];
+    const questionTemplateIds = questionTemplateIdsByDisplayPage[page.pageNo];
     const questionIds = questions
       .filter(question =>
         questionTemplateIds.includes(question.questionTemplateId)
