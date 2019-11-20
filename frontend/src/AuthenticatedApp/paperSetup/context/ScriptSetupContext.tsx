@@ -52,7 +52,7 @@ export const ScriptSetupProvider: React.FC = props => {
   };
 
   useEffect(() => {
-    getScriptTemplateSetupData();
+    setTimeout(getScriptTemplateSetupData, 1000);
   }, [paper_id, refreshFlag]);
 
   if (isLoading) {

@@ -25,3 +25,16 @@ export interface CanvasProps {
   onForegroundAnnotationChange: (annotation: Annotation) => void;
   onViewChange: (position: Point, scale: number) => void;
 }
+
+export interface CanvasSaveProps {
+  width?: number;
+  height?: number;
+  backgroundImageSource: string;
+  backgroundAnnotations?: Annotation[];
+  foregroundAnnotation?: Annotation;
+  mode?: CanvasMode;
+  penColor?: string;
+  penWidth?: number;
+  position?: Point;
+  scale?: number;
+}
