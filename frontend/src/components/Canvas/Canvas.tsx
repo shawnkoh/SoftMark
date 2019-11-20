@@ -492,6 +492,7 @@ const Canvas: React.FC<CanvasProps> = ({
               points={line.points}
               stroke={line.color}
               strokeWidth={line.width}
+              strokeHitEnabled={false}
               globalCompositeOperation={line.type}
               lineJoin="round"
               lineCap="round"
@@ -506,9 +507,8 @@ const Canvas: React.FC<CanvasProps> = ({
             points={line.points}
             stroke={line.color}
             strokeWidth={line.width}
-            hitStrokeWidth={
-              (mode as CanvasMode) === CanvasMode.Eraser ? 5 : line.width
-            }
+            strokeHitEnabled={(mode as CanvasMode) === CanvasMode.Eraser}
+            hitStrokeWidth={5}
             globalCompositeOperation={line.type}
             lineJoin="round"
             lineCap="round"
