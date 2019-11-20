@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import api from "../../../api";
 import { QuestionViewData } from "backend/src/types/view";
 
@@ -11,17 +10,8 @@ import {
   DialogActions,
   Slider
 } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    slider: {
-      width: "100%",
-      marginTop: theme.spacing(6)
-    }
-  })
-);
+import useStyles from "./styles";
 
 interface OwnProps {
   question: QuestionViewData;
@@ -55,9 +45,9 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
     toggleVisibility();
   };
 
-  const handleSave = event => {
-    setActualScore(localScore); // band-aid, check putMarkData response pending problem
-    putMarkData(id, localScore);
+  const handleSave = async event => {
+    const score = await putMarkData(id, localScore);
+    setActualScore(score);
     toggleVisibility();
   };
 

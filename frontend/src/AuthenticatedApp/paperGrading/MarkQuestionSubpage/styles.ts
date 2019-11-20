@@ -50,6 +50,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     questionBarItem: {
       marginRight: theme.spacing(1)
+    },
+    slider: {
+      width: "100%",
+      marginTop: theme.spacing(6)
     }
   })
 );

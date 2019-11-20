@@ -243,11 +243,9 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
 
   return (
     <div className={classes.container}>
-      <Header
-        subtitle={`Error occurred marking question template ID ${questionTemplateId}`}
-      />
+      <Header subtitle={`Marking question template ID ${questionTemplateId}`} />
       <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">An error occurred.</Typography>
+        <Typography variant="subtitle1">No scripts to mark.</Typography>
       </Container>
     </div>
   );
