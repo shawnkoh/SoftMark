@@ -4,7 +4,7 @@ import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
 import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
-import React, { useState } from "react";
+import React, { useRef, useState, useLayoutEffect } from "react";
 import { useDrop, XYCoord } from "react-dnd";
 import api from "../../../../api";
 import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
@@ -12,6 +12,7 @@ import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
 import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { toast } from "react-toastify";
+import LoadingSpinner from "components/LoadingSpinner";
 
 type DragItem = QuestionTemplateLeafData & { type: string; index: number };
 
@@ -24,21 +25,35 @@ const PageTemplateView: React.FC<{
 
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [imgScale, setImgScale] = useState(1.0);
+  useLayoutEffect(() => {
+    if (imgRef.current) {
+      const imgEle = imgRef.current;
+      window.addEventListener("resize", () =>
+        setImgScale(imgEle.width / imgEle.naturalWidth)
+      );
+      setImgScale(imgEle.width / imgEle.naturalWidth);
+    }
+  }, [imgRef.current]);
   const [, drop] = useDrop({
     accept: "questionBox",
     async drop(item: DragItem, monitor) {
-      const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-      const leftOffset = Math.round(item.leftOffset! + delta.x);
-      const topOffset = Math.round(item.topOffset! + delta.y);
-      try {
-        await api.questionTemplates.editQuestionTemplate(item.id, {
-          topOffset,
-          leftOffset
-        });
-        toast.success(`${item.name}'s position successfully updated`);
-        refresh();
-      } catch (error) {
-        toast.error(`Failed to move ${item.name}`);
+      if (imgRef.current) {
+        const scale = imgRef.current.width / imgRef.current.naturalWidth;
+        const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
+        const leftOffset = Math.round(item.leftOffset! + delta.x / scale);
+        const topOffset = Math.round(item.topOffset! + delta.y / scale);
+        try {
+          await api.questionTemplates.editQuestionTemplate(item.id, {
+            topOffset,
+            leftOffset
+          });
+          toast.success(`${item.name}'s position successfully updated`);
+          refresh();
+        } catch (error) {
+          toast.error(`Failed to move ${item.name}`);
+        }
       }
 
       return undefined;
@@ -50,6 +65,7 @@ const PageTemplateView: React.FC<{
       component="div"
       role="tabpanel"
       hidden={pageTemplate.pageNo !== currentPageNo}
+      className={classes.panel}
     >
       <QuestionTemplateDialog
         mode="create"
@@ -71,7 +87,11 @@ const PageTemplateView: React.FC<{
           <BackIcon />
         </IconButton>
         <div ref={drop} className={classes.container}>
-          <img className={classes.scriptImage} src={pageTemplate.imageUrl} />
+          <img
+            ref={imgRef}
+            className={classes.scriptImage}
+            src={pageTemplate.imageUrl}
+          />
           {pageTemplate.questionTemplates
             .filter(q => q.displayPage === currentPageNo)
             .map((questionTemplate, index) => (
@@ -79,6 +99,7 @@ const PageTemplateView: React.FC<{
                 key={questionTemplate.id}
                 index={index}
                 questionTemplate={questionTemplate}
+                imgScale={imgScale}
               />
             ))}
         </div>

@@ -9,13 +9,15 @@ import useStyles from "./useStyles";
 interface ScriptTemplateQuestionProps {
   index: number;
   questionTemplate: QuestionTemplateLeafData;
+  imgScale: number;
 }
 
 type Props = ScriptTemplateQuestionProps;
 
 const ScriptTemplateQuestion: React.FC<Props> = ({
   index,
-  questionTemplate
+  questionTemplate,
+  imgScale
 }) => {
   const classes = useStyles();
   const [editOpen, setEditOpen] = React.useState(false);
@@ -50,8 +52,8 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
         color="primary"
         className={classes.chip}
         style={{
-          top: questionTemplate.topOffset,
-          left: questionTemplate.leftOffset
+          top: questionTemplate.topOffset * imgScale,
+          left: questionTemplate.leftOffset * imgScale
         }}
       />
     </>
