@@ -11,7 +11,7 @@ import {
   Typography
 } from "@material-ui/core";
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
-import UploadIcon from "@material-ui/icons/Publish";
+import UploadIcon from "@material-ui/icons/CloudUpload";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import { ScriptListData } from "backend/src/types/scripts";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
