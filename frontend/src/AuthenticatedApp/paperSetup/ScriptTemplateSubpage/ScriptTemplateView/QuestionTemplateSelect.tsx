@@ -23,7 +23,7 @@ const GenerateTreeData = (
     title: questionTemplateTree.name,
     key: "" + questionTemplateTree.id,
     children: questionTemplateTree.childQuestionTemplates
-      .filter(e => e.childQuestionTemplates.length !== 0)
+      .filter(e => e.score === null) // no score indicates question template is a leaf
       .map(e => GenerateTreeData(e, selfId)),
     disabled: selfId === questionTemplateTree.id
   };
