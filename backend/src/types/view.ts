@@ -6,9 +6,9 @@ export interface QuestionViewData {
   id: number;
   name: string;
   score: number | null;
-  maxScore: number | null;
-  topOffset: number | null;
-  leftOffset: number | null;
+  maxScore: number;
+  topOffset: number;
+  leftOffset: number;
 }
 
 export interface AnnotationViewData {
@@ -24,13 +24,19 @@ export interface PageViewData {
   questionIds: number[];
 }
 
+export interface QuestionTemplateViewData {
+  id: number;
+  name: string;
+}
+
 export interface ScriptViewData {
+  id: number;
   // it can be null because of either
   // 1. the student doesnt have a matriculation number tagged to it
   // 2. or there is no student tagged to it
   studentId: number | null; // refers to paperUserId
   matriculationNumber: string | null;
-  rootQuestion: QuestionViewData;
-  descendantQuestions: QuestionViewData[];
+  rootQuestionTemplate: QuestionTemplateViewData;
+  questions: QuestionViewData[];
   pages: PageViewData[];
 }

@@ -84,8 +84,8 @@ export async function create(request: Request, response: Response) {
     score,
     pageCovered,
     displayPage,
-    50,
-    50,
+    displayPage ? 50 : null, 
+    displayPage ? 50 : null, 
     parentQuestionTemplate
   );
   const errors = await validate(questionTemplate);

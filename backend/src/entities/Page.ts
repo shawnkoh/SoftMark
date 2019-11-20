@@ -2,7 +2,6 @@ import { Column, Entity, getRepository, ManyToOne, OneToMany } from "typeorm";
 import { PageData, PageListData } from "../types/pages";
 import { Annotation } from "./Annotation";
 import { Discardable } from "./Discardable";
-import { PageQuestion } from "./PageQuestion";
 import { Script } from "./Script";
 
 @Entity()
@@ -28,9 +27,6 @@ export class Page extends Discardable {
   @Column({ type: "int" })
   pageNo!: number;
 
-  @OneToMany(type => PageQuestion, pageQuestion => pageQuestion.page)
-  pageQuestions?: PageQuestion[];
-
   @OneToMany(type => Annotation, annotation => annotation.page)
   annotations?: Annotation[];
 
@@ -39,18 +35,12 @@ export class Page extends Discardable {
     scriptId: this.scriptId,
     pageNo: this.pageNo ? this.pageNo : -1,
     imageUrl: this.imageUrl ? this.imageUrl : "",
-    pageQuestionsCount: this.pageQuestions
-      ? this.pageQuestions.length
-      : await getRepository(PageQuestion).count({ pageId: this.id }),
     annotationsCount: this.annotations
       ? this.annotations.length
       : await getRepository(Annotation).count({ pageId: this.id })
   });
 
   getData = async (): Promise<PageData> => {
-    const pageQuestions =
-      this.pageQuestions ||
-      (await getRepository(PageQuestion).find({ pageId: this.id }));
     const annotations =
       this.annotations ||
       (await getRepository(Annotation).find({ pageId: this.id }));
@@ -58,11 +48,8 @@ export class Page extends Discardable {
     return {
       ...(await this.getListData()),
       scriptId: this.scriptId,
-      pageQuestions: await Promise.all(
-        pageQuestions.map(pageQuestion => pageQuestion.getListData())
-      ),
       annotations: await Promise.all(
-        annotations.map(pageQuestion => pageQuestion.getListData())
+        annotations.map(annotation => annotation.getListData())
       )
     };
   };

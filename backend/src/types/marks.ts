@@ -1,6 +1,4 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { isPaperUserListData, PaperUserListData } from "./paperUsers";
-import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface MarkPutData {
   score: number;
@@ -13,31 +11,19 @@ export interface MarkPatchData {
   // timeSpent: number;
 }
 
-export interface MarkListData extends DiscardableData {
+export interface MarkData extends DiscardableData {
   questionId: number;
   markerId: number;
   score: number;
+  // TODO: Not in MVP
   // timeSpent: number;
 }
 
-export interface MarkData extends MarkListData {
-  question: QuestionListData;
-  marker: PaperUserListData;
-}
-
-export function isMarkListData(data: any): data is MarkListData {
+export function isMarkData(data: any): data is MarkData {
   return (
     typeof data.questionId === "number" &&
     typeof data.markerId === "number" &&
     typeof data.score === "number" &&
     isDiscardableData(data)
-  );
-}
-
-export function isMarkData(data: any): data is MarkData {
-  return (
-    isQuestionListData(data.question) &&
-    isPaperUserListData(data.marker) &&
-    isMarkListData(data)
   );
 }
