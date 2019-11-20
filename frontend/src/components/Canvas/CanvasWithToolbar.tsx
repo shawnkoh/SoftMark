@@ -93,7 +93,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setPosition(position);
     let clampedScale = scale > 10.0 ? 10.0 : scale;
     clampedScale = scale < 0.1 ? 0.1 : clampedScale;
-    setScale(scale);
+    setScale(clampedScale);
   };
   const handleZoomOutClick = event =>
     setScale(prevValue => Math.max(0.1, Math.floor(prevValue * 0.9 * 10) / 10));
@@ -154,6 +154,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
                 container
                 spacing={1}
                 className={clsx(classes.sliderContainer, classes.padding)}
+                alignItems="center"
               >
                 <Grid item>
                   <MinWidthIcon />
@@ -191,7 +192,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
                   <ZoomOutIcon />
                 </IconButton>
                 <Typography variant="button">
-                  {`${Math.round(scale * 100)}%`}
+                  {scale.toLocaleString(undefined, { style: "percent" })}
                 </Typography>
                 <IconButton onClick={handleZoomInClick}>
                   <ZoomInIcon />

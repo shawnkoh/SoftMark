@@ -57,7 +57,7 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
             }
           >
             <ListItemText
-              primary={questionTemplateTree.name}
+              primary={"Q" + questionTemplateTree.name}
               secondary={
                 questionTemplateTree.score !== null &&
                 `Score: ${questionTemplateTree.score}`
@@ -81,7 +81,7 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
               paddingLeft: theme.spacing(depth + 2)
             }}
           >
-            <ListItemText primary={questionTemplateTree.name} />
+            <ListItemText primary={"Q" + questionTemplateTree.name} />
             <ListItemIcon>
               {open ? <ExpandLess /> : <ExpandMore />}
             </ListItemIcon>

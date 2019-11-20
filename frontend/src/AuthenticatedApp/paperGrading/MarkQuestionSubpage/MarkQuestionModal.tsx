@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import api from "../../../api";
 import { QuestionViewData } from "backend/src/types/view";
 
@@ -11,16 +10,8 @@ import {
   DialogActions,
   Slider
 } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    slider: {
-      width: 200
-    }
-  })
-);
+import useStyles from "./styles";
 
 interface OwnProps {
   question: QuestionViewData;
@@ -41,7 +32,6 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
   const [localScore, setLocalScore] = useState<number>(score || 0);
   const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
     setLocalScore(newValue as number);
-    setActualScore(newValue as number);
   };
 
   const putMarkData = async (questionId: number, score: number) => {
@@ -55,8 +45,10 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
     toggleVisibility();
   };
 
-  const handleSave = event => {
-    putMarkData(id, localScore);
+  const handleSave = async event => {
+    const score = await putMarkData(id, localScore);
+    setActualScore(score);
+    toggleVisibility();
   };
 
   return (
@@ -70,7 +62,7 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score:
+            Saved score:
             {actualScore !== null
               ? ` ${actualScore} / ${maxScore}`
               : " no score yet"}
