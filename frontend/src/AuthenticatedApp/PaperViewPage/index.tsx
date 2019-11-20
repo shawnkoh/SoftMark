@@ -19,7 +19,10 @@ import SetupPage, {
   ScriptTemplateSubpage
 } from "../paperSetup";
 import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
-import ScriptsPage, { ScriptViewSubpage } from "../paperScripts";
+import ScriptsPage, {
+  ScriptViewSubpage,
+  ScriptEditSubpage
+} from "../paperScripts";
 import { PaperUserRole } from "../../types/paperUsers";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import DownloadAsPdfPage from "../DownloadAsPdfPage";
@@ -123,6 +126,12 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       component={ScriptViewSubpage}
     />
   );
+  const scriptEditRoute = (
+    <Route
+      path={`${path}/${SCRIPTS}/:scriptId/mark`}
+      component={ScriptEditSubpage}
+    />
+  );
   const gradingRoute = (
     <Route path={`${path}/${GRADING}`}>
       {(routeProps: RouteComponentProps) => (
@@ -153,6 +162,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     <>
       {role === PaperUserRole.Owner && (
         <Switch>
+          {scriptEditRoute}
           {questionAllocationRoute}
           {setupScriptTemplateRoute}
           {scriptMappingRoute}
@@ -166,6 +176,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       )}
       {role === PaperUserRole.Marker && (
         <Switch>
+          {scriptEditRoute}
           {markQuestionRoute}
           {scriptViewRoute}
           {gradingRoute}

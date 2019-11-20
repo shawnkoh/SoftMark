@@ -29,6 +29,7 @@ const PageTemplateView: React.FC<{
 
   const imgRef = useRef<HTMLImageElement>(null);
   const [imgScale, setImgScale] = useState(1.0);
+  const [imgLoaded, setImgLoaded] = useState(false);
   useLayoutEffect(() => {
     if (imgRef.current) {
       const imgEle = imgRef.current;
@@ -37,7 +38,7 @@ const PageTemplateView: React.FC<{
       );
       setImgScale(imgEle.width / imgEle.naturalWidth);
     }
-  }, [imgRef.current]);
+  }, [imgRef.current, imgLoaded]);
   const [, drop] = useDrop({
     accept: "questionBox",
     async drop(item: DragItem, monitor) {
@@ -93,6 +94,7 @@ const PageTemplateView: React.FC<{
             ref={imgRef}
             className={classes.scriptImage}
             src={pageTemplate.imageUrl}
+            onLoad={() => setImgLoaded(true)}
           />
           {pageTemplate.questionTemplates
             .filter(q => q.displayPage === currentPageNo)

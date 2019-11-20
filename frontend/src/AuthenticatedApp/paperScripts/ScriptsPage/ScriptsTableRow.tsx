@@ -82,6 +82,17 @@ const ScriptsTableRow: React.FC<Props> = props => {
         </Grid>
       </TableCell>
       <TableCell>
+        <Tooltip title={`Mark script of ${matriculationNumber}`}>
+          <Button
+            component={Link}
+            to={`${match.url}/${id}/mark`}
+            variant="contained"
+            color="primary"
+            style={{ borderRadius: 24 }}
+          >
+            Mark
+          </Button>
+        </Tooltip>
         <Tooltip title={`View script of ${matriculationNumber}`}>
           <Button
             component={Link}
