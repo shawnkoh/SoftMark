@@ -364,7 +364,7 @@ export async function questionToMark(request: Request, response: Response) {
     )
     .select("page.id", "id")
     .addSelect("page.pageNo", "pageNo")
-    // .addSelect("page.imageUrl", "imageUrl")
+    .addSelect("page.imageUrl", "imageUrl")
     .addSelect("annotation.id", "annotationId")
     .addSelect("annotation.layer", "layer")
     .getRawMany();
