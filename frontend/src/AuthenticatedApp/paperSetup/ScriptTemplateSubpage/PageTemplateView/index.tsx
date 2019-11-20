@@ -13,7 +13,7 @@ import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { toast } from "react-toastify";
 
-type DragItem = QuestionTemplateLeafData & { type: string; index: number };
+export type DragItem = QuestionTemplateLeafData & { type: string; index: number };
 
 const PageTemplateView: React.FC<{
   pageTemplate: PageTemplateSetupData;
@@ -30,17 +30,16 @@ const PageTemplateView: React.FC<{
       const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
       const leftOffset = Math.round(item.leftOffset! + delta.x);
       const topOffset = Math.round(item.topOffset! + delta.y);
-      try {
-        await api.questionTemplates.editQuestionTemplate(item.id, {
+      
+      api.questionTemplates.editQuestionTemplate(item.id, {
           topOffset,
           leftOffset
+        }).then(() => { 
+          refresh();
+          toast.success(`${item.name}'s position successfully updated`);
+        }).catch(() => {
+          toast.error(`Failed to move ${item.name}`);
         });
-        toast.success(`${item.name}'s position successfully updated`);
-        refresh();
-      } catch (error) {
-        toast.error(`Failed to move ${item.name}`);
-      }
-
       return undefined;
     }
   });
