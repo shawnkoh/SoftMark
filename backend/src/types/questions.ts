@@ -1,6 +1,6 @@
 import { BookmarkListData, isBookmarkListData } from "./bookmarks";
 import { DiscardableData, isDiscardableData } from "./entities";
-import { isMarkListData, MarkListData } from "./marks";
+import { isMarkData, MarkData } from "./marks";
 
 export interface QuestionListData extends DiscardableData {
   questionTemplateId: number;
@@ -12,7 +12,7 @@ export interface QuestionListData extends DiscardableData {
 }
 
 export interface QuestionData extends QuestionListData {
-  marks: MarkListData[];
+  marks: MarkData[];
   bookmarks: BookmarkListData[];
 }
 
@@ -29,7 +29,7 @@ export function isQuestionListData(data: any): data is QuestionListData {
 
 export function isQuestionData(data: any): data is QuestionData {
   return (
-    data.marks.every((mark: any) => isMarkListData(mark)) &&
+    data.marks.every((mark: any) => isMarkData(mark)) &&
     data.bookmarks.every((bookmark: any) => isBookmarkListData(bookmark)) &&
     isQuestionListData(data)
   );

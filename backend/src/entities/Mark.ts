@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, Validate } from "class-validator";
 import { Column, Entity, ManyToOne } from "typeorm";
 import IsValidScoreConstraint from "../constraints/IsValidScoreConstraint";
-import { MarkListData } from "../types/marks";
+import { MarkData } from "../types/marks";
 import { Discardable } from "./Discardable";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
@@ -41,7 +41,7 @@ export class Mark extends Discardable {
   // @IsNumber()
   // timeSpent!: number;
 
-  getListData = (): MarkListData => ({
+  getData = (): MarkData => ({
     ...this.getBase(),
     questionId: this.questionId,
     markerId: this.markerId,
