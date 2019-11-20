@@ -11,69 +11,59 @@ import {
   DialogActions,
   Slider
 } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    slider: {
-      width: 200
-    }
-  })
-);
+import useStyles from "./styles";
 
 interface OwnProps {
+  isVisible: boolean;
   question: QuestionViewData;
-  render: any;
+  onSave: (score: number) => void;
+  onCancel: () => void;
 }
 
 type Props = OwnProps;
 
-const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
+const MarkQuestionModal: React.FC<Props> = ({
+  isVisible,
+  question,
+  onSave,
+  onCancel
+}) => {
   const classes = useStyles();
 
   const { id, name, score, maxScore, topOffset, leftOffset } = question;
 
-  const [isVisible, setIsVisible] = useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
-  const [actualScore, setActualScore] = useState<number | null>(score);
   const [localScore, setLocalScore] = useState<number>(score || 0);
   const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
     setLocalScore(newValue as number);
-    setActualScore(newValue as number);
   };
 
   const putMarkData = async (questionId: number, score: number) => {
-    await api.marks.replaceMark(questionId, { score });
-    setActualScore(score);
-    return score;
+    const response = await api.marks.replaceMark(questionId, { score });
+    const newScore = response.data.mark.score;
+    return newScore;
   };
 
   const handleCancel = event => {
-    setLocalScore(actualScore || 0);
-    toggleVisibility();
+    setLocalScore(score || 0);
+    onCancel();
   };
 
   const handleSave = event => {
     putMarkData(id, localScore);
+    onSave(localScore);
   };
 
   return (
     <>
-      <Dialog open={isVisible} onClose={toggleVisibility} fullWidth>
-        <CustomDialogTitle
-          id="customized-dialog-title"
-          onClose={toggleVisibility}
-        >
+      <Dialog open={isVisible} onClose={onCancel} fullWidth>
+        <CustomDialogTitle id="customized-dialog-title" onClose={onCancel}>
           Marks for Q{name} {maxScore && ` (Maximum: ${maxScore})`}
         </CustomDialogTitle>
         <DialogContent dividers>
           <Typography variant="subtitle1">
-            Current score:
-            {actualScore !== null
-              ? ` ${actualScore} / ${maxScore}`
-              : " no score yet"}
+            Saved score:
+            {score !== null ? ` ${score} / ${maxScore}` : " no score yet"}
           </Typography>
           <div className={classes.slider}>
             <Slider
@@ -96,7 +86,6 @@ const MarkQuestionModal: React.FC<Props> = ({ question, render }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {render(toggleVisibility, actualScore, name)}
     </>
   );
 };

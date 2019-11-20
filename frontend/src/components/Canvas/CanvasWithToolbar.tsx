@@ -32,6 +32,7 @@ type DrilledProps = Partial<
     | "backgroundAnnotations"
     | "foregroundAnnotation"
     | "onForegroundAnnotationChange"
+    | "onViewChange"
   >
 >;
 
@@ -48,7 +49,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       width: "100%",
-      touchAction: "none"
+      touchAction: "none",
+      position: "relative"
     },
     padding: {
       marginRight: theme.spacing(2)
@@ -64,6 +66,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   backgroundAnnotations = [[]],
   foregroundAnnotation = [],
   onForegroundAnnotationChange = annotation => {},
+  onViewChange = (position, scale) => {},
   transparentToolbar = false,
   drawable = false
 }: Props) => {
@@ -81,11 +84,13 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state
-    onForegroundAnnotationChange(annotation); // callback upwards
   };
   const handleClearAllClick = event => setThisForegroundAnnotation([]);
+  useEffect(() => onForegroundAnnotationChange(thisForegroundAnnotation), [
+    thisForegroundAnnotation
+  ]);
 
-  const defaultPosition = { x: 32, y: 32 };
+  const defaultPosition = { x: 64, y: 128 };
   const [position, setPosition] = useState<Point>(defaultPosition);
   const defaultScale = 1.0;
   const [scale, setScale] = useState<number>(defaultScale);
@@ -93,7 +98,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setPosition(position);
     let clampedScale = scale > 10.0 ? 10.0 : scale;
     clampedScale = scale < 0.1 ? 0.1 : clampedScale;
-    setScale(scale);
+    setScale(clampedScale);
   };
   const handleZoomOutClick = event =>
     setScale(prevValue => Math.max(0.1, Math.floor(prevValue * 0.9 * 10) / 10));
@@ -103,6 +108,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     setPosition(defaultPosition);
     setScale(defaultScale);
   };
+  useEffect(() => onViewChange(position, scale), [position, scale]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
     drawable ? CanvasMode.Pen : CanvasMode.View
@@ -121,7 +127,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   return (
     <div className={classes.container}>
-      <AppBar position="static" color="inherit">
+      <AppBar position="absolute" color="inherit">
         <Toolbar>
           {drawable && (
             <ToggleButtonGroup
@@ -154,6 +160,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
                 container
                 spacing={1}
                 className={clsx(classes.sliderContainer, classes.padding)}
+                alignItems="center"
               >
                 <Grid item>
                   <MinWidthIcon />
@@ -191,7 +198,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
                   <ZoomOutIcon />
                 </IconButton>
                 <Typography variant="button">
-                  {`${Math.round(scale * 100)}%`}
+                  {scale.toLocaleString(undefined, { style: "percent" })}
                 </Typography>
                 <IconButton onClick={handleZoomInClick}>
                   <ZoomInIcon />

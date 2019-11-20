@@ -45,10 +45,20 @@ const useStyles = makeStyles((theme: Theme) =>
     questionBar: {
       backgroundColor: lightBlue[50],
       top: "auto",
-      bottom: 0
+      bottom: 0,
+      overflowX: "auto"
     },
     questionBarItem: {
       marginRight: theme.spacing(1)
+    },
+    slider: {
+      width: "100%",
+      marginTop: theme.spacing(6)
+    },
+    canvasWithToolbarContainer: {
+      position: "relative",
+      display: "flex",
+      flexGrow: 1
     }
   })
 );
