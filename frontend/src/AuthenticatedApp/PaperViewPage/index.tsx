@@ -25,6 +25,7 @@ import ScriptsPage, {
 } from "../paperScripts";
 import { PaperUserRole } from "../../types/paperUsers";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import DownloadAsPdfPage from "../DownloadAsPdfPage";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -170,6 +171,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {setupRoute}
           {gradingRoute}
           {scriptsListingRoute}
+          <Route path={`${path}/save_script`} component={DownloadAsPdfPage} />
         </Switch>
       )}
       {role === PaperUserRole.Marker && (

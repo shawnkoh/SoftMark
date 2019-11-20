@@ -39,7 +39,7 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
             })
             .finally(() => {
               if (refreshStudents) {
-                setTimeout(refreshStudents, 4000);
+                setTimeout(refreshStudents, 3000);
               }
             });
         }}
