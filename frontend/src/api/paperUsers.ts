@@ -42,7 +42,7 @@ export async function postStudents(
               onSuccess(name);
               studentsUploaded++;
               if (studentsUploaded % 100 === 0) {
-                setTimeout(refresh, 5000);
+                setTimeout(refresh, 3000);
               }
               asynchronousPostStudent(index + 1, limit);
             })
@@ -50,7 +50,7 @@ export async function postStudents(
             .finally(() => {
               studentsLeft--;
               if (studentsLeft <= 3) {
-                setTimeout(refresh, 4000);
+                setTimeout(refresh, 3000);
               }
             });
         }

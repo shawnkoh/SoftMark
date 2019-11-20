@@ -8,10 +8,12 @@ import useStyles from "./useStyles";
 import QuestionTemplateTree from "./QuestionTemplateTree";
 import useScriptSetup from "../../context/ScriptSetupContext";
 import Header from "./PaperSetupHeaderStatic";
+import { useEffect } from "react";
 
 const ScriptTemplateView: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplateSetupData, goPage } = useScriptSetup();
+
   return (
     <div className={classes.root}>
       <Header title="Set up question structure" />
