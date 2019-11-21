@@ -256,7 +256,7 @@ export async function index(request: Request, response: Response) {
         : { paper, discardedAt: IsNull() },
     relations: ["student", "pages", "questions"]
   });
-  
+
   const data: ScriptListData[] = await Promise.all(
     scripts.sort(sortByFilename).map(script => script.getListData())
   );

@@ -63,3 +63,34 @@ export function sortAllocationsByQuestionNameThenPaperUserName(
     ? questionNameA.localeCompare(questionNameB)
     : paperUserNameA.localeCompare(paperUserNameB);
 }
+
+interface withPageInfo {
+  topOffset: number | null;
+  leftOffset: number | null;
+  displayPage: number | null;
+  name: string;
+}
+
+export function sortByPageInfo<A extends withPageInfo, B extends withPageInfo>(
+  a: A,
+  b: B
+) {
+  const displayPageA = a.displayPage || 0;
+  const displayPageB = b.displayPage || 0;
+  const topOffsetA = a.topOffset || 0;
+  const topOffsetB = b.topOffset || 0;
+  const leftOffsetA = a.leftOffset || 0;
+  const leftOffsetB = b.leftOffset || 0;
+  const nameA = a.name.toLocaleLowerCase();
+  const nameB = b.name.toLocaleLowerCase();
+
+  if (displayPageA !== displayPageB) {
+    return displayPageA - displayPageB;
+  } else if (topOffsetA !== topOffsetB) {
+    return topOffsetA - topOffsetB;
+  } else if (leftOffsetA !== leftOffsetB) {
+    return leftOffsetA - leftOffsetB;
+  } else {
+    return nameA.localeCompare(nameB);
+  }
+}
