@@ -48,9 +48,9 @@ const MarkQuestionModal: React.FC<Props> = ({
     onCancel();
   };
 
-  const handleSave = event => {
-    putMarkData(id, localScore);
-    onSave(localScore);
+  const handleSave = async event => {
+    const newScore = await putMarkData(id, localScore);
+    onSave(newScore);
   };
 
   return (
