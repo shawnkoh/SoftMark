@@ -10,12 +10,12 @@ import {
   QuestionTemplateViewData
 } from "backend/src/types/view";
 
-import { AppBar, Toolbar, Typography, Chip, Avatar } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, Avatar } from "@material-ui/core";
 
-import MarkQuestionModal from "./MarkQuestionModal";
 import ReversedChip from "../../../components/ReversedChip";
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import { Point } from "../../../components/Canvas/types";
+import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
 
 interface OwnProps {
@@ -108,7 +108,8 @@ const Annotator: React.FC<Props> = ({
           key={index}
           onClick={() => handleChipClick(index)}
           label={"Q" + questionState.question.name}
-          avatar={<Avatar>{questionState.question.score || "-"}</Avatar>}
+          avatar={<Avatar>{`${questionState.question.score || "-"} / ${questionState
+                  .question.maxScore || "-"}`}</Avatar>}
           color={questionState.question.score ? "primary" : "default"}
           style={{
             position: "absolute",
@@ -130,7 +131,12 @@ const Annotator: React.FC<Props> = ({
               key={index}
               onClick={() => handleChipClick(index)}
               label={"Q" + questionState.question.name}
-              avatar={<Avatar>{questionState.question.score || "-"}</Avatar>}
+              avatar={
+                <Avatar>
+                  {`${questionState.question.score || "-"} / ${questionState
+                    .question.maxScore || "-"}`}
+                </Avatar>
+              }
               color={questionState.question.score ? "primary" : "default"}
               className={classes.questionBarItem}
             />
