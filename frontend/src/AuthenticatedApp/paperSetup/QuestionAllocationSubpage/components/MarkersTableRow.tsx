@@ -47,7 +47,7 @@ const MarkersTableRow: React.FC<Props> = props => {
   const { name, email } = user;
 
   const [canSeeAllocatedQuestions, setCanSeeAllocatedQuestions] = useState(
-    false
+    true
   );
   const toggleCanSeeAllocatedQuestions = () =>
     setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions);
