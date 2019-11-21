@@ -59,7 +59,7 @@ class CanvasSaver extends React.Component {
         <Layer>
           <UrlImage
             src={this.props.backgroundImageSource}
-            onLoad={handleLoad}
+            onLoad={this.handleLoad}
           />
         </Layer>
         {this.props.backgroundAnnotations.map(
