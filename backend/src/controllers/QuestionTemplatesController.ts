@@ -26,6 +26,7 @@ import {
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import { generatePages, isPageValid } from "../utils/questionTemplate";
+import { sortByPageInfo } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -84,8 +85,8 @@ export async function create(request: Request, response: Response) {
     score,
     pageCovered,
     displayPage,
-    displayPage ? 50 : null, 
-    displayPage ? 50 : null, 
+    displayPage ? 50 : null,
+    displayPage ? 50 : null,
     parentQuestionTemplate
   );
   const errors = await validate(questionTemplate);
@@ -139,9 +140,9 @@ export async function index(request: Request, response: Response) {
   }
 
   try {
-    const data = await Promise.all(
+    const data = (await Promise.all(
       questionTemplates.map(questionTemplate => questionTemplate.getData())
-    );
+    )).sort(sortByPageInfo);
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
     return response.sendStatus(500);
