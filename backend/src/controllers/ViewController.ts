@@ -182,7 +182,7 @@ export async function viewScript(request: Request, response: Response) {
  */
 export async function questionToMark(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
+  const { userId } = payload;
   const questionTemplateId = Number(request.params.id);
   const questionTemplate = await getRepository(QuestionTemplate)
     .createQueryBuilder("questionTemplate")
@@ -201,45 +201,28 @@ export async function questionToMark(request: Request, response: Response) {
   }
   const { paperId } = questionTemplate.scriptTemplate!;
 
-  const allowed = await allowedRequester(
-    requesterId,
-    paperId,
-    PaperUserRole.Marker
-  );
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Marker);
   if (!allowed) {
     response.sendStatus(404);
     return;
   }
   const { requester } = allowed;
 
-  // TODO: THIS ASSUMES THAT questionTemplateId = ROOT
-  const rootQuestionTemplate = await getRepository(QuestionTemplate)
-    .createQueryBuilder("questionTemplate")
-    .where("questionTemplate.id = :questionTemplateId", { questionTemplateId })
+  const rootQuestionTemplate = await getTreeRepository(QuestionTemplate)
+    .createAncestorsQueryBuilder(
+      "questionTemplate",
+      "questionTemplateClosure",
+      questionTemplate
+    )
+    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .andWhere("questionTemplate.discardedAt IS NULL")
     .innerJoin(
       "questionTemplate.allocations",
       "allocation",
-      "allocation.paperUserId = :requesterId",
-      { requesterId }
+      "allocation.paperUserId = :paperUserId",
+      { paperUserId: requester.id }
     )
     .getOne();
-
-  // const rootQuestionTemplate = await getTreeRepository(QuestionTemplate)
-  //   .createAncestorsQueryBuilder(
-  //     "questionTemplate",
-  //     "questionTemplateClosure",
-  //     questionTemplate
-  //   )
-  //   .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
-  //   .andWhere("questionTemplate.discardedAt IS NULL")
-  //   .innerJoin(
-  //     "questionTemplate.allocations",
-  //     "allocation",
-  //     "allocation.paperUserId = :id",
-  //     { id: requesterId }
-  //   )
-  //   .getOne();
   if (!rootQuestionTemplate) {
     response.sendStatus(404);
     return;
@@ -268,8 +251,8 @@ export async function questionToMark(request: Request, response: Response) {
       // Prevent race condition
       .andWhere(
         new Brackets(qb => {
-          qb.where("question.currentMarker IS NULL")
-            .orWhere("question.currentMarkerId = :id", { id: requesterId })
+          qb.where("question.currentMarkerId IS NULL")
+            .orWhere("question.currentMarkerId = :id", { id: requester.id })
             // Prevent other markers from accessing this route for the next 30 minutes
             .orWhere("question.currentMarkerUpdatedAt < :date", {
               date: addMinutes(new Date(), -30)
@@ -390,8 +373,8 @@ export async function questionToMark(request: Request, response: Response) {
     .leftJoin(
       "page.annotations",
       "annotation",
-      "annotation.paperUserId = :requesterId",
-      { requesterId }
+      "annotation.paperUserId = :paperUserId",
+      { paperUserId: requester.id }
     )
     .select("page.id", "id")
     .addSelect("page.pageNo", "pageNo")
