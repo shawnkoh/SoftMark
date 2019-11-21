@@ -212,21 +212,34 @@ export async function questionToMark(request: Request, response: Response) {
   }
   const { requester } = allowed;
 
-  const rootQuestionTemplate = await getTreeRepository(QuestionTemplate)
-    .createAncestorsQueryBuilder(
-      "questionTemplate",
-      "questionTemplateClosure",
-      questionTemplate
-    )
-    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
+  // TODO: THIS ASSUMES THAT questionTemplateId = ROOT
+  const rootQuestionTemplate = await getRepository(QuestionTemplate)
+    .createQueryBuilder("questionTemplate")
+    .where("questionTemplate.id = :questionTemplateId", { questionTemplateId })
     .andWhere("questionTemplate.discardedAt IS NULL")
     .innerJoin(
       "questionTemplate.allocations",
       "allocation",
-      "allocation.paperUserId = :id",
-      { id: requesterId }
+      "allocation.paperUserId = :requesterId",
+      { requesterId }
     )
     .getOne();
+
+  // const rootQuestionTemplate = await getTreeRepository(QuestionTemplate)
+  //   .createAncestorsQueryBuilder(
+  //     "questionTemplate",
+  //     "questionTemplateClosure",
+  //     questionTemplate
+  //   )
+  //   .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
+  //   .andWhere("questionTemplate.discardedAt IS NULL")
+  //   .innerJoin(
+  //     "questionTemplate.allocations",
+  //     "allocation",
+  //     "allocation.paperUserId = :id",
+  //     { id: requesterId }
+  //   )
+  //   .getOne();
   if (!rootQuestionTemplate) {
     response.sendStatus(404);
     return;
