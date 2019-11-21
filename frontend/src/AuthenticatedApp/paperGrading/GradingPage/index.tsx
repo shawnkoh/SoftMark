@@ -94,7 +94,7 @@ const GradingSubpage: React.FC = () => {
           })}
         </Typography>
         <BorderLinearProgress
-          value={totalMarkCount / totalQuestionCount}
+          value={(totalMarkCount / totalQuestionCount) * 100}
           color="secondary"
           variant="determinate"
           className={classes.grow}
