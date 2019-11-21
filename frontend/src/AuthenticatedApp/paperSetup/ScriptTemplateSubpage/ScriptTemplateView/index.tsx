@@ -1,14 +1,13 @@
-import { AppBar, Drawer, List, Toolbar, Typography } from "@material-ui/core";
+import { Drawer, List } from "@material-ui/core";
 import React from "react";
 import { DndProvider } from "react-dnd";
 import MultiBackend from "react-dnd-multi-backend";
 import HTML5toTouch from "react-dnd-multi-backend/dist/esm/HTML5toTouch";
-import PageTemplateView from "../PageTemplateView";
-import useStyles from "./useStyles";
-import QuestionTemplateTree from "./QuestionTemplateTree";
 import useScriptSetup from "../../context/ScriptSetupContext";
+import PageTemplateView from "../PageTemplateView";
 import Header from "./PaperSetupHeaderStatic";
-import { useEffect } from "react";
+import QuestionTemplateTree from "./QuestionTemplateTree";
+import useStyles from "./useStyles";
 
 const ScriptTemplateView: React.FC = () => {
   const classes = useStyles();

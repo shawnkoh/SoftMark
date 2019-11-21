@@ -1,9 +1,9 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
 import api from "api";
-import { useParams, useHistory } from "react-router";
-import { toast } from "react-toastify";
-import LoadingSpinner from "components/LoadingSpinner";
 import { ScriptTemplateSetupData } from "backend/src/types/scriptTemplates";
+import LoadingSpinner from "components/LoadingSpinner";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router";
+import { toast } from "react-toastify";
 
 interface ScriptSetupState {
   scriptTemplateSetupData: ScriptTemplateSetupData;
@@ -52,7 +52,7 @@ export const ScriptSetupProvider: React.FC = props => {
   };
 
   useEffect(() => {
-    setTimeout(getScriptTemplateSetupData, 1000);
+    getScriptTemplateSetupData();
   }, [paper_id, refreshFlag]);
 
   if (isLoading) {
