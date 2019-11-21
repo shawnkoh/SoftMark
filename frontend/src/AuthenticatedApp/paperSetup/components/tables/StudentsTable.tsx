@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
-import UploadIcon from "@material-ui/icons/Publish";
+import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useEffect, useState } from "react";
 import api from "../../../../api";
@@ -126,7 +126,7 @@ const StudentsTable: React.FC = () => {
               color="primary"
               startIcon={<UploadIcon />}
             >
-              Upload
+              Upload students
             </RoundedButton>
           </UploadNominalRollWrapper>
         </Grid>

@@ -135,14 +135,14 @@ const ScriptsTable: React.FC = () => {
         <Grid item>
           <UploadScriptsWrapper
             paperId={paper.id}
-            refreshScripts={callbackScripts}
+            refreshScripts={getScripts}
           >
             <RoundedButton
               variant="contained"
               color="primary"
               startIcon={<UploadIcon />}
             >
-              Upload
+              Upload scripts
             </RoundedButton>
           </UploadScriptsWrapper>
         </Grid>

@@ -47,12 +47,6 @@ const MarkersTableRow: React.FC<Props> = props => {
   const { user } = marker;
   const { name, email } = user;
 
-  const [canSeeAllocatedQuestions, setCanSeeAllocatedQuestions] = useState(
-    true
-  );
-  const toggleCanSeeAllocatedQuestions = () =>
-    setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions);
-
   const [allocations, setAllocations] = useState<AllocationListData[]>([]);
 
   const getAllocations = () => {
@@ -68,16 +62,17 @@ const MarkersTableRow: React.FC<Props> = props => {
       .catch(() => toast.error("Question allocation could not be made."));
   };
 
-  const postAllocation = (questionTemplateId: number) => {
+  const postAllocation = (questionTemplate: QuestionTemplateData) => {
     const allocationPostData: AllocationPostData = {
       paperUserId: marker.id
     };
     api.allocations
-      .createAllocation(questionTemplateId, allocationPostData)
+      .createAllocation(questionTemplate.id, allocationPostData)
       .then(res => {
+        toast.success(`Question ${questionTemplate.name} was successfully allocated to ${name}`);
         getAllocations();
       })
-      .catch(() => toast.error("Question allocation could not be made."));
+      .catch(() => toast.error(`Question ${questionTemplate.name}could not be allocated to ${name}.`));
   };
 
   useEffect(getAllocations, []);
@@ -123,19 +118,7 @@ const MarkersTableRow: React.FC<Props> = props => {
             />
           )}
         </TableCell>
-        <TableCell>
-          <RoundedButton
-            onClick={toggleCanSeeAllocatedQuestions}
-            color="primary"
-            startIcon={
-              canSeeAllocatedQuestions ? <ExpandLessIcon /> : <ExpandMoreIcon />
-            }
-          >
-            {canSeeAllocatedQuestions ? "Hide questions" : "Show questions"}
-          </RoundedButton>
-        </TableCell>
       </TableRow>
-      {canSeeAllocatedQuestions && (
         <TableRow>
           <TableCell />
           <TableCell>Total marks: {totalScore}</TableCell>
@@ -153,14 +136,13 @@ const MarkersTableRow: React.FC<Props> = props => {
                   onClick={() => {
                     allocationId
                       ? deleteAllocation(allocationId)
-                      : postAllocation(questionTemplate.id);
+                      : postAllocation(questionTemplate);
                   }}
                 />
               );
             })}
           </TableCell>
         </TableRow>
-      )}
     </>
   );
 };
