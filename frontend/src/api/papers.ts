@@ -1,10 +1,10 @@
 import { AxiosResponse } from "axios";
+import { GradingData } from "backend/src/types/grading";
 import {
   PaperData,
   PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
-import { QuestionTemplateGradingListData } from "backend/src/types/questionTemplates";
 import { ScriptTemplateSetupData } from "backend/src/types/scriptTemplates";
 import { PaperUserData, PaperUserPostData } from "../types/paperUsers";
 import client from "./client";
@@ -53,8 +53,6 @@ export async function getScriptTemplateSetupData(paperId: number) {
   );
 }
 
-export async function getRootQuestionTemplates(paperId: number) {
-  return await client.get<QuestionTemplateGradingListData>(
-    `${URL}/${paperId}/root_question_templates`
-  );
+export async function getGradingData(paperId: number) {
+  return await client.get<GradingData>(`${URL}/${paperId}/grading`);
 }

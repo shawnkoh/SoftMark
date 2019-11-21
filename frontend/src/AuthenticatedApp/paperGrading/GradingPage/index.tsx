@@ -11,9 +11,9 @@ import {
   Typography
 } from "@material-ui/core";
 import {
-  QuestionTemplateGradingListData,
-  QuestionTemplateRootData
-} from "backend/src/types/questionTemplates";
+  GradingData,
+  QuestionTemplateGradingRootData
+} from "backend/src/types/grading";
 import { UserListData } from "backend/src/types/users";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -29,10 +29,7 @@ const GradingSubpage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
 
-  const [
-    questionTemplateGradingListData,
-    setQuestionTemplateGradingListData
-  ] = useState<QuestionTemplateGradingListData>({
+  const [gradingData, setGradingData] = useState<GradingData>({
     rootQuestionTemplates: [],
     markers: [],
     totalQuestionCount: 0,
@@ -41,10 +38,10 @@ const GradingSubpage: React.FC = () => {
 
   useEffect(() => {
     api.papers
-      .getRootQuestionTemplates(paper.id)
-      .then(res => setQuestionTemplateGradingListData(res.data))
+      .getGradingData(paper.id)
+      .then(res => setGradingData(res.data))
       // TODO: Handle this better
-      .catch(error => toast.error("Failed to get RootQuestionTemplates"));
+      .catch(error => toast.error("Failed to get GradingData"));
   }, [paper]);
   /** root question template hooks end */
 
@@ -53,7 +50,7 @@ const GradingSubpage: React.FC = () => {
     totalQuestionCount,
     totalMarkCount,
     markers
-  } = questionTemplateGradingListData;
+  } = gradingData;
 
   const userMap = new Map<number, UserListData>();
   for (let i = 0; i < markers.length; i++) {
@@ -135,7 +132,10 @@ const GradingSubpage: React.FC = () => {
               </TableRow>
             )}
             {rootQuestionTemplates.map(
-              (rootQuestionTemplate: QuestionTemplateRootData, index) => {
+              (
+                rootQuestionTemplate: QuestionTemplateGradingRootData,
+                index
+              ) => {
                 const modifiedTemplate: any = rootQuestionTemplate;
                 modifiedTemplate.markers = rootQuestionTemplate.markers
                   .map(markerId => userMap.get(markerId))
