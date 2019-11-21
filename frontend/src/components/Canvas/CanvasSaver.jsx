@@ -24,12 +24,9 @@ class CanvasSaver extends React.Component {
     const stage = this.refs.stage.getStage();
     //downloads the stage as a .png file
     setTimeout(async () => {
-      console.log("Stage");
-      console.log(stage.toDataURL());
       var dataURL = await stage.toDataURL();
-      console.log(dataURL);
-      //downloadURI(dataURL, 'stage.png');
-    }, 7000);
+      this.props.callBackImageUrl(dataURL);
+    }, 3000);
   }
 
   componentDidUpdate() {
