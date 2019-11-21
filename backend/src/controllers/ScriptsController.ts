@@ -5,6 +5,7 @@ import { getManager, getRepository, IsNull, Not } from "typeorm";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
+import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
@@ -83,14 +84,22 @@ export async function create(request: Request, response: Response) {
     relations: ["questionTemplates"],
     where: { paperId, discardedAt: IsNull() }
   });
+  const questionTemplates = await getRepository(QuestionTemplate)
+    .createQueryBuilder("questionTemplate")
+    .where("questionTemplate.discardedAt IS NULL")
+    // select only leaves
+    .andWhere("questionTemplate.displayPage IS NOT NULL")
+    .innerJoin(
+      "questionTemplate.scriptTemplate",
+      "scriptTemplate",
+      "scriptTemplate.discardedAt IS NULL AND scriptTemplate.paperId = :paperId",
+      { paperId }
+    )
+    .getMany();
 
-  let questions: Question[] | undefined;
-  if (scriptTemplate && scriptTemplate.questionTemplates) {
-    questions = scriptTemplate.questionTemplates.map(questionTemplate => {
-      const question = new Question(script, questionTemplate);
-      return question;
-    });
-  }
+  const questions = questionTemplates.map(
+    questionTemplate => new Question(script, questionTemplate)
+  );
 
   await getManager().transaction(async manager => {
     await manager.save(script);
