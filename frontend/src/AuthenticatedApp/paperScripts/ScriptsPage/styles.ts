@@ -32,6 +32,11 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": {
         backgroundColor: red[700]
       }
+    },
+    button: {
+      borderRadius: 24,
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(2)
     }
   })
 );

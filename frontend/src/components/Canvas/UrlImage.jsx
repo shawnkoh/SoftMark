@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Image } from "react-konva";
 
-export default class URLImage extends React.Component {
+export default class URLImage extends Component {
   state = {
     image: null
   };
@@ -31,10 +31,12 @@ export default class URLImage extends React.Component {
     // if you keep same image object during source updates
     // you will have to update layer manually:
     // this.imageNode.getLayer().batchDraw();
+    if ("onLoad" in this.props)
+      this.props.onLoad(this.image.width, this.image.height);
   };
   render() {
     return (
-      <Image 
+      <Image
         x={this.props.x}
         y={this.props.y}
         image={this.state.image}

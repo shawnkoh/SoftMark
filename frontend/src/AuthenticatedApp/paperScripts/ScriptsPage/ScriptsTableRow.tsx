@@ -88,7 +88,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             to={`${match.url}/${id}/mark`}
             variant="contained"
             color="primary"
-            style={{ borderRadius: 24 }}
+            className={classes.button}
           >
             Mark
           </Button>
@@ -99,7 +99,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             to={`${match.url}/${id}`}
             variant="contained"
             color="primary"
-            style={{ borderRadius: 24 }}
+            className={classes.button}
           >
             View
           </Button>
