@@ -60,9 +60,11 @@ const MarkQuestionModal: React.FC<Props> = ({
           Marks for Q{name} {maxScore && ` (Maximum: ${maxScore})`}
         </CustomDialogTitle>
         <DialogContent dividers>
-          <Typography variant="subtitle1">
-            Saved score:
-            {score !== null ? ` ${score} / ${maxScore}` : " no score yet"}
+          <Typography variant="overline">Saved score</Typography>
+          <Typography variant="h5">
+            {score !== null
+              ? `${score} / ${maxScore}`
+              : `no score yet (maximum: ${maxScore})`}
           </Typography>
           <div className={classes.slider}>
             <Slider
