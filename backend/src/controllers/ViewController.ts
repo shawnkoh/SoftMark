@@ -218,8 +218,8 @@ export async function questionToMark(request: Request, response: Response) {
       "questionTemplateClosure",
       questionTemplate
     )
-    .andWhere("questionTemplate.parentQuestionTemplate is null")
-    .andWhere("questionTemplate.discardedAt is null")
+    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
+    .andWhere("questionTemplate.discardedAt IS NULL")
     .innerJoin(
       "questionTemplate.allocations",
       "allocation",
