@@ -1,5 +1,4 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { UserListData } from "./users";
 
 export interface QuestionTemplatePostData {
   name: string;
@@ -22,22 +21,6 @@ export interface QuestionTemplateData extends DiscardableData {
   score: number | null;
   scriptTemplateId: number;
   topOffset: number | null;
-}
-
-export interface QuestionTemplateRootData {
-  id: number;
-  name: string;
-  totalScore: number | null;
-  markers: number[];
-  questionCount: number;
-  markCount: number;
-}
-
-export interface QuestionTemplateGradingListData {
-  rootQuestionTemplates: QuestionTemplateRootData[];
-  markers: UserListData[];
-  totalQuestionCount: number;
-  totalMarkCount: number;
 }
 
 export interface QuestionTemplateLeafData {

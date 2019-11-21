@@ -1,8 +1,8 @@
 import { Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { RouteComponentProps, withRouter } from "react-router";
+import { Link } from "react-router-dom";
 import { getUser } from "../../../store/auth/selectors";
 
 interface OwnProps {

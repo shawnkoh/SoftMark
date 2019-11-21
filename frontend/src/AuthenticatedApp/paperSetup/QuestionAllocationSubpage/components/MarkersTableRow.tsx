@@ -1,13 +1,7 @@
-import {
-  Chip,
-  IconButton,
-  TableCell,
-  TableRow,
-  Tooltip
-} from "@material-ui/core";
+import { IconButton, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
-import { makeStyles } from "@material-ui/core/styles";
 import red from "@material-ui/core/colors/red";
+import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -21,10 +15,10 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { sumArray } from "utils/arrays";
 import api from "../../../../api";
+import ReversedChip from "../../../../components/ReversedChip";
 import { getUser } from "../../../../store/auth/selectors";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
-import ReversedChip from "../../../../components/ReversedChip";
 
 const useStyles = makeStyles(theme => ({
   red: {

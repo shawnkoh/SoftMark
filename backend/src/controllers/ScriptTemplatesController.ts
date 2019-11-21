@@ -1,6 +1,6 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
-import _ from "lodash";
+import { pick } from "lodash";
 import {
   getManager,
   getRepository,
@@ -24,7 +24,7 @@ export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
   const paperId = Number(request.params.id);
-  const { imageUrls, sha256 } = _.pick(
+  const { imageUrls, sha256 } = pick(
     request.body,
     "imageUrls",
     "sha256"
@@ -241,7 +241,7 @@ export async function getSetupData(request: Request, response: Response) {
       const queryBuilder = getTreeRepository(QuestionTemplate)
         .createQueryBuilder("questionTemplate")
         .where("questionTemplate.displayPage IS NOT NULL")
-        .where("questionTemplate.discardedAt IS NULL")
+        .andWhere("questionTemplate.discardedAt IS NULL")
         .innerJoin(
           "questionTemplate.pageQuestionTemplates",
           "pageQuestionTemplate",

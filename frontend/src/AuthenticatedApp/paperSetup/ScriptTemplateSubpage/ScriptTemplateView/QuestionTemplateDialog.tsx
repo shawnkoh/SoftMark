@@ -2,31 +2,31 @@
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Grid,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Typography
 } from "@material-ui/core";
 import api from "api";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import {
   Field,
   FieldProps,
   Form,
   Formik,
-  FormikProps,
-  FormikErrors
+  FormikErrors,
+  FormikProps
 } from "formik";
 import React from "react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 import { isPageValid } from "../../../../utils/questionTemplateUtil";
 import QuestionTemplateSelect from "./QuestionTemplateSelect";
-import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 
 export interface NewQuestionTemplateValues {
   title: string;
