@@ -5,8 +5,15 @@ const ReversedChip = withStyles({
   root: {
     direction: "rtl",
     "& $avatar": {
-      marginLeft: "-6px",
-      marginRight: "5px"
+      direction: "ltr",
+      display: "inline-flex",
+      width: "auto",
+      minWidth: 24,
+      borderRadius: 12,
+      paddingLeft: 8,
+      paddingRight: 8,
+      marginLeft: -6,
+      marginRight: 5
     }
   },
   avatar: {}
