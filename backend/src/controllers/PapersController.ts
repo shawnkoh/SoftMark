@@ -1,9 +1,13 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import _ from "lodash";
+import { getRepository, getTreeRepository } from "typeorm";
+import { Allocation } from "../entities/Allocation";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
+import QuestionTemplate from "../entities/QuestionTemplate";
 import { selectPaperData } from "../selectors/papers";
+import { GradingData, QuestionTemplateGradingRootData } from "../types/grading";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -134,4 +138,161 @@ export async function undiscard(request: Request, response: Response) {
 
   const data = await paper.getData(requester.role);
   response.status(200).json({ paper: data });
+}
+
+export async function grading(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const paperId = request.params.id;
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Marker
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const paperQuery = () =>
+    getRepository(Paper)
+      .createQueryBuilder("paper")
+      .where("paper.id = :paperId", { paperId })
+      .andWhere("paper.discardedAt IS NULL");
+
+  const rootQuestionTemplatesData: {
+    id: number;
+    name: string;
+  }[] = await paperQuery()
+    .innerJoin(
+      "paper.scriptTemplates",
+      "scriptTemplate",
+      "scriptTemplate.discardedAt IS NULL"
+    )
+    .innerJoin(
+      "scriptTemplate.questionTemplates",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    )
+    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
+    .select("questionTemplate.id", "id")
+    .addSelect("questionTemplate.name", "name")
+    .getRawMany();
+
+  const rootQuestionTemplateIds = rootQuestionTemplatesData.map(
+    data => data.id
+  );
+
+  const questions: {
+    questionTemplateId: number;
+    id: number;
+    maxScore: number;
+    score: number | null;
+  }[] = await paperQuery()
+    .innerJoin("paper.scripts", "script", "script.discardedAt IS NULL")
+    .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
+    .innerJoin(
+      "question.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    )
+    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+    .select("questionTemplate.id", "questionTemplateId")
+    .addSelect("question.id", "id")
+    .addSelect("questionTemplate.score", "maxScore")
+    .addSelect("mark.score", "score")
+    .getRawMany();
+
+  console.log("questions", questions);
+
+  const markersData: {
+    questionTemplateId: number;
+    id: number;
+    email: string;
+    emailVerified: boolean;
+    name: string | null;
+  }[] = await getRepository(Allocation)
+    .createQueryBuilder("allocation")
+    .innerJoin(
+      "allocation.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.id IN (:...ids)",
+      { ids: rootQuestionTemplateIds }
+    )
+    .innerJoin("allocation.paperUser", "marker", "marker.discardedAt IS NULL")
+    .innerJoin("marker.user", "user", "user.discardedAt IS NULL")
+    .select("questionTemplate.id", "questionTemplateId")
+    .addSelect("user.id", "id")
+    .addSelect("user.email", "email")
+    .addSelect("user.emailVerified", "emailVerified")
+    .addSelect("user.name", "name")
+    .getRawMany();
+
+  console.log("markersData", markersData);
+
+  const markers = _.uniqBy(markersData, "id");
+
+  const markerIdsByQuestionTemplateId = markersData.reduce(
+    (collection, currentValue) => {
+      const { questionTemplateId, id } = currentValue;
+      if (!(questionTemplateId in collection)) {
+        collection[questionTemplateId] = new Set<number>();
+      }
+      collection[questionTemplateId].add(id);
+      return collection;
+    },
+    {} as { [questionTemplateId: number]: Set<number> }
+  );
+
+  const rootQuestionTemplates = await Promise.all(
+    rootQuestionTemplatesData.map(async root => {
+      const descendantQuestionTemplates = await getTreeRepository(
+        QuestionTemplate
+      ).findDescendants(root.id as any);
+      const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
+        descendant => descendant.id
+      );
+      const leaves = questions.filter(question =>
+        descendantQuestionTemplateIds.includes(question.questionTemplateId)
+      );
+      const totalScore = leaves.reduce((accumulator, currentValue) => {
+        const { maxScore } = currentValue;
+        accumulator = accumulator + maxScore;
+        return accumulator;
+      }, 0);
+
+      const questionCount = leaves.length;
+      const markCount = leaves.reduce((count, currentValue) => {
+        const { score } = currentValue;
+        if (score) {
+          count = count + 1;
+        }
+        return count;
+      }, 0);
+
+      const result: QuestionTemplateGradingRootData = {
+        ...root,
+        totalScore,
+        markers: markerIdsByQuestionTemplateId[root.id]
+          ? Array.from(markerIdsByQuestionTemplateId[root.id])
+          : [],
+        questionCount,
+        markCount
+      };
+      return result;
+    })
+  );
+
+  console.log("rootQuestionTemplateIds", rootQuestionTemplateIds);
+
+  const data: GradingData = {
+    rootQuestionTemplates,
+    totalQuestionCount: questions.length,
+    totalMarkCount: questions.filter(question => !!question.score).length,
+    markers: markers as any // temporary
+  };
+
+  console.log("data", data);
+
+  response.status(200).json(data);
 }

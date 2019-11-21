@@ -64,7 +64,7 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   const getQuestionTemplates = () => {
     api.questionTemplates
       .getRootQuestionTemplates(paper.id)
-      .then(resp => setQuestionTemplates(resp.data.questionTemplates))
+      .then(resp => setQuestionTemplates(resp.data.rootQuestionTemplates))
       .finally(() => setIsLoadingQuestionTemplates(false));
   };
   useEffect(getQuestionTemplates, [refreshQuestionTemplatesFlag]);

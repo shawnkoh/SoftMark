@@ -2,15 +2,13 @@ import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import _ from "lodash";
 import {
+  createQueryBuilder,
   getManager,
   getRepository,
   getTreeRepository,
   IsNull,
-  Not,
-  createQueryBuilder
+  Not
 } from "typeorm";
-import { Allocation } from "../entities/Allocation";
-import { Mark } from "../entities/Mark";
 import { PageQuestionTemplate } from "../entities/PageQuestionTemplate";
 import { Question } from "../entities/Question";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
@@ -18,10 +16,8 @@ import { Script } from "../entities/Script";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import {
-  QuestionTemplateGradingListData,
   QuestionTemplatePatchData,
-  QuestionTemplatePostData,
-  QuestionTemplateRootData
+  QuestionTemplatePostData
 } from "../types/questionTemplates";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
@@ -143,33 +139,6 @@ export async function index(request: Request, response: Response) {
     const data = (await Promise.all(
       questionTemplates.map(questionTemplate => questionTemplate.getData())
     )).sort(sortByPageInfo);
-    response.status(200).json({ questionTemplates: data });
-  } catch (error) {
-    return response.sendStatus(500);
-  }
-}
-
-export async function getRootQuestionTemplates(
-  request: Request,
-  response: Response
-) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
-  const paperId = Number(request.params.id);
-  let rootQuestionTemplates: QuestionTemplate[] = [];
-  try {
-    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
-    rootQuestionTemplates = (await getActiveQuestionTemplates(paperId)).filter(
-      questionTemplate => !questionTemplate.parentQuestionTemplateId
-    );
-  } catch (error) {
-    return response.sendStatus(404);
-  }
-
-  try {
-    const data = await Promise.all(
-      rootQuestionTemplates.map(questionTemplate => questionTemplate.getData())
-    );
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
     return response.sendStatus(500);
@@ -410,123 +379,33 @@ export async function getActiveQuestionTemplates(paperId: number) {
   });
 }
 
+// TODO: This function should return all the data needed for http://localhost:3000/papers/1/setup/allocate
 export async function rootQuestionTemplates(
   request: Request,
   response: Response
 ) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterId = payload.userId;
-  const scriptTemplateId = request.params.id;
-  const scriptTemplate = await getRepository(ScriptTemplate).findOne(
-    scriptTemplateId,
-    { where: { discardedAt: IsNull() } }
-  );
-  if (!scriptTemplate) {
-    response.sendStatus(404);
-    return;
-  }
-  const { paperId } = scriptTemplate;
+  const paperId = request.params.id;
   const allowed = allowedRequester(requesterId, paperId, PaperUserRole.Marker);
   if (!allowed) {
     response.sendStatus(404);
     return;
   }
 
-  let totalMarkCount = 0;
-  let totalQuestionCount = 0;
-  let aggregateMarkers: any[] = [];
-
-  // TODO: I think this can be optimised into one query using group by
-  const rawRoots = await getTreeRepository(QuestionTemplate)
+  const rootQuestionTemplates = await getRepository(QuestionTemplate)
     .createQueryBuilder("questionTemplate")
-    .where("questionTemplate.discardedAt IS NULL")
-    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .innerJoin(
       "questionTemplate.scriptTemplate",
       "scriptTemplate",
-      "scriptTemplate.paperId = :id and scriptTemplate.discardedAt IS NULL",
-      { id: paperId }
+      "scriptTemplate.discardedAt IS NULL"
     )
-    .select("questionTemplate.id", "id")
-    .addSelect("questionTemplate.name", "name")
-    .getRawMany();
+    .where("scriptTemplate.paperId = :paperId", { paperId })
+    .andWhere("questionTemplate.discardedAt IS NULL")
+    .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
+    .getMany();
 
-  const roots = await Promise.all(
-    rawRoots.map(async rawRoot => {
-      const descendants = await getTreeRepository(
-        QuestionTemplate
-      ).findDescendants(rawRoot);
-      const descendantIds = descendants.map(descendant => descendant.id);
-
-      let totalScore = 0;
-      let questionCount = 0;
-      descendants.forEach(descendant => {
-        if (descendant.score) {
-          totalScore += descendant.score;
-          questionCount++;
-        }
-      });
-      totalQuestionCount += questionCount;
-
-      let markers: any = await getRepository(Allocation)
-        .createQueryBuilder("allocation")
-        .where("allocation.questionTemplateId IN (:...ids)", {
-          ids: descendantIds
-        })
-        .innerJoin("allocation.paperUser", "marker")
-        .innerJoin("marker.user", "user")
-        .select("user.id", "id")
-        .addSelect("user.email", "email")
-        .addSelect("user.emailVerified", "emailVerified")
-        .addSelect("user.name", "name")
-        .getRawMany();
-      markers.forEach((marker: any) => {
-        aggregateMarkers.push(marker);
-      });
-
-      markers = _.chain(markers)
-        .map(marker => marker.id)
-        .sortedUniq();
-
-      const questions = await getRepository(Question)
-        .createQueryBuilder("question")
-        .where("question.discardedAt IS NULL")
-        .andWhere("question.questionTemplateId IN (:...ids)", {
-          ids: descendantIds
-        })
-        .select("question.id")
-        .getRawMany();
-      const questionIds = questions.map(question => question.id);
-
-      const markCount =
-        questionIds.length > 0
-          ? await getRepository(Mark)
-              .createQueryBuilder("mark")
-              .where("mark.questionId IN (:...ids)", { ids: questionIds })
-              .getCount()
-          : 0;
-      totalMarkCount += markCount;
-
-      const root: QuestionTemplateRootData = {
-        id: rawRoot.id,
-        name: rawRoot.name,
-        totalScore,
-        markers,
-        markCount,
-        questionCount
-      };
-      return root;
-    })
-  );
-
-  aggregateMarkers = _.uniqBy(aggregateMarkers, marker => marker.id);
-
-  const data: QuestionTemplateGradingListData = {
-    rootQuestionTemplates: roots,
-    totalQuestionCount,
-    totalMarkCount,
-    markers: aggregateMarkers
-  };
+  const data = { rootQuestionTemplates };
 
   response.status(200).json(data);
 }

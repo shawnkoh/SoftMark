@@ -19,7 +19,19 @@ class CanvasSaver extends React.Component {
     this.handleLoad = this.handleLoad.bind(this);
   }
 
-  async componentDidMount() {}
+  async componentDidMount() {
+    if (this.state.width !== 0 && this.state.height !== 0) {
+      // log stage react wrapper
+      // log Konva.Stage instance
+      console.log(this.refs.stage.getStage());
+      const stage = this.refs.stage.getStage();
+      //downloads the stage as a .png file
+      setTimeout(async () => {
+        var dataURL = await stage.toDataURL();
+        this.props.callBackImageUrl(dataURL);
+      }, 3000);
+    }
+  }
 
   componentDidUpdate() {
     if (this.state.width !== 0 && this.state.height !== 0) {
@@ -29,13 +41,9 @@ class CanvasSaver extends React.Component {
       const stage = this.refs.stage.getStage();
       //downloads the stage as a .png file
       setTimeout(async () => {
-        console.log("Stage");
-        console.log(stage.toDataURL());
         var dataURL = await stage.toDataURL();
-        console.log(dataURL);
-        //downloadURI(dataURL, 'stage.png');
-      }, 7000);
-      // should be able to remove timeout?
+        this.props.callBackImageUrl(dataURL);
+      }, 3000);
     }
   }
 

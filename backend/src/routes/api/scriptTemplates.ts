@@ -12,9 +12,4 @@ router.patch("/:id/undiscard", ScriptTemplatesController.undiscard);
 
 router.post("/:id/question_templates", QuestionTemplatesController.create);
 
-router.get(
-  "/:id/root_question_templates",
-  QuestionTemplatesController.rootQuestionTemplates
-);
-
 export default router;

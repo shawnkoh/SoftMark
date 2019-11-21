@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { GradingData } from "backend/src/types/grading";
 import {
   PaperData,
   PaperPatchData,
@@ -50,4 +51,8 @@ export async function getScriptTemplateSetupData(paperId: number) {
   return await client.get<ScriptTemplateSetupData>(
     `${URL}/${paperId}/script_template/setup`
   );
+}
+
+export async function getGradingData(paperId: number) {
+  return await client.get<GradingData>(`${URL}/${paperId}/grading`);
 }

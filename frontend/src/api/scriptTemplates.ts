@@ -1,5 +1,4 @@
 import { AxiosResponse } from "axios";
-import { QuestionTemplateGradingListData } from "backend/src/types/questionTemplates";
 import {
   ScriptTemplateData,
   ScriptTemplatePostData
@@ -75,10 +74,4 @@ export async function postScriptTemplate(
     });
   };
   reader.readAsDataURL(file);
-}
-
-export function getRootQuestionTemplates(
-  scriptTemplateId: number
-): Promise<AxiosResponse<QuestionTemplateGradingListData>> {
-  return client.get(`${URL}/${scriptTemplateId}/root_question_templates`);
 }
