@@ -54,38 +54,38 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   return (
-    <>
-      <Dialog open={isVisible} onClose={onCancel} fullWidth>
-        <CustomDialogTitle id="customized-dialog-title" onClose={onCancel}>
-          Marks for Q{name} {maxScore && ` (Maximum: ${maxScore})`}
-        </CustomDialogTitle>
-        <DialogContent dividers>
-          <Typography variant="subtitle1">
-            Saved score:
-            {score !== null ? ` ${score} / ${maxScore}` : " no score yet"}
-          </Typography>
-          <div className={classes.slider}>
-            <Slider
-              value={localScore}
-              onChange={handleLocalScoreChange}
-              step={0.5}
-              marks
-              min={0}
-              max={maxScore || 100}
-              valueLabelDisplay="on"
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button color="primary" onClick={handleSave}>
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog open={isVisible} onClose={onCancel} fullWidth>
+      <CustomDialogTitle id="customized-dialog-title" onClose={onCancel}>
+        Q{name}
+      </CustomDialogTitle>
+      <DialogContent dividers>
+        <Typography variant="overline">Saved score</Typography>
+        <Typography variant="h5">
+          {score !== null
+            ? `${score} / ${maxScore}`
+            : `no score yet (maximum: ${maxScore})`}
+        </Typography>
+        <div className={classes.slider}>
+          <Slider
+            value={localScore}
+            onChange={handleLocalScoreChange}
+            step={0.5}
+            marks
+            min={0}
+            max={maxScore || 100}
+            valueLabelDisplay="on"
+          />
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button color="primary" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button color="primary" onClick={handleSave}>
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

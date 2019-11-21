@@ -4,7 +4,7 @@ import Konva, { Stage, Layer, Line } from "react-konva";
 import UrlImage from "./UrlImage";
 
 function downloadURI(uri, name) {
-  var link = document.createElement('a');
+  var link = document.createElement("a");
   link.download = name;
   link.href = uri;
   document.body.appendChild(link);
@@ -15,42 +15,60 @@ function downloadURI(uri, name) {
 class CanvasSaver extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { width: 0, height: 0 };
+    this.handleLoad = this.handleLoad.bind(this);
   }
 
   async componentDidMount() {
-    // log stage react wrapper
-    // log Konva.Stage instance
-    console.log(this.refs.stage.getStage());
-    const stage = this.refs.stage.getStage();
-    //downloads the stage as a .png file
-    setTimeout(async () => {
-      var dataURL = await stage.toDataURL();
-      this.props.callBackImageUrl(dataURL);
-    }, 3000);
+    if (this.state.width !== 0 && this.state.height !== 0) {
+      // log stage react wrapper
+      // log Konva.Stage instance
+      console.log(this.refs.stage.getStage());
+      const stage = this.refs.stage.getStage();
+      //downloads the stage as a .png file
+      setTimeout(async () => {
+        var dataURL = await stage.toDataURL();
+        this.props.callBackImageUrl(dataURL);
+      }, 3000);
+    }
   }
 
   componentDidUpdate() {
-    
+    if (this.state.width !== 0 && this.state.height !== 0) {
+      // log stage react wrapper
+      // log Konva.Stage instance
+      console.log(this.refs.stage.getStage());
+      const stage = this.refs.stage.getStage();
+      //downloads the stage as a .png file
+      setTimeout(async () => {
+        var dataURL = await stage.toDataURL();
+        this.props.callBackImageUrl(dataURL);
+      }, 3000);
+    }
   }
 
-  async componentWillUnmount() {
-    
+  async componentWillUnmount() {}
+
+  handleLoad(width, height) {
+    this.setState({ width, height });
   }
 
   render() {
     return (
       <Stage
         ref="stage"
-        width={1000}
-        height={1500}
+        width={this.state.width}
+        height={this.state.height}
         scaleX={1}
         scaleY={1}
-        x={32}
-        y={32}
-        style={{ touchAction: "none" }}
+        x={0}
+        y={0}
       >
         <Layer>
-          <UrlImage src={this.props.backgroundImageSource} />
+          <UrlImage
+            src={this.props.backgroundImageSource}
+            onLoad={this.handleLoad}
+          />
         </Layer>
         {this.props.backgroundAnnotations.map(
           (backgroundAnnotationLines, i) => (
