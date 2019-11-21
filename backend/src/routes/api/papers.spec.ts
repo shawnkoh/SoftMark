@@ -372,7 +372,8 @@ describe("POST /papers/:id/scripts", () => {
     const data: ScriptData = response.body.script;
     expect(isScriptData(data)).toBe(true);
     const count = await getRepository(Question).count({ scriptId: data.id });
-    expect(count).toBe(4);
+    // Only 2 leaves
+    expect(count).toBe(2);
   });
 });
 
