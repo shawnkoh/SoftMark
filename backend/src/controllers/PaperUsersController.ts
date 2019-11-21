@@ -356,19 +356,6 @@ export async function replyInvite(request: Request, response: Response) {
     accepted
   }: { name: string | null; accepted: boolean } = request.body;
 
-  if (name) {
-    await createQueryBuilder(User, "user")
-      .innerJoin(
-        "user.paperUsers",
-        "paperUser",
-        "paperUser.id = :paperUserId AND paperUser.discardedAt IS NULL",
-        { paperUserId }
-      )
-      .update()
-      .set({ name })
-      .execute();
-  }
-
   const partial: QueryDeepPartialEntity<PaperUser> = accepted
     ? { acceptedInvite: true }
     : { discardedAt: new Date() };
@@ -384,6 +371,11 @@ export async function replyInvite(request: Request, response: Response) {
   if (!user) {
     response.sendStatus(404);
     return;
+  }
+
+  if (name) {
+    user.name = name;
+    await getRepository(User).save(user);
   }
 
   const data = user.createAuthenticationTokens();
