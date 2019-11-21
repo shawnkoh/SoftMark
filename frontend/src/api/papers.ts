@@ -4,6 +4,7 @@ import {
   PaperPatchData,
   PaperPostData
 } from "backend/src/types/papers";
+import { QuestionTemplateGradingListData } from "backend/src/types/questionTemplates";
 import { ScriptTemplateSetupData } from "backend/src/types/scriptTemplates";
 import { PaperUserData, PaperUserPostData } from "../types/paperUsers";
 import client from "./client";
@@ -49,5 +50,11 @@ export async function createPaperUser(
 export async function getScriptTemplateSetupData(paperId: number) {
   return await client.get<ScriptTemplateSetupData>(
     `${URL}/${paperId}/script_template/setup`
+  );
+}
+
+export async function getRootQuestionTemplates(paperId: number) {
+  return await client.get<QuestionTemplateGradingListData>(
+    `${URL}/${paperId}/root_question_templates`
   );
 }

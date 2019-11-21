@@ -1,7 +1,6 @@
 import {
   Box,
   Container,
-  LinearProgress,
   Paper,
   Table,
   TableBody,
@@ -15,12 +14,11 @@ import {
   QuestionTemplateGradingListData,
   QuestionTemplateRootData
 } from "backend/src/types/questionTemplates";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { UserListData } from "backend/src/types/users";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import api from "../../../api";
-import LoadingSpinner from "../../../components/LoadingSpinner";
 import BorderLinearProgress from "../../../components/BorderLinearProgress";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
@@ -31,27 +29,6 @@ const GradingSubpage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
 
-  /** Script template hooks start */
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  const getScriptTemplate = async () => {
-    const scriptTemplate = await api.scriptTemplates.getScriptTemplate(
-      paper.id
-    );
-    setScriptTemplate(scriptTemplate);
-    setIsLoadingScriptTemplate(false);
-    return scriptTemplate;
-  };
-
-  useEffect(() => {
-    getScriptTemplate();
-  }, []);
-
-  // getRootQuestionTemplates states
   const [
     questionTemplateGradingListData,
     setQuestionTemplateGradingListData
@@ -62,21 +39,14 @@ const GradingSubpage: React.FC = () => {
     totalMarkCount: 0
   });
 
-  const getRootQuestionTemplates = () => {
-    if (scriptTemplate) {
-      api.scriptTemplates
-        .getRootQuestionTemplates(scriptTemplate.id)
-        .then(res => setQuestionTemplateGradingListData(res.data));
-    }
-  };
-  useEffect(getRootQuestionTemplates, [scriptTemplate]);
+  useEffect(() => {
+    api.papers
+      .getRootQuestionTemplates(paper.id)
+      .then(res => setQuestionTemplateGradingListData(res.data))
+      // TODO: Handle this better
+      .catch(error => toast.error("Failed to get RootQuestionTemplates"));
+  }, [paper]);
   /** root question template hooks end */
-
-  if (isLoadingScriptTemplate) {
-    return <LoadingSpinner loadingMessage={`Loading script template...`} />;
-  } else if (!scriptTemplate) {
-    return <div>Please upload a script template first</div>;
-  }
 
   const {
     rootQuestionTemplates = [],
