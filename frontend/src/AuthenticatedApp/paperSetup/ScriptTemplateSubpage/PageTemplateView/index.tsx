@@ -2,16 +2,16 @@ import { Box, Fab, IconButton, Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
 import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
-import React, { useRef, useState, useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
-import api from "../../../../api";
-import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
-import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
-import useStyles from "./useStyles";
-import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { toast } from "react-toastify";
+import api from "../../../../api";
+import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
+import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
+import useStyles from "./useStyles";
 
 export type DragItem = QuestionTemplateLeafData & {
   type: string;
@@ -52,7 +52,6 @@ const PageTemplateView: React.FC<{
             topOffset,
             leftOffset
           });
-          toast.success(`${item.name}'s position successfully updated`);
           refresh();
         } catch (error) {
           toast.error(`Failed to move ${item.name}`);
