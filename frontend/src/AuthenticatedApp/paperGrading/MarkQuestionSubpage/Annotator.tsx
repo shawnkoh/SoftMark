@@ -111,8 +111,8 @@ const Annotator: React.FC<Props> = ({
           label={"Q" + questionState.question.name}
           avatar={
             <Avatar>
-              {questionState.question.score || "-"} /{" "}
-              {questionState.question.maxScore || "-"}
+              {`${questionState.question.score || "-"} / ${questionState
+                .question.maxScore || "-"}`}
             </Avatar>
           }
           color={questionState.question.score ? "primary" : "default"}
@@ -142,8 +142,8 @@ const Annotator: React.FC<Props> = ({
               onClick={() => handleChipClick(index)}
               label={"Q" + questionState.question.name}
               avatar={
-                <Avatar>{`${questionState.question.score || "-"}/${questionState
-                  .question.maxScore || "-"}`}</Avatar>
+                <Avatar>{`${questionState.question.score ||
+                  "-"} / ${questionState.question.maxScore || "-"}`}</Avatar>
               }
               color={questionState.question.score ? "primary" : "default"}
               className={classes.questionBarItem}

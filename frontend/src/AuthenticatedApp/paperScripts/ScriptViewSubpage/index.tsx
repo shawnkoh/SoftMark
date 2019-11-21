@@ -150,7 +150,7 @@ const ScriptView: React.FC<Props> = ({ match }) => {
                 key={question.id}
                 avatar={
                   <Avatar>
-                    {question.score || "-"} / {question.maxScore || "-"}
+                    {`${question.score || "-"} / ${question.maxScore || "-"}`}
                   </Avatar>
                 }
                 label={"Q" + question.name}
