@@ -22,8 +22,10 @@ import MinWidthIcon from "mdi-material-ui/CircleMedium";
 import MaxWidthIcon from "mdi-material-ui/Circle";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
+import HelpIcon from "@material-ui/icons/Help";
 
 import CanvasContainer from "./CanvasContainer";
+import HelpModal from "./CanvasWithToolbarHelpModal";
 
 type DrilledProps = Partial<
   Pick<
@@ -213,6 +215,14 @@ const CanvasWithToolbar: React.FC<Props> = ({
               </Button>
             </>
           )}
+          <HelpModal
+            drawable={drawable}
+            render={toggleModal => (
+              <IconButton onClick={toggleModal}>
+                <HelpIcon />
+              </IconButton>
+            )}
+          />
         </Toolbar>
       </AppBar>
       <CanvasContainer
