@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { sumArray } from "utils/arrays";
 import api from "../../../../api";
 import ReversedChip from "../../../../components/ReversedChip";
+import RoundedButton from "../../../../components/buttons/RoundedButton";
 import { getUser } from "../../../../store/auth/selectors";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import DeleteMarkerModal from "./DeleteMarkerModal";
@@ -47,7 +48,7 @@ const MarkersTableRow: React.FC<Props> = props => {
   const { name, email } = user;
 
   const [canSeeAllocatedQuestions, setCanSeeAllocatedQuestions] = useState(
-    false
+    true
   );
   const toggleCanSeeAllocatedQuestions = () =>
     setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions);
@@ -123,9 +124,15 @@ const MarkersTableRow: React.FC<Props> = props => {
           )}
         </TableCell>
         <TableCell>
-          <IconButton onClick={toggleCanSeeAllocatedQuestions}>
-            {canSeeAllocatedQuestions ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
+          <RoundedButton
+            onClick={toggleCanSeeAllocatedQuestions}
+            color="primary"
+            startIcon={
+              canSeeAllocatedQuestions ? <ExpandLessIcon /> : <ExpandMoreIcon />
+            }
+          >
+            {canSeeAllocatedQuestions ? "Hide questions" : "Show questions"}
+          </RoundedButton>
         </TableCell>
       </TableRow>
       {canSeeAllocatedQuestions && (
