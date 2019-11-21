@@ -38,18 +38,13 @@ const Annotator: React.FC<Props> = ({
     isVisible: boolean;
     question: QuestionViewData;
   }
-  const getInitialQuestionStates = (questions: QuestionViewData[]) => {
-    const initialQuestionStates: {
-      [index: number]: QuestionState;
-    } = {};
-    questions.forEach((question, index) => {
-      initialQuestionStates[index] = { isVisible: false, question };
-    });
-    return initialQuestionStates;
-  };
-  const [questionStates, setQuestionStates] = useState<{
-    [index: number]: QuestionState;
-  }>(getInitialQuestionStates(questions));
+  const initialQuestionStates = questions.map(question => ({
+    isVisible: false,
+    question
+  }));
+  const [questionStates, setQuestionStates] = useState<QuestionState[]>(
+    initialQuestionStates
+  );
 
   const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1.0);
@@ -89,11 +84,11 @@ const Annotator: React.FC<Props> = ({
 
   return (
     <div className={classes.canvasWithToolbarContainer}>
-      {questions.map((question, index) => (
+      {questionStates.map((questionState: QuestionState, index: number) => (
         <MarkQuestionModal
           key={index}
-          question={question}
-          isVisible={questionStates[index].isVisible}
+          question={questionState.question}
+          isVisible={questionState.isVisible}
           onCancel={() => handleModalCancel(index)}
           onSave={score => handleModalSave(index, score)}
         />
@@ -108,19 +103,17 @@ const Annotator: React.FC<Props> = ({
         onForegroundAnnotationChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
       />
-      {/*questions.map((question, index) => (
+      {/*questionStates.map((questionState: QuestionState, index: number) => (
         <ReversedChip
           key={index}
           onClick={() => handleChipClick(index)}
-          label={"Q" + question.name}
-          avatar={
-            <Avatar>{questionStates[index].question.score || "-"}</Avatar>
-          }
-          color={questionStates[index].question.score ? "primary" : "default"}
+          label={"Q" + questionState.question.name}
+          avatar={<Avatar>{questionState.question.score || "-"}</Avatar>}
+          color={questionState.question.score ? "primary" : "default"}
           style={{
             position: "absolute",
-            left: question.leftOffset * scale + position.x,
-            top: question.topOffset * scale + position.y
+            left: questionState.question.leftOffset * scale + position.x,
+            top: questionState.question.topOffset * scale + position.y
           }}
         />
         ))*/}
@@ -132,17 +125,13 @@ const Annotator: React.FC<Props> = ({
           >
             {matriculationNumber || "(Unmatched script)"} page {page.pageNo}
           </Typography>
-          {questions.map((question, index) => (
+          {questionStates.map((questionState: QuestionState, index: number) => (
             <ReversedChip
               key={index}
               onClick={() => handleChipClick(index)}
-              label={"Q" + question.name}
-              avatar={
-                <Avatar>{questionStates[index].question.score || "-"}</Avatar>
-              }
-              color={
-                questionStates[index].question.score ? "primary" : "default"
-              }
+              label={"Q" + questionState.question.name}
+              avatar={<Avatar>{questionState.question.score || "-"}</Avatar>}
+              color={questionState.question.score ? "primary" : "default"}
               className={classes.questionBarItem}
             />
           ))}
