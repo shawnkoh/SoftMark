@@ -32,13 +32,15 @@ const DownloadAsPdfPage: React.FC = () => {
       scriptTemplate &&
       imageUrlArray.length === scriptTemplate.pageTemplates.length
     ) {
-      var pdf = new jsPDF();
+      let pdf = new jsPDF();
+      const width = pdf.internal.pageSize.getWidth();
+      const height = pdf.internal.pageSize.getHeight();
       for (let i = 0; i < imageUrlArray.length; i++) {
         if (i > 0) {
           pdf.addPage();
           pdf.setPage(i + 1);
         }
-        pdf.addImage(imageUrlArray[i], "JPEG", 0, 0);
+        pdf.addImage(imageUrlArray[i], "JPEG", 0, 0, width, height);
       }
       pdf.save("scriptTemplate.pdf");
     }
