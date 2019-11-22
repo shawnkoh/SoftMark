@@ -8,20 +8,17 @@ import api from "../../../../api";
 import { Dialog, DialogContent } from "@material-ui/core";
 import SimpleForm, { FormMetadataType } from "components/forms/SimpleForm";
 import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithCloseButton";
+import usePaper from "contexts/PaperContext";
 
 interface OwnProps {
-  paperId: number;
   render: any;
   refreshMarkers: () => void;
 }
 
 type Props = OwnProps;
 
-const AddMarkerModal: React.FC<Props> = ({
-  render,
-  refreshMarkers,
-  paperId
-}) => {
+const AddMarkerModal: React.FC<Props> = ({ render, refreshMarkers }) => {
+  const paper = usePaper();
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -56,7 +53,7 @@ const AddMarkerModal: React.FC<Props> = ({
             onCancel={toggleVisibility}
             onSubmit={(newValues: PaperUserPostData) =>
               api.papers
-                .createPaperUser(paperId, newValues)
+                .createPaperUser(paper.id, newValues)
                 .then(resp => {
                   refreshMarkers();
                   toggleVisibility();

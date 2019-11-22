@@ -127,7 +127,7 @@ const ScriptsSubpage: React.FC = () => {
       isSortable: true
     },
     {
-      name: "Published",
+      name: "Has been published?",
       key: "published"
     },
     {

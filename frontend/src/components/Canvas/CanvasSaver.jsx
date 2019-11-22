@@ -21,11 +21,8 @@ class CanvasSaver extends React.Component {
 
   async componentDidMount() {
     if (this.state.width !== 0 && this.state.height !== 0) {
-      // log stage react wrapper
-      // log Konva.Stage instance
-      console.log(this.refs.stage.getStage());
       const stage = this.refs.stage.getStage();
-      //downloads the stage as a .png file
+      // sends back image dataurl to parent component
       setTimeout(async () => {
         var dataURL = await stage.toDataURL();
         this.props.callBackImageUrl(dataURL);

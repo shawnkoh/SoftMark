@@ -4,9 +4,9 @@ import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { toast } from "react-toastify";
+import usePaper from "contexts/PaperContext";
 
 interface OwnProps {
-  paperId: number;
   setScriptTemplate: React.Dispatch<ScriptTemplateData>;
   clickable?: boolean;
 }
@@ -14,7 +14,8 @@ interface OwnProps {
 type Props = RouteComponentProps & OwnProps;
 
 const UploadScriptTemplateWrapper: React.FC<Props> = props => {
-  const { children, clickable = true, paperId, setScriptTemplate } = props;
+  const paper = usePaper();
+  const { children, clickable = true, setScriptTemplate } = props;
 
   return (
     <DropAreaBase
@@ -30,7 +31,7 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
             toast.error(`Script template has failed to be uploaded.`);
           };
           api.scriptTemplates.postScriptTemplate(
-            paperId,
+            paper.id,
             files[key],
             onSuccess,
             onFail,

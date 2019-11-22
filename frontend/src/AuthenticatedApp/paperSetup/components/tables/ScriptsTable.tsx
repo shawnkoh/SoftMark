@@ -26,11 +26,12 @@ import usePaper from "../../../../contexts/PaperContext";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
-import { toast } from "react-toastify";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 const ScriptsTable: React.FC = () => {
-  const paper = usePaper();
   const classes = useStyles();
+  const paper = usePaper();
+  const { scripts, matchScriptsToStudents } = useScriptsAndStudents();
 
   const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
 
@@ -39,42 +40,21 @@ const ScriptsTable: React.FC = () => {
     setScriptTemplate
   ] = useState<ScriptTemplateData | null>(null);
 
-  const getScriptTemplate = async (paperId: number) => {
-    const data = await api.scriptTemplates.getScriptTemplate(paper.id);
-    setScriptTemplate(data);
-  };
-
-  useEffect(() => {
-    getScriptTemplate(paper.id);
-    setIsLoadingScriptTemplate(false);
-  }, []);
-
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-
-  const getScripts = () => {
-    api.scripts
-      .getScripts(paper.id)
-      .then(resp => {
-        setScripts(resp.data.scripts);
+  const getScriptTemplate = () => {
+    api.scriptTemplates
+      .getScriptTemplate(paper.id)
+      .then(data => {
+        setScriptTemplate(data);
       })
-      .finally(() => setIsLoadingScripts(false));
+      .finally(() => setIsLoadingScriptTemplate(false));
   };
 
-  useEffect(getScripts, []);
-
-  const callbackScripts = () => {
-    setTimeout(() => {
-      getScripts();
-    }, 2000);
-  };
+  useEffect(getScriptTemplate, []);
 
   const [searchText, setSearchText] = useState("");
 
   if (isLoadingScriptTemplate) {
     return <LoadingSpinner loadingMessage={`Loading script template...`} />;
-  } else if (isLoadingScripts) {
-    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
   }
 
   const columns: TableColumn[] = [
@@ -100,6 +80,8 @@ const ScriptsTable: React.FC = () => {
     }
   ];
 
+  const unmatchedScriptsCount = scripts.filter(s => !s.student).length;
+
   const filteredScripts = scripts.filter(script => {
     const { filename, student } = script;
     const matriculationNumber =
@@ -115,7 +97,8 @@ const ScriptsTable: React.FC = () => {
   return (
     <>
       <Typography variant="overline" className={classes.margin}>
-        {scripts.length} script(s) in total
+        {`${scripts.length} script(s) in total ` +
+          `(${unmatchedScriptsCount} unmatched scripts)`}
       </Typography>
       <Grid
         container
@@ -133,10 +116,7 @@ const ScriptsTable: React.FC = () => {
           />
         </Grid>
         <Grid item>
-          <UploadScriptsWrapper
-            paperId={paper.id}
-            refreshScripts={getScripts}
-          >
+          <UploadScriptsWrapper>
             <RoundedButton
               variant="contained"
               color="primary"
@@ -152,19 +132,7 @@ const ScriptsTable: React.FC = () => {
               variant="contained"
               color="primary"
               startIcon={<MatchIcon />}
-              onClick={() => {
-                toast("Attempting to match scripts to students...");
-                api.scripts
-                  .matchScriptsToPaperUsers(paper.id)
-                  .then(resp => {
-                    setScripts([]);
-                    getScripts();
-                    toast.success("Matching algorithm ran successfully");
-                  })
-                  .catch(() => {
-                    toast.error("An error occurred when matching.");
-                  });
-              }}
+              onClick={matchScriptsToStudents}
             >
               Match
             </RoundedButton>
@@ -172,7 +140,6 @@ const ScriptsTable: React.FC = () => {
         </Grid>
         <Grid item>
           <DeleteAllScriptsModal
-            refreshScripts={callbackScripts}
             render={toggleModal => (
               <RoundedButton
                 onClick={toggleModal}
@@ -224,7 +191,6 @@ const ScriptsTable: React.FC = () => {
                   scriptTemplate ? scriptTemplate.pageTemplates.length : -1
                 }
                 script={script}
-                refreshScripts={getScripts}
               />
             ))}
           </TableBody>

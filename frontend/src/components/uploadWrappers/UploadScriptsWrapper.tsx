@@ -2,18 +2,16 @@ import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { toast } from "react-toastify";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import usePaper from "contexts/PaperContext";
 
-interface OwnProps {
-  paperId: number;
-  refreshScripts: () => void;
-}
-
-type Props = RouteComponentProps & OwnProps;
+type Props = RouteComponentProps;
 
 const UploadScriptsWrapper: React.FC<Props> = props => {
-  const { children, paperId, refreshScripts } = props;
+  const paper = usePaper();
+  const { refreshScripts } = useScriptsAndStudents();
+  const { children } = props;
 
   return (
     <DropAreaBase
@@ -21,6 +19,7 @@ const UploadScriptsWrapper: React.FC<Props> = props => {
       clickable
       multiple
       onSelectFiles={async files => {
+        toast("Attempting to upload files");
         const keys = Object.keys(files);
         let scriptUploaded = 0;
         let scriptsLeft = keys.length;
@@ -46,7 +45,7 @@ const UploadScriptsWrapper: React.FC<Props> = props => {
             };
             const atLoadEnd = () => asynchronousPostScript(index + 1, limit);
             await api.scripts.postScript(
-              paperId,
+              paper.id,
               fileName,
               file,
               onSuccess,

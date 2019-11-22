@@ -58,8 +58,11 @@ const MarkersTableRow: React.FC<Props> = props => {
   const deleteAllocation = (allocationId: number) => {
     api.allocations
       .deleteAllocation(allocationId)
-      .then(() => getAllocations())
-      .catch(() => toast.error("Question allocation could not be made."));
+      .then(() => {
+        getAllocations();
+        toast.success("Deallication of question was succesfuk.");
+      })
+      .catch(() => toast.error("Deallocation of question could not be made."));
   };
 
   const postAllocation = (questionTemplate: QuestionTemplateData) => {
@@ -69,10 +72,16 @@ const MarkersTableRow: React.FC<Props> = props => {
     api.allocations
       .createAllocation(questionTemplate.id, allocationPostData)
       .then(res => {
-        toast.success(`Question ${questionTemplate.name} was successfully allocated to ${name}`);
+        toast.success(
+          `Question ${questionTemplate.name} was successfully allocated to ${name}`
+        );
         getAllocations();
       })
-      .catch(() => toast.error(`Question ${questionTemplate.name}could not be allocated to ${name}.`));
+      .catch(() =>
+        toast.error(
+          `Question ${questionTemplate.name} could not be allocated to ${name}.`
+        )
+      );
   };
 
   useEffect(getAllocations, []);
@@ -119,30 +128,30 @@ const MarkersTableRow: React.FC<Props> = props => {
           )}
         </TableCell>
       </TableRow>
-        <TableRow>
-          <TableCell />
-          <TableCell>Total marks: {totalScore}</TableCell>
-          <TableCell colSpan={columns - 2}>
-            {questionTemplates.map(questionTemplate => {
-              const allocationId = allocatedQuestionTemplateIdToAllocationIdMap.get(
-                questionTemplate.id
-              );
-              return (
-                <ReversedChip
-                  avatar={<Avatar>{questionTemplate.score}</Avatar>}
-                  label={"Q" + questionTemplate.name}
-                  color={allocationId ? "primary" : "default"}
-                  className={classes.chip}
-                  onClick={() => {
-                    allocationId
-                      ? deleteAllocation(allocationId)
-                      : postAllocation(questionTemplate);
-                  }}
-                />
-              );
-            })}
-          </TableCell>
-        </TableRow>
+      <TableRow>
+        <TableCell />
+        <TableCell>Total marks: {totalScore}</TableCell>
+        <TableCell colSpan={columns - 2}>
+          {questionTemplates.map(questionTemplate => {
+            const allocationId = allocatedQuestionTemplateIdToAllocationIdMap.get(
+              questionTemplate.id
+            );
+            return (
+              <ReversedChip
+                avatar={<Avatar>{questionTemplate.score}</Avatar>}
+                label={"Q" + questionTemplate.name}
+                color={allocationId ? "primary" : "default"}
+                className={classes.chip}
+                onClick={() => {
+                  allocationId
+                    ? deleteAllocation(allocationId)
+                    : postAllocation(questionTemplate);
+                }}
+              />
+            );
+          })}
+        </TableCell>
+      </TableRow>
     </>
   );
 };

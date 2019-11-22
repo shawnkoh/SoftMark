@@ -18,6 +18,8 @@ import {
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import api from "../../../../api";
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface Props {
   script: ScriptListData;
@@ -26,6 +28,11 @@ interface Props {
 }
 
 const PickStudentModal: React.FC<Props> = props => {
+  const paper = usePaper();
+  const {
+    unmatchedStudents,
+    refreshUnmatchedStudents
+  } = useScriptsAndStudents();
   const { render, callbackScript, script } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -34,20 +41,18 @@ const PickStudentModal: React.FC<Props> = props => {
     script.student
   );
 
-  const [unmatchedStudents, setUnmatchedStudents] = useState<
-    Array<PaperUserListData | null>
-  >([]);
+  const [options, setOptions] = useState<Array<PaperUserListData | null>>([]);
 
   useEffect(() => {
     if (isOpen) {
-      api.paperUsers.getUnmatchedStudents(script.paperId).then(resp => {
-        const options: Array<PaperUserListData | null> = resp.data.paperUsers;
-        if (chosenStudent) {
-          options.push(chosenStudent);
-        }
-        options.push(null);
-        setUnmatchedStudents(options);
-      });
+      const newOptions: Array<PaperUserListData | null> = [
+        ...unmatchedStudents
+      ];
+      if (chosenStudent) {
+        newOptions.push(chosenStudent);
+      }
+      newOptions.push(null);
+      setOptions(newOptions);
     }
   }, [isOpen]);
 
@@ -59,7 +64,7 @@ const PickStudentModal: React.FC<Props> = props => {
           <Autocomplete
             clearOnEscape
             defaultValue={chosenStudent}
-            options={unmatchedStudents}
+            options={options}
             getOptionLabel={(option: PaperUserListData | null) => {
               if (!option) {
                 return "No match";
@@ -99,6 +104,7 @@ const PickStudentModal: React.FC<Props> = props => {
                   toast(
                     `Script ${script.filename} has been updated successfully.`
                   );
+                  refreshUnmatchedStudents();
                 })
                 .catch(errors => {
                   toast.error(

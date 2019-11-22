@@ -21,18 +21,18 @@ import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import useStyles from "./styles";
 import VerificationSwitch from "../../../../components/misc/VerificationSwitch";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   script: ScriptListData;
   scriptTemplatePagesCount: number;
-  refreshScripts: () => void;
 }
 
 type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
-  const { refreshScripts, scriptTemplatePagesCount } = props;
+  const { scriptTemplatePagesCount } = props;
 
   const [script, setScript] = useState(props.script);
 
@@ -120,7 +120,6 @@ const ScriptsTableRow: React.FC<Props> = props => {
         />
         <DeleteScriptModal
           script={script}
-          refreshScripts={refreshScripts}
           render={toggleModal => (
             <Tooltip title={"Delete script"}>
               <IconButton onClick={toggleModal} className={classes.red}>

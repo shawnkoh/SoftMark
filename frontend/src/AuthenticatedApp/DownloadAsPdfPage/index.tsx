@@ -27,7 +27,6 @@ const DownloadAsPdfPage: React.FC = () => {
   const imageUrlArray: string[] = [];
   const callBackImageUrl = async (imageUrl: string) => {
     imageUrlArray.push(imageUrl);
-    console.log(imageUrlArray);
     if (
       scriptTemplate &&
       imageUrlArray.length === scriptTemplate.pageTemplates.length

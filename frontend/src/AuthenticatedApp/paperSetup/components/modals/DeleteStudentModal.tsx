@@ -3,17 +3,18 @@ import { toast } from "react-toastify";
 import api from "../../../../api";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 import { PaperUserListData } from "../../../../types/paperUsers";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   student: PaperUserListData;
-  refreshStudents?: () => void;
   render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const DeleteStudentModal: React.FC<Props> = props => {
-  const { student, refreshStudents, render } = props;
+  const { refreshAllStudents } = useScriptsAndStudents();
+  const { student, render } = props;
   const { user, matriculationNumber } = student;
   const { name } = user;
   const [isOpen, setIsOpen] = useState(false);
@@ -31,9 +32,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
             .discardPaperUser(student.id)
             .then(() => {
               toast.success(`Student ${name} has been deleted successfully.`);
-              if (refreshStudents) {
-                refreshStudents();
-              }
+              refreshAllStudents();
             })
             .catch(errors => {
               toast.error(`Student ${name} could not be deleted.`);

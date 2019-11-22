@@ -1,6 +1,10 @@
-import { IconButton, TableCell, TableRow, Tooltip } from "@material-ui/core";
-import red from "@material-ui/core/colors/red";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import {
+  IconButton,
+  TableCell,
+  TableRow,
+  Tooltip,
+  Typography
+} from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/DeleteForever";
 import EditIcon from "@material-ui/icons/Edit";
 import React, { useState } from "react";
@@ -11,15 +15,14 @@ import useStyles from "./styles";
 
 interface OwnProps {
   student: PaperUserListData;
-  refreshStudents: () => void;
+  matched: boolean;
 }
 
 type Props = OwnProps;
 
 const StudentsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
-
-  const { refreshStudents } = props;
+  const { matched } = props;
   const [student, setStudent] = useState(props.student);
   const { matriculationNumber, user } = student;
   const { name, email } = user;
@@ -29,6 +32,11 @@ const StudentsTableRow: React.FC<Props> = props => {
       <TableCell>{matriculationNumber ? matriculationNumber : ""}</TableCell>
       <TableCell>{name ? name : "-"}</TableCell>
       <TableCell>{email}</TableCell>
+      <TableCell>
+        <Typography className={matched ? classes.green : classes.red}>
+          {matched ? "matched" : "unmatched"}
+        </Typography>
+      </TableCell>
       <TableCell>
         <EditStudentModal
           student={student}
@@ -42,7 +50,6 @@ const StudentsTableRow: React.FC<Props> = props => {
           )}
         />
         <DeleteStudentModal
-          refreshStudents={refreshStudents}
           student={student}
           render={toggleVisibility => (
             <Tooltip title={"Delete student"}>

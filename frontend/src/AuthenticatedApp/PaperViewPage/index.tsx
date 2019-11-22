@@ -13,6 +13,7 @@ import Settings from "@material-ui/icons/Settings";
 
 import useStyles from "./styles";
 import PaperViewHeader from "./components/PaperViewHeader";
+import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
 import SetupPage, {
   ScriptMappingSubpage,
   QuestionAllocationSubpage,
@@ -91,11 +92,11 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   const setupRoute = (
     <Route exact path={`${path}/${SETUP}`}>
       {(routeProps: RouteComponentProps) => (
-        <>
+        <ScriptsAndStudentsProvider>
           <PaperViewHeader />
           <SetupPage {...routeProps} />
           <BottomNav />
-        </>
+        </ScriptsAndStudentsProvider>
       )}
     </Route>
   );
@@ -112,7 +113,11 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     />
   );
   const scriptMappingRoute = (
-    <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
+    <Route path={`${path}/${SETUP}/map`}>
+      <ScriptsAndStudentsProvider>
+        <ScriptMappingSubpage />
+      </ScriptsAndStudentsProvider>
+    </Route>
   );
   const markQuestionRoute = (
     <Route
