@@ -5,9 +5,9 @@ import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 import LoadingSpinner from "components/LoadingSpinner";
 import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
-  refreshStudents?: () => void;
   render: (toggleVisibility: () => void) => ReactNode;
 }
 
@@ -15,7 +15,8 @@ type Props = OwnProps;
 
 const DeleteAllStudentsModal: React.FC<Props> = props => {
   const paper = usePaper();
-  const { refreshStudents, render } = props;
+  const { refreshAllStudents } = useScriptsAndStudents();
+  const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -37,11 +38,7 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
             .catch(errors => {
               toast.error(`Students could not be deleted.`);
             })
-            .finally(() => {
-              if (refreshStudents) {
-                setTimeout(refreshStudents, 3000);
-              }
-            });
+            .finally(refreshAllStudents);
         }}
       />
       {render(toggleVisibility)}

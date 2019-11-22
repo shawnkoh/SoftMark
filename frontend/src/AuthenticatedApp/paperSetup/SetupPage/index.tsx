@@ -13,6 +13,7 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   const history = useHistory();
   const paper = usePaper();
+  const { scripts } = useScriptsAndStudents();
   const classes = useStyles();
 
   const [
@@ -58,36 +60,8 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     getScriptTemplate(paper.id);
   }, [refreshScriptTemplateFlag]);
 
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-
-  const getScripts = async (paperId: number) => {
-    api.scripts
-      .getScripts(paperId)
-      .then(res => {
-        setScripts(res.data.scripts);
-      })
-      .finally(() => setIsLoadingScripts(false));
-  };
-
-  const [refreshScriptsFlag, setRefreshScriptsFlag] = useState(0);
-  const refreshScripts = () => {
-    setTimeout(() => {
-      setRefreshScriptsFlag(refreshScriptsFlag + 1);
-    }, 2000);
-  };
-  useEffect(() => {
-    getScripts(paper.id);
-  }, [refreshScriptsFlag]);
-
-  const [isOpenEditPaperDialog, setOpenEditPaperDialog] = useState(false);
-  const toggleOpenEditPaperDialog = () =>
-    setOpenEditPaperDialog(!isOpenEditPaperDialog);
-
   if (isLoadingScriptTemplate) {
     return <LoadingSpinner loadingMessage="Loading script template..." />;
-  } else if (isLoadingScripts) {
-    return <LoadingSpinner loadingMessage="Loading scripts..." />;
   }
 
   const createGridRow = ({ title, button }) => (
@@ -107,7 +81,6 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       button: (
         <UploadScriptTemplateWrapper
           clickable={!isLoadingScriptTemplate}
-          paperId={paper.id}
           setScriptTemplate={setScriptTemplate}
         >
           <Button
@@ -127,10 +100,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           ? "(" + scripts.length + " scripts)"
           : " (Upload master copy first)"),
       button: (
-        <UploadScriptsWrapper
-          paperId={paper.id}
-          refreshScripts={refreshScripts}
-        >
+        <UploadScriptsWrapper>
           <Button
             color="primary"
             variant="contained"
@@ -143,12 +113,9 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       )
     },
     {
-      title: "Upload student list / nominal roll",
+      title: `Upload student list / nominal roll ".csv" file (Format: matriculation number | name | email)`,
       button: (
-        <UploadNominalRollWrapper
-          paperId={paper.id}
-          clickable={!isLoadingScriptTemplate}
-        >
+        <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
           <Button
             color="primary"
             variant="contained"

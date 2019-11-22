@@ -44,7 +44,6 @@ export async function postStudents(
               if (studentsUploaded % 100 === 0) {
                 setTimeout(refresh, 3000);
               }
-              asynchronousPostStudent(index + 1, limit);
             })
             .catch(() => onFail(name))
             .finally(() => {
@@ -52,6 +51,7 @@ export async function postStudents(
               if (studentsLeft <= 3) {
                 setTimeout(refresh, 3000);
               }
+              asynchronousPostStudent(index + 1, limit);
             });
         }
       }

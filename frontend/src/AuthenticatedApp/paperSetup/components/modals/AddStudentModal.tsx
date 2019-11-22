@@ -8,17 +8,19 @@ import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
 import { PaperUserPostData, PaperUserRole } from "../../../../types/paperUsers";
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
-  paperId: number;
-  refreshStudents: () => void;
   render: (toggleVisibility: () => void) => ReactNode;
 }
 
 type Props = OwnProps;
 
 const AddStudentModal: React.FC<Props> = props => {
-  const { paperId, refreshStudents, render } = props;
+  const paper = usePaper();
+  const { refreshAllStudents } = useScriptsAndStudents();
+  const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -65,9 +67,9 @@ const AddStudentModal: React.FC<Props> = props => {
             onCancel={toggleVisibility}
             onSubmit={(newValues: any) =>
               api.paperUsers
-                .createPaperUser(paperId, newValues)
+                .createPaperUser(paper.id, newValues)
                 .then(resp => {
-                  refreshStudents();
+                  refreshAllStudents();
                   return false;
                 })
                 .catch(() => {

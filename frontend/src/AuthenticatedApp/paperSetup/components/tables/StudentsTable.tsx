@@ -9,18 +9,16 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
-import UploadIcon from "@material-ui/icons/Publish";
+import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useEffect, useState } from "react";
 import api from "../../../../api";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
-import usePaper from "../../../../contexts/PaperContext";
+import useScriptsAndStudents from "../../../../contexts/ScriptsAndStudentsContext";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import AddStudentModal from "../modals/AddStudentModal";
 import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
@@ -28,40 +26,13 @@ import StudentsTableRow from "./StudentsTableRow";
 import useStyles from "./styles";
 
 const StudentsTable: React.FC = () => {
-  const paper = usePaper();
   const classes = useStyles();
+  const scriptsAndStudents = useScriptsAndStudents();
+  const { allStudents, unmatchedStudents } = scriptsAndStudents;
 
-  const [students, setStudents] = useState<PaperUserListData[]>([]);
-  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
-  const [refreshStudentsFlag, setRefreshStudentsFlag] = useState(0);
-
-  const getStudents = () => {
-    api.paperUsers
-      .getStudents(paper.id)
-      .then(resp => {
-        setStudents(resp.data.paperUsers);
-      })
-      .finally(() => setIsLoadingStudents(false));
-  };
-
-  useEffect(getStudents, [refreshStudentsFlag]);
-
-  const refreshStudents = () => {
-    setTimeout(() => {
-      setRefreshStudentsFlag(refreshStudentsFlag + 1);
-    }, 2500);
-  };
-  const callbackStudents = () => {
-    setTimeout(() => {
-      getStudents();
-    }, 2000);
-  };
+  const unmatchedStudentsIds = unmatchedStudents.map(student => student.id);
 
   const [searchText, setSearchText] = useState("");
-
-  if (isLoadingStudents) {
-    return <LoadingSpinner loadingMessage={`Loading students...`} />;
-  }
 
   const columns: TableColumn[] = [
     {
@@ -77,12 +48,16 @@ const StudentsTable: React.FC = () => {
       key: "email"
     },
     {
+      name: "Matching script?",
+      key: "hasMatchingScript"
+    },
+    {
       name: "",
       key: "actions"
     }
   ];
 
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = allStudents.filter(student => {
     const { user, matriculationNumber } = student;
     const matricNo = matriculationNumber || "";
     const studentName = user.name || "";
@@ -99,7 +74,8 @@ const StudentsTable: React.FC = () => {
   return (
     <>
       <Typography variant="overline" className={classes.margin}>
-        {students.length} student(s) in total
+        {`${allStudents.length} student(s) in total ` +
+          `(${unmatchedStudents.length} unmatched students)`}
       </Typography>
       <Grid
         container
@@ -117,23 +93,18 @@ const StudentsTable: React.FC = () => {
           />
         </Grid>
         <Grid item>
-          <UploadNominalRollWrapper
-            paperId={paper.id}
-            refreshStudents={getStudents}
-          >
+          <UploadNominalRollWrapper>
             <RoundedButton
               variant="contained"
               color="primary"
               startIcon={<UploadIcon />}
             >
-              Upload
+              Upload students
             </RoundedButton>
           </UploadNominalRollWrapper>
         </Grid>
         <Grid item>
           <AddStudentModal
-            paperId={paper.id}
-            refreshStudents={getStudents}
             render={toggleVisibility => (
               <RoundedButton
                 onClick={toggleVisibility}
@@ -148,7 +119,6 @@ const StudentsTable: React.FC = () => {
         </Grid>
         <Grid item>
           <DeleteAllStudentsModal
-            refreshStudents={callbackStudents}
             render={toggleVisibility => (
               <RoundedButton
                 onClick={toggleVisibility}
@@ -198,7 +168,7 @@ const StudentsTable: React.FC = () => {
                 <StudentsTableRow
                   key={student.id}
                   student={student}
-                  refreshStudents={refreshStudents}
+                  matched={!unmatchedStudentsIds.includes(student.id)}
                 />
               );
             })}

@@ -47,12 +47,6 @@ const MarkersTableRow: React.FC<Props> = props => {
   const { user } = marker;
   const { name, email } = user;
 
-  const [canSeeAllocatedQuestions, setCanSeeAllocatedQuestions] = useState(
-    true
-  );
-  const toggleCanSeeAllocatedQuestions = () =>
-    setCanSeeAllocatedQuestions(!canSeeAllocatedQuestions);
-
   const [allocations, setAllocations] = useState<AllocationListData[]>([]);
 
   const getAllocations = () => {
@@ -64,20 +58,30 @@ const MarkersTableRow: React.FC<Props> = props => {
   const deleteAllocation = (allocationId: number) => {
     api.allocations
       .deleteAllocation(allocationId)
-      .then(() => getAllocations())
-      .catch(() => toast.error("Question allocation could not be made."));
+      .then(() => {
+        getAllocations();
+        toast.success("Deallication of question was succesfuk.");
+      })
+      .catch(() => toast.error("Deallocation of question could not be made."));
   };
 
-  const postAllocation = (questionTemplateId: number) => {
+  const postAllocation = (questionTemplate: QuestionTemplateData) => {
     const allocationPostData: AllocationPostData = {
       paperUserId: marker.id
     };
     api.allocations
-      .createAllocation(questionTemplateId, allocationPostData)
+      .createAllocation(questionTemplate.id, allocationPostData)
       .then(res => {
+        toast.success(
+          `Question ${questionTemplate.name} was successfully allocated to ${name}`
+        );
         getAllocations();
       })
-      .catch(() => toast.error("Question allocation could not be made."));
+      .catch(() =>
+        toast.error(
+          `Question ${questionTemplate.name} could not be allocated to ${name}.`
+        )
+      );
   };
 
   useEffect(getAllocations, []);
@@ -123,44 +127,31 @@ const MarkersTableRow: React.FC<Props> = props => {
             />
           )}
         </TableCell>
-        <TableCell>
-          <RoundedButton
-            onClick={toggleCanSeeAllocatedQuestions}
-            color="primary"
-            startIcon={
-              canSeeAllocatedQuestions ? <ExpandLessIcon /> : <ExpandMoreIcon />
-            }
-          >
-            {canSeeAllocatedQuestions ? "Hide questions" : "Show questions"}
-          </RoundedButton>
+      </TableRow>
+      <TableRow>
+        <TableCell />
+        <TableCell>Total marks: {totalScore}</TableCell>
+        <TableCell colSpan={columns - 2}>
+          {questionTemplates.map(questionTemplate => {
+            const allocationId = allocatedQuestionTemplateIdToAllocationIdMap.get(
+              questionTemplate.id
+            );
+            return (
+              <ReversedChip
+                avatar={<Avatar>{questionTemplate.score}</Avatar>}
+                label={"Q" + questionTemplate.name}
+                color={allocationId ? "primary" : "default"}
+                className={classes.chip}
+                onClick={() => {
+                  allocationId
+                    ? deleteAllocation(allocationId)
+                    : postAllocation(questionTemplate);
+                }}
+              />
+            );
+          })}
         </TableCell>
       </TableRow>
-      {canSeeAllocatedQuestions && (
-        <TableRow>
-          <TableCell />
-          <TableCell>Total marks: {totalScore}</TableCell>
-          <TableCell colSpan={columns - 2}>
-            {questionTemplates.map(questionTemplate => {
-              const allocationId = allocatedQuestionTemplateIdToAllocationIdMap.get(
-                questionTemplate.id
-              );
-              return (
-                <ReversedChip
-                  avatar={<Avatar>{questionTemplate.score}</Avatar>}
-                  label={"Q" + questionTemplate.name}
-                  color={allocationId ? "primary" : "default"}
-                  className={classes.chip}
-                  onClick={() => {
-                    allocationId
-                      ? deleteAllocation(allocationId)
-                      : postAllocation(questionTemplate.id);
-                  }}
-                />
-              );
-            })}
-          </TableCell>
-        </TableRow>
-      )}
     </>
   );
 };

@@ -1,24 +1,18 @@
 import React from "react";
 import api from "../../api";
 import { DropAreaBase } from "material-ui-file-dropzone";
-import { PaperData } from "backend/src/types/papers";
 import { toast } from "react-toastify";
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface Props {
-  paperId: number;
   clickable?: boolean;
-  refreshScripts?: () => void;
-  refreshStudents?: () => void;
 }
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
-  const {
-    paperId,
-    children,
-    clickable = true,
-    refreshScripts,
-    refreshStudents
-  } = props;
+  const paper = usePaper();
+  const { refreshAllStudents } = useScriptsAndStudents();
+  const { children, clickable = true } = props;
 
   return (
     <DropAreaBase
@@ -28,11 +22,6 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
           const file = files[key];
-          const refresh = () => {
-            if (refreshStudents) {
-              refreshStudents();
-            }
-          };
           const onSuccess = (name: string) => {
             toast.success(`Account for student ${name} created successfully.`);
           };
@@ -40,11 +29,11 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
             toast.error(`Account for student ${name} could not be created.`);
           };
           api.paperUsers.postStudents(
-            paperId,
+            paper.id,
             file,
             onSuccess,
             onFail,
-            refresh
+            refreshAllStudents
           );
         });
       }}

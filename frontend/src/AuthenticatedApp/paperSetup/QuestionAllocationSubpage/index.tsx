@@ -57,17 +57,14 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   const [isLoadingQuestionTemplates, setIsLoadingQuestionTemplates] = useState(
     true
   );
-  const [
-    refreshQuestionTemplatesFlag,
-    setRefreshQuestionTemplatesFlag
-  ] = useState(0);
+
   const getQuestionTemplates = () => {
     api.questionTemplates
       .getRootQuestionTemplates(paper.id)
       .then(resp => setQuestionTemplates(resp.data.rootQuestionTemplates))
       .finally(() => setIsLoadingQuestionTemplates(false));
   };
-  useEffect(getQuestionTemplates, [refreshQuestionTemplatesFlag]);
+  useEffect(getQuestionTemplates, []);
   /** Question template hooks end */
 
   /** Markers hooks start */
@@ -118,12 +115,14 @@ const QuestionAllocationPage: React.FC<Props> = () => {
       <Header title="Question allocation" />
       <Container maxWidth={false} className={classes.container}>
         <AddMarkerModal
-          paperId={paper.id}
           refreshMarkers={refreshMarkers}
           render={toggleModal => (
             <Box display="flex" justifyContent="space-between">
               <Typography variant="overline">
                 {markers.length} marker(s) in total
+              </Typography>
+              <Typography variant="overline">
+                {`Click on chips to allocate questions to markers.`}
               </Typography>
               <Button
                 onClick={toggleModal}

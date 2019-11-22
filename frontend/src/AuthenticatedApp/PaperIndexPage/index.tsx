@@ -10,11 +10,9 @@ import {
   Chip
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import blue from "@material-ui/core/colors/blue";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { PaperData } from "backend/src/types/papers";
-import clsx from "clsx";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";

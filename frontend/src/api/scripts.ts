@@ -99,10 +99,8 @@ export async function postScript(
         imageUrls: await Promise.all(pages)
       };
       createScript(paper_id, scriptPostData)
-        .then(res => {
-          onSuccess();
-        })
-        .catch(() => onFail())
+        .then(onSuccess)
+        .catch(onFail)
         .finally(atLoadEnd);
     });
   };

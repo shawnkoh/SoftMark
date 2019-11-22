@@ -5,15 +5,16 @@ import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 import api from "../../../../api";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface Props {
   script: ScriptListData;
   render: any;
-  refreshScripts?: () => void;
 }
 
 const DeleteScriptModal: React.FC<Props> = props => {
-  const { script, render, refreshScripts } = props;
+  const { refreshScripts } = useScriptsAndStudents();
+  const { script, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
@@ -28,9 +29,8 @@ const DeleteScriptModal: React.FC<Props> = props => {
           api.scripts
             .discardScript(script.id)
             .then(() => {
-              if (refreshScripts) {
-                refreshScripts();
-              }
+              refreshScripts();
+              toggleVisibility();
               toast(`Script ${script.filename} has been deleted successfully.`);
             })
             .catch(errors => {
