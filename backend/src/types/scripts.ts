@@ -1,5 +1,5 @@
 import { DiscardableData, isDiscardableData } from "./entities";
-import { isPageListData, PageListData } from "./pages";
+import { isPageListData, PageData } from "./pages";
 import { PaperUserListData } from "./paperUsers";
 import { isQuestionListData, QuestionListData } from "./questions";
 
@@ -28,7 +28,7 @@ export interface ScriptListData extends DiscardableData {
 }
 
 export interface ScriptData extends ScriptListData {
-  pages: PageListData[];
+  pages: PageData[];
   questions: QuestionListData[];
 }
 

@@ -28,13 +28,10 @@ export async function matchScriptsToPaperUsers(
   return client.patch(`/papers/${id}/scripts/match`, {}, { timeout: 120000 });
 }
 
-export async function getScript(id: number): Promise<ScriptData | null> {
-  try {
-    const response = await client.get<{ script: ScriptData }>(`${URL}/${id}`);
-    return response.data.script;
-  } catch (error) {
-    return null;
-  }
+export async function getScript(
+  id: number
+): Promise<AxiosResponse<{ script: ScriptData }>> {
+  return client.get(`${URL}/${id}`);
 }
 
 export async function viewScript(id: number): Promise<ScriptViewData | null> {

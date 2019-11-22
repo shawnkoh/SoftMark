@@ -1,8 +1,7 @@
 import { Dialog, DialogContent } from "@material-ui/core";
-import { PaperPostData } from "backend/src/types/papers";
 import React, { useState } from "react";
 import * as Yup from "yup";
-import { PaperPatchData, PaperData } from "backend/src/types/papers";
+import { PaperPatchData } from "backend/src/types/papers";
 import { editPaper } from "../../../api/papers";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import SimpleForm, {

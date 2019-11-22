@@ -172,7 +172,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {setupRoute}
           {gradingRoute}
           {scriptsListingRoute}
-          <Route path={`${path}/save_script`} component={DownloadAsPdfPage} />
+          <Route path={`${path}/save_scripts`} component={DownloadAsPdfPage} />
         </Switch>
       )}
       {role === PaperUserRole.Marker && (
@@ -203,8 +203,10 @@ const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
   const paper = usePaper();
   const role = paper.role;
 
+  //TODO: get scriptID of the student
+
   return role === PaperUserRole.Student ? (
-    <Redirect to={`/papers/${paper.id}/${SCRIPTS}`} />
+    <Redirect to={`/papers/${paper.id}/${SCRIPTS}/scriptId`} />
   ) : (
     <div />
   );

@@ -1,7 +1,6 @@
 import { ScriptListData } from "backend/src/types/scripts";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 
 import api from "../../../../api";

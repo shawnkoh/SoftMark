@@ -10,6 +10,7 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
+import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
@@ -23,9 +24,11 @@ import usePaper from "../../../contexts/PaperContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
+import { useHistory } from "react-router";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
   const paper = usePaper();
 
   const ASC = "asc";
@@ -189,6 +192,16 @@ const ScriptsSubpage: React.FC = () => {
               </RoundedButton>
             )}
           />
+        </Grid>
+        <Grid item>
+          <RoundedButton
+            variant="contained"
+            color="primary"
+            onClick={() => history.push(`/papers/${paper.id}/save_scripts`)}
+            startIcon={<DownloadIcon />}
+          >
+            Download all scripts
+          </RoundedButton>
         </Grid>
       </Grid>
       <Paper className={clsx(classes.margin, classes.tableWrapper)}>

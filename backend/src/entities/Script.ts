@@ -152,7 +152,7 @@ export class Script extends Discardable {
 
     return {
       ...(await this.getListData()),
-      pages: await Promise.all(pages.map(page => page.getListData())),
+      pages: await Promise.all(pages.map(page => page.getData())),
       questions: await Promise.all(
         questions.map(question => question.getListData())
       )
