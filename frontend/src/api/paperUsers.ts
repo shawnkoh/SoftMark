@@ -1,6 +1,10 @@
 import { AxiosResponse } from "axios";
 import { PaperData } from "backend/src/types/papers";
-import { InviteData, InvitePostData } from "backend/src/types/paperUsers";
+import {
+  InviteData,
+  InvitePostData,
+  NominalRollPostData
+} from "backend/src/types/paperUsers";
 import {
   PaperUserData,
   PaperUserListData,
@@ -9,65 +13,18 @@ import {
 } from "../types/paperUsers";
 import client from "./client";
 import { AuthenticationData } from "backend/src/types/auth";
-import { timeout } from "q";
 
 const URL = "/paper_users";
 
-export async function postStudents(
-  paperId: number,
-  file: File,
-  onSuccess: (name: string) => void,
-  onFail: (name: string) => void,
-  refresh: () => void
-) {
-  const reader = new FileReader();
-  reader.onloadend = async (e: any) => {
-    const rows: string[] = e.target.result.split("\n");
-    let studentsUploaded = 0;
-    let studentsLeft = rows.length;
-    const asynchronousPostStudent = async (index: number, limit: number) => {
-      if (index < limit) {
-        const row = rows[index];
-        const cells = row.split("\r")[0].split(",");
-        if (cells.length >= 3) {
-          const name = cells[1];
-          const paperUserPostData: PaperUserPostData = {
-            matriculationNumber: cells[0],
-            name: name,
-            email: cells[2],
-            role: PaperUserRole.Student
-          };
-          return createPaperUser(paperId, paperUserPostData)
-            .then(() => {
-              onSuccess(name);
-              studentsUploaded++;
-              if (studentsUploaded % 100 === 0) {
-                setTimeout(refresh, 3000);
-              }
-            })
-            .catch(() => onFail(name))
-            .finally(() => {
-              studentsLeft--;
-              if (studentsLeft <= 3) {
-                setTimeout(refresh, 3000);
-              }
-              asynchronousPostStudent(index + 1, limit);
-            });
-        }
-      }
-    };
-    const threads = 5;
-    let prevUpperLimitForIndex = 0;
-    let upperLimitForIndex = 0;
-    for (let i = 1; i <= threads; i++) {
-      upperLimitForIndex = Math.floor((i / threads) * rows.length);
-      if (prevUpperLimitForIndex !== upperLimitForIndex) {
-        asynchronousPostStudent(prevUpperLimitForIndex, upperLimitForIndex);
-        prevUpperLimitForIndex = upperLimitForIndex;
-      }
-    }
-  };
-  reader.readAsText(file);
+export async function createStudents(
+  id: number,
+  nominalRollPostData: NominalRollPostData
+): Promise<
+  AxiosResponse<{ successfullyAdded: string; failedToBeAdded: string }>
+> {
+  return client.post(`papers/${id}/multiple_students`, nominalRollPostData, {
+    timeout: 1000000
+  });
 }
 
 export async function createPaperUser(

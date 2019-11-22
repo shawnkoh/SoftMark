@@ -39,7 +39,7 @@ export class ScriptTemplate extends Discardable {
   @Column()
   @IsNotEmpty()
   @IsString()
-  @Validate(IsUniqueSha256)
+  //@Validate(IsUniqueSha256)
   sha256: string;
 
   @OneToMany(type => PageTemplate, pageTemplate => pageTemplate.scriptTemplate)

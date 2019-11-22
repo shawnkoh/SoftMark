@@ -19,6 +19,10 @@ export interface PaperUserPostData {
   matriculationNumber?: string;
 }
 
+export interface NominalRollPostData {
+  csvFile: string;
+}
+
 export type PaperUserPatchData = Partial<{
   role: PaperUserRole;
   matriculationNumber: string | null;

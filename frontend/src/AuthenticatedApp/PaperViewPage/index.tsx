@@ -92,11 +92,11 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   const setupRoute = (
     <Route exact path={`${path}/${SETUP}`}>
       {(routeProps: RouteComponentProps) => (
-        <ScriptsAndStudentsProvider>
+        <>
           <PaperViewHeader />
           <SetupPage {...routeProps} />
           <BottomNav />
-        </ScriptsAndStudentsProvider>
+        </>
       )}
     </Route>
   );
@@ -113,11 +113,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     />
   );
   const scriptMappingRoute = (
-    <Route path={`${path}/${SETUP}/map`}>
-      <ScriptsAndStudentsProvider>
-        <ScriptMappingSubpage />
-      </ScriptsAndStudentsProvider>
-    </Route>
+    <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
   );
   const markQuestionRoute = (
     <Route
@@ -206,30 +202,8 @@ const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
   const { path } = match;
   const paper = usePaper();
   const role = paper.role;
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
 
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  const getScriptTemplate = async () => {
-    const scriptTemplate = await api.scriptTemplates.getScriptTemplate(
-      paper.id
-    );
-    setScriptTemplate(scriptTemplate);
-    setIsLoadingScriptTemplate(false);
-  };
-
-  useEffect(() => {
-    getScriptTemplate();
-  }, []);
-
-  if (isLoadingScriptTemplate) {
-    return <LoadingSpinner />;
-  }
-
-  return role === PaperUserRole.Student && scriptTemplate ? (
+  return role === PaperUserRole.Student ? (
     <Redirect to={`/papers/${paper.id}/${SCRIPTS}`} />
   ) : (
     <div />

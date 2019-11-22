@@ -27,35 +27,15 @@ import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
+  const { scriptTemplate } = useScriptTemplate();
   const { scripts, matchScriptsToStudents } = useScriptsAndStudents();
 
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
-
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  const getScriptTemplate = () => {
-    api.scriptTemplates
-      .getScriptTemplate(paper.id)
-      .then(data => {
-        setScriptTemplate(data);
-      })
-      .finally(() => setIsLoadingScriptTemplate(false));
-  };
-
-  useEffect(getScriptTemplate, []);
-
   const [searchText, setSearchText] = useState("");
-
-  if (isLoadingScriptTemplate) {
-    return <LoadingSpinner loadingMessage={`Loading script template...`} />;
-  }
 
   const columns: TableColumn[] = [
     {

@@ -22,7 +22,7 @@ import {
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import { generatePages, isPageValid } from "../utils/questionTemplate";
-import { sortByPageInfo } from "../utils/sorts";
+import { sortByCreatedAt } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -138,7 +138,7 @@ export async function index(request: Request, response: Response) {
   try {
     const data = (await Promise.all(
       questionTemplates.map(questionTemplate => questionTemplate.getData())
-    )).sort(sortByPageInfo);
+    )).sort(sortByCreatedAt);
     response.status(200).json({ questionTemplates: data });
   } catch (error) {
     return response.sendStatus(500);

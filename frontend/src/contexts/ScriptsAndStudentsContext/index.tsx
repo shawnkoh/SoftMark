@@ -27,7 +27,9 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   const { paper_id } = useParams();
 
   if (!paper_id) {
-    throw new Error("StudentsProvider cannnot be used without paper_id");
+    throw new Error(
+      "ScriptsAndStudentsProvider cannnot be used without paper_id"
+    );
   }
 
   const paperId = Number(paper_id);
@@ -36,9 +38,6 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
 
   const [allStudents, setAllStudents] = useState<PaperUserListData[]>([]);
   const [isLoadingAllStudents, setIsLoadingAllStudents] = useState(true);
-  const [refreshAllStudentsFlag, setRefreshAllStudentsFlag] = useState(0);
-  const refreshAllStudents = () =>
-    setRefreshAllStudentsFlag(refreshAllStudentsFlag + 1);
 
   const getStudents = () => {
     api.paperUsers
@@ -53,17 +52,11 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
       .finally(() => setIsLoadingAllStudents(false));
   };
 
-  useEffect(getStudents, [paper_id, refreshAllStudentsFlag]);
+  useEffect(getStudents, [paper_id]);
 
   const [unmatchedStudents, setUnmatchedStudents] = useState<
     PaperUserListData[]
   >([]);
-  const [
-    refreshUnmatchedStudentsFlag,
-    setRefreshUnmatchedStudentsFlag
-  ] = useState(0);
-  const refreshUnmatchedStudents = () =>
-    setRefreshUnmatchedStudentsFlag(refreshUnmatchedStudentsFlag + 1);
 
   const getUnmatchedStudents = () => {
     api.paperUsers.getUnmatchedStudents(paperId).then(resp => {
@@ -71,7 +64,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
     });
   };
 
-  useEffect(getUnmatchedStudents, [paper_id, refreshUnmatchedStudentsFlag]);
+  useEffect(getUnmatchedStudents, [paper_id]);
 
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);

@@ -19,15 +19,8 @@ export async function createScriptTemplate(
 
 export async function getScriptTemplate(
   paperId: number
-): Promise<ScriptTemplateData | null> {
-  try {
-    const response = await client.get(
-      `/papers/${paperId}/script_templates/active`
-    );
-    return response.data.scriptTemplate;
-  } catch (error) {
-    return null;
-  }
+): Promise<AxiosResponse<{ scriptTemplate: ScriptTemplateData }>> {
+  return client.get(`/papers/${paperId}/script_templates/active`);
 }
 
 export async function discardScriptTemplate(
@@ -46,8 +39,7 @@ export async function postScriptTemplate(
   paper_id: number,
   file: File,
   onSuccess: () => void,
-  onFail: () => void,
-  callbackScriptData?: React.Dispatch<ScriptTemplateData>
+  onFail: () => void
 ) {
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -62,12 +54,7 @@ export async function postScriptTemplate(
         sha256: sha256(pdfAsString)
       };
       createScriptTemplate(paper_id, scriptTemplatePostData)
-        .then(res => {
-          onSuccess();
-          if (callbackScriptData) {
-            callbackScriptData(res.data.scriptTemplate);
-          }
-        })
+        .then(onSuccess)
         .catch(errors => {
           onFail();
         });

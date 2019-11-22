@@ -1,28 +1,10 @@
 import React, { useState, useEffect } from "react";
-import api from "../../api";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { CanvasSaver } from "../../components/Canvas";
-import usePaper from "../../contexts/PaperContext";
+import useScriptTemplate from "../../contexts/ScriptTemplateContext";
 import jsPDF from "jspdf";
 
 const DownloadAsPdfPage: React.FC = () => {
-  const paper = usePaper();
-
-  /** Script template hooks start (should be changed to script) */
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-
-  const getScriptTemplate = () => {
-    api.scriptTemplates
-      .getScriptTemplate(paper.id)
-      .then(resp => setScriptTemplate(resp))
-      .finally(() => setIsLoadingScriptTemplate(false));
-  };
-
-  useEffect(getScriptTemplate, []);
+  const { scriptTemplate } = useScriptTemplate();
 
   const imageUrlArray: string[] = [];
   const callBackImageUrl = async (imageUrl: string) => {
@@ -45,9 +27,7 @@ const DownloadAsPdfPage: React.FC = () => {
     }
   };
 
-  if (isLoadingScriptTemplate) {
-    return <div>loading</div>;
-  } else if (!scriptTemplate) {
+  if (!scriptTemplate) {
     return <div>template doesnt exist</div>;
   }
 
