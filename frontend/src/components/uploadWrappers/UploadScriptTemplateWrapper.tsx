@@ -5,9 +5,9 @@ import { DropAreaBase } from "material-ui-file-dropzone";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import { toast } from "react-toastify";
 import usePaper from "contexts/PaperContext";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 interface OwnProps {
-  setScriptTemplate: React.Dispatch<ScriptTemplateData>;
   clickable?: boolean;
 }
 
@@ -15,16 +15,18 @@ type Props = RouteComponentProps & OwnProps;
 
 const UploadScriptTemplateWrapper: React.FC<Props> = props => {
   const paper = usePaper();
-  const { children, clickable = true, setScriptTemplate } = props;
+  const { refreshScriptTemplate } = useScriptTemplate();
+  const { children, clickable = true } = props;
 
   return (
     <DropAreaBase
       accept={".pdf"}
-      clickable={clickable}
-      single
+      clickable
+      multiple={false}
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
           const onSuccess = () => {
+            refreshScriptTemplate();
             toast.success(`Script template has been uploaded successfully.`);
           };
           const onFail = () => {
@@ -34,8 +36,7 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
             paper.id,
             files[key],
             onSuccess,
-            onFail,
-            setScriptTemplate
+            onFail
           );
         });
       }}

@@ -12,7 +12,11 @@ import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity
 import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
-import { PaperUserPostData, PaperUserRole } from "../types/paperUsers";
+import {
+  PaperUserPostData,
+  PaperUserRole,
+  NominalRollPostData
+} from "../types/paperUsers";
 import {
   AccessTokenSignedPayload,
   InviteTokenSignedPayload
@@ -424,5 +428,89 @@ export async function discardStudents(request: Request, response: Response) {
     response.sendStatus(204);
   } catch (error) {
     response.sendStatus(400);
+  }
+}
+
+export async function createMultipleStudents(
+  request: Request,
+  response: Response
+) {
+  try {
+    const payload = response.locals.payload as AccessTokenSignedPayload;
+    const paperId = request.params.id;
+    const allowed = await allowedRequester(
+      payload.userId,
+      paperId,
+      PaperUserRole.Owner
+    );
+    if (!allowed) {
+      return response.sendStatus(404);
+    }
+    const { paper } = allowed;
+    const { csvFile } = request.body as NominalRollPostData;
+    let successfullyAdded = "";
+    let failedToBeAdded = "";
+    const rows: string[] = csvFile.split("\n");
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.split("\r")[0].split(",");
+      if (cells.length >= 3) {
+        const matriculationNumber = cells[0];
+        const name = cells[1];
+        const email = cells[2];
+        const role = PaperUserRole.Student;
+        const studentDetails = matriculationNumber + " " + name + " " + email;
+
+        const user =
+          (await getRepository(User).findOne({
+            email,
+            discardedAt: IsNull()
+          })) || new User(email, undefined, name);
+        const userErrors = await validate(user);
+
+        const paperUser =
+          (await getRepository(PaperUser).findOne(
+            {
+              user,
+              role,
+              discardedAt: Not(IsNull())
+            },
+            { relations: ["user", "paper"] }
+          )) || new PaperUser(paper, user, role, false, matriculationNumber);
+
+        paperUser.matriculationNumber = matriculationNumber || null;
+        paperUser.discardedAt = null;
+        paperUser.acceptedInvite = false;
+        const paperUserErrors = await validate(paperUser);
+        //this is not good practice for error handling, but it will do for now
+        if (userErrors.length === 0 && paperUserErrors.length === 0) {
+          try {
+            await getManager().transaction(async manager => {
+              await getRepository(User).save(user);
+              await getRepository(PaperUser).save(paperUser);
+            });
+            successfullyAdded += studentDetails + "\n";
+          } catch (error) {
+            failedToBeAdded +=
+              studentDetails + " (Error: Student has already been added)\n";
+          }
+        } else {
+          if (userErrors.length > 0) {
+            failedToBeAdded +=
+              studentDetails + " (Error: " + userErrors[0] + ")\n";
+          } else {
+            failedToBeAdded +=
+              studentDetails + " (Error: " + paperUserErrors[0] + ")\n";
+          }
+        }
+      }
+    }
+
+    return response.status(200).json({
+      successfullyAdded: successfullyAdded ? successfullyAdded : "None",
+      failedToBeAdded: failedToBeAdded ? failedToBeAdded : "None"
+    });
+  } catch (error) {
+    return response.sendStatus(400);
   }
 }

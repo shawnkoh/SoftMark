@@ -8,6 +8,8 @@ import PaperIndex from "./PaperIndexPage";
 import PaperView from "./PaperViewPage";
 import theme from "./theme";
 import { PaperProvider } from "contexts/PaperContext";
+import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
+import { ScriptTemplateProvider } from "contexts/ScriptTemplateContext";
 
 const AuthenticatedApp: React.FC = () => {
   return (
@@ -18,7 +20,11 @@ const AuthenticatedApp: React.FC = () => {
         <Route exact path="/papers" component={PaperIndex} />
         <Route path="/papers/:paper_id">
           <PaperProvider>
-            <PaperView />
+            <ScriptTemplateProvider>
+              <ScriptsAndStudentsProvider>
+                <PaperView />
+              </ScriptsAndStudentsProvider>
+            </ScriptTemplateProvider>
           </PaperProvider>
         </Route>
         <Route exact path="/invite/:token" component={InvitePage} />

@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useHistory, RouteComponentProps } from "react-router";
-import { Route, Switch } from "react-router-dom";
+import React from "react";
+import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
-import { ScriptListData } from "backend/src/types/scripts";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import api from "../../../api";
-import usePaper from "../../../contexts/PaperContext";
 
 import { Button, Box, Container, Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import LoadingSpinner from "../../../components/LoadingSpinner";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,35 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
-  const history = useHistory();
-  const paper = usePaper();
-  const { scripts } = useScriptsAndStudents();
   const classes = useStyles();
-
-  const [
-    scriptTemplate,
-    setScriptTemplate
-  ] = useState<ScriptTemplateData | null>(null);
-  const [isLoadingScriptTemplate, setIsLoadingScriptTemplate] = useState(true);
-  const [refreshScriptTemplateFlag, setRefreshScriptTemplateFlag] = useState(
-    true
-  );
-  const refreshScriptTemplate = () =>
-    setRefreshScriptTemplateFlag(!refreshScriptTemplateFlag);
-
-  const getScriptTemplate = async (id: number) => {
-    const data = await api.scriptTemplates.getScriptTemplate(id);
-    setScriptTemplate(data);
-    setIsLoadingScriptTemplate(false);
-  };
-
-  useEffect(() => {
-    getScriptTemplate(paper.id);
-  }, [refreshScriptTemplateFlag]);
-
-  if (isLoadingScriptTemplate) {
-    return <LoadingSpinner loadingMessage="Loading script template..." />;
-  }
+  const { scriptTemplate } = useScriptTemplate();
+  const { scripts } = useScriptsAndStudents();
 
   const createGridRow = ({ title, button }) => (
     <Grid item xs={12}>
@@ -79,10 +48,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     {
       title: "Upload master copy",
       button: (
-        <UploadScriptTemplateWrapper
-          clickable={!isLoadingScriptTemplate}
-          setScriptTemplate={setScriptTemplate}
-        >
+        <UploadScriptTemplateWrapper>
           <Button
             color="primary"
             variant="contained"
@@ -115,7 +81,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     {
       title: `Upload student list / nominal roll ".csv" file (Format: matriculation number | name | email)`,
       button: (
-        <UploadNominalRollWrapper clickable={!isLoadingScriptTemplate}>
+        <UploadNominalRollWrapper>
           <Button
             color="primary"
             variant="contained"
@@ -153,7 +119,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           to={`${match.url}/template`}
           color="primary"
           variant="contained"
-          disabled={isLoadingScriptTemplate || !scriptTemplate}
+          disabled={!scriptTemplate}
           className={classes.button}
         >
           Set up
@@ -170,7 +136,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
           to={`${match.url}/allocate`}
           color="primary"
           variant="contained"
-          disabled={isLoadingScriptTemplate || !scriptTemplate}
+          disabled={!scriptTemplate}
           className={classes.button}
         >
           Allocate

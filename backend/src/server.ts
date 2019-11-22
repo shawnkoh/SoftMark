@@ -32,6 +32,7 @@ export class ApiServer {
     app.use("/", routes);
 
     this.server = app.listen(port);
+    this.server.timeout = 1200000;
   }
 
   async close() {

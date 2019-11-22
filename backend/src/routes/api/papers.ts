@@ -19,6 +19,10 @@ router.get(
   PaperUsersController.getUnmatchedStudents
 );
 router.post("/:id/users", PaperUsersController.create);
+router.post(
+  "/:id/multiple_students",
+  PaperUsersController.createMultipleStudents
+);
 router.delete("/:id/all_students", PaperUsersController.discardStudents);
 
 router.post("/", PapersController.create);

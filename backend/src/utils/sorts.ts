@@ -94,3 +94,14 @@ export function sortByPageInfo<A extends withPageInfo, B extends withPageInfo>(
     return nameA.localeCompare(nameB);
   }
 }
+
+interface withCreatedAt {
+  createdAt: Date;
+}
+
+export function sortByCreatedAt<
+  A extends withCreatedAt,
+  B extends withCreatedAt
+>(a: A, b: B) {
+  return a.createdAt.getTime() - b.createdAt.getTime();
+}
