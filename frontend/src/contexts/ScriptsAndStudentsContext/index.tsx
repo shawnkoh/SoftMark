@@ -1,7 +1,7 @@
 import { PaperUserListData } from "../../types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router";
+import { useParams } from "react-router";
 import { toast } from "react-toastify";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";

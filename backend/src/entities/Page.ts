@@ -47,7 +47,6 @@ export class Page extends Discardable {
 
     return {
       ...(await this.getListData()),
-      scriptId: this.scriptId,
       annotations: await Promise.all(
         annotations.map(annotation => annotation.getListData())
       )

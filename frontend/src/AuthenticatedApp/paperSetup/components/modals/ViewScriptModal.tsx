@@ -25,9 +25,12 @@ const ViewScriptModal: React.FC<Props> = props => {
 
   const getScript = async (scriptId: number) => {
     setIsLoading(true);
-    const data = await api.scripts.getScript(scriptId);
-    setScriptData(data);
-    setIsLoading(false);
+    api.scripts
+      .getScript(scriptId)
+      .then(resp => {
+        setScriptData(resp.data.script);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {

@@ -19,29 +19,18 @@ class CanvasSaver extends React.Component {
     this.handleLoad = this.handleLoad.bind(this);
   }
 
-  async componentDidMount() {
-    if (this.state.width !== 0 && this.state.height !== 0) {
+  async componentDidMount() {   
       const stage = this.refs.stage.getStage();
       // sends back image dataurl to parent component
+      // if (this.state.width !== 0 && this.state.height !== 0) { will add this back later
       setTimeout(async () => {
-        var dataURL = await stage.toDataURL();
-        this.props.callBackImageUrl(dataURL);
+          var dataURL = await stage.toDataURL();
+          this.props.callBackImageUrl(dataURL);
       }, 3000);
-    }
   }
 
   componentDidUpdate() {
-    if (this.state.width !== 0 && this.state.height !== 0) {
-
-      const stage = this.refs.stage.getStage();
-
-      //downloads the stage as a imageDataUrl
-      setTimeout(async () => {
-        var dataURL = await stage.toDataURL();
-        this.props.callBackImageUrl(dataURL);
-      }, 3000);
-      
-    }
+    // shouldnt send the data URL back more than once
   }
 
   async componentWillUnmount() {}

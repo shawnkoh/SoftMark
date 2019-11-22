@@ -1,6 +1,6 @@
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Box, Typography } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 
 interface OwnProps {
   index: any;
