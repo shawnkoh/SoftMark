@@ -1,28 +1,22 @@
 import { Avatar } from "@material-ui/core";
-import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
 import React from "react";
 import { useDrag } from "react-dnd";
 import ReversedChip from "../../../../components/ReversedChip";
-import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
 import useStyles from "./useStyles";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 
-interface ScriptTemplateQuestionProps {
-  index: number;
-  questionTemplate: QuestionTemplateLeafData;
+interface QuestionGradeboxProps {
+  id: number;
   imgScale: number;
 }
 
-type Props = ScriptTemplateQuestionProps;
+type Props = QuestionGradeboxProps;
 
-const ScriptTemplateQuestion: React.FC<Props> = ({
-  index,
-  questionTemplate,
-  imgScale
-}) => {
+const ScriptTemplateQuestion: React.FC<Props> = ({ id, imgScale }) => {
   const classes = useStyles();
-  const [editOpen, setEditOpen] = React.useState(false);
+  const { leafQuestions, updateLeaf } = useScriptSetup();
   const [{ isDragging }, drag] = useDrag({
-    item: { ...questionTemplate, index, type: "questionBox" },
+    item: { ...leafQuestions[id], id, type: "questionBox" },
     collect: monitor => ({
       isDragging: monitor.isDragging()
     })
@@ -32,31 +26,18 @@ const ScriptTemplateQuestion: React.FC<Props> = ({
     return <div ref={drag} />;
   }
   return (
-    <>
-      <QuestionTemplateDialog
-        mode="editLeaf"
-        questionTemplateId={questionTemplate.id}
-        open={editOpen}
-        handleClose={() => setEditOpen(false)}
-        initialValues={{
-          title: questionTemplate.name,
-          score: questionTemplate.score,
-          pageCovered: questionTemplate.pageCovered
-        }}
-      />
-      <ReversedChip
-        ref={drag}
-        avatar={<Avatar>{questionTemplate.score || "-"}</Avatar>}
-        label={"Q" + questionTemplate.name}
-        onClick={() => setEditOpen(true)}
-        color="primary"
-        className={classes.chip}
-        style={{
-          top: questionTemplate.topOffset * imgScale,
-          left: questionTemplate.leftOffset * imgScale
-        }}
-      />
-    </>
+    <ReversedChip
+      ref={drag}
+      avatar={<Avatar>{leafQuestions[id].score || "-"}</Avatar>}
+      label={"Q" + leafQuestions[id].name}
+      onClick={() => updateLeaf(id)}
+      color="primary"
+      className={classes.chip}
+      style={{
+        top: leafQuestions[id].topOffset * imgScale,
+        left: leafQuestions[id].leftOffset * imgScale
+      }}
+    />
   );
 };
 
