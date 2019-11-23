@@ -146,7 +146,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
     }
   };
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} disableBackdropClick>
       <Formik
         initialValues={initialValues}
         onSubmit={(values, actions) => {
