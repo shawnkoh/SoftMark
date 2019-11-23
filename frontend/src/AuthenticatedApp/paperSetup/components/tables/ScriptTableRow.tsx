@@ -34,7 +34,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
   const { scriptTemplatePagesCount } = props;
 
-  const [script, setScript] = useState(props.script);
+  const [script, setScript] = useState<ScriptListData>(props.script);
 
   const patchScript = newValues => {
     newValues.studentId = script.student ? script.student.id : null;
