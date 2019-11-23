@@ -108,6 +108,7 @@ export class Script extends Discardable {
       this.questions ||
       (await getRepository(Question).find({
         where: {
+          scriptId: this.id,
           questionTemplateId: questionTemplateIds,
           discardedAt: IsNull()
         },
@@ -144,7 +145,6 @@ export class Script extends Discardable {
   };
 
   getListData = async () => {
-
     const paperUser = this.studentId
       ? await getRepository(PaperUser).findOne(this.studentId)
       : null;
@@ -155,13 +155,17 @@ export class Script extends Discardable {
     });
 
     let awardedMarks = 0;
-    
+
     if (scriptTemplate) {
       const questionTemplates = await getRepository(QuestionTemplate).find({
         where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
       });
       const questions = await getRepository(Question).find({
-        where: { questionTemplate: questionTemplates, discardedAt: IsNull() }
+        where: {
+          scriptId: this.id,
+          questionTemplate: questionTemplates,
+          discardedAt: IsNull()
+        }
       });
       const marks = await getRepository(Mark).find({
         where: { question: questions, discardedAt: IsNull() }
