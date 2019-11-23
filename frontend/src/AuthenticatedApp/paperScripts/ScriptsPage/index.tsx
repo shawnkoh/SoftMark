@@ -25,11 +25,19 @@ import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
 import { useHistory } from "react-router";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const paper = usePaper();
+  const scriptsAndStudents = useScriptsAndStudents();
+
+  const [scripts, setScripts] = useState<ScriptListData[]>(
+    scriptsAndStudents.scripts
+  );
+
+  const [searchText, setSearchText] = useState("");
 
   const ASC = "asc";
   const DESC = "desc";
@@ -68,24 +76,6 @@ const ScriptsSubpage: React.FC = () => {
     return res;
   };
 
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
-  const [isLoadingScripts, setIsLoadingScripts] = useState(true);
-
-  const getScripts = () => {
-    setIsLoadingScripts(true);
-    api.scripts
-      .getScripts(paper.id)
-      .then(resp => {
-        resetOrder();
-        setScripts(resp.data.scripts);
-      })
-      .finally(() => setIsLoadingScripts(false));
-  };
-
-  useEffect(getScripts, []);
-
-  const [searchText, setSearchText] = useState("");
-
   const sortTable = () => {
     setScripts(scripts.sort(tableComparator));
   };
@@ -99,15 +89,11 @@ const ScriptsSubpage: React.FC = () => {
     setOrderBy(str);
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!isLoadingScripts) {
       setTimeout(sortTable, 1000);
     }
-  }, [order, orderBy]);
-
-  if (isLoadingScripts) {
-    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
-  }
+  }, [order, orderBy]);*/
 
   const columns: TableColumn[] = [
     {
@@ -180,7 +166,6 @@ const ScriptsSubpage: React.FC = () => {
         </Grid>
         <Grid item>
           <PublishScriptsModal
-            refreshScripts={getScripts}
             render={toggleModal => (
               <RoundedButton
                 variant="contained"

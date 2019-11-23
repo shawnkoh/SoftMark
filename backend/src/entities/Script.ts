@@ -18,6 +18,7 @@ import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { ScriptTemplate } from "./ScriptTemplate";
+import { ScriptTemplateData } from "scriptTemplates";
 
 @Entity()
 @Unique(["paper", "filename"])
@@ -90,24 +91,75 @@ export class Script extends Discardable {
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
 
-  getListData = async (): Promise<ScriptListData> => {
+  getListDataWithScriptTemplate = async (
+    scriptTemplateData: ScriptTemplateData | undefined
+  ): Promise<ScriptListData> => {
     const paperUser = this.studentId
       ? await getRepository(PaperUser).findOne(this.studentId)
       : null;
-    let awardedMarks = 0;
-    let totalMarks = 0;
+
+    const questionTemplateIds = scriptTemplateData
+      ? scriptTemplateData.questionTemplates.map(
+          questionTemplate => questionTemplate.id
+        )
+      : [-1]; // stub in case of weird behavior of empty arrays
+
+    const questions = (
+      this.questions ||
+      (await getRepository(Question).find({
+        where: {
+          questionTemplateId: questionTemplateIds,
+          discardedAt: IsNull()
+        },
+        relations: ["marks"]
+      }))
+    ).filter(question =>
+      questionTemplateIds.includes(question.questionTemplateId)
+    );
+
+    const add = (a: number, b: number) => a + b;
+
+    const awardedMarks = questions
+      .map(question => {
+        const marksForQuestion = question.marks ? question.marks : [];
+        return marksForQuestion.map(mark => mark.score).reduce(add, 0);
+      })
+      .reduce(add, 0);
+
+    return {
+      ...this.getBase(),
+      paperId: this.paperId,
+      filename: this.filename,
+      student: paperUser ? await paperUser.getData() : null,
+      hasVerifiedStudent: this.hasVerifiedStudent,
+      hasBeenPublished: this.hasBeenPublished,
+      awardedMarks,
+      pagesCount: this.pages
+        ? this.pages.length
+        : await getRepository(Page).count({ scriptId: this.id }),
+      questionsCount: this.questions
+        ? this.questions.length
+        : await getRepository(Question).count({ scriptId: this.id })
+    };
+  };
+
+  getListData = async () => {
+
+    const paperUser = this.studentId
+      ? await getRepository(PaperUser).findOne(this.studentId)
+      : null;
+
     const scriptTemplate = await getRepository(ScriptTemplate).findOne({
       where: { paperId: this.paperId, discardedAt: IsNull() },
       relations: ["questionTemplates"]
     });
+
+    let awardedMarks = 0;
+    
     if (scriptTemplate) {
       const questionTemplates = await getRepository(QuestionTemplate).find({
         where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
       });
-      totalMarks = questionTemplates
-        .map(questionTemplate => questionTemplate.score)
-        .filter(questionTemplate => questionTemplate)
-        .reduce((a: number, b: number | null) => (b ? a + b : a), 0);
       const questions = await getRepository(Question).find({
         where: { questionTemplate: questionTemplates, discardedAt: IsNull() }
       });
@@ -126,7 +178,6 @@ export class Script extends Discardable {
       hasVerifiedStudent: this.hasVerifiedStudent,
       hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
-      totalMarks,
       pagesCount: this.pages
         ? this.pages.length
         : await getRepository(Page).count({ scriptId: this.id }),

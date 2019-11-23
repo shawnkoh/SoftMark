@@ -14,6 +14,7 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 import { sendScriptEmail } from "../utils/sendgrid";
 import { sortByFilename } from "../utils/sorts";
+import { ScriptTemplateData } from "scriptTemplates";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -237,8 +238,14 @@ export async function match(request: Request, response: Response) {
     );
   });
 
+  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
+
   const data: ScriptListData[] = await Promise.all(
-    scripts.sort(sortByFilename).map(script => script.getListData())
+    scripts
+      .sort(sortByFilename)
+      .map(script =>
+        script.getListDataWithScriptTemplate(activeScriptTemplateData)
+      )
   );
   response.status(200).json({ scripts: data });
 }
@@ -266,8 +273,14 @@ export async function index(request: Request, response: Response) {
     relations: ["student", "pages", "questions"]
   });
 
+  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
+
   const data: ScriptListData[] = await Promise.all(
-    scripts.sort(sortByFilename).map(script => script.getListData())
+    scripts
+      .sort(sortByFilename)
+      .map(script =>
+        script.getListDataWithScriptTemplate(activeScriptTemplateData)
+      )
   );
   response.status(200).json({ scripts: data });
 }
@@ -453,3 +466,11 @@ export async function publishScripts(request: Request, response: Response) {
     response.sendStatus(400);
   }
 }
+
+const getActiveScriptTemplateData = async (paperId: number) => {
+  const scriptTemplate = await getRepository(ScriptTemplate).findOne({
+    where: { paperId: paperId, discardedAt: IsNull() },
+    relations: ["questionTemplates"]
+  });
+  return scriptTemplate ? await scriptTemplate.getData() : scriptTemplate;
+};

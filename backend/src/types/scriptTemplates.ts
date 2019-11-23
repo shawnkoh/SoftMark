@@ -17,6 +17,7 @@ export interface ScriptTemplatePostData {
 
 // potentially deprecated
 export interface ScriptTemplateData extends DiscardableData {
+  totalMarks: number;
   pageTemplates: PageTemplateListData[];
   questionTemplates: QuestionTemplateData[];
 }
