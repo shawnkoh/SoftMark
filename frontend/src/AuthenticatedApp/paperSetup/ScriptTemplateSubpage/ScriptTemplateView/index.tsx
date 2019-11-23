@@ -1,7 +1,8 @@
 import { Drawer, List } from "@material-ui/core";
 import React from "react";
 import { DndProvider } from "react-dnd";
-import TouchBackend from "react-dnd-touch-backend";
+import MultiBackend from "react-dnd-multi-backend";
+import HTML5toTouch from "react-dnd-multi-backend/dist/esm/HTML5toTouch";
 import useScriptSetup from "../../context/ScriptSetupContext";
 import PageTemplateView from "../PageTemplateView";
 import Header from "./PaperSetupHeaderStatic";
@@ -36,7 +37,7 @@ const ScriptTemplateView: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <DndProvider backend={TouchBackend}>
+        <DndProvider backend={MultiBackend} options={HTML5toTouch}>
           {scriptTemplateSetupData.pageTemplates.map(pageTemplate => (
             <PageTemplateView
               key={pageTemplate.id}
