@@ -1,5 +1,3 @@
-import { UserListData } from "./users";
-
 export interface QuestionTemplateGradingRootData {
   id: number;
   name: string;
@@ -9,9 +7,16 @@ export interface QuestionTemplateGradingRootData {
   markCount: number;
 }
 
+export interface MarkerGradingData {
+  id: number; // refers to userId
+  email: string;
+  emailVerified: boolean;
+  name: string | null;
+}
+
 export interface GradingData {
   rootQuestionTemplates: QuestionTemplateGradingRootData[];
-  markers: UserListData[];
+  markers: MarkerGradingData[];
   totalQuestionCount: number;
   totalMarkCount: number;
 }
