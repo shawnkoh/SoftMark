@@ -1,7 +1,6 @@
 import {
   ScriptListData,
-  ScriptPatchData,
-  ScriptData
+  ScriptPatchData
 } from "backend/src/types/scripts";
 import { PaperUserListData } from "../../../../types/paperUsers";
 import React, { useState, useEffect } from "react";
@@ -24,7 +23,7 @@ import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 interface Props {
   script: ScriptListData;
   render: any;
-  callbackScript: (s: ScriptData) => void;
+  callbackScript: (s: ScriptListData) => void;
 }
 
 const PickStudentModal: React.FC<Props> = props => {
