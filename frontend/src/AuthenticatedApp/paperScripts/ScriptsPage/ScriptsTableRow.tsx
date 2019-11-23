@@ -9,6 +9,7 @@ import { ScriptListData } from "backend/src/types/scripts";
 import { Button, Grid, TableRow, TableCell, Tooltip } from "@material-ui/core";
 import VerificationSwitch from "../../../components/misc/VerificationSwitch";
 import useStyles from "./styles";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 interface OwnProps {
   script: ScriptListData;
@@ -18,17 +19,12 @@ type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
+  const { scriptTemplate } = useScriptTemplate();
+  const totalMarks = scriptTemplate ? scriptTemplate.totalMarks : 0;
   const { match } = props;
 
   const [script, setScript] = useState(props.script);
-  const {
-    student,
-    filename,
-    id,
-    awardedMarks,
-    totalMarks,
-    hasBeenPublished
-  } = script;
+  const { student, filename, id, awardedMarks, hasBeenPublished } = script;
   let matriculationNumber = "-";
   let name = "-";
   let email = "";

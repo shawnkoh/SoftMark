@@ -22,7 +22,6 @@ export interface ScriptListData extends DiscardableData {
   hasBeenPublished: boolean;
   filename: string;
   awardedMarks: number;
-  totalMarks: number;
   pagesCount: number;
   questionsCount: number;
 }

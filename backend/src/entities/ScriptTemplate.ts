@@ -52,22 +52,27 @@ export class ScriptTemplate extends Discardable {
   questionTemplates?: QuestionTemplate[];
 
   getData = async (): Promise<ScriptTemplateData> => {
-    if (this.pageTemplates) {
-      this.pageTemplates.sort(sortByPageNo);
-    }
     const questionTemplates =
       this.questionTemplates ||
       (await getRepository(QuestionTemplate).find({
         where: { scriptTemplate: this }
       }));
-    const pageTemplates =
+    const totalMarks = questionTemplates
+      .map(questionTemplate => questionTemplate.score)
+      .filter(questionTemplate => questionTemplate)
+      .reduce((a: number, b: number | null) => (b ? a + b : a), 0);
+
+    const pageTemplates = (
       this.pageTemplates ||
       (await getRepository(PageTemplate).find({
         where: { scriptTemplate: this },
         order: { pageNo: "ASC" }
-      }));
+      }))
+    ).sort(sortByPageNo);
+
     return {
       ...this.getBase(),
+      totalMarks,
       pageTemplates: pageTemplates.map(pageTemplate =>
         pageTemplate.getListData()
       ),

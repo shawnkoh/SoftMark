@@ -127,9 +127,12 @@ export async function getStudents(request: Request, response: Response) {
   }
 
   const students = (await getRepository(PaperUser).find({
-    paperId,
-    role: PaperUserRole.Student,
-    discardedAt: IsNull()
+    where: {
+      paperId,
+      role: PaperUserRole.Student,
+      discardedAt: IsNull()
+    },
+    relations: ["user", "allocations", "marks", "bookmarks"]
   })).sort(sortByMatricNo);
 
   const data = await Promise.all(
@@ -170,9 +173,12 @@ export async function getUnmatchedStudents(
   }
 
   const students = (await getRepository(PaperUser).find({
-    paperId,
-    role: PaperUserRole.Student,
-    discardedAt: IsNull()
+    where: {
+      paperId,
+      role: PaperUserRole.Student,
+      discardedAt: IsNull()
+    },
+    relations: ["user", "allocations", "marks", "bookmarks"]
   }))
     .filter(student => !boundedStudentIdsSet.has(student.id))
     .sort(sortByMatricNo);

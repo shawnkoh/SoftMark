@@ -29,7 +29,8 @@ const DownloadAsPdfPage: React.FC = () => {
   const incrementScriptIndex = () => setScriptIndex(scriptIndex + 1);
 
   const getNextScript = () => {
-    if (scriptIndex < scripts.length) {
+    const isValidScriptIndex = scriptIndex < scripts.length;
+    if (isValidScriptIndex) {
       const nextScript = scripts[scriptIndex];
       getScript(nextScript.id);
       incrementScriptIndex();
@@ -54,7 +55,10 @@ const DownloadAsPdfPage: React.FC = () => {
   const imageUrlArray: string[] = [];
   const callBackImageUrl = async (imageUrl: string) => {
     imageUrlArray.push(imageUrl);
-    if (imageUrlArray.length === pages.length) {
+
+    const allImagesFullyLoaded = imageUrlArray.length === pages.length;
+
+    if (allImagesFullyLoaded) {
       let pdf = new jsPDF();
       const width = pdf.internal.pageSize.getWidth();
       const height = pdf.internal.pageSize.getHeight();
@@ -66,7 +70,10 @@ const DownloadAsPdfPage: React.FC = () => {
         pdf.addImage(imageUrlArray[i], "JPEG", 0, 0, width, height);
       }
       pdf.save(`${script.filename}.pdf`);
-      if (scripts.length > scriptIndex) {
+
+      // gets next script to download if there is one
+      const isValidScriptIndex = scriptIndex < scripts.length;
+      if (isValidScriptIndex) {
         getNextScript();
       } else {
         toast.success("No more scripts to download", { autoClose: false });
