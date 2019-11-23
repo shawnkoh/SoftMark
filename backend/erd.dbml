@@ -3,12 +3,12 @@ Table user {
   
   email varchar [not null, unique]
   password varchar
-  email_verified boolean [not null, unique]
+  emailVerified boolean [not null, unique]
   name varchar [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
 Table paper {
@@ -16,64 +16,72 @@ Table paper {
   
   name varchar [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
-Table paper_user {
+Table paperUser {
   id int [pk]
-  paper_id int [ref: > paper.id]
-  user_id int [ref: > user.id]
+  paperId int [ref: > paper.id]
+  userId int [ref: > user.id]
   
   role enum [not null]
+  acceptedInvite boolean [not null]
+  matriculationNumber varchar
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
-Table script_template {
+Table scriptTemplate {
   id int [pk]
-  paper_id int [ref: > paper.id]
+  paperId int [ref: > paper.id]
   
-  name varchar
+  sha256 string [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
-Table page_template {
+Table pageTemplate {
   id int [pk]
-  script_template_id int [ref: > script_template.id]
+  scriptTemplateId int [ref: > scriptTemplate.id]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  imageUrl bytea [not null]
+  pageNo int [not null]
+  
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
-Table question_template {
+Table questionTemplate {
   id int [pk]
-  script_template_id int [ref: > script_template.id]
-  parent_question_template_id int [ref: > question_template.id]
+  scriptTemplateId int [ref: > scriptTemplate.id]
+  parentQuestionTemplateId int [ref: > questionTemplate.id]
   
   name varchar [not null]
   score double
+  pageCovered varchar
+  displayPage int
+  topOffset int
+  leftOffset int
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
-Table page_question_template {
+Table pageQuestionTemplate {
   id int [pk]
-  page_template_id int [ref: > page_template.id]
-  question_template_id int [ref: > question_template.id]
+  pageTemplateId int [ref: > pageTemplate.id]
+  questionTemplateId int [ref: > questionTemplate.id]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
 }
 
 Table allocation {
@@ -81,99 +89,94 @@ Table allocation {
   
   // count int [not null]
   
-  question_template_id int [ref: > question_template.id]
-  paper_user_id int [ref: > paper_user.id]
+  questionTemplate_id int [ref: > questionTemplate.id]
+  paperUserId int [ref: > paperUser.id]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
 }
 
 Table bookmark {
   id int [pk]
-  paper_user_id int [ref: > paper_user.id]
+  paperUserId int [ref: > paperUser.id]
   question_id int [ref: > question.id]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
 }
 
 Table question {
   id int [pk]
-  question_template_id int [ref: > question_template.id]
-  script_id int [ref: > script.id]
+  questionTemplateId int [ref: > questionTemplate.id]
+  scriptId int [ref: > script.id]
   
-  order int [not null]
+  // Flag to prevent other markers from marking at the same time
+  currentMarkerId int [ref: > paperUser.id]
+  currentMarkerUpdatedAt datetime
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
 Table script {
   id int [pk]
-  paper_user_id int [ref: > paper_user.id]
-  paper_id int [ref: > paper.id]
+  studentId int [ref: > paperUser.id]
+  paperId int [ref: > paper.id]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  sha256 varchar [not null]
+  hasVerifiedStudent boolean
+  publishedDate datetime
+  
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
 Table page {
   id int [pk]
-  script_id int [ref: > script.id]
+  scriptId int [ref: > script.id]
   
-  image bytea [not null]
+  imageUrl bytea [not null]
+  pageNo int [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
-}
-
-Table page_question {
-  id int [pk]
-  page_id int [ref: > page.id]
-  question_id int [ref: > question.id]
-  
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
 Table annotation {
   id int [pk]
-  page_id int [ref: > page.id]
-  paper_user_id int [ref: > paper_user.id]
   
-  annotation json [not null]
+  pageId int [ref: > page.id]
+  paperUserId int [ref: > paperUser.id]
+  layer jsonb [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
 }
 
 Table comment {
   id int [pk]
   question_id int [ref: > question.id]
-  paper_user_id int [ref: > paper_user.id]
+  paperUserId int [ref: > paperUser.id]
   
-  annotation json [not null]
+  comment string [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
 
 Table mark {
   id int [pk]
-  question_id int [ref: > question.id]
-  paper_user_id int [ref: > paper_user.id]
+  questionId int [ref: > question.id]
+  markerId int [ref: > paperUser.id]
   
-  score int [not null]
-  time_spent int
+  score double [not null]
+  timeSpent int [not null]
   
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  discarded_at datetime [not null]
+  createdAt datetime [not null]
+  updatedAt datetime [not null]
+  discardedAt datetime [not null]
 }
