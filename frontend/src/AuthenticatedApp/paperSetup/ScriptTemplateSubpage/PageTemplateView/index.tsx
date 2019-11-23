@@ -2,30 +2,35 @@ import { Box, Fab, IconButton, Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
-import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
+import useScriptSetup, {
+  QuestionGradebox
+} from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
-import { QuestionTemplateLeafData } from "backend/src/types/questionTemplates";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDrop, XYCoord } from "react-dnd";
 import { toast } from "react-toastify";
 import api from "../../../../api";
 import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
-import QuestionTemplateDialog from "../ScriptTemplateView/QuestionTemplateDialog";
 import useStyles from "./useStyles";
 
-export type DragItem = QuestionTemplateLeafData & {
+type DragItem = QuestionGradebox & {
+  id: number;
   type: string;
-  index: number;
 };
-
 const PageTemplateView: React.FC<{
   pageTemplate: PageTemplateSetupData;
 }> = props => {
   const classes = useStyles();
   const { pageTemplate } = props;
-  const { currentPageNo, pageCount, goPage, refresh } = useScriptSetup();
-
-  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const {
+    currentPageNo,
+    pageCount,
+    goPage,
+    refresh,
+    addLeaf,
+    updateLeaf,
+    leafQuestions
+  } = useScriptSetup();
 
   const imgRef = useRef<HTMLImageElement>(null);
   const [imgScale, setImgScale] = useState(1.0);
@@ -39,14 +44,16 @@ const PageTemplateView: React.FC<{
       setImgScale(imgEle.width / imgEle.naturalWidth);
     }
   }, [imgRef.current, imgLoaded]);
+
   const [, drop] = useDrop({
     accept: "questionBox",
     async drop(item: DragItem, monitor) {
       if (imgRef.current) {
         const scale = imgRef.current.width / imgRef.current.naturalWidth;
         const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-        const leftOffset = Math.round(item.leftOffset! + delta.x / scale);
-        const topOffset = Math.round(item.topOffset! + delta.y / scale);
+        const leftOffset = Math.round(item.leftOffset + delta.x / scale);
+        const topOffset = Math.round(item.topOffset + delta.y / scale);
+        updateLeaf(item.id, { leftOffset, topOffset });
         try {
           await api.questionTemplates.editQuestionTemplate(item.id, {
             topOffset,
@@ -69,16 +76,7 @@ const PageTemplateView: React.FC<{
       hidden={pageTemplate.pageNo !== currentPageNo}
       className={classes.panel}
     >
-      <QuestionTemplateDialog
-        mode="create"
-        open={openEditDialog}
-        handleClose={() => setOpenEditDialog(false)}
-      />
-      <Fab
-        onClick={() => setOpenEditDialog(true)}
-        color="primary"
-        className={classes.addFab}
-      >
+      <Fab onClick={addLeaf} color="primary" className={classes.addFab}>
         <AddIcon />
       </Fab>
       <Box p={0} display="flex" justifyContent="center" alignItems="center">
@@ -95,16 +93,14 @@ const PageTemplateView: React.FC<{
             src={pageTemplate.imageUrl}
             onLoad={() => setImgLoaded(true)}
           />
-          {pageTemplate.questionTemplates
-            .filter(q => q.displayPage === currentPageNo)
-            .map((questionTemplate, index) => (
-              <ScriptTemplateQuestion
-                key={questionTemplate.id}
-                index={index}
-                questionTemplate={questionTemplate}
-                imgScale={imgScale}
-              />
-            ))}
+
+          {Object.keys(leafQuestions).map(key =>
+            leafQuestions[key].displayPage === currentPageNo ? (
+              <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale} />
+            ) : (
+              <></>
+            )
+          )}
         </div>
         <IconButton
           onClick={() => goPage(currentPageNo + 1)}

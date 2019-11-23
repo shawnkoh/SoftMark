@@ -6,7 +6,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   scriptImage: {
     objectFit: "contain",
-    maxHeight: "calc(99vh - 64px)"
+    maxHeight: "calc(99vh - 64px)",
+    maxWidth: "100%"
   },
   addFab: {
     position: "absolute",

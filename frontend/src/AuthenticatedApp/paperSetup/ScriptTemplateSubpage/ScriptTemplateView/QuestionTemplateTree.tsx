@@ -14,6 +14,7 @@ import QuestionTemplateDialog from "./QuestionTemplateDialog";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import EditIcon from "@material-ui/icons/Edit";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 
 interface TreeProps {
   questionTemplateTree: QuestionTemplateTreeData;
@@ -23,6 +24,7 @@ interface TreeProps {
 
 const QuestionTemplateTree: React.FC<TreeProps> = props => {
   const { questionTemplateTree, depth, leafOnClick } = props;
+  const { isLeaf, updateLeaf } = useScriptSetup();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
   const [editOpen, setEditOpen] = React.useState(false);
@@ -32,7 +34,7 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
 
   return (
     <>
-      {!questionTemplateTree.displayPage && (
+      {!isLeaf(questionTemplateTree.id) && (
         <QuestionTemplateDialog
           mode="editTree"
           questionTemplateId={questionTemplateTree.id}
@@ -63,13 +65,22 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
                 `Score: ${questionTemplateTree.score}`
               }
             />
-            {!questionTemplateTree.displayPage && (
-              <ListItemSecondaryAction>
-                <IconButton onClick={() => setEditOpen(true)} edge="end">
-                  <EditIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            )}
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                onClick={
+                  isLeaf(questionTemplateTree.id)
+                    ? () => {
+                        questionTemplateTree.displayPage &&
+                          leafOnClick(questionTemplateTree.displayPage);
+                        updateLeaf(questionTemplateTree.id);
+                      }
+                    : () => setEditOpen(true)
+                }
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </ListItemSecondaryAction>
           </ListItem>
         </List>
       ) : (
@@ -87,7 +98,7 @@ const QuestionTemplateTree: React.FC<TreeProps> = props => {
             </ListItemIcon>
             <ListItemSecondaryAction>
               <IconButton onClick={() => setEditOpen(true)} edge="end">
-                <EditIcon />
+                <EditIcon fontSize="small" />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>

@@ -14,6 +14,8 @@ import {
 } from "@material-ui/core";
 import api from "api";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 import {
   Field,
   FieldProps,
@@ -27,7 +29,6 @@ import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 import { isPageValid } from "../../../../utils/questionTemplateUtil";
 import QuestionTemplateSelect from "./QuestionTemplateSelect";
-import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 export interface NewQuestionTemplateValues {
   title: string;
@@ -41,6 +42,7 @@ interface SharedProps {
   handleClose: (e?: any) => void;
   initialValues?: NewQuestionTemplateValues;
   questionTemplateId?: number;
+  onSuccess?: (qt: QuestionTemplateData) => void;
 }
 
 export interface QuestionEditDialogProps extends SharedProps {
@@ -67,6 +69,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
     open,
     mode,
     handleClose,
+    onSuccess,
     initialValues = {
       title: "",
       score: 1,
@@ -90,10 +93,11 @@ const QuestionEditDialog: React.FC<Props> = props => {
               displayPage: currentPageNo,
               parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
             };
-        await api.questionTemplates.createQuestionTemplate(
+        const response = await api.questionTemplates.createQuestionTemplate(
           scriptTemplateSetupData.id,
           postData
         );
+        onSuccess && onSuccess(response.data.questionTemplate);
       } else {
         const postData =
           mode === "editLeaf"
@@ -105,10 +109,11 @@ const QuestionEditDialog: React.FC<Props> = props => {
             : {
                 name: values.title
               };
-        await api.questionTemplates.editQuestionTemplate(
+        const response = await api.questionTemplates.editQuestionTemplate(
           (props as QuestionEditDialogProps).questionTemplateId,
           postData
         );
+        onSuccess && onSuccess(response.data.questionTemplate);
       }
       toast.success("Question successfully updated");
       refresh();
