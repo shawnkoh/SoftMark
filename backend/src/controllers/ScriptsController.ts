@@ -166,7 +166,7 @@ export async function update(request: Request, response: Response) {
     return response.sendStatus(400);
   }
 
-  const data = await script.getData();
+  const data = await script.getListData();
   response.status(201).json({ script: data });
 }
 

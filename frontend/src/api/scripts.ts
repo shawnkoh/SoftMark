@@ -52,7 +52,7 @@ export async function getScripts(
 export async function patchScript(
   id: number,
   scriptPatchData: ScriptPatchData
-): Promise<AxiosResponse<{ script: ScriptData }>> {
+): Promise<AxiosResponse<{ script: ScriptListData }>> {
   return client.patch(`${URL}/${id}`, scriptPatchData);
 }
 
