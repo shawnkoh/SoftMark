@@ -51,30 +51,36 @@ const UnauthenticatedApp: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
-        <Route exact path="/" component={SignInPage} />
-        <Route exact path="/login" component={SignInPage} />
-        <Route exact path="/signup" component={SignUpPage} />
-        <Route exact path="/reset_password" component={ForgotPasswordPage} />
+        <Route exact path="/">
+          <SignInPage />
+        </Route>
+        <Route exact path="/login">
+          <SignInPage />
+        </Route>
+        <Route exact path="/signup">
+          <SignUpPage />
+        </Route>
+        <Route exact path="/reset_password">
+          <ForgotPasswordPage />
+        </Route>
 
-        <Route
-          exact
-          path="/auth/passwordless/:token"
-          component={PasswordlessPage}
-        />
-        <Route
-          exact
-          path="/users/reset_password/:token"
-          component={ResetPasswordPage}
-        />
-        <Route
-          exact
-          path="/users/verify_email/:token"
-          component={VerifyAccountPage}
-        />
+        <Route exact path="/auth/passwordless/:token">
+          <PasswordlessPage />
+        </Route>
+        <Route exact path="/users/reset_password/:token">
+          <ResetPasswordPage />
+        </Route>
+        <Route exact path="/users/verify_email/:token">
+          <VerifyAccountPage />
+        </Route>
 
-        <Route exact path="/invite/:token" component={InvitePage} />
+        <Route exact path="/invite/:token">
+          <InvitePage />
+        </Route>
 
-        <Route component={NotFoundPage} />
+        <Route>
+          <NotFoundPage />
+        </Route>
       </Switch>
     </ThemeProvider>
   );

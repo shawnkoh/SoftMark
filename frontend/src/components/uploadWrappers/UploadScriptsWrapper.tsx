@@ -1,14 +1,11 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../api";
-import { DropAreaBase } from "material-ui-file-dropzone";
-import { toast } from "react-toastify";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import { DropAreaBase } from "material-ui-file-dropzone";
+import React from "react";
+import { toast } from "react-toastify";
+import api from "../../api";
 
-type Props = RouteComponentProps;
-
-const UploadScriptsWrapper: React.FC<Props> = props => {
+const UploadScriptsWrapper: React.FC = props => {
   const paper = usePaper();
   const { refreshScripts } = useScriptsAndStudents();
   const { children } = props;
@@ -74,4 +71,4 @@ const UploadScriptsWrapper: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(UploadScriptsWrapper);
+export default UploadScriptsWrapper;

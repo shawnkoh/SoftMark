@@ -11,24 +11,20 @@ import EditIcon from "@material-ui/icons/Edit";
 import { ScriptListData } from "backend/src/types/scripts";
 import ViewIcon from "mdi-material-ui/FileFind";
 import React, { useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import api from "../../../../api";
 import SingleTextfieldForm from "../../../../components/forms/SingleTextfieldForm";
+import VerificationSwitch from "../../../../components/misc/VerificationSwitch";
 import DeleteScriptModal from "../modals/DeleteScriptModal";
 import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import useStyles from "./styles";
-import VerificationSwitch from "../../../../components/misc/VerificationSwitch";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
-interface OwnProps {
+interface Props {
   script: ScriptListData;
   scriptTemplatePagesCount: number;
 }
-
-type Props = OwnProps & RouteComponentProps;
 
 const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
@@ -133,4 +129,4 @@ const ScriptsTableRow: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(ScriptsTableRow);
+export default ScriptsTableRow;

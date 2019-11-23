@@ -14,18 +14,16 @@ import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
-import React, { useEffect, useState } from "react";
-import api from "../../../api";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
-import { useHistory } from "react-router";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();

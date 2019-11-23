@@ -1,45 +1,41 @@
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import React, { useState, useEffect } from "react";
-import { RouteComponentProps, withRouter, Redirect } from "react-router";
-import { Link, Route, Switch } from "react-router-dom";
-import api from "../../api";
-
-import usePaper from "contexts/PaperContext";
-
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import Check from "@material-ui/icons/Check";
 import People from "@material-ui/icons/People";
 import Settings from "@material-ui/icons/Settings";
-
-import useStyles from "./styles";
-import PaperViewHeader from "./components/PaperViewHeader";
-import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
-import SetupPage, {
-  ScriptMappingSubpage,
-  QuestionAllocationSubpage,
-  ScriptTemplateSubpage
-} from "../paperSetup";
+import usePaper from "contexts/PaperContext";
+import React, { useState } from "react";
+import {
+  Redirect,
+  RouteComponentProps,
+  useLocation,
+  useRouteMatch
+} from "react-router";
+import { Link, Route, Switch } from "react-router-dom";
+import { PaperUserRole } from "../../types/paperUsers";
+import DownloadAsPdfPage from "../DownloadAsPdfPage";
 import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
 import ScriptsPage, {
-  ScriptViewSubpage,
-  ScriptEditSubpage
+  ScriptEditSubpage,
+  ScriptViewSubpage
 } from "../paperScripts";
-import { PaperUserRole } from "../../types/paperUsers";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import DownloadAsPdfPage from "../DownloadAsPdfPage";
+import SetupPage, {
+  QuestionAllocationSubpage,
+  ScriptMappingSubpage,
+  ScriptTemplateSubpage
+} from "../paperSetup";
+import PaperViewHeader from "./components/PaperViewHeader";
+import useStyles from "./styles";
 
 const SETUP = "setup";
 const GRADING = "grading";
 const SCRIPTS = "scripts";
 
-const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
-  const classes = useStyles();
-  // https://reacttraining.com/react-router/web/example/nesting
-  const { path, url } = match;
-  const { pathname } = location;
-
+const PaperView: React.FC = () => {
+  const { pathname } = useLocation();
+  const { path, url } = useRouteMatch()!;
   const paper = usePaper();
   const { role } = paper;
+  const classes = useStyles();
 
   const getTabValueFromPathname = pathname => {
     if (pathname.includes(SETUP)) {
@@ -101,37 +97,34 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     </Route>
   );
   const questionAllocationRoute = (
-    <Route
-      path={`${path}/${SETUP}/allocate`}
-      component={QuestionAllocationSubpage}
-    />
+    <Route path={`${path}/${SETUP}/allocate`}>
+      <QuestionAllocationSubpage />
+    </Route>
   );
   const setupScriptTemplateRoute = (
-    <Route
-      path={`${path}/${SETUP}/template`}
-      component={ScriptTemplateSubpage}
-    />
+    <Route path={`${path}/${SETUP}/template`}>
+      <ScriptTemplateSubpage />
+    </Route>
   );
   const scriptMappingRoute = (
-    <Route path={`${path}/${SETUP}/map`} component={ScriptMappingSubpage} />
+    <Route path={`${path}/${SETUP}/map`}>
+      <ScriptMappingSubpage />
+    </Route>
   );
   const markQuestionRoute = (
-    <Route
-      path={`${path}/${GRADING}/:questionTemplateId`}
-      component={MarkQuestionSubpage}
-    />
+    <Route path={`${path}/${GRADING}/:questionTemplateId`}>
+      <MarkQuestionSubpage />
+    </Route>
   );
   const scriptViewRoute = (
-    <Route
-      path={`${path}/${SCRIPTS}/:scriptId`}
-      component={ScriptViewSubpage}
-    />
+    <Route path={`${path}/${SCRIPTS}/:scriptId`}>
+      <ScriptViewSubpage />
+    </Route>
   );
   const scriptEditRoute = (
-    <Route
-      path={`${path}/${SCRIPTS}/:scriptId/mark`}
-      component={ScriptEditSubpage}
-    />
+    <Route path={`${path}/${SCRIPTS}/:scriptId/mark`}>
+      <ScriptEditSubpage />
+    </Route>
   );
   const gradingRoute = (
     <Route path={`${path}/${GRADING}`}>
@@ -156,7 +149,9 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     </Route>
   );
   const studentRedirectRoute = (
-    <Route path={`${path}`} component={StudentRedirectToScriptView} />
+    <Route path={`${path}`}>
+      <StudentRedirectToScriptView />
+    </Route>
   );
 
   return (
@@ -172,7 +167,9 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
           {setupRoute}
           {gradingRoute}
           {scriptsListingRoute}
-          <Route path={`${path}/save_scripts`} component={DownloadAsPdfPage} />
+          <Route path={`${path}/save_scripts`}>
+            <DownloadAsPdfPage />
+          </Route>
         </Switch>
       )}
       {role === PaperUserRole.Marker && (
@@ -194,12 +191,9 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
   );
 };
 
-export default withRouter(PaperView);
+export default PaperView;
 
-const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
-  match
-}) => {
-  const { path } = match;
+const StudentRedirectToScriptView: React.FC = () => {
   const paper = usePaper();
   const role = paper.role;
 

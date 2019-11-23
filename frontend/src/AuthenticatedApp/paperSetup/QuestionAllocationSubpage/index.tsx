@@ -16,7 +16,6 @@ import AddIcon from "@material-ui/icons/Add";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
 import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
@@ -44,9 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type Props = RouteComponentProps;
-
-const QuestionAllocationPage: React.FC<Props> = () => {
+const QuestionAllocationPage: React.FC = props => {
   const classes = useStyles();
   const paper = usePaper();
 
@@ -189,4 +186,4 @@ const QuestionAllocationPage: React.FC<Props> = () => {
   );
 };
 
-export default withRouter(QuestionAllocationPage);
+export default QuestionAllocationPage;

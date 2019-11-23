@@ -1,16 +1,13 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
 import { Typography } from "@material-ui/core";
+import React from "react";
 
-interface OwnProps {
+interface Props {
   index: any;
   value: any;
 }
 
-type Props = OwnProps & RouteComponentProps;
-
 const TabPanel: React.FC<Props> = props => {
-  const { children, value, index, ...other } = props;
+  const { children, index, value, ...other } = props;
 
   return (
     <Typography
@@ -25,4 +22,4 @@ const TabPanel: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(TabPanel);
+export default TabPanel;
