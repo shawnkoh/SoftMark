@@ -13,9 +13,9 @@ import { PaperUser } from "../entities/PaperUser";
 import { Script } from "../entities/Script";
 import { User } from "../entities/User";
 import {
+  NominalRollPostData,
   PaperUserPostData,
-  PaperUserRole,
-  NominalRollPostData
+  PaperUserRole
 } from "../types/paperUsers";
 import {
   AccessTokenSignedPayload,
@@ -366,9 +366,20 @@ export async function replyInvite(request: Request, response: Response) {
     accepted
   }: { name: string | null; accepted: boolean } = request.body;
 
-  const partial: QueryDeepPartialEntity<PaperUser> = accepted
-    ? { acceptedInvite: true }
-    : { discardedAt: new Date() };
+  const paperUser = await getRepository(PaperUser).findOne(paperUserId);
+  if (!paperUser) {
+    response.sendStatus(404);
+    return;
+  }
+
+  let partial: QueryDeepPartialEntity<PaperUser>;
+  if (accepted) {
+    partial = { acceptedInvite: true };
+  } else if (paperUser.role !== PaperUserRole.Student) {
+    partial = { discardedAt: new Date() };
+  } else {
+    return;
+  }
 
   await getRepository(PaperUser).update(paperUserId, partial);
 
