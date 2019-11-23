@@ -13,7 +13,7 @@ interface Props {
   script: ScriptListData;
 }
 
-const ScriptsTableRow: React.FC = () => {
+const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
   const totalMarks = scriptTemplate ? scriptTemplate.totalMarks : 0;

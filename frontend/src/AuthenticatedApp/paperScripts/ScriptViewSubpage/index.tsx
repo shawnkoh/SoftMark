@@ -38,7 +38,7 @@ const ScriptView: React.FC = () => {
   };
 
   useEffect(() => {
-    getScriptViewData(scriptId);
+    getScriptViewData(Number(scriptId));
   }, [refreshFlag]);
 
   const [pageNo, setPageNo] = useState(1);

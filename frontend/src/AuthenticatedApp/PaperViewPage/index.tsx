@@ -4,7 +4,12 @@ import People from "@material-ui/icons/People";
 import Settings from "@material-ui/icons/Settings";
 import usePaper from "contexts/PaperContext";
 import React, { useState } from "react";
-import { Redirect, RouteComponentProps, useRouteMatch } from "react-router";
+import {
+  Redirect,
+  RouteComponentProps,
+  useLocation,
+  useRouteMatch
+} from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
 import { PaperUserRole } from "../../types/paperUsers";
 import DownloadAsPdfPage from "../DownloadAsPdfPage";
@@ -26,13 +31,11 @@ const GRADING = "grading";
 const SCRIPTS = "scripts";
 
 const PaperView: React.FC = () => {
-  const classes = useStyles();
-  // https://reacttraining.com/react-router/web/example/nesting
+  const { pathname } = useLocation();
   const { path, url } = useRouteMatch()!;
-  const { pathname } = location;
-
   const paper = usePaper();
   const { role } = paper;
+  const classes = useStyles();
 
   const getTabValueFromPathname = pathname => {
     if (pathname.includes(SETUP)) {
