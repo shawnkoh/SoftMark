@@ -1,40 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Link } from "react-router-dom";
-
-import api from "../../../api";
-import usePaper from "../../../contexts/PaperContext";
-import { ScriptViewData } from "backend/src/types/view";
-
 import {
+  AppBar,
   Container,
   Grid,
-  AppBar,
   IconButton,
   Toolbar,
-  Typography,
-  Avatar
+  Typography
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-
-import Annotator from "./Annotator";
+import { ScriptViewData } from "backend/src/types/view";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import ReversedChip from "../../../components/ReversedChip";
-
+import usePaper from "../../../contexts/PaperContext";
+import Annotator from "./Annotator";
 import useStyles from "./styles";
 
-type Props = RouteComponentProps;
-
-const ScriptEdit: React.FC<Props> = ({ match }) => {
+const ScriptEdit: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
-
-  const scriptId = parseInt(
-    (match.params as { scriptId: string }).scriptId,
-    10
-  );
+  const { scriptId } = useParams();
 
   const [scriptViewData, setScriptViewData] = useState<ScriptViewData | null>(
     null
@@ -50,7 +37,7 @@ const ScriptEdit: React.FC<Props> = ({ match }) => {
   };
 
   useEffect(() => {
-    getScriptViewData(scriptId);
+    getScriptViewData(Number(scriptId));
   }, [refreshFlag]);
 
   const [pageNo, setPageNo] = useState(1);
@@ -178,4 +165,4 @@ const ScriptEdit: React.FC<Props> = ({ match }) => {
   );
 };
 
-export default withRouter(ScriptEdit);
+export default ScriptEdit;

@@ -1,49 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Link } from "react-router-dom";
-import clsx from "clsx";
-
-import api from "../../../api";
-import usePaper from "../../../contexts/PaperContext";
 import {
-  QuestionViewData,
-  AnnotationViewData,
-  PageViewData,
-  ScriptViewData
-} from "backend/src/types/view";
-
-import {
-  Container,
-  Grid,
   AppBar,
   Button,
+  Container,
+  Grid,
   IconButton,
   Toolbar,
-  Typography,
-  Chip,
-  Avatar
+  Typography
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-
+import { ScriptViewData } from "backend/src/types/view";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
+import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-import ReversedChip from "../../../components/ReversedChip";
+import usePaper from "../../../contexts/PaperContext";
 import Annotator from "./Annotator";
-import MarkQuestionModal from "./MarkQuestionModal";
-
 import useStyles from "./styles";
 
-type Props = RouteComponentProps;
-
-const MarkQuestionPage: React.FC<Props> = ({ match }) => {
+const MarkQuestionPage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
-
-  const questionTemplateId = parseInt(
-    (match.params as { questionTemplateId: string }).questionTemplateId,
-    10
-  );
+  const { questionTemplateId } = useParams();
 
   const [scriptViewData, setScriptViewData] = useState<ScriptViewData | null>(
     null
@@ -65,7 +45,7 @@ const MarkQuestionPage: React.FC<Props> = ({ match }) => {
   };
 
   useEffect(() => {
-    getScriptViewData(questionTemplateId);
+    getScriptViewData(Number(questionTemplateId));
   }, [refreshFlag]);
 
   useEffect(() => {

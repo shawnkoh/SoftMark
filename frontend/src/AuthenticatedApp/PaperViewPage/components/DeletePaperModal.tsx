@@ -7,20 +7,19 @@ import {
   TextField
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import usePaper from "../../../contexts/PaperContext";
 
-interface OwnProps {
+interface Props {
   render: any;
 }
 
-type Props = OwnProps & RouteComponentProps;
-
 const DeletePaperModal: React.FC<Props> = props => {
   const { render } = props;
+  const history = useHistory();
   const paper = usePaper();
   const { id, name } = paper;
 
@@ -40,7 +39,7 @@ const DeletePaperModal: React.FC<Props> = props => {
       .discardPaper(id)
       .then(() => {
         toast.success(`${name} has been deleted successfully.`);
-        props.history.push(`/`);
+        history.push(`/`);
       })
       .catch(errors => {
         toast.error(`${name} could not be deleted.`);
@@ -86,4 +85,4 @@ const DeletePaperModal: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(DeletePaperModal);
+export default DeletePaperModal;

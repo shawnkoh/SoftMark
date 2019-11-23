@@ -2,12 +2,12 @@ import {
   Box,
   Card,
   CardActionArea,
+  Chip,
   Container,
   Grid,
-  IconButton,
   Hidden,
-  Typography,
-  Chip
+  IconButton,
+  Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -15,13 +15,13 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { PaperData } from "backend/src/types/papers";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { useHistory } from "react-router";
 import api from "../../api";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import RoundedButton from "../../components/buttons/RoundedButton";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { PaperUserRole } from "../../types/paperUsers";
 import AddPaperModal from "./components/AddPaperModal";
 import Header from "./components/PaperIndexHeader";
-import { PaperUserRole } from "../../types/paperUsers";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -42,10 +42,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type Props = RouteComponentProps;
-
-const PaperIndex: React.FC<Props> = props => {
+const PaperIndex: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const toggleRefreshFlag = () => setRefreshFlag(refreshFlag + 1);
@@ -110,13 +109,13 @@ const PaperIndex: React.FC<Props> = props => {
                     onClick={() => {
                       switch (paper.role) {
                         case PaperUserRole.Owner:
-                          props.history.push(`/papers/${paper.id}/setup`);
+                          history.push(`/papers/${paper.id}/setup`);
                           break;
                         case PaperUserRole.Marker:
-                          props.history.push(`/papers/${paper.id}/grading`);
+                          history.push(`/papers/${paper.id}/grading`);
                           break;
                         case PaperUserRole.Student:
-                          props.history.push(`/papers/${paper.id}`);
+                          history.push(`/papers/${paper.id}`);
                           break;
                       }
                     }}
@@ -169,4 +168,4 @@ const PaperIndex: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(PaperIndex);
+export default PaperIndex;

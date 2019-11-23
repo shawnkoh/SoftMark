@@ -1,13 +1,8 @@
-import React from "react";
-import { RouteComponentProps } from "react-router";
-
 import { Grid, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-
+import React from "react";
 import softmarkLogo from "../../assets/softmark-logo.svg";
 import SignInForm from "./SignInForm";
-
-type Props = RouteComponentProps;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const SignInPage: React.FC<Props> = props => {
+const SignInPage: React.FC = props => {
   const classes = useStyles();
 
   return (

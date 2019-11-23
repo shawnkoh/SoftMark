@@ -1,16 +1,13 @@
-import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
-import api from "../../api";
-import { DropAreaBase } from "material-ui-file-dropzone";
-import { toast } from "react-toastify";
 import usePaper from "contexts/PaperContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
+import { DropAreaBase } from "material-ui-file-dropzone";
+import React from "react";
+import { toast } from "react-toastify";
+import api from "../../api";
 
-interface OwnProps {
+interface Props {
   clickable?: boolean;
 }
-
-type Props = RouteComponentProps & OwnProps;
 
 const UploadScriptTemplateWrapper: React.FC<Props> = props => {
   const paper = usePaper();
@@ -45,4 +42,4 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(UploadScriptTemplateWrapper);
+export default UploadScriptTemplateWrapper;

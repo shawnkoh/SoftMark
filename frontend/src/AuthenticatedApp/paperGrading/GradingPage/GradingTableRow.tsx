@@ -1,20 +1,18 @@
 import { Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Link } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import { getUser } from "../../../store/auth/selectors";
 
-interface OwnProps {
+interface Props {
   questionTemplate: any;
 }
 
-type Props = OwnProps & RouteComponentProps;
-
 const GradingTableRow: React.FC<Props> = props => {
   const currentUser = useSelector(getUser);
+  const { url } = useRouteMatch()!;
 
-  const { questionTemplate, match } = props;
+  const { questionTemplate } = props;
 
   const {
     name,
@@ -52,7 +50,7 @@ const GradingTableRow: React.FC<Props> = props => {
           <Tooltip title={`Continue grading`}>
             <Button
               component={Link}
-              to={`${match.url}/${questionTemplate.id}`}
+              to={`${url}/${questionTemplate.id}`}
               variant="contained"
               color="primary"
               style={{ borderRadius: 24 }}
@@ -66,4 +64,4 @@ const GradingTableRow: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(GradingTableRow);
+export default GradingTableRow;

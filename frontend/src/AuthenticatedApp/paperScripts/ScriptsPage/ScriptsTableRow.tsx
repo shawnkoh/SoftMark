@@ -1,27 +1,23 @@
+import { Button, Grid, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import { ScriptListData } from "backend/src/types/scripts";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 import React, { useState } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { useRouteMatch } from "react-router";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../api";
-
-import { ScriptListData } from "backend/src/types/scripts";
-
-import { Button, Grid, TableRow, TableCell, Tooltip } from "@material-ui/core";
 import VerificationSwitch from "../../../components/misc/VerificationSwitch";
 import useStyles from "./styles";
-import useScriptTemplate from "contexts/ScriptTemplateContext";
 
-interface OwnProps {
+interface Props {
   script: ScriptListData;
 }
 
-type Props = OwnProps & RouteComponentProps;
-
-const ScriptsTableRow: React.FC<Props> = props => {
+const ScriptsTableRow: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
   const totalMarks = scriptTemplate ? scriptTemplate.totalMarks : 0;
-  const { match } = props;
+  const { url } = useRouteMatch()!;
 
   const [script, setScript] = useState(props.script);
   const { student, filename, id, awardedMarks, hasBeenPublished } = script;
@@ -81,7 +77,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <Tooltip title={`Mark script of ${matriculationNumber}`}>
           <Button
             component={Link}
-            to={`${match.url}/${id}/mark`}
+            to={`${url}/${id}/mark`}
             variant="contained"
             color="primary"
             className={classes.button}
@@ -92,7 +88,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <Tooltip title={`View script of ${matriculationNumber}`}>
           <Button
             component={Link}
-            to={`${match.url}/${id}`}
+            to={`${url}/${id}`}
             variant="contained"
             color="primary"
             className={classes.button}
@@ -105,4 +101,4 @@ const ScriptsTableRow: React.FC<Props> = props => {
   );
 };
 
-export default withRouter(ScriptsTableRow);
+export default ScriptsTableRow;
