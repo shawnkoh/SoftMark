@@ -2,7 +2,9 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
-    position: "relative"
+    position: "relative",
+    maxHeight: "calc(99vh - 64px)",
+    maxWidth: "100%"
   },
   scriptImage: {
     objectFit: "contain",
@@ -16,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     zIndex: 1
   },
   panel: {
-    height: "100vh"
+    maxHeight: "100vh"
   }
 }));
 

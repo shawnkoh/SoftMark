@@ -1,9 +1,11 @@
 import { Avatar } from "@material-ui/core";
-import React from "react";
-import { useDrag } from "react-dnd";
+import React, { useState } from "react";
+import Draggable, { DraggableData, DraggableEvent, DraggableCore } from "react-draggable";
 import ReversedChip from "../../../../components/ReversedChip";
 import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
+import { toast } from "react-toastify";
+import api from "../../../../api";
 
 interface QuestionGradeboxProps {
   id: number;
@@ -14,30 +16,49 @@ type Props = QuestionGradeboxProps;
 
 const ScriptTemplateQuestion: React.FC<Props> = ({ id, imgScale }) => {
   const classes = useStyles();
-  const { leafQuestions, updateLeaf } = useScriptSetup();
-  const [{ isDragging }, drag] = useDrag({
-    item: { ...leafQuestions[id], id, type: "questionBox" },
-    collect: monitor => ({
-      isDragging: monitor.isDragging()
-    })
-  });
+  const { leafQuestions, updateLeaf, refresh } = useScriptSetup();
+  const leafQuestion = leafQuestions[id];
+  const [offset, setOffset] = useState<{top: number, left: number}>({top: leafQuestion.topOffset, left: leafQuestion.leftOffset})
 
-  if (isDragging) {
-    return <div ref={drag} />;
-  }
+  const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+    setOffset({
+      top: offset.top + data.deltaY / imgScale,
+      left: offset.left + data.deltaX / imgScale
+    })
+  };
+
+  const handleDrop = async (data: DraggableData) => {
+    const leftOffset = Math.round(offset.left);
+    const topOffset = Math.round(offset.top);
+    updateLeaf(id, { leftOffset, topOffset });
+    try {
+      await api.questionTemplates.editQuestionTemplate(id, {
+        topOffset,
+        leftOffset
+      });
+      refresh();
+    } catch (error) {
+      toast.error(`Failed to move ${leafQuestion.name}`);
+    }
+  };
+  
   return (
-    <ReversedChip
-      ref={drag}
-      avatar={<Avatar>{leafQuestions[id].score || "-"}</Avatar>}
-      label={"Q" + leafQuestions[id].name}
-      onClick={() => updateLeaf(id)}
-      color="primary"
-      className={classes.chip}
-      style={{
-        top: leafQuestions[id].topOffset * imgScale,
-        left: leafQuestions[id].leftOffset * imgScale
-      }}
-    />
+    <DraggableCore
+      onDrag={handleDrag}
+      onStop={(e: DraggableEvent, data: DraggableData) => {handleDrop(data)}}
+    >
+      <ReversedChip
+        avatar={<Avatar>{leafQuestion.score || "-"}</Avatar>}
+        label={"Q" + leafQuestion.name}
+        onDoubleClick={() => updateLeaf(id)}
+        color="primary"
+        className={classes.chip}
+        style={{
+          top: offset.top * imgScale,
+          left: offset.left * imgScale
+        }}  
+      />
+    </DraggableCore>
   );
 };
 

@@ -7,16 +7,9 @@ import useScriptSetup, {
 } from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { useDrop, XYCoord } from "react-dnd";
-import { toast } from "react-toastify";
-import api from "../../../../api";
 import ScriptTemplateQuestion from "../ScriptTemplateGradebox";
 import useStyles from "./useStyles";
 
-type DragItem = QuestionGradebox & {
-  id: number;
-  type: string;
-};
 const PageTemplateView: React.FC<{
   pageTemplate: PageTemplateSetupData;
 }> = props => {
@@ -26,9 +19,7 @@ const PageTemplateView: React.FC<{
     currentPageNo,
     pageCount,
     goPage,
-    refresh,
     addLeaf,
-    updateLeaf,
     leafQuestions
   } = useScriptSetup();
 
@@ -44,30 +35,6 @@ const PageTemplateView: React.FC<{
       setImgScale(imgEle.width / imgEle.naturalWidth);
     }
   }, [imgRef.current, imgLoaded]);
-
-  const [, drop] = useDrop({
-    accept: "questionBox",
-    async drop(item: DragItem, monitor) {
-      if (imgRef.current) {
-        const scale = imgRef.current.width / imgRef.current.naturalWidth;
-        const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-        const leftOffset = Math.round(item.leftOffset + delta.x / scale);
-        const topOffset = Math.round(item.topOffset + delta.y / scale);
-        updateLeaf(item.id, { leftOffset, topOffset });
-        try {
-          await api.questionTemplates.editQuestionTemplate(item.id, {
-            topOffset,
-            leftOffset
-          });
-          refresh();
-        } catch (error) {
-          toast.error(`Failed to move ${item.name}`);
-        }
-      }
-
-      return undefined;
-    }
-  });
 
   return (
     <Typography
@@ -86,7 +53,7 @@ const PageTemplateView: React.FC<{
         >
           <BackIcon />
         </IconButton>
-        <div ref={drop} className={classes.container}>
+        <div className={classes.container}>
           <img
             ref={imgRef}
             className={classes.scriptImage}
@@ -96,7 +63,7 @@ const PageTemplateView: React.FC<{
 
           {Object.keys(leafQuestions).map(key =>
             leafQuestions[key].displayPage === currentPageNo ? (
-              <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale} />
+              <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale}/>
             ) : (
               <></>
             )
