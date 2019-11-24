@@ -435,7 +435,6 @@ export async function questionToMark(request: Request, response: Response) {
   response.status(200).json(data);
 }
 
-// given script and question template id, find the questions that i need
 export async function markScript(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;

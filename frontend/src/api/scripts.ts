@@ -1,16 +1,15 @@
 import { AxiosResponse } from "axios";
 import {
-  ScriptListData,
   ScriptData,
-  ScriptPostData,
-  ScriptPatchData
+  ScriptListData,
+  ScriptPatchData,
+  ScriptPostData
 } from "backend/src/types/scripts";
-import { ScriptViewData } from "backend/src/types/view";
-import PDFJS from "pdfjs-dist/webpack";
+import { ScriptMarkingData, ScriptViewData } from "backend/src/types/view";
 import { sha256 } from "js-sha256";
-
-import client from "./client";
+import PDFJS from "pdfjs-dist/webpack";
 import { getPage } from "../utils/canvas";
+import client from "./client";
 
 const URL = "/scripts";
 
@@ -102,4 +101,13 @@ export async function postScript(
     });
   };
   await reader.readAsDataURL(file);
+}
+
+export async function markScript(
+  scriptId: number,
+  rootQuestionTemplateId: number
+) {
+  return client.get<ScriptMarkingData>(
+    `${URL}/${scriptId}/question_templates/${rootQuestionTemplateId}`
+  );
 }

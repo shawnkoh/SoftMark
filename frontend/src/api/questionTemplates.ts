@@ -56,6 +56,7 @@ export async function editQuestionTemplate(
 /**
  * Only accessible to Marker
  */
+// DEPRECATED
 export async function getQuestionToMark(id: number) {
   try {
     const { data } = await client.get<ScriptViewData>(
@@ -65,4 +66,10 @@ export async function getQuestionToMark(id: number) {
   } catch (error) {
     return null;
   }
+}
+
+export async function getNextScriptToMark(questionTemplateId: number) {
+  return client.get<{ scriptId: number; rootQuestionTemplateId: number }>(
+    `${URL}/${questionTemplateId}/next_script_to_mark`
+  );
 }
