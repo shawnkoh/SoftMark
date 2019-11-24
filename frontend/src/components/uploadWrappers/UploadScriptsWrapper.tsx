@@ -54,7 +54,7 @@ const UploadScriptsWrapper: React.FC = props => {
             setTimeout(refreshScripts, 3000);
           }
         };
-        const threads = 5;
+        const threads = 4;
         let prevUpperLimitForIndex = 0;
         let upperLimitForIndex = 0;
         for (let i = 1; i <= threads; i++) {
