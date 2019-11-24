@@ -99,9 +99,9 @@ export class Script extends Discardable {
   getListDataWithScriptTemplate = async (
     scriptTemplateData: ScriptTemplateData | undefined
   ): Promise<ScriptListData> => {
-    const paperUser = this.studentId
-      ? await getRepository(PaperUser).findOne(this.studentId)
-      : null;
+    const paperUser = this.student || (this.studentId
+      && await getRepository(PaperUser).findOne(this.studentId))
+      || null;
 
     const questionTemplateIds = scriptTemplateData
       ? scriptTemplateData.questionTemplates.map(
