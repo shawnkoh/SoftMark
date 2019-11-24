@@ -16,5 +16,6 @@ router.patch("/:id/undiscard", QuestionTemplatesController.undiscard);
 router.post("/:id/allocations", AllocationsController.create);
 
 router.get("/:id/question_to_mark", ViewController.questionToMark);
+router.get("/:id/next_script_to_mark", ViewController.nextScriptToMark);
 
 export default router;

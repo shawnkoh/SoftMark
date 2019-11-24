@@ -40,3 +40,9 @@ export interface ScriptViewData {
   questions: QuestionViewData[];
   pages: PageViewData[];
 }
+
+export interface ScriptMarkingData extends ScriptViewData {
+  canMark: boolean;
+  previousScriptId: number | null;
+  nextScriptId: number | null;
+}
