@@ -55,7 +55,7 @@ export async function create(request: Request, response: Response) {
   }
 
   // Case: new script
-  const script = new Script(paperId, filename, sha256);
+  const script = new Script(paperId, filename, sha256, (imageUrls as string[]).length);
   const errors = await validate(script);
 
   if (errors.length > 0) {
@@ -269,7 +269,7 @@ export async function index(request: Request, response: Response) {
       requester.role === PaperUserRole.Student
         ? { paper, student: requester, discardedAt: IsNull() }
         : { paper, discardedAt: IsNull() },
-    relations: ["student", "pages", "questions"]
+    relations: ["student", "student.user"]
   });
 
   const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);

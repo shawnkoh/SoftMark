@@ -123,7 +123,6 @@ const InviteForm: React.FC<Props> = ({ token }) => {
       }}
     >
       {props => {
-        
         const { isSubmitting, handleSubmit } = props;
 
         return (

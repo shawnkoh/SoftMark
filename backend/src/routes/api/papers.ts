@@ -61,4 +61,6 @@ router.get(
   ScriptTemplatesController.getSetupData
 );
 
+router.get("/:paperId/allocations/self", AllocationsController.selfAllocations);
+
 export default router;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { CanvasSaver } from "../../../components/Canvas";
 import api from "../../../api";
 import jsPDF from "jspdf";
+import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { ScriptData } from "backend/src/types/scripts";
 import LoadingSpinner from "components/LoadingSpinner";
 import { toast } from "react-toastify";
@@ -42,6 +43,8 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
 
   useEffect(getNextScript, []);
 
+  const [isDownloading, setIsDownloading] = useState(true);
+
   if (isLoading) {
     return <LoadingSpinner loadingMessage="Loading next script..." />;
   }
@@ -79,6 +82,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
       if (isValidScriptIndex) {
         getNextScript();
       } else {
+        setIsDownloading(false);
         toast.success("No more scripts to download", { autoClose: false });
       }
     }
@@ -86,6 +90,14 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
 
   return (
     <div style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}>
+      <Dialog open={isDownloading}>
+        <DialogTitle>
+          Browser needs to be open in order to download the script(s).
+        </DialogTitle>
+        <DialogContent>
+          <LoadingSpinner loadingMessage="Downloading scripts..." />
+        </DialogContent>
+      </Dialog>
       {pages.map(page => {
         const backgroundAnnotations = page.annotations.map(
           annotation => annotation.layer

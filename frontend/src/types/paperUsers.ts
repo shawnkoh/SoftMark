@@ -37,6 +37,12 @@ export interface PaperUserListData extends DiscardableData {
   bookmarkCount: number;
 }
 
+export interface StudentListData extends DiscardableData {
+  user: UserData; // intentionally nested
+  role: PaperUserRole;
+  matriculationNumber: string | null;
+}
+
 export interface InviteData {
   paperName: string;
   userName: string | null;

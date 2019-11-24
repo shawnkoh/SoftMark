@@ -7,7 +7,8 @@ import {
 import {
   PaperUserData,
   PaperUserListData,
-  PaperUserPostData
+  PaperUserPostData,
+  StudentListData
 } from "../types/paperUsers";
 import client from "./client";
 import { AuthenticationData } from "backend/src/types/auth";
@@ -40,20 +41,20 @@ export async function getMarkers(
 
 export async function getStudents(
   id: number
-): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
+): Promise<AxiosResponse<{ paperUsers: StudentListData[] }>> {
   return client.get(`papers/${id}/students`);
 }
 
 export async function getUnmatchedStudents(
   id: number
-): Promise<AxiosResponse<{ paperUsers: PaperUserListData[] }>> {
+): Promise<AxiosResponse<{ paperUsers: StudentListData[] }>> {
   return client.get(`papers/${id}/unmatched_students`);
 }
 
 export async function patchStudent(
   id: number,
   data
-): Promise<AxiosResponse<{ paperUser: PaperUserData }>> {
+): Promise<AxiosResponse<{ paperUser: StudentListData }>> {
   return client.patch(`${URL}/${id}/students`, data);
 }
 

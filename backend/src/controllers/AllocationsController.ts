@@ -6,6 +6,7 @@ import { Allocation } from "../entities/Allocation";
 import { PaperUser } from "../entities/PaperUser";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
+import { selectAllocationListData } from "../selectors/allocations";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -210,4 +211,28 @@ async function getActiveAllocationsByPaperUserId(paperUserId: number) {
   return activeAllocations.filter(
     allocation => allocation.paperUserId === paperUserId
   );
+}
+
+export async function selfAllocations(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const paperId = Number(request.params.paperId);
+
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Marker);
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { requester } = allowed;
+
+  const query = getRepository(Allocation)
+    .createQueryBuilder("allocation")
+    .where("allocation.paperUserId = :paperUserId", {
+      paperUserId: requester.id
+    });
+
+  const allocations = await selectAllocationListData(query).getRawMany();
+
+  const data = { allocations };
+  response.status(200).json(data);
 }
