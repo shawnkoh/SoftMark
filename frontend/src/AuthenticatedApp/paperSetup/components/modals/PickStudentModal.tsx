@@ -1,8 +1,5 @@
-import {
-  ScriptListData,
-  ScriptPatchData
-} from "backend/src/types/scripts";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { ScriptListData, ScriptPatchData } from "backend/src/types/scripts";
+import { StudentListData } from "../../../../types/paperUsers";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import {
@@ -16,7 +13,6 @@ import {
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import api from "../../../../api";
-import usePaper from "contexts/PaperContext";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface Props {
@@ -34,17 +30,15 @@ const PickStudentModal: React.FC<Props> = props => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
-  const [chosenStudent, setChosenStudent] = useState<PaperUserListData | null>(
+  const [chosenStudent, setChosenStudent] = useState<StudentListData | null>(
     script.student
   );
 
-  const [options, setOptions] = useState<Array<PaperUserListData | null>>([]);
+  const [options, setOptions] = useState<Array<StudentListData | null>>([]);
 
   useEffect(() => {
     if (isOpen) {
-      const newOptions: Array<PaperUserListData | null> = [
-        ...unmatchedStudents
-      ];
+      const newOptions: Array<StudentListData | null> = [...unmatchedStudents];
       if (chosenStudent) {
         newOptions.push(chosenStudent);
       }
@@ -62,7 +56,7 @@ const PickStudentModal: React.FC<Props> = props => {
             clearOnEscape
             defaultValue={chosenStudent}
             options={options}
-            getOptionLabel={(option: PaperUserListData | null) => {
+            getOptionLabel={(option: StudentListData | null) => {
               if (!option) {
                 return "No match";
               }

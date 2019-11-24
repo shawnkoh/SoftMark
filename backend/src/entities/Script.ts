@@ -30,6 +30,7 @@ export class Script extends Discardable {
     paper: number | Paper,
     filename: string,
     sha256: string,
+    pageCount: number,
     student?: number | PaperUser
   ) {
     super();
@@ -48,6 +49,7 @@ export class Script extends Discardable {
     } else {
       this.student = student;
     }
+    this.pageCount = pageCount;
     this.hasVerifiedStudent = false;
     this.hasBeenPublished = false;
   }
@@ -84,6 +86,9 @@ export class Script extends Discardable {
   @Column("boolean")
   @IsNotEmpty()
   hasBeenPublished!: boolean;
+
+  @Column({ type: "int" })
+  pageCount!: number;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -131,16 +136,11 @@ export class Script extends Discardable {
       ...this.getBase(),
       paperId: this.paperId,
       filename: this.filename,
-      student: paperUser ? await paperUser.getData() : null,
+      student: paperUser ? await paperUser.getStudentData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
       hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
-      pagesCount: this.pages
-        ? this.pages.length
-        : await getRepository(Page).count({ scriptId: this.id }),
-      questionsCount: this.questions
-        ? this.questions.length
-        : await getRepository(Question).count({ scriptId: this.id })
+      pagesCount: this.pageCount
     };
   };
 
@@ -178,16 +178,13 @@ export class Script extends Discardable {
       ...this.getBase(),
       paperId: this.paperId,
       filename: this.filename,
-      student: paperUser ? await paperUser.getData() : null,
+      student: paperUser ? await paperUser.getStudentData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
       hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
       pagesCount: this.pages
         ? this.pages.length
-        : await getRepository(Page).count({ scriptId: this.id }),
-      questionsCount: this.questions
-        ? this.questions.length
-        : await getRepository(Question).count({ scriptId: this.id })
+        : await getRepository(Page).count({ scriptId: this.id })
     };
   };
 

@@ -18,7 +18,7 @@ import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
 import useScriptsAndStudents from "../../../../contexts/ScriptsAndStudentsContext";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { StudentListData } from "../../../../types/paperUsers";
 import AddStudentModal from "../modals/AddStudentModal";
 import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
 import StudentsTableRow from "./StudentsTableRow";
@@ -162,7 +162,7 @@ const StudentsTable: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            {filteredStudents.map((student: PaperUserListData) => {
+            {filteredStudents.map((student: StudentListData) => {
               return (
                 <StudentsTableRow
                   key={student.id}

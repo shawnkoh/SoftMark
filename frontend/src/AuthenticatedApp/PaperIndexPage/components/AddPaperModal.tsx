@@ -22,7 +22,6 @@ const AddPaperModal: React.FC<Props> = ({
   toggleVisibility,
   toggleRefresh
 }) => {
-
   const values: PaperPostData = {
     name: ""
   };
