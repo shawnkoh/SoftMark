@@ -12,9 +12,9 @@ import {
 } from "@material-ui/core";
 import {
   GradingData,
+  MarkerGradingData,
   QuestionTemplateGradingRootData
 } from "backend/src/types/grading";
-import { UserListData } from "backend/src/types/users";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -52,7 +52,7 @@ const GradingSubpage: React.FC = () => {
     markers
   } = gradingData;
 
-  const userMap = new Map<number, UserListData>();
+  const userMap = new Map<number, MarkerGradingData>();
   for (let i = 0; i < markers.length; i++) {
     const marker = markers[i];
     userMap.set(marker.id, marker);
