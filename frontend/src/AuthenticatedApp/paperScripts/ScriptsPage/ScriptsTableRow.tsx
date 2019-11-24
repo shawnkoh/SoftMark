@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import api from "../../../api";
 import VerificationSwitch from "../../../components/misc/VerificationSwitch";
 import useStyles from "./styles";
+import MarkWhichQuestionModal from "./MarkWhichQuestionModal";
 
 interface Props {
   script: ScriptListData;
@@ -75,15 +76,20 @@ const ScriptsTableRow: React.FC<Props> = props => {
       </TableCell>
       <TableCell>
         <Tooltip title={`Mark script of ${matriculationNumber}`}>
-          <Button
-            component={Link}
-            to={`${url}/${id}/mark`}
-            variant="contained"
-            color="primary"
-            className={classes.button}
-          >
-            Mark
-          </Button>
+          <MarkWhichQuestionModal
+            baseUrl={`${url}/${id}/mark`}
+            render={
+              <Button
+                component={Link}
+                to={`${url}/${id}/mark`}
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                Mark
+              </Button>
+            }
+          />
         </Tooltip>
         <Tooltip title={`View script of ${matriculationNumber}`}>
           <Button
