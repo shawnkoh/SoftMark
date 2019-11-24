@@ -642,19 +642,16 @@ export async function marking(request: Request, response: Response) {
     .select("script.id", "id")
     .getRawMany();
 
-  let nextScript: { id: number; rootQuestionTemplateId: number } | null = null;
-  let previousScript: {
-    id: number;
-    rootQuestionTemplateId: number;
-  } | null = null;
+  let nextScriptId: number | null = null;
+  let previousScriptId: number | null = null;
 
   if (scripts.length > 1) {
     const scriptIndex = scripts.findIndex(script => script.id === scriptId);
     if (scriptIndex > 0) {
-      previousScript = { id: scriptId, rootQuestionTemplateId };
+      previousScriptId = scripts[scriptIndex - 1].id;
     }
     if (scriptIndex < scripts.length - 1) {
-      nextScript = { id: scriptId, rootQuestionTemplateId };
+      nextScriptId = scripts[scriptIndex + 1].id;
     }
   }
 
@@ -666,8 +663,8 @@ export async function marking(request: Request, response: Response) {
     questions,
     rootQuestionTemplate,
     canMark,
-    nextScript,
-    previousScript
+    nextScriptId,
+    previousScriptId
   };
 
   response.status(200).json(data);

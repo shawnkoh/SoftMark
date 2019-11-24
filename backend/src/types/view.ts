@@ -43,6 +43,6 @@ export interface ScriptViewData {
 
 export interface ScriptMarkingData extends ScriptViewData {
   canMark: boolean;
-  previousScript: { id: number; rootQuestionTemplateId: number } | null;
-  nextScript: { id: number; rootQuestionTemplateId: number } | null;
+  previousScriptId: number | null;
+  nextScriptId: number | null;
 }
