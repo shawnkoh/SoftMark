@@ -55,7 +55,7 @@ const GradingTableRow: React.FC<Props> = props => {
               color="primary"
               style={{ borderRadius: 24 }}
             >
-              Grade
+              Mark
             </Button>
           </Tooltip>
         )}

@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexGrow: 1
     },
+    button: {
+      marginLeft: theme.spacing(4)
+    },
     backButton: {
       marginRight: theme.spacing(2)
     },
