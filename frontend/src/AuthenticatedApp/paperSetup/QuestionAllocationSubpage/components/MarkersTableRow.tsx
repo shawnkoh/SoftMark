@@ -57,9 +57,12 @@ const MarkersTableRow: React.FC<Props> = props => {
       .deleteAllocation(allocationId)
       .then(() => {
         getAllocations();
-        toast.success("Deallication of question was succesfuk.");
       })
-      .catch(() => toast.error("Deallocation of question could not be made."));
+      .catch(() =>
+        toast.error(
+          "An error occured while deallocating the question. Try refreshing the page."
+        )
+      );
   };
 
   const postAllocation = (questionTemplate: QuestionTemplateData) => {
@@ -69,14 +72,11 @@ const MarkersTableRow: React.FC<Props> = props => {
     api.allocations
       .createAllocation(questionTemplate.id, allocationPostData)
       .then(res => {
-        toast.success(
-          `Question ${questionTemplate.name} was successfully allocated to ${name}`
-        );
         getAllocations();
       })
       .catch(() =>
         toast.error(
-          `Question ${questionTemplate.name} could not be allocated to ${name}.`
+          `An error occured while allocating Question ${questionTemplate.name}. Try refreshing the page.`
         )
       );
   };

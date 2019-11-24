@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { PaperUserListData } from "../../../../types/paperUsers";
-import { discardPaperUser } from "../../../../api/paperUsers";
-
 import { toast } from "react-toastify";
+import { discardPaperUser } from "../../../../api/paperUsers";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
+import { PaperUserListData } from "../../../../types/paperUsers";
 
 interface OwnProps {
   marker: PaperUserListData;
@@ -35,10 +34,11 @@ const DeleteMarkerModal: React.FC<Props> = props => {
               if (refreshMarkers) {
                 refreshMarkers();
               }
-              toast(`Marker ${userAsString} has been deleted successfully.`);
             })
             .catch(errors => {
-              toast.error(`Marker ${userAsString} could not be deleted.`);
+              toast.error(
+                `An error occured while deleting Marker ${userAsString}. Try refreshing the page.`
+              );
             });
         }}
       />
