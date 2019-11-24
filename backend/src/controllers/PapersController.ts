@@ -7,7 +7,11 @@ import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { selectPaperData } from "../selectors/papers";
-import { GradingData, QuestionTemplateGradingRootData } from "../types/grading";
+import {
+  GradingData,
+  MarkerGradingData,
+  QuestionTemplateGradingRootData
+} from "../types/grading";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -203,32 +207,26 @@ export async function grading(request: Request, response: Response) {
     .addSelect("mark.score", "score")
     .getRawMany();
 
-  console.log("questions", questions);
+  let markersData: (MarkerGradingData & { questionTemplateId: number })[] = [];
 
-  const markersData: {
-    questionTemplateId: number;
-    id: number;
-    email: string;
-    emailVerified: boolean;
-    name: string | null;
-  }[] = await getRepository(Allocation)
-    .createQueryBuilder("allocation")
-    .innerJoin(
-      "allocation.questionTemplate",
-      "questionTemplate",
-      "questionTemplate.id IN (:...ids)",
-      { ids: rootQuestionTemplateIds }
-    )
-    .innerJoin("allocation.paperUser", "marker", "marker.discardedAt IS NULL")
-    .innerJoin("marker.user", "user", "user.discardedAt IS NULL")
-    .select("questionTemplate.id", "questionTemplateId")
-    .addSelect("user.id", "id")
-    .addSelect("user.email", "email")
-    .addSelect("user.emailVerified", "emailVerified")
-    .addSelect("user.name", "name")
-    .getRawMany();
-
-  console.log("markersData", markersData);
+  if (rootQuestionTemplateIds.length > 0) {
+    markersData = await getRepository(Allocation)
+      .createQueryBuilder("allocation")
+      .innerJoin(
+        "allocation.questionTemplate",
+        "questionTemplate",
+        "questionTemplate.id IN (:...ids)",
+        { ids: rootQuestionTemplateIds }
+      )
+      .innerJoin("allocation.paperUser", "marker", "marker.discardedAt IS NULL")
+      .innerJoin("marker.user", "user", "user.discardedAt IS NULL")
+      .select("questionTemplate.id", "questionTemplateId")
+      .addSelect("user.id", "id")
+      .addSelect("user.email", "email")
+      .addSelect("user.emailVerified", "emailVerified")
+      .addSelect("user.name", "name")
+      .getRawMany();
+  }
 
   const markers = _.uniqBy(markersData, "id");
 
@@ -248,7 +246,7 @@ export async function grading(request: Request, response: Response) {
     rootQuestionTemplatesData.map(async root => {
       const descendantQuestionTemplates = await getTreeRepository(
         QuestionTemplate
-      ).findDescendants(root.id as any);
+      ).findDescendants((root as unknown) as QuestionTemplate);
       const descendantQuestionTemplateIds = descendantQuestionTemplates.map(
         descendant => descendant.id
       );
@@ -283,16 +281,12 @@ export async function grading(request: Request, response: Response) {
     })
   );
 
-  console.log("rootQuestionTemplateIds", rootQuestionTemplateIds);
-
   const data: GradingData = {
     rootQuestionTemplates,
     totalQuestionCount: questions.length,
     totalMarkCount: questions.filter(question => !!question.score).length,
-    markers: markers as any // temporary
+    markers
   };
-
-  console.log("data", data);
 
   response.status(200).json(data);
 }
