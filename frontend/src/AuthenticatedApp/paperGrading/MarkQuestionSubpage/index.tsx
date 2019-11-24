@@ -10,7 +10,10 @@ import {
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-import { ScriptViewData } from "backend/src/types/view";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import SkipNextIcon from "@material-ui/icons/SkipNext";
+import { ScriptMarkingData } from "backend/src/types/view";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
@@ -23,11 +26,17 @@ import useStyles from "./styles";
 const MarkQuestionPage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
-  const { questionTemplateId } = useParams();
+  const { questionTemplateId: questionTemplateIdString } = useParams();
+  const questionTemplateId = Number(questionTemplateIdString);
 
-  const [scriptViewData, setScriptViewData] = useState<ScriptViewData | null>(
-    null
-  );
+  const [nextScriptToMarkData, setNextScriptToMarkData] = useState<{
+    scriptId: number;
+    rootQuestionTemplateId: number;
+  } | null>(null);
+  const [
+    scriptMarkingData,
+    setScriptMarkingData
+  ] = useState<ScriptMarkingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
@@ -35,28 +44,70 @@ const MarkQuestionPage: React.FC = () => {
   const [pageNo, setPageNo] = useState<number>(0);
   const [pageNos, setPageNos] = useState<number[]>([0]);
 
-  const getScriptViewData = async (questionTemplateId: number) => {
+  const getNextScriptToMarkData = async (questionTemplateId: number) => {
     setIsLoading(true);
-    const data = await api.questionTemplates.getQuestionToMark(
+    const response = await api.questionTemplates.getNextScriptToMark(
       questionTemplateId
     );
-    setScriptViewData(data);
+    setNextScriptToMarkData(response.data);
+    setIsLoading(false);
+  };
+
+  const getScriptMarkingData = async (
+    scriptId: number,
+    questionTemplateId: number
+  ) => {
+    setIsLoading(true);
+    const response = await api.scripts.markScript(scriptId, questionTemplateId);
+    setScriptMarkingData(response.data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    getScriptViewData(Number(questionTemplateId));
+    getNextScriptToMarkData(questionTemplateId);
   }, [refreshFlag]);
 
   useEffect(() => {
-    if (scriptViewData && scriptViewData.pages.length) {
-      setPageNos(scriptViewData.pages.map(page => page.pageNo));
+    if (nextScriptToMarkData) {
+      getScriptMarkingData(
+        nextScriptToMarkData.scriptId,
+        nextScriptToMarkData.rootQuestionTemplateId
+      );
     }
-  }, [scriptViewData]);
+  }, [nextScriptToMarkData]);
+
+  useEffect(() => {
+    console.log(scriptMarkingData); // for debugging
+    if (scriptMarkingData && scriptMarkingData.pages.length) {
+      setPageNos(scriptMarkingData.pages.map(page => page.pageNo));
+    }
+  }, [scriptMarkingData]);
 
   useEffect(() => {
     if (pageNos.length) setPageNo(pageNos[0]);
   }, [pageNos]);
+
+  const handlePrevClick = event => {
+    if (scriptMarkingData) {
+      const prevScriptId = scriptMarkingData.previousScriptId;
+      if (prevScriptId) {
+        getScriptMarkingData(prevScriptId, questionTemplateId);
+      }
+    }
+  };
+
+  const handleNextClick = event => {
+    if (scriptMarkingData) {
+      const nextScriptId = scriptMarkingData.nextScriptId;
+      if (nextScriptId) {
+        getScriptMarkingData(nextScriptId, questionTemplateId);
+      }
+    }
+  };
+
+  const handleNextUnmarkedClick = event => {
+    toggleRefreshFlag();
+  };
 
   interface HeaderProps {
     subtitle: string;
@@ -80,8 +131,30 @@ const MarkQuestionPage: React.FC = () => {
             <Typography variant="subtitle1">{subtitle}</Typography>
           </Grid>
         </Grid>
-        <Button color="inherit" onClick={toggleRefreshFlag}>
-          Next Script
+        <Button
+          color="inherit"
+          onClick={handlePrevClick}
+          startIcon={<NavigateBeforeIcon />}
+          className={classes.button}
+        >
+          Previous
+        </Button>
+        <Button
+          color="inherit"
+          onClick={handleNextClick}
+          startIcon={<NavigateNextIcon />}
+          className={classes.button}
+        >
+          Next
+        </Button>
+        <Button
+          color="inherit"
+          variant="outlined"
+          onClick={handleNextUnmarkedClick}
+          startIcon={<SkipNextIcon />}
+          className={classes.button}
+        >
+          Next Unmarked
         </Button>
       </Toolbar>
     </AppBar>
@@ -98,22 +171,37 @@ const MarkQuestionPage: React.FC = () => {
     );
   }
 
-  if (scriptViewData) {
-    console.log(scriptViewData); // for debugging
-
+  if (scriptMarkingData) {
     const {
       matriculationNumber,
       rootQuestionTemplate,
       questions,
-      pages
-    } = scriptViewData;
+      pages,
+      canMark
+    } = scriptMarkingData;
+
+    if (!canMark) {
+      return (
+        <div className={classes.container}>
+          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Container maxWidth={false} className={classes.innerContainer}>
+            <Typography variant="subtitle1">
+              Cannot mark this script. Someone else may be marking it now. Try
+              another script.
+            </Typography>
+          </Container>
+        </div>
+      );
+    }
 
     if (!pages) {
       return (
         <div className={classes.container}>
           <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
-            <Typography variant="subtitle1">No pages to display.</Typography>
+            <Typography variant="subtitle1">
+              No pages to display for this script.
+            </Typography>
           </Container>
         </div>
       );
