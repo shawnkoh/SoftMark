@@ -96,6 +96,17 @@ const ScriptsTableRow: React.FC<Props> = props => {
             View
           </Button>
         </Tooltip>
+        <Tooltip title={`Download script of ${matriculationNumber}`}>
+          <Button
+            component={Link}
+            to={`${url}/${id}/save_script`}
+            variant="contained"
+            color="primary"
+            className={classes.button}
+          >
+            Download
+          </Button>
+        </Tooltip>
       </TableCell>
     </TableRow>
   );

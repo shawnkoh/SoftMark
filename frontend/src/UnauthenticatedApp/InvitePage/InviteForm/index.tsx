@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { InviteData, InvitePostData } from "backend/src/types/paperUsers";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -123,15 +123,8 @@ const InviteForm: React.FC<Props> = ({ token }) => {
       }}
     >
       {props => {
-        const {
-          values,
-          touched,
-          errors,
-          isSubmitting,
-          handleChange,
-          handleBlur,
-          handleSubmit
-        } = props;
+        
+        const { isSubmitting, handleSubmit } = props;
 
         return (
           <form className="l-form" onSubmit={handleSubmit}>

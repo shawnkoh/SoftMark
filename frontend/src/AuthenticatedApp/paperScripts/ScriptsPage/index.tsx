@@ -215,7 +215,7 @@ const ScriptsSubpage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
-                  <div style={{ textAlign: "center" }}>No students found.</div>
+                  <div style={{ textAlign: "center" }}>No scripts found.</div>
                   <br />
                 </TableCell>
               </TableRow>

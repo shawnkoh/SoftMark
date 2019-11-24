@@ -1,16 +1,7 @@
 import React from "react";
-import Konva, { Stage, Layer, Line } from "react-konva";
+import { Stage, Layer, Line } from "react-konva";
 
 import UrlImage from "./UrlImage";
-
-function downloadURI(uri, name) {
-  var link = document.createElement("a");
-  link.download = name;
-  link.href = uri;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
 
 class CanvasSaver extends React.Component {
   constructor(props) {
@@ -32,8 +23,6 @@ class CanvasSaver extends React.Component {
   componentDidUpdate() {
     // shouldnt send the data URL back more than once
   }
-
-  async componentWillUnmount() {}
 
   handleLoad(width, height) {
     this.setState({ width, height });

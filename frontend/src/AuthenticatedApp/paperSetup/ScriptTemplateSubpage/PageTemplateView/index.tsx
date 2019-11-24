@@ -2,9 +2,7 @@ import { Box, Fab, IconButton, Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import BackIcon from "@material-ui/icons/ArrowBackIos";
 import ForwardIcon from "@material-ui/icons/ArrowForwardIos";
-import useScriptSetup, {
-  QuestionGradebox
-} from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
+import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { PageTemplateSetupData } from "backend/src/types/pageTemplates";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import ScriptTemplateQuestion from "../ScriptTemplateGradebox";

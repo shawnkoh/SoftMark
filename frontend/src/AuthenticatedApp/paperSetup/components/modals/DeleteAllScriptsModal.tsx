@@ -1,4 +1,3 @@
-import { ScriptListData } from "backend/src/types/scripts";
 import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../../api";

@@ -1,5 +1,4 @@
 import { AxiosResponse } from "axios";
-import { PaperData } from "backend/src/types/papers";
 import {
   InviteData,
   InvitePostData,
@@ -8,8 +7,7 @@ import {
 import {
   PaperUserData,
   PaperUserListData,
-  PaperUserPostData,
-  PaperUserRole
+  PaperUserPostData
 } from "../types/paperUsers";
 import client from "./client";
 import { AuthenticationData } from "backend/src/types/auth";

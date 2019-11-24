@@ -13,16 +13,11 @@ import {
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
-import { ScriptListData } from "backend/src/types/scripts";
-import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
-import React, { useEffect, useState } from "react";
-import api from "../../../../api";
+import React, { useState } from "react";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
-import usePaper from "../../../../contexts/PaperContext";
 import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
@@ -31,7 +26,6 @@ import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
-  const paper = usePaper();
   const { scriptTemplate } = useScriptTemplate();
   const { scripts, matchScriptsToStudents } = useScriptsAndStudents();
 

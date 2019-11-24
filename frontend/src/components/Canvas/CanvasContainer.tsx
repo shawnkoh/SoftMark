@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { Annotation } from "backend/src/types/annotations";
 import { CanvasProps, CanvasMode } from "./types";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";

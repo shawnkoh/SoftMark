@@ -1,8 +1,6 @@
-import { PaperUserListData } from "../../types/paperUsers";
 import { ScriptTemplateData } from "backend/src/types/scriptTemplates";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router";
-import { toast } from "react-toastify";
+import { useParams } from "react-router";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
@@ -27,8 +25,6 @@ export const ScriptTemplateProvider: React.FC = props => {
 
   const paperId = Number(paper_id);
 
-  const [isRejected, setIsRejected] = useState(false);
-
   const [
     scriptTemplate,
     setScriptTemplate
@@ -46,14 +42,6 @@ export const ScriptTemplateProvider: React.FC = props => {
 
   if (isLoadingScriptTemplate) {
     return <LoadingSpinner loadingMessage="Loading script template..." />;
-  }
-
-  if (isRejected) {
-    return (
-      <div>
-        <p>The Paper you are trying to access does not exist.</p>
-      </div>
-    );
   }
 
   return (

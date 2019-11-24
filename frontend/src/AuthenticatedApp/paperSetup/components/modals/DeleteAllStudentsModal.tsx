@@ -1,9 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import api from "../../../../api";
-import { PaperUserListData } from "../../../../types/paperUsers";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
-import LoadingSpinner from "components/LoadingSpinner";
 import usePaper from "contexts/PaperContext";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 

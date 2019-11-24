@@ -36,11 +36,7 @@ const PublishScriptsModal: React.FC<Props> = props => {
             .catch(errors => {
               toast.error(`Scripts could not be published.`);
             })
-            .finally(() => {
-              if (refreshScripts) {
-                refreshScripts();
-              }
-            });
+            .finally(() => refreshScripts());
         }}
       />
       {render(toggleVisibility)}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { PAPER_USER_ROLE_OPTIONS } from "../../../../utils/options";
 import { PaperUserRole, PaperUserPostData } from "../../../../types/paperUsers";
 import api from "../../../../api";
 
