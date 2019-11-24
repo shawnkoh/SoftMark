@@ -66,12 +66,13 @@ export async function viewScript(request: Request, response: Response) {
   const requesterId = payload.userId;
   const scriptId = Number(request.params.id);
 
-  const scriptQuery = getRepository(Script)
-    .createQueryBuilder("script")
-    .where("script.id = :scriptId", { scriptId })
-    .andWhere("script.discardedAt IS NULL");
+  const scriptQuery = () =>
+    getRepository(Script)
+      .createQueryBuilder("script")
+      .where("script.id = :scriptId", { scriptId })
+      .andWhere("script.discardedAt IS NULL");
 
-  const script = await selectScriptData(scriptQuery)
+  const script = await selectScriptData(scriptQuery())
     .leftJoin("script.student", "student", "student.discardedAt IS NULL")
     .getRawOne();
   if (!script) {
@@ -89,22 +90,23 @@ export async function viewScript(request: Request, response: Response) {
     return;
   }
 
-  const questionsQuery = scriptQuery
-    .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
-    .innerJoin(
-      "question.questionTemplate",
-      "questionTemplate",
-      "questionTemplate.discardedAt IS NULL"
-    );
+  const questionsQuery = () =>
+    scriptQuery()
+      .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
+      .innerJoin(
+        "question.questionTemplate",
+        "questionTemplate",
+        "questionTemplate.discardedAt IS NULL"
+      );
 
   const questions: QuestionViewData[] = await selectQuestionViewData(
-    questionsQuery
+    questionsQuery()
   )
     .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
     .getRawMany();
 
   // TODO: Not sure how useful rootQuestionTemplate is in viewScript
-  const rootQuestionTemplate = await questionsQuery
+  const rootQuestionTemplate = await questionsQuery()
     .orderBy("questionTemplate.displayPage", "ASC")
     .select("questionTemplate.id", "id")
     .addSelect("questionTemplate.name", "name")
@@ -122,7 +124,7 @@ export async function viewScript(request: Request, response: Response) {
     annotationId: number | null;
     layer: any;
     imageUrl: string;
-  }> = await selectPageViewData(questionsQuery)
+  }> = await selectPageViewData(questionsQuery())
     .innerJoin("script.pages", "page", "page.discardedAt IS NULL")
     .leftJoin("page.annotations", "annotation")
     .getRawMany();
