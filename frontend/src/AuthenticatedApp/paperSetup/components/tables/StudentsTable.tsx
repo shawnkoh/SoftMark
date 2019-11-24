@@ -12,8 +12,7 @@ import {
 import DeleteAllIcon from "@material-ui/icons/DeleteForever";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
-import React, { useEffect, useState } from "react";
-import api from "../../../../api";
+import React, { useState } from "react";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";

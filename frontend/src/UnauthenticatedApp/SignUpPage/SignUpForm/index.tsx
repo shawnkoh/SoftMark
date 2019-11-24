@@ -1,4 +1,4 @@
-import { Button, Grid, Link, TextField } from "@material-ui/core";
+import { Grid, Link, TextField } from "@material-ui/core";
 import { Formik } from "formik";
 import React from "react";
 import { useDispatch } from "react-redux";
@@ -57,7 +57,6 @@ const SignUpForm: React.FC = () => {
       {props => {
         const {
           values,
-          touched,
           errors,
           isSubmitting,
           handleChange,

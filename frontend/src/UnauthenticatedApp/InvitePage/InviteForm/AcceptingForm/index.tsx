@@ -1,4 +1,4 @@
-import { Button, Grid, TextField, Typography } from "@material-ui/core";
+import { Grid, TextField, Typography } from "@material-ui/core";
 import { InviteData } from "backend/src/types/paperUsers";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const AcceptingForm: React.FC<Props> = ({ inviteData, replyInvite }) => {
-  const { paperName, userName } = inviteData;
+  const { userName } = inviteData;
 
   return (
     <Formik

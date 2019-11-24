@@ -27,7 +27,6 @@ const ScriptEdit: React.FC = () => {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
 
   const getScriptViewData = async (scriptId: number) => {
     setIsLoading(true);
@@ -38,7 +37,7 @@ const ScriptEdit: React.FC = () => {
 
   useEffect(() => {
     getScriptViewData(Number(scriptId));
-  }, [refreshFlag]);
+  }, []);
 
   const [pageNo, setPageNo] = useState(1);
 

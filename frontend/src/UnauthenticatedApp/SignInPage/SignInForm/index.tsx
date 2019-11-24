@@ -1,12 +1,9 @@
 import {
-  Button,
   Grid,
   Link,
   Paper,
   TextField,
-  Theme,
-  Typography,
-  withStyles
+  Typography
 } from "@material-ui/core";
 import { Formik } from "formik";
 import React, { useState } from "react";
@@ -26,12 +23,6 @@ const validationSchema = yup.object().shape({
     .required(),
   password: yup.string()
 });
-
-const ThemedTextField = withStyles((theme: Theme) => ({
-  root: {
-    backgroundColor: theme.palette.common.white
-  }
-}))(TextField);
 
 const SignInForm = () => {
   const history = useHistory();

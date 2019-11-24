@@ -28,7 +28,6 @@ const ScriptView: React.FC = () => {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
 
   const getScriptViewData = async (scriptId: number) => {
     setIsLoading(true);
@@ -39,7 +38,7 @@ const ScriptView: React.FC = () => {
 
   useEffect(() => {
     getScriptViewData(Number(scriptId));
-  }, [refreshFlag]);
+  }, []);
 
   const [pageNo, setPageNo] = useState(1);
 
@@ -87,8 +86,7 @@ const ScriptView: React.FC = () => {
     console.log(scriptViewData); // for debugging
 
     const {
-      matriculationNumber,
-      rootQuestionTemplate,
+      matriculationNumber,  
       questions,
       pages
     } = scriptViewData;

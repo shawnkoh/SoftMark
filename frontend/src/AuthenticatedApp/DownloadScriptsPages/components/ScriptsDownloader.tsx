@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { CanvasSaver } from "../../components/Canvas";
-import api from "../../api";
+import { CanvasSaver } from "../../../components/Canvas";
+import api from "../../../api";
 import jsPDF from "jspdf";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import { ScriptData } from "backend/src/types/scripts";
 import LoadingSpinner from "components/LoadingSpinner";
 import { toast } from "react-toastify";
 
-const DownloadAsPdfPage: React.FC = () => {
-  const { scripts } = useScriptsAndStudents();
+interface Props {
+  scriptIds: number[];
+}
+
+const DownloadAsPdfPage: React.FC<Props> = props => {
+  const { scriptIds } = props;
 
   const [script, setScript] = useState<ScriptData | null>(null);
 
@@ -29,10 +32,10 @@ const DownloadAsPdfPage: React.FC = () => {
   const incrementScriptIndex = () => setScriptIndex(scriptIndex + 1);
 
   const getNextScript = () => {
-    const isValidScriptIndex = scriptIndex < scripts.length;
+    const isValidScriptIndex = scriptIndex < scriptIds.length;
     if (isValidScriptIndex) {
-      const nextScript = scripts[scriptIndex];
-      getScript(nextScript.id);
+      const nextScriptId = scriptIds[scriptIndex];
+      getScript(nextScriptId);
       incrementScriptIndex();
     }
   };
@@ -47,7 +50,7 @@ const DownloadAsPdfPage: React.FC = () => {
     return <div>This script does not exist.</div>;
   }
 
-  if (scriptIndex > scripts.length) {
+  if (scriptIndex > scriptIds.length) {
     return <div>No more scripts to download.</div>;
   }
 
@@ -72,7 +75,7 @@ const DownloadAsPdfPage: React.FC = () => {
       pdf.save(`${script.filename}.pdf`);
 
       // gets next script to download if there is one
-      const isValidScriptIndex = scriptIndex < scripts.length;
+      const isValidScriptIndex = scriptIndex < scriptIds.length;
       if (isValidScriptIndex) {
         getNextScript();
       } else {

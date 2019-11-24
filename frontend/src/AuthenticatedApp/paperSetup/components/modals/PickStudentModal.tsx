@@ -11,8 +11,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
-  Typography
+  TextField
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
@@ -27,7 +26,6 @@ interface Props {
 }
 
 const PickStudentModal: React.FC<Props> = props => {
-  const paper = usePaper();
   const {
     unmatchedStudents,
     refreshUnmatchedStudents
