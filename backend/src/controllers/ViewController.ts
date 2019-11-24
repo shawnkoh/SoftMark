@@ -15,7 +15,12 @@ import { Script } from "../entities/Script";
 import { AnnotationLine } from "../types/annotations";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
-import { PageViewData, QuestionViewData, ScriptViewData } from "../types/view";
+import {
+  PageViewData,
+  QuestionViewData,
+  ScriptMarkingData,
+  ScriptViewData
+} from "../types/view";
 import { allowedRequester } from "../utils/papers";
 
 function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
@@ -431,13 +436,11 @@ export async function questionToMark(request: Request, response: Response) {
 }
 
 // given script and question template id, find the questions that i need
-export async function markQuestionTemplate(
-  request: Request,
-  response: Response
-) {
+export async function marking(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;
-  const { scriptId, rootQuestionTemplateId } = request.params;
+  const scriptId = Number(request.params.scriptId);
+  const rootQuestionTemplateId = Number(request.params.rootQuestionTemplateId);
 
   const script = await getRepository(Script)
     .createQueryBuilder("script")
@@ -631,14 +634,40 @@ export async function markQuestionTemplate(
     return { ...page, questionIds };
   });
 
-  const data: ScriptViewData = {
-    id: Number(scriptId),
+  const scripts: { id: number }[] = await getRepository(Script)
+    .createQueryBuilder("script")
+    .where("script.paperId = :paperId", { paperId })
+    .andWhere("script.discardedAt IS NULL")
+    .orderBy("script.id", "ASC")
+    .select("script.id", "id")
+    .getRawMany();
+
+  let nextScript: { id: number; rootQuestionTemplateId: number } | null = null;
+  let previousScript: {
+    id: number;
+    rootQuestionTemplateId: number;
+  } | null = null;
+
+  if (scripts.length > 1) {
+    const scriptIndex = scripts.findIndex(script => script.id === scriptId);
+    if (scriptIndex > 0) {
+      previousScript = { id: scriptId, rootQuestionTemplateId };
+    }
+    if (scriptIndex < scripts.length - 1) {
+      nextScript = { id: scriptId, rootQuestionTemplateId };
+    }
+  }
+
+  const data: ScriptMarkingData = {
+    id: scriptId,
     studentId,
     matriculationNumber,
     pages,
     questions,
     rootQuestionTemplate,
-    canMark
+    canMark,
+    nextScript,
+    previousScript
   };
 
   response.status(200).json(data);

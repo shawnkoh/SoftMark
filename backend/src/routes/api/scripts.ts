@@ -15,7 +15,7 @@ router.patch("/:id", ScriptsController.update);
 
 router.get(
   "/:scriptId/question_templates/:rootQuestionTemplateId",
-  ViewController.markQuestionTemplate
+  ViewController.marking
 );
 
 export default router;

@@ -39,5 +39,10 @@ export interface ScriptViewData {
   rootQuestionTemplate: QuestionTemplateViewData;
   questions: QuestionViewData[];
   pages: PageViewData[];
-  canMark?: boolean;
+}
+
+export interface ScriptMarkingData extends ScriptViewData {
+  canMark: boolean;
+  previousScript: { id: number; rootQuestionTemplateId: number } | null;
+  nextScript: { id: number; rootQuestionTemplateId: number } | null;
 }
