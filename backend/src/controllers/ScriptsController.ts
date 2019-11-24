@@ -14,7 +14,6 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 import { sendScriptEmail } from "../utils/sendgrid";
 import { sortByFilename } from "../utils/sorts";
-import { ScriptTemplateData } from "scriptTemplates";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;

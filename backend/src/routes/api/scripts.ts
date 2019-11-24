@@ -13,4 +13,9 @@ router.delete("/:id", ScriptsController.discard);
 router.patch("/:id/undiscard", ScriptsController.undiscard);
 router.patch("/:id", ScriptsController.update);
 
+router.get(
+  "/:scriptId/question_templates/:rootQuestionTemplateId",
+  ViewController.markQuestionTemplate
+);
+
 export default router;
