@@ -7,10 +7,10 @@ import CustomDialogTitle from "../../../../components/dialogs/DialogTitleWithClo
 import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { StudentListData } from "../../../../types/paperUsers";
 
 interface OwnProps {
-  student: PaperUserListData;
+  student: StudentListData;
   callbackStudentData: Dispatch<any>;
   render: (toggleVisibility: () => void) => ReactNode;
 }

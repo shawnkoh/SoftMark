@@ -85,11 +85,7 @@ const ScriptView: React.FC = () => {
 
     console.log(scriptViewData); // for debugging
 
-    const {
-      matriculationNumber,  
-      questions,
-      pages
-    } = scriptViewData;
+    const { matriculationNumber, questions, pages } = scriptViewData;
 
     /*
     const getCurrentPageQuestions = () => {

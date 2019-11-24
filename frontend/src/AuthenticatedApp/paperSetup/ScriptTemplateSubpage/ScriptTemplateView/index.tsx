@@ -34,12 +34,9 @@ const ScriptTemplateView: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-          {scriptTemplateSetupData.pageTemplates.map(pageTemplate => (
-            <PageTemplateView
-              key={pageTemplate.id}
-              pageTemplate={pageTemplate}
-            />
-          ))}
+        {scriptTemplateSetupData.pageTemplates.map(pageTemplate => (
+          <PageTemplateView key={pageTemplate.id} pageTemplate={pageTemplate} />
+        ))}
       </main>
     </div>
   );

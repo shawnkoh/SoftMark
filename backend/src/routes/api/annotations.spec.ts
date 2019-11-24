@@ -39,6 +39,7 @@ beforeEach(async () => {
     fixtures.paper,
     "A0185892L.pdf",
     "stub",
+    1,
     fixtures.student
   );
   // TODO: Mock imageUrl properly
