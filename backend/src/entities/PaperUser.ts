@@ -17,7 +17,8 @@ import {
 import {
   PaperUserData,
   PaperUserListData,
-  PaperUserRole
+  PaperUserRole,
+  StudentListData
 } from "../types/paperUsers";
 import { BearerTokenType, InviteTokenPayload } from "../types/tokens";
 import { Allocation } from "./Allocation";
@@ -146,5 +147,14 @@ export class PaperUser extends Discardable {
 
   getData = async (): Promise<PaperUserData> => ({
     ...(await this.getListData())
+  });
+
+  getStudentData = async (): Promise<StudentListData> => ({
+    ...this.getBase(),
+    user: this.user
+      ? this.user.getData()
+      : (await getRepository(User).findOneOrFail(this.userId)).getData(),
+    role: this.role,
+    matriculationNumber: this.matriculationNumber
   });
 }

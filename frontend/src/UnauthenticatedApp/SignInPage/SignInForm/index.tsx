@@ -1,10 +1,4 @@
-import {
-  Grid,
-  Link,
-  Paper,
-  TextField,
-  Typography
-} from "@material-ui/core";
+import { Grid, Link, Paper, TextField, Typography } from "@material-ui/core";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";

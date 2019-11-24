@@ -1,6 +1,10 @@
 import { Avatar } from "@material-ui/core";
 import React, { useState } from "react";
-import Draggable, { DraggableData, DraggableEvent, DraggableCore } from "react-draggable";
+import Draggable, {
+  DraggableData,
+  DraggableEvent,
+  DraggableCore
+} from "react-draggable";
 import ReversedChip from "../../../../components/ReversedChip";
 import useStyles from "./useStyles";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
@@ -18,13 +22,16 @@ const ScriptTemplateQuestion: React.FC<Props> = ({ id, imgScale }) => {
   const classes = useStyles();
   const { leafQuestions, updateLeaf, refresh } = useScriptSetup();
   const leafQuestion = leafQuestions[id];
-  const [offset, setOffset] = useState<{top: number, left: number}>({top: leafQuestion.topOffset, left: leafQuestion.leftOffset})
+  const [offset, setOffset] = useState<{ top: number; left: number }>({
+    top: leafQuestion.topOffset,
+    left: leafQuestion.leftOffset
+  });
 
   const handleDrag = (e: DraggableEvent, data: DraggableData) => {
     setOffset({
       top: offset.top + data.deltaY / imgScale,
       left: offset.left + data.deltaX / imgScale
-    })
+    });
   };
 
   const handleDrop = async (data: DraggableData) => {
@@ -41,11 +48,13 @@ const ScriptTemplateQuestion: React.FC<Props> = ({ id, imgScale }) => {
       toast.error(`Failed to move ${leafQuestion.name}`);
     }
   };
-  
+
   return (
     <DraggableCore
       onDrag={handleDrag}
-      onStop={(e: DraggableEvent, data: DraggableData) => {handleDrop(data)}}
+      onStop={(e: DraggableEvent, data: DraggableData) => {
+        handleDrop(data);
+      }}
     >
       <ReversedChip
         avatar={<Avatar>{leafQuestion.score || "-"}</Avatar>}
@@ -56,7 +65,7 @@ const ScriptTemplateQuestion: React.FC<Props> = ({ id, imgScale }) => {
         style={{
           top: offset.top * imgScale,
           left: offset.left * imgScale
-        }}  
+        }}
       />
     </DraggableCore>
   );

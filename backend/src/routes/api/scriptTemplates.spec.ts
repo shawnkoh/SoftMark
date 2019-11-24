@@ -199,6 +199,7 @@ describe("POST /script_templates/:id/question_templates", () => {
         fixtures.paper,
         `SCRIPT${i}.pdf`,
         `SCRIPT${i}.pdf`,
+        1,
         student
       );
       paper1Scripts.push(script);
@@ -215,6 +216,7 @@ describe("POST /script_templates/:id/question_templates", () => {
         paper2,
         `SCRIPT${i}.pdf`,
         `SCRIPT${i}.pdf`,
+        1,
         student
       );
       paper2Scripts.push(script);

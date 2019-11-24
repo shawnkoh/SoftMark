@@ -19,12 +19,14 @@ beforeAll(async () => {
     fixtures.paper,
     "A0185892L.pdf",
     "stub1",
+    1,
     fixtures.student
   );
   script2 = new Script(
     fixtures.paper,
     "A0123456L.pdf",
     "stub2",
+    1,
     (await fixtures.createPaperUser(PaperUserRole.Student)).paperUser
   );
   await getRepository(Script).save([script1, script2]);

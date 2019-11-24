@@ -156,10 +156,18 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     <Route path={`${path}`} component={StudentRedirectToScriptView} />
   );
   const downloadAllScriptsRoute = (
-    <Route exact path={`${path}/save_scripts`} component={DownloadAllScriptsPage} />
+    <Route
+      exact
+      path={`${path}/save_scripts`}
+      component={DownloadAllScriptsPage}
+    />
   );
   const downloadSingleScriptRoute = (
-    <Route exact path={`${path}/${SCRIPTS}/:scriptId/save_script`} component={DownloadSingleScriptPage} />
+    <Route
+      exact
+      path={`${path}/${SCRIPTS}/:scriptId/save_script`}
+      component={DownloadSingleScriptPage}
+    />
   );
 
   return (

@@ -61,7 +61,7 @@ const PageTemplateView: React.FC<{
 
           {Object.keys(leafQuestions).map(key =>
             leafQuestions[key].displayPage === currentPageNo ? (
-              <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale}/>
+              <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale} />
             ) : (
               <></>
             )

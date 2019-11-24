@@ -1,6 +1,6 @@
 import { DiscardableData, isDiscardableData } from "./entities";
 import { isPageListData, PageData } from "./pages";
-import { PaperUserListData } from "./paperUsers";
+import { StudentListData } from "./paperUsers";
 import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface ScriptPostData {
@@ -17,13 +17,12 @@ export type ScriptPatchData = Partial<{
 
 export interface ScriptListData extends DiscardableData {
   paperId: number;
-  student: PaperUserListData | null;
+  student: StudentListData | null;
   hasVerifiedStudent: boolean;
   hasBeenPublished: boolean;
   filename: string;
   awardedMarks: number;
   pagesCount: number;
-  questionsCount: number;
 }
 
 export interface ScriptData extends ScriptListData {
@@ -35,7 +34,6 @@ export function isScriptListData(data: any): data is ScriptListData {
   return (
     typeof data.paperId === "number" &&
     typeof data.pagesCount === "number" &&
-    typeof data.questionsCount === "number" &&
     isDiscardableData(data)
   );
 }

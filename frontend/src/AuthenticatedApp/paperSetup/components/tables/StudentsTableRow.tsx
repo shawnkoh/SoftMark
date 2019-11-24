@@ -8,13 +8,13 @@ import {
 import DeleteIcon from "@material-ui/icons/DeleteForever";
 import EditIcon from "@material-ui/icons/Edit";
 import React, { useState } from "react";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { StudentListData } from "../../../../types/paperUsers";
 import DeleteStudentModal from "../modals/DeleteStudentModal";
 import EditStudentModal from "../modals/EditStudentModal";
 import useStyles from "./styles";
 
 interface OwnProps {
-  student: PaperUserListData;
+  student: StudentListData;
   matched: boolean;
 }
 
