@@ -119,8 +119,7 @@ export const ScriptSetupProvider: React.FC = props => {
   >(null);
 
   // Load Script Template Setup Data
-  const [refreshFlag, setRefreshFlag] = useState(0);
-  const refresh = () => setRefreshFlag(refreshFlag + 1);
+  const refresh = () => {getScriptTemplateSetupData()};
   const getScriptTemplateSetupData = async () => {
     try {
       const { data } = await api.papers.getScriptTemplateSetupData(
@@ -163,7 +162,7 @@ export const ScriptSetupProvider: React.FC = props => {
 
   useEffect(() => {
     getScriptTemplateSetupData();
-  }, [paper_id, refreshFlag]);
+  }, [paper_id]);
 
   if (isLoading) {
     return <LoadingSpinner />;
