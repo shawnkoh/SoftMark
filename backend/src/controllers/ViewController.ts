@@ -97,7 +97,7 @@ export async function viewScript(request: Request, response: Response) {
 
   const questionsQuery = () =>
     scriptQuery()
-      .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
+      .leftJoin("script.questions", "question", "question.discardedAt IS NULL")
       .innerJoin(
         "question.questionTemplate",
         "questionTemplate",
