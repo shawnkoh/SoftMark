@@ -1,14 +1,19 @@
-import { Button, Grid, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import {
+  Button,
+  Container,
+  TableCell,
+  TableRow,
+  Tooltip
+} from "@material-ui/core";
+import CancelRounded from "@material-ui/icons/CancelRounded";
+import CheckRounded from "@material-ui/icons/CheckRounded";
 import { ScriptListData } from "backend/src/types/scripts";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
 import React, { useState } from "react";
 import { useRouteMatch } from "react-router";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import api from "../../../api";
-import VerificationSwitch from "../../../components/misc/VerificationSwitch";
-import useStyles from "./styles";
 import MarkWhichQuestionModal from "./MarkWhichQuestionModal";
+import useStyles from "./styles";
 import { QuestionTemplate } from "./types";
 
 interface Props {
@@ -34,18 +39,6 @@ const ScriptsTableRow: React.FC<Props> = props => {
     email = user.email;
   }
 
-  const patchScript = newValues => {
-    newValues.studentId = script.student ? script.student.id : null;
-    return api.scripts
-      .patchScript(script.id, newValues)
-      .then(resp => {
-        setScript(resp.data.script);
-      })
-      .catch(() => {
-        toast.error(`Script ${script.filename} could not be updated!`);
-      });
-  };
-
   return (
     <TableRow>
       <TableCell>{filename}</TableCell>
@@ -57,24 +50,13 @@ const ScriptsTableRow: React.FC<Props> = props => {
       </TableCell>
       <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
       <TableCell>
-        <Grid component="label" container alignItems="center" spacing={1}>
-          <Grid item className={hasBeenPublished ? undefined : classes.red}>
-            Unpublished
-          </Grid>
-          <Grid item>
-            <VerificationSwitch
-              color="primary"
-              checked={hasBeenPublished}
-              onChange={event =>
-                patchScript({ hasBeenPublished: event.target.checked })
-              }
-              value="verified"
-            />
-          </Grid>
-          <Grid item className={hasBeenPublished ? classes.green : undefined}>
-            Published
-          </Grid>
-        </Grid>
+        <Container>
+          {hasBeenPublished ? (
+            <CheckRounded color="secondary" />
+          ) : (
+            <CancelRounded color="error" />
+          )}
+        </Container>
       </TableCell>
       <TableCell>
         <Tooltip title={`Mark script of ${matriculationNumber}`}>
