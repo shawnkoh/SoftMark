@@ -15,7 +15,7 @@ import PublishIcon from "@material-ui/icons/Publish";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
@@ -24,6 +24,8 @@ import usePaper from "../../../contexts/PaperContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
+import api from "../../../api";
+import { QuestionTemplate } from "./types";
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
@@ -34,6 +36,38 @@ const ScriptsSubpage: React.FC = () => {
   const [scripts, setScripts] = useState<ScriptListData[]>(
     scriptsAndStudents.scripts
   );
+
+  const [questionTemplates, setQuestionTemplates] = useState<
+    QuestionTemplate[]
+  >([]);
+
+  const mapQuestionTemplateIds = async (questionTemplateIds: number[]) => {
+    return Promise.all(
+      questionTemplateIds.map(async questionTemplateId => {
+        const response = await api.questionTemplates.getQuestionTemplate(
+          questionTemplateId
+        );
+        const questionTemplate = response.data.questionTemplate;
+        return { id: questionTemplateId, name: questionTemplate.name };
+      })
+    );
+  };
+
+  const getQuestionTemplates = async () => {
+    const allocationsResponse = await api.allocations.getSelfAllocations(
+      paper.id
+    );
+    const allocations = allocationsResponse.data.allocations;
+    const questionTemplateIds = allocations.map(
+      allocation => allocation.questionTemplateId
+    );
+    const questionTemplates = await mapQuestionTemplateIds(questionTemplateIds);
+    setQuestionTemplates(questionTemplates);
+  };
+
+  useEffect(() => {
+    getQuestionTemplates();
+  }, []);
 
   const [searchText, setSearchText] = useState("");
 
@@ -221,7 +255,13 @@ const ScriptsSubpage: React.FC = () => {
               </TableRow>
             )}
             {filteredScripts.map((script: ScriptListData, index) => {
-              return <ScriptsTableRow key={script.id} script={script} />;
+              return (
+                <ScriptsTableRow
+                  key={script.id}
+                  script={script}
+                  questionTemplates={questionTemplates}
+                />
+              );
             })}
           </TableBody>
         </Table>

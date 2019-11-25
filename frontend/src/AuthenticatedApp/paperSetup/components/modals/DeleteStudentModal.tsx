@@ -2,11 +2,11 @@ import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../../api";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
-import { PaperUserListData } from "../../../../types/paperUsers";
+import { StudentListData } from "../../../../types/paperUsers";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
-  student: PaperUserListData;
+  student: StudentListData;
   render: (toggleVisibility: () => void) => ReactNode;
 }
 

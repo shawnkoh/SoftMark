@@ -1,4 +1,4 @@
-import { PaperUserListData } from "../../types/paperUsers";
+import { StudentListData } from "../../types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -8,9 +8,9 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 
 type ScriptsAndStudentsContextProps =
   | ({
-      allStudents: PaperUserListData[];
+      allStudents: StudentListData[];
       refreshAllStudents: () => void;
-      unmatchedStudents: PaperUserListData[];
+      unmatchedStudents: StudentListData[];
       refreshUnmatchedStudents: () => void;
       scripts: ScriptListData[];
       refreshScripts: () => void;
@@ -36,7 +36,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
 
   const [isRejected, setIsRejected] = useState(false);
 
-  const [allStudents, setAllStudents] = useState<PaperUserListData[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentListData[]>([]);
   const [isLoadingAllStudents, setIsLoadingAllStudents] = useState(true);
 
   const getStudents = () => {
@@ -54,9 +54,9 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
 
   useEffect(getStudents, [paper_id]);
 
-  const [unmatchedStudents, setUnmatchedStudents] = useState<
-    PaperUserListData[]
-  >([]);
+  const [unmatchedStudents, setUnmatchedStudents] = useState<StudentListData[]>(
+    []
+  );
 
   const getUnmatchedStudents = () => {
     api.paperUsers.getUnmatchedStudents(paperId).then(resp => {

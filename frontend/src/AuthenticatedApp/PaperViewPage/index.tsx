@@ -19,7 +19,7 @@ import SetupPage, {
 import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
 import ScriptsPage, {
   ScriptViewSubpage,
-  ScriptEditSubpage
+  ScriptMarkSubpage
 } from "../paperScripts";
 import { PaperUserRole } from "../../types/paperUsers";
 import DownloadAllScriptsPage from "../DownloadScriptsPages/DownloadAllScriptsPage";
@@ -124,10 +124,10 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       component={ScriptViewSubpage}
     />
   );
-  const scriptEditRoute = (
+  const scriptMarkRoute = (
     <Route
-      path={`${path}/${SCRIPTS}/:scriptId/mark`}
-      component={ScriptEditSubpage}
+      path={`${path}/${SCRIPTS}/:scriptId/mark/:questionTemplateId`}
+      component={ScriptMarkSubpage}
     />
   );
   const gradingRoute = (
@@ -156,10 +156,18 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
     <Route path={`${path}`} component={StudentRedirectToScriptView} />
   );
   const downloadAllScriptsRoute = (
-    <Route exact path={`${path}/save_scripts`} component={DownloadAllScriptsPage} />
+    <Route
+      exact
+      path={`${path}/save_scripts`}
+      component={DownloadAllScriptsPage}
+    />
   );
   const downloadSingleScriptRoute = (
-    <Route exact path={`${path}/${SCRIPTS}/:scriptId/save_script`} component={DownloadSingleScriptPage} />
+    <Route
+      exact
+      path={`${path}/${SCRIPTS}/:scriptId/save_script`}
+      component={DownloadSingleScriptPage}
+    />
   );
 
   return (
@@ -168,7 +176,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
         <Switch>
           {downloadAllScriptsRoute}
           {downloadSingleScriptRoute}
-          {scriptEditRoute}
+          {scriptMarkRoute}
           {questionAllocationRoute}
           {setupScriptTemplateRoute}
           {scriptMappingRoute}
@@ -183,7 +191,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
         <Switch>
           {downloadAllScriptsRoute}
           {downloadSingleScriptRoute}
-          {scriptEditRoute}
+          {scriptMarkRoute}
           {markQuestionRoute}
           {scriptViewRoute}
           {gradingRoute}

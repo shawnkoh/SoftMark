@@ -16,7 +16,7 @@ const URL = "/scripts";
 export async function createScript(
   id: number,
   scriptPostData: ScriptPostData
-): Promise<AxiosResponse<{ script: ScriptData }>> {
+): Promise<AxiosResponse<{ script: ScriptListData }>> {
   return client.post(`/papers/${id}/scripts`, scriptPostData, {
     timeout: 120000
   });

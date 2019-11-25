@@ -132,11 +132,11 @@ export async function getStudents(request: Request, response: Response) {
       role: PaperUserRole.Student,
       discardedAt: IsNull()
     },
-    relations: ["user", "allocations", "marks", "bookmarks"]
+    relations: ["user"]
   })).sort(sortByMatricNo);
 
   const data = await Promise.all(
-    students.map(async (student: PaperUser) => await student.getListData())
+    students.map(async (student: PaperUser) => await student.getStudentData())
   );
 
   return response.status(200).json({ paperUsers: data });
@@ -178,13 +178,13 @@ export async function getUnmatchedStudents(
       role: PaperUserRole.Student,
       discardedAt: IsNull()
     },
-    relations: ["user", "allocations", "marks", "bookmarks"]
+    relations: ["user"]
   }))
     .filter(student => !boundedStudentIdsSet.has(student.id))
     .sort(sortByMatricNo);
 
   const data = await Promise.all(
-    students.map(async (student: PaperUser) => await student.getListData())
+    students.map(async (student: PaperUser) => await student.getStudentData())
   );
   return response.status(200).json({ paperUsers: data });
 }
@@ -269,7 +269,7 @@ export async function updateStudent(request: Request, response: Response) {
     await getRepository(PaperUser).save(student);
   });
 
-  const data = await student.getData();
+  const data = await student.getStudentData();
   response.status(201).json({ paperUser: data });
 }
 

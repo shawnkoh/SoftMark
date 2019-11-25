@@ -18,8 +18,13 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexGrow: 1
     },
+    text: {
+      whiteSpace: "nowrap",
+      marginLeft: theme.spacing(2)
+    },
     button: {
-      marginLeft: theme.spacing(4)
+      minWidth: "initial",
+      marginLeft: theme.spacing(2)
     },
     backButton: {
       marginRight: theme.spacing(2)
