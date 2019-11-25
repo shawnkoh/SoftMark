@@ -13,7 +13,7 @@ type Props = OwnProps;
 
 const DeleteAllStudentsModal: React.FC<Props> = props => {
   const paper = usePaper();
-  const { refreshAllStudents } = useScriptsAndStudents();
+  const { refreshAllStudents, refreshScripts, refreshUnmatchedStudents } = useScriptsAndStudents();
   const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -36,7 +36,11 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
             .catch(errors => {
               toast.error(`Students could not be deleted.`);
             })
-            .finally(refreshAllStudents);
+            .finally(() => {
+              refreshAllStudents();
+              refreshUnmatchedStudents();
+              refreshScripts();
+            });
         }}
       />
       {render(toggleVisibility)}

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const DeleteScriptModal: React.FC<Props> = props => {
-  const { refreshScripts } = useScriptsAndStudents();
+  const { refreshScripts, refreshUnmatchedStudents } = useScriptsAndStudents();
   const { script, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -29,6 +29,7 @@ const DeleteScriptModal: React.FC<Props> = props => {
             .discardScript(script.id)
             .then(() => {
               refreshScripts();
+              refreshUnmatchedStudents();
               toggleVisibility();
               toast(`Script ${script.filename} has been deleted successfully.`);
             })

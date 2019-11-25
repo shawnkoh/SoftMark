@@ -58,8 +58,9 @@ export class ScriptTemplate extends Discardable {
         where: { scriptTemplate: this }
       }));
     const totalMarks = questionTemplates
+      .filter(questionTemplate => !questionTemplate.discardedAt)
       .map(questionTemplate => questionTemplate.score)
-      .filter(questionTemplate => questionTemplate)
+      .filter(score => score)
       .reduce((a: number, b: number | null) => (b ? a + b : a), 0);
 
     const pageTemplates = (

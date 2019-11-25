@@ -285,9 +285,10 @@ export async function discard(request: Request, response: Response) {
       response.sendStatus(404);
       return;
     }
+    const paperId = paperUser.paperId;
     const allowed = await allowedRequester(
       userId,
-      paperUser.paperId,
+      paperId,
       PaperUserRole.Owner
     );
     if (!allowed) {
@@ -298,6 +299,19 @@ export async function discard(request: Request, response: Response) {
     await getRepository(PaperUser).update(paperUserId, {
       discardedAt: new Date()
     });
+
+    const scriptsWithStudent = await getRepository(Script).find({
+      where: { paperId, studentId: paperUserId }
+    });
+
+    await Promise.all(
+      scriptsWithStudent.map(async script => {
+        await getRepository(Script).update(script.id, {
+          studentId: null,
+          hasVerifiedStudent: false
+        });
+      })
+    );
 
     response.sendStatus(204);
   } catch (error) {
