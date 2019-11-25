@@ -87,6 +87,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
       .then(resp => {
         setScripts([]);
         getScripts();
+        getUnmatchedStudents();
         toast.success("Matching algorithm ran successfully");
       })
       .catch(() => {
