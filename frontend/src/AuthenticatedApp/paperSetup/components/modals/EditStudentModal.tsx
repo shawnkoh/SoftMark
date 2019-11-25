@@ -8,6 +8,7 @@ import SimpleForm, {
   FormMetadataType
 } from "../../../../components/forms/SimpleForm";
 import { StudentListData } from "../../../../types/paperUsers";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   student: StudentListData;
@@ -18,6 +19,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const EditStudentModal: React.FC<Props> = props => {
+  const { matchScriptsToStudents } = useScriptsAndStudents();
   const { student, callbackStudentData, render } = props;
   const { matriculationNumber, user } = student;
   const { name, email } = user;
@@ -68,6 +70,7 @@ const EditStudentModal: React.FC<Props> = props => {
               api.paperUsers
                 .patchStudent(student.id, newValues)
                 .then(resp => {
+                  matchScriptsToStudents();
                   callbackStudentData(resp.data.paperUser);
                   return false;
                 })

@@ -17,7 +17,8 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
   const paper = usePaper();
   const {
     refreshAllStudents,
-    refreshUnmatchedStudents
+    refreshUnmatchedStudents,
+    matchScriptsToStudents
   } = useScriptsAndStudents();
   const { children, clickable = true } = props;
 
@@ -45,8 +46,9 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
           <DialogContent dividers>
             <DialogContentText>Successfully added students</DialogContentText>
             {splitStringIntoLines(studentsThatSucceeded)}
-          </DialogContent>
-          <DialogContent dividers>
+            <br />
+            <br />
+            <br />
             <DialogContentText>
               Students that were not successfully uploaded
             </DialogContentText>
@@ -75,6 +77,7 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
             api.paperUsers
               .createStudents(paper.id, nominalRollPostData)
               .then(resp => {
+                matchScriptsToStudents();
                 setStudentsThatFailed(resp.data.failedToBeAdded);
                 setStudentsThatSucceeded(resp.data.successfullyAdded);
                 setIsSavingStudents(false);
