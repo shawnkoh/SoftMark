@@ -13,7 +13,11 @@ interface OwnProps {
 type Props = OwnProps;
 
 const DeleteStudentModal: React.FC<Props> = props => {
-  const { refreshAllStudents, refreshUnmatchedStudents, refreshScripts } = useScriptsAndStudents();
+  const {
+    refreshAllStudents,
+    refreshUnmatchedStudents,
+    refreshScripts
+  } = useScriptsAndStudents();
   const { student, render } = props;
   const { user, matriculationNumber } = student;
   const { name } = user;

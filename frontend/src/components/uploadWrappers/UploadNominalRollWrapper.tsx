@@ -15,7 +15,10 @@ interface Props {
 
 const UploadNominalRollWrapper: React.FC<Props> = props => {
   const paper = usePaper();
-  const { refreshAllStudents, refreshUnmatchedStudents } = useScriptsAndStudents();
+  const {
+    refreshAllStudents,
+    refreshUnmatchedStudents
+  } = useScriptsAndStudents();
   const { children, clickable = true } = props;
 
   const [isSavingStudents, setIsSavingStudents] = useState(false);
@@ -105,10 +108,14 @@ const splitStringIntoLines = (str: string) => {
     return str;
   }
   const lines = str.split("\n");
-  return lines.map((line, index) => line !== "" ? (
-    <>
-      {`${index + 1}. ${line}`}
-      <br />
-    </>
-  ) : line);
+  return lines.map((line, index) =>
+    line !== "" ? (
+      <>
+        {`${index + 1}. ${line}`}
+        <br />
+      </>
+    ) : (
+      line
+    )
+  );
 };

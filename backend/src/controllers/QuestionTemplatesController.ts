@@ -22,7 +22,8 @@ import {
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import { generatePages, isPageValid } from "../utils/questionTemplate";
-import { sortByCreatedAt } from "../utils/sorts";
+import { getActiveRootQuestionTemplatesByPaperId } from "../utils/queries";
+import { sortByCreatedAt, sortRootQuestionTemplates } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -121,28 +122,6 @@ export async function create(request: Request, response: Response) {
 
   const data = questionTemplate.getData();
   response.status(201).json({ questionTemplate: data });
-}
-
-export async function index(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
-  const paperId = Number(request.params.id);
-  let questionTemplates: QuestionTemplate[] = [];
-  try {
-    await allowedRequesterOrFail(requesterId, paperId, PaperUserRole.Student);
-    questionTemplates = await getActiveQuestionTemplates(paperId);
-  } catch (error) {
-    return response.sendStatus(404);
-  }
-
-  try {
-    const data = (await Promise.all(
-      questionTemplates.map(questionTemplate => questionTemplate.getData())
-    )).sort(sortByCreatedAt);
-    response.status(200).json({ questionTemplates: data });
-  } catch (error) {
-    return response.sendStatus(500);
-  }
 }
 
 export async function show(request: Request, response: Response) {
@@ -369,16 +348,6 @@ export async function undiscard(request: Request, response: Response) {
   response.status(200).json({ questionTemplate: data });
 }
 
-export async function getActiveQuestionTemplates(paperId: number) {
-  const scriptTemplate = await getRepository(ScriptTemplate).findOneOrFail({
-    where: { paperId, discardedAt: IsNull() },
-    relations: ["questionTemplates"]
-  });
-  return await getRepository(QuestionTemplate).find({
-    where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
-  });
-}
-
 // TODO: This function should return all the data needed for http://localhost:3000/papers/1/setup/allocate
 export async function rootQuestionTemplates(
   request: Request,
@@ -405,7 +374,24 @@ export async function rootQuestionTemplates(
     .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .getMany();
 
-  const data = { rootQuestionTemplates };
+  const sortedRootQuestionTemplates = await sortRootQuestionTemplates(rootQuestionTemplates);
+
+  const rootQuestionTemplateData = await Promise.all(
+    sortedRootQuestionTemplates.map(async rootQuestionTemplate => {
+      const descendants: QuestionTemplate[] = await getTreeRepository(
+        QuestionTemplate
+      ).findDescendants(rootQuestionTemplate);
+      const rootQuestionTemplateScore = rootQuestionTemplate.score || 0;
+      rootQuestionTemplate.score =
+        rootQuestionTemplateScore +
+        descendants
+          .map(QuestionTemplate => QuestionTemplate.score || 0)
+          .reduce((a, b) => a + b, 0);
+      return rootQuestionTemplate;
+    })
+  );
+
+  const data = { rootQuestionTemplates: rootQuestionTemplateData };
 
   response.status(200).json(data);
 }

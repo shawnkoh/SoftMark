@@ -1,6 +1,8 @@
+import { getTreeRepository } from "typeorm";
 import { AllocationData } from "allocations";
 import { PaperUserListData } from "paperUsers";
 import { PaperUser } from "../entities/PaperUser";
+import QuestionTemplate from "../entities/QuestionTemplate";
 
 interface withPageNo {
   pageNo: number;
@@ -104,4 +106,69 @@ export function sortByCreatedAt<
   B extends withCreatedAt
 >(a: A, b: B) {
   return a.createdAt.getTime() - b.createdAt.getTime();
+}
+
+interface WeightInfo {
+  page: number;
+  top: number;
+  left: number;
+}
+
+export async function sortRootQuestionTemplates(
+  activeRootQuestionTemplates: QuestionTemplate[]
+) {
+  const INF = 1000000;
+  const getWeightInfo = (questionTemplate: QuestionTemplate): WeightInfo => {
+    return questionTemplate.score //check if leaf
+      ? {
+          page: questionTemplate.displayPage || INF,
+          top: questionTemplate.topOffset || INF,
+          left: questionTemplate.leftOffset || INF
+        }
+      : {
+          page: INF,
+          top: INF,
+          left: INF
+        };
+  };
+
+  const compareWeightInfo = (a: WeightInfo, b: WeightInfo) => {
+    if (a.page !== b.page) {
+      return a.page - b.page;
+    } else if (a.top !== b.top) {
+      return a.top - b.top;
+    } else if (a.left !== b.left) {
+      return a.left - b.left;
+    } else {
+      return 0;
+    }
+  };
+
+  const activeRootedQuestionTemplatesWithWeightInfo: Array<{
+    questionTemplate: QuestionTemplate;
+    weightInfo: WeightInfo;
+  }> = await Promise.all(
+    activeRootQuestionTemplates.map(async rootQuestionTemplate => {
+      const descendants = (await getTreeRepository(
+        QuestionTemplate
+      ).findDescendants(rootQuestionTemplate)).filter(
+        descendant => !descendant.discardedAt
+      );
+      let earliestWeightInfo = getWeightInfo(rootQuestionTemplate);
+      for (let i = 0; i < descendants.length; i++) {
+        const descendantWeightInfo = getWeightInfo(descendants[i]);
+        if (compareWeightInfo(earliestWeightInfo, descendantWeightInfo) > 0) {
+          earliestWeightInfo = descendantWeightInfo;
+        }
+      }
+      return {
+        questionTemplate: rootQuestionTemplate,
+        weightInfo: earliestWeightInfo
+      };
+    })
+  );
+
+  return activeRootedQuestionTemplatesWithWeightInfo
+    .sort((a, b) => compareWeightInfo(a.weightInfo, b.weightInfo))
+    .map(x => x.questionTemplate);
 }
