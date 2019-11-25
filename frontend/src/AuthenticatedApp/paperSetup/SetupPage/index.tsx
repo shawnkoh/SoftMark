@@ -79,7 +79,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
       )
     },
     {
-      title: `Upload student list / nominal roll ".csv" file (Format: matriculation number | name | email)`,
+      title: `Upload student list / nominal roll ".csv" file (Format: matriculation number, name, email)`,
       button: (
         <UploadNominalRollWrapper>
           <Button
