@@ -32,6 +32,13 @@ const MarkWhichQuestionModal: React.FC<Props> = props => {
         <CustomDialogTitle id="alert-dialog-title" onClose={toggleVisibility}>
           Mark which question?
         </CustomDialogTitle>
+        {questionTemplates.length === 0 && (
+          <DialogContent>
+            <DialogContentText>
+              You need to be allocated questions in order to mark them.
+            </DialogContentText>
+          </DialogContent>
+        )}
         <List>
           {questionTemplates.map((questionTemplate, index) => (
             <ListItem

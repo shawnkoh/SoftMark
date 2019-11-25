@@ -213,11 +213,11 @@ const QuestionEditDialog: React.FC<Props> = props => {
                             onChange={() => setIsParent(!isParent)}
                           />
                         }
-                        label="Is Parent Question?"
+                        label="Has sub-questions?"
                       />
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography>Parent: </Typography>
+                      <Typography>Parent question: </Typography>
                     </Grid>
                     <Grid item xs={9}>
                       <QuestionTemplateSelect
@@ -241,7 +241,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                           <TextField
                             error={!!meta.error}
                             margin="dense"
-                            label="Score"
+                            label="Maximum score"
                             helperText={meta.error}
                             type="number"
                             required
@@ -260,7 +260,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                           <TextField
                             error={!!meta.error}
                             margin="dense"
-                            label="Page Covered"
+                            label="Pages covered"
                             helperText={meta.error}
                             placeholder="1, 2, 4-5"
                             required

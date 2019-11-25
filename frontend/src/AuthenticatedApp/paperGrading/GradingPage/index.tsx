@@ -89,9 +89,11 @@ const GradingSubpage: React.FC = () => {
       </Typography>
       <Box display="flex" alignItems="center" className={classes.margin}>
         <Typography variant="subtitle1" className={classes.marginRight}>
-          {(totalMarkCount / totalQuestionCount).toLocaleString(undefined, {
+          {`Total ${totalMarkCount}/${totalQuestionCount} (${(
+            totalMarkCount / totalQuestionCount
+          ).toLocaleString(undefined, {
             style: "percent"
-          })}
+          })})`}
         </Typography>
         <BorderLinearProgress
           value={(totalMarkCount / totalQuestionCount) * 100}
