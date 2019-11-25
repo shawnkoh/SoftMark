@@ -12,8 +12,8 @@ import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import {
   getActiveAllocationsByPaperId,
-  getActiveRootAllocationsByPaperId,
-  getActiveAllocationsByPaperUserId
+  getActiveAllocationsByPaperUserId,
+  getActiveRootAllocationsByPaperId
 } from "../utils/queries";
 import { sortAllocationsByQuestionNameThenPaperUserName } from "../utils/sorts";
 
@@ -159,8 +159,6 @@ export async function destroy(request: Request, response: Response) {
   }
 }
 
-// can actually just use the getAllocationsOfMarker and pass in the current userId
-// instead of this route
 export async function selfAllocations(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;
@@ -177,7 +175,12 @@ export async function selfAllocations(request: Request, response: Response) {
     .createQueryBuilder("allocation")
     .where("allocation.paperUserId = :paperUserId", {
       paperUserId: requester.id
-    });
+    })
+    .innerJoin(
+      "allocation.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    );
 
   const allocations = await selectAllocationListData(query).getRawMany();
 
