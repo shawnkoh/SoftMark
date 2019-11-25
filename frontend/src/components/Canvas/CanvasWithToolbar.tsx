@@ -78,19 +78,14 @@ const CanvasWithToolbar: React.FC<Props> = ({
     Annotation
   >(foregroundAnnotation);
 
-  useEffect(() => {
-    if (!isEqual(foregroundAnnotation, thisForegroundAnnotation)) {
-      setThisForegroundAnnotation(foregroundAnnotation);
-    }
-  }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
-
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state
   };
   const handleClearAllClick = event => setThisForegroundAnnotation([]);
-  useEffect(() => onForegroundAnnotationChange(thisForegroundAnnotation), [
-    thisForegroundAnnotation
-  ]);
+
+  useEffect(() => {
+    onForegroundAnnotationChange(thisForegroundAnnotation);
+  }, [thisForegroundAnnotation]);
 
   const defaultPosition = { x: 64, y: 128 };
   const [position, setPosition] = useState<Point>(defaultPosition);
