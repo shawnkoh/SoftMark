@@ -1,12 +1,4 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Slider,
-  Typography,
-  Popover
-} from "@material-ui/core";
+import { DialogContent, Slider, Popover } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { useState } from "react";
@@ -81,21 +73,24 @@ const MarkQuestionModal: React.FC<Props> = ({
       }}
     >
       <DialogContent className={classes.popover}>
-        <Typography variant="overline">Saved score</Typography>
-        <Typography variant="h5">
-          {score !== null
-            ? `${score} / ${maxScore}`
-            : `no score yet (maximum: ${maxScore})`}
-        </Typography>
         <div className={classes.slider}>
           <Slider
             value={localScore}
             onChange={handleLocalScoreChange}
             onChangeCommitted={handleSave}
             step={0.5}
-            marks
+            marks={[
+              {
+                value: 0,
+                label: 0
+              },
+              {
+                value: maxScore,
+                label: maxScore
+              }
+            ]}
             min={0}
-            max={maxScore || 100}
+            max={maxScore}
             valueLabelDisplay="on"
           />
         </div>
