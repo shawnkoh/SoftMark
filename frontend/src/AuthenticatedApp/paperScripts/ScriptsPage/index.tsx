@@ -1,4 +1,5 @@
 import {
+  Box,
   Container,
   Grid,
   Paper,
@@ -176,18 +177,23 @@ const ScriptsSubpage: React.FC = () => {
 
   return (
     <Container maxWidth={false} className={classes.container}>
-      <Typography variant="h4">Scripts</Typography>
-      <Typography variant="subtitle2" className={classes.marginTop}>
-        {scripts.length} scripts in total
-      </Typography>
-
+      <Grid container spacing={2}>
+        <Grid item className={classes.grow}>
+          <Typography variant="h4">Scripts</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="overline" className={classes.marginTop}>
+            {scripts.length} script(s) in total
+          </Typography>
+        </Grid>
+      </Grid>
       <Grid
         container
         direction="row"
         justify="center"
         alignItems="center"
         spacing={1}
-        className={classes.margin}
+        className={clsx(classes.marginTop, classes.margin)}
       >
         <Grid item className={classes.grow}>
           <SearchBar

@@ -1,8 +1,9 @@
-import { Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import { Grid, Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { getUser } from "../../../store/auth/selectors";
+import BorderLinearProgress from "../../../components/BorderLinearProgress";
 
 interface Props {
   questionTemplate: any;
@@ -38,12 +39,22 @@ const GradingTableRow: React.FC<Props> = props => {
         })}
       </TableCell>
       <TableCell>
-        {`${markCount} / ${questionCount} (${(
-          markCount / questionCount
-        ).toLocaleString(undefined, {
-          style: "percent"
-        })}) of questions marked`}
-        <br />
+        <Grid container alignItems="center" spacing={2}>
+          <Grid item xs={12} sm={6}>
+            {`${markCount}/${questionCount} (${(
+              markCount / questionCount
+            ).toLocaleString(undefined, {
+              style: "percent"
+            })}) of questions marked`}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <BorderLinearProgress
+              value={(markCount / questionCount) * 100}
+              color="secondary"
+              variant="determinate"
+            />
+          </Grid>
+        </Grid>
       </TableCell>
       <TableCell>
         {currentUser && markers.some(marker => marker.id === currentUser.id) && (

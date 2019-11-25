@@ -111,16 +111,16 @@ const QuestionAllocationPage: React.FC = props => {
     <>
       <Header title="Question allocation" />
       <Container maxWidth={false} className={classes.container}>
-        <AddMarkerModal
-          refreshMarkers={refreshMarkers}
-          render={toggleModal => (
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="overline">
-                {markers.length} marker(s) in total
-              </Typography>
-              <Typography variant="overline">
-                {`Click on chips to allocate questions to markers.`}
-              </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="overline">
+            {markers.length} marker(s) in total
+          </Typography>
+          <Typography variant="overline">
+            {`Click on chips to allocate questions to markers.`}
+          </Typography>
+          <AddMarkerModal
+            refreshMarkers={refreshMarkers}
+            render={toggleModal => (
               <Button
                 onClick={toggleModal}
                 variant="contained"
@@ -130,9 +130,9 @@ const QuestionAllocationPage: React.FC = props => {
               >
                 Add Marker
               </Button>
-            </Box>
-          )}
-        />
+            )}
+          />
+        </Box>
         <Paper className={clsx(classes.margin, classes.tableWrapper)}>
           <Table>
             <TableHead>

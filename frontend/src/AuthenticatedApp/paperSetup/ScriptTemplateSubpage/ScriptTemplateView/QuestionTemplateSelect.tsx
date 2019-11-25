@@ -42,7 +42,7 @@ const QuestionTemplateSelect: React.FC<SelectTreeProps> = props => {
       style={{ width: "100%" }}
       value={parentName}
       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-      placeholder="Please select"
+      placeholder="No parent (click to select)"
       allowClear
       onChange={(v: string, l: string) => {
         setFieldValue("parentQuestionTemplateId", v);
