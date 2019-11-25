@@ -132,12 +132,12 @@ const ScriptView: React.FC = () => {
               <ReversedChip
                 key={question.id}
                 avatar={
-                  <Avatar>
-                    {`${question.score || "-"} / ${question.maxScore || "-"}`}
-                  </Avatar>
+                  <Avatar>{`${
+                    question.score === null ? "-" : question.score
+                  } / ${question.maxScore || "-"}`}</Avatar>
                 }
                 label={"Q" + question.name}
-                color={question.score ? "primary" : "default"}
+                color={question.score === null ? "default" : "primary"}
                 className={classes.questionBarItem}
               />
             ))}
