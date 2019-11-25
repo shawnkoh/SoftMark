@@ -268,7 +268,7 @@ export async function grading(request: Request, response: Response) {
       const questionCount = leaves.length;
       const markCount = leaves.reduce((count, currentValue) => {
         const { score } = currentValue;
-        if (score) {
+        if (score !== null) {
           count = count + 1;
         }
         return count;
@@ -290,7 +290,8 @@ export async function grading(request: Request, response: Response) {
   const data: GradingData = {
     rootQuestionTemplates,
     totalQuestionCount: questions.length,
-    totalMarkCount: questions.filter(question => !!question.score).length,
+    totalMarkCount: questions.filter(question => question.score !== null)
+      .length,
     markers
   };
 

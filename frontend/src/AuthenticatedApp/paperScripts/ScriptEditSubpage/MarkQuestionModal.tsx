@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import api from "../../../api";
-import { QuestionViewData } from "backend/src/types/view";
-import { toast } from "react-toastify";
-
 import {
   Button,
-  Typography,
   Dialog,
-  DialogContent,
   DialogActions,
-  Slider
+  DialogContent,
+  Slider,
+  Typography
 } from "@material-ui/core";
+import { QuestionViewData } from "backend/src/types/view";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../../../api";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import useStyles from "./styles";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   isVisible: boolean;
@@ -45,7 +44,6 @@ const MarkQuestionModal: React.FC<Props> = ({
       .replaceMark(questionId, { score })
       .then(res => {
         refreshScripts();
-        toast.success("Mark was saved.");
         const newScore = res.data.mark.score;
         return newScore;
       })
