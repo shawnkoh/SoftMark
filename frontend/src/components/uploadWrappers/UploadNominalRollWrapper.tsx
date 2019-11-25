@@ -41,13 +41,13 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
           <DialogTitle>Result of upload</DialogTitle>
           <DialogContent dividers>
             <DialogContentText>Successfully added students</DialogContentText>
-            {studentsThatSucceeded}
+            {splitStringIntoLines(studentsThatSucceeded)}
           </DialogContent>
           <DialogContent dividers>
             <DialogContentText>
               Students that were not successfully uploaded
             </DialogContentText>
-            {studentsThatFailed}
+            {splitStringIntoLines(studentsThatFailed)}
           </DialogContent>
         </>
       )}
@@ -96,3 +96,16 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
 };
 
 export default UploadNominalRollWrapper;
+
+const splitStringIntoLines = (str: string) => {
+  if (str.toLocaleLowerCase() === "none") {
+    return str;
+  }
+  const lines = str.split("\n");
+  return lines.map((line, index) => (
+    <>
+      {`${index + 1}. ${line}`}
+      <br />
+    </>
+  ));
+};

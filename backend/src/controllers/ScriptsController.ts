@@ -55,7 +55,12 @@ export async function create(request: Request, response: Response) {
   }
 
   // Case: new script
-  const script = new Script(paperId, filename, sha256, (imageUrls as string[]).length);
+  const script = new Script(
+    paperId,
+    filename,
+    sha256,
+    (imageUrls as string[]).length
+  );
   const errors = await validate(script);
 
   if (errors.length > 0) {
