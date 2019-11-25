@@ -42,3 +42,9 @@ export async function deleteAllocation(
 ): Promise<AxiosResponse> {
   return client.delete(`${URL}/${allocationId}`);
 }
+
+export async function getSelfAllocations(paperId: number) {
+  return client.get<{ allocations: AllocationListData[] }>(
+    `papers/${paperId}/allocations/self`
+  );
+}

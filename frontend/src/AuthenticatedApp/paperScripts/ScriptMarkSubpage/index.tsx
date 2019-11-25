@@ -20,38 +20,27 @@ import { Link } from "react-router-dom";
 import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import usePaper from "../../../contexts/PaperContext";
-import Annotator from "./Annotator";
-import useStyles from "./styles";
+import Annotator from "../../paperGrading/MarkQuestionSubpage/Annotator";
+import useStyles from "../../paperGrading/MarkQuestionSubpage/styles";
 
-const MarkQuestionPage: React.FC = () => {
+const ScriptMarkPage: React.FC = () => {
   const classes = useStyles();
   const paper = usePaper();
-  const { questionTemplateId: questionTemplateIdString } = useParams();
+  const {
+    scriptId: scriptIdString,
+    questionTemplateId: questionTemplateIdString
+  } = useParams();
+  const scriptId = Number(scriptIdString);
   const questionTemplateId = Number(questionTemplateIdString);
 
-  const [nextScriptToMarkData, setNextScriptToMarkData] = useState<{
-    scriptId: number;
-    rootQuestionTemplateId: number;
-  } | null>(null);
   const [
     scriptMarkingData,
     setScriptMarkingData
   ] = useState<ScriptMarkingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-  const toggleRefreshFlag = () => setRefreshFlag(!refreshFlag);
 
   const [pageNo, setPageNo] = useState<number>(0);
   const [pageNos, setPageNos] = useState<number[]>([0]);
-
-  const getNextScriptToMarkData = async (questionTemplateId: number) => {
-    setIsLoading(true);
-    const response = await api.questionTemplates.getNextScriptToMark(
-      questionTemplateId
-    );
-    setNextScriptToMarkData(response.data);
-    setIsLoading(false);
-  };
 
   const getScriptMarkingData = async (
     scriptId: number,
@@ -64,17 +53,8 @@ const MarkQuestionPage: React.FC = () => {
   };
 
   useEffect(() => {
-    getNextScriptToMarkData(questionTemplateId);
-  }, [refreshFlag]);
-
-  useEffect(() => {
-    if (nextScriptToMarkData) {
-      getScriptMarkingData(
-        nextScriptToMarkData.scriptId,
-        nextScriptToMarkData.rootQuestionTemplateId
-      );
-    }
-  }, [nextScriptToMarkData]);
+    getScriptMarkingData(scriptId, questionTemplateId);
+  }, [scriptId, questionTemplateId]);
 
   useEffect(() => {
     console.log(scriptMarkingData); // for debugging
@@ -103,10 +83,6 @@ const MarkQuestionPage: React.FC = () => {
         getScriptMarkingData(nextScriptId, questionTemplateId);
       }
     }
-  };
-
-  const handleNextUnmarkedClick = event => {
-    toggleRefreshFlag();
   };
 
   interface HeaderProps {
@@ -154,15 +130,6 @@ const MarkQuestionPage: React.FC = () => {
         >
           Next
         </Button>
-        <Button
-          color="inherit"
-          variant="outlined"
-          onClick={handleNextUnmarkedClick}
-          startIcon={<SkipNextIcon />}
-          className={classes.button}
-        >
-          Next Unmarked
-        </Button>
       </Toolbar>
     </AppBar>
   );
@@ -171,7 +138,7 @@ const MarkQuestionPage: React.FC = () => {
     return (
       <div className={classes.container}>
         <Header
-          subtitle={`Marking question template ID ${questionTemplateId}`}
+          subtitle={`Marking script ID ${scriptId} question template ID ${questionTemplateId}`}
         />
         <LoadingSpinner loadingMessage="Loading script..." />
       </div>
@@ -190,7 +157,9 @@ const MarkQuestionPage: React.FC = () => {
     if (!canMark) {
       return (
         <div className={classes.container}>
-          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Header
+            subtitle={`Marking script ID ${scriptId} Q${rootQuestionTemplate.name}`}
+          />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               Cannot mark this script. Someone else may be marking it now. Try
@@ -204,7 +173,9 @@ const MarkQuestionPage: React.FC = () => {
     if (!pages) {
       return (
         <div className={classes.container}>
-          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Header
+            subtitle={`Marking script ID ${scriptId} Q${rootQuestionTemplate.name}`}
+          />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               No pages to display for this script.
@@ -240,7 +211,11 @@ const MarkQuestionPage: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+        <Header
+          subtitle={`Marking ${matriculationNumber || "unmatched script"} Q${
+            rootQuestionTemplate.name
+          }`}
+        />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
@@ -281,12 +256,14 @@ const MarkQuestionPage: React.FC = () => {
 
   return (
     <div className={classes.container}>
-      <Header subtitle={`Marking question template ID ${questionTemplateId}`} />
+      <Header
+        subtitle={`Marking script ID ${scriptId} question template ID ${questionTemplateId}`}
+      />
       <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">No scripts to mark.</Typography>
+        <Typography variant="subtitle1">An error occurred.</Typography>
       </Container>
     </div>
   );
 };
 
-export default MarkQuestionPage;
+export default ScriptMarkPage;
