@@ -110,12 +110,13 @@ Props) => {
           onClick={() => handleChipClick(index)}
           label={"Q" + questionState.question.name}
           avatar={
-            <Avatar>
-              {`${questionState.question.score || "-"} / ${questionState
-                .question.maxScore || "-"}`}
-            </Avatar>
+            <Avatar>{`${
+              questionState.question.score === null
+                ? "-"
+                : questionState.question.score
+            } / ${questionState.question.maxScore || "-"}`}</Avatar>
           }
-          color={questionState.question.score ? "primary" : "default"}
+          color={questionState.question.score === null ? "default" : "primary"}
           style={{
             position: "absolute",
             left: questionState.question.leftOffset * scale + position.x,
@@ -143,10 +144,15 @@ Props) => {
               onClick={() => handleChipClick(index)}
               label={"Q" + questionState.question.name}
               avatar={
-                <Avatar>{`${questionState.question.score ||
-                  "-"} / ${questionState.question.maxScore || "-"}`}</Avatar>
+                <Avatar>{`${
+                  questionState.question.score === null
+                    ? "-"
+                    : questionState.question.score
+                } / ${questionState.question.maxScore || "-"}`}</Avatar>
               }
-              color={questionState.question.score ? "primary" : "default"}
+              color={
+                questionState.question.score === null ? "default" : "primary"
+              }
               className={classes.questionBarItem}
             />
           ))}
