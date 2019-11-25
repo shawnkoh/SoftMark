@@ -1,5 +1,5 @@
 import {
-  Box,
+  Grid,
   Container,
   Paper,
   Table,
@@ -83,25 +83,39 @@ const GradingSubpage: React.FC = () => {
 
   return (
     <Container maxWidth={false} className={classes.container}>
-      <Typography variant="h4">Marking</Typography>
-      <Typography variant="subtitle2" className={classes.margin}>
-        {`${rootQuestionTemplates.length}`} question(s) in total
-      </Typography>
-      <Box display="flex" alignItems="center" className={classes.margin}>
-        <Typography variant="subtitle1" className={classes.marginRight}>
-          {`Total ${totalMarkCount}/${totalQuestionCount} (${(
-            totalMarkCount / totalQuestionCount
-          ).toLocaleString(undefined, {
-            style: "percent"
-          })})`}
-        </Typography>
-        <BorderLinearProgress
-          value={(totalMarkCount / totalQuestionCount) * 100}
-          color="secondary"
-          variant="determinate"
-          className={classes.grow}
-        />
-      </Box>
+      <Grid container spacing={2}>
+        <Grid item className={classes.grow}>
+          <Typography variant="h4">Marking</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="overline" className={classes.margin}>
+            {`${rootQuestionTemplates.length}`} question(s) in total
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        alignItems="center"
+        spacing={2}
+        className={classes.margin}
+      >
+        <Grid item>
+          <Typography variant="subtitle1">
+            {`Total ${totalMarkCount}/${totalQuestionCount} (${(
+              totalMarkCount / totalQuestionCount
+            ).toLocaleString(undefined, {
+              style: "percent"
+            })})`}
+          </Typography>
+        </Grid>
+        <Grid item className={classes.grow}>
+          <BorderLinearProgress
+            value={(totalMarkCount / totalQuestionCount) * 100}
+            color="secondary"
+            variant="determinate"
+          />
+        </Grid>
+      </Grid>
       <Paper className={clsx(classes.margin, classes.tableWrapper)}>
         <Table>
           <TableHead>
