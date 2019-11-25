@@ -1,9 +1,9 @@
-import { Grid, Button, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import { Button, Grid, TableCell, TableRow, Tooltip } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
-import { getUser } from "../../../store/auth/selectors";
 import BorderLinearProgress from "../../../components/BorderLinearProgress";
+import { getUser } from "../../../store/auth/selectors";
 
 interface Props {
   questionTemplate: any;
@@ -65,6 +65,7 @@ const GradingTableRow: React.FC<Props> = props => {
               variant="contained"
               color="primary"
               style={{ borderRadius: 24 }}
+              disabled={markCount === questionCount}
             >
               Mark
             </Button>
