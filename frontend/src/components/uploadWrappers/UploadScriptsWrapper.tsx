@@ -54,7 +54,7 @@ const UploadScriptsWrapper: React.FC = props => {
             setTimeout(matchScriptsToStudents, 3000);
           }
         };
-        const threads = 4;
+        const threads = 3;
         let prevUpperLimitForIndex = 0;
         let upperLimitForIndex = 0;
         for (let i = 1; i <= threads; i++) {

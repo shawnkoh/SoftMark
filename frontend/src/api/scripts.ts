@@ -18,7 +18,7 @@ export async function createScript(
   scriptPostData: ScriptPostData
 ): Promise<AxiosResponse<{ script: ScriptListData }>> {
   return client.post(`/papers/${id}/scripts`, scriptPostData, {
-    timeout: 120000
+    timeout: 250000
   });
 }
 export async function matchScriptsToPaperUsers(
