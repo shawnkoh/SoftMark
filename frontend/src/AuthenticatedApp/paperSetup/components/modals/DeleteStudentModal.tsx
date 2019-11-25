@@ -13,7 +13,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const DeleteStudentModal: React.FC<Props> = props => {
-  const { refreshAllStudents } = useScriptsAndStudents();
+  const { refreshAllStudents, refreshUnmatchedStudents, refreshScripts } = useScriptsAndStudents();
   const { student, render } = props;
   const { user, matriculationNumber } = student;
   const { name } = user;
@@ -33,6 +33,8 @@ const DeleteStudentModal: React.FC<Props> = props => {
             .then(() => {
               toast.success(`Student ${name} has been deleted successfully.`);
               refreshAllStudents();
+              refreshUnmatchedStudents();
+              refreshScripts();
             })
             .catch(errors => {
               toast.error(`Student ${name} could not be deleted.`);

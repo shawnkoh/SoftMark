@@ -5,12 +5,16 @@ import { getRepository, IsNull } from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { PaperUser } from "../entities/PaperUser";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { selectAllocationListData } from "../selectors/allocations";
 import { AllocationPostData } from "../types/allocations";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
+import {
+  getActiveAllocationsByPaperId,
+  getActiveRootAllocationsByPaperId,
+  getActiveAllocationsByPaperUserId
+} from "../utils/queries";
 import { sortAllocationsByQuestionNameThenPaperUserName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
@@ -155,64 +159,8 @@ export async function destroy(request: Request, response: Response) {
   }
 }
 
-/** helper functions */
-async function getActiveScriptTemplate(paperId: number) {
-  return await getRepository(ScriptTemplate).findOneOrFail({
-    paperId,
-    discardedAt: IsNull()
-  });
-}
-
-async function getActiveQuestionTemplates(paperId: number) {
-  const activeScriptTemplate = await getActiveScriptTemplate(paperId);
-  return await getRepository(QuestionTemplate).find({
-    scriptTemplateId: activeScriptTemplate.id,
-    discardedAt: IsNull()
-  });
-}
-
-async function getAllocationsByQuestionTemplateIds(
-  questionTemplateIds: number[]
-) {
-  return questionTemplateIds.length > 0
-    ? await getRepository(Allocation)
-        .createQueryBuilder("allocation")
-        .where("allocation.questionTemplateId IN (:...ids)", {
-          ids: questionTemplateIds
-        })
-        .getMany()
-    : [];
-}
-
-async function getActiveRootAllocationsByPaperId(paperId: number) {
-  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
-  const activeRootQuestionTemplates = activeQuestionTemplates.filter(
-    x => !x.parentQuestionTemplateId
-  );
-  const activeRootQuestionTemplateIds = activeRootQuestionTemplates.map(
-    q => q.id
-  );
-  return await getAllocationsByQuestionTemplateIds(
-    activeRootQuestionTemplateIds
-  );
-}
-
-async function getActiveAllocationsByPaperId(paperId: number) {
-  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
-  const activeQuestionTemplateIds = activeQuestionTemplates.map(q => q.id);
-  return await getAllocationsByQuestionTemplateIds(activeQuestionTemplateIds);
-}
-
-async function getActiveAllocationsByPaperUserId(paperUserId: number) {
-  const paperUser = await getRepository(PaperUser).findOneOrFail(paperUserId);
-  const activeAllocations = await getActiveAllocationsByPaperId(
-    paperUser.paperId
-  );
-  return activeAllocations.filter(
-    allocation => allocation.paperUserId === paperUserId
-  );
-}
-
+// can actually just use the getAllocationsOfMarker and pass in the current userId
+// instead of this route
 export async function selfAllocations(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;

@@ -19,7 +19,7 @@ type Props = OwnProps;
 
 const AddStudentModal: React.FC<Props> = props => {
   const paper = usePaper();
-  const { refreshAllStudents } = useScriptsAndStudents();
+  const { refreshAllStudents, refreshUnmatchedStudents } = useScriptsAndStudents();
   const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -70,6 +70,7 @@ const AddStudentModal: React.FC<Props> = props => {
                 .createPaperUser(paper.id, newValues)
                 .then(resp => {
                   refreshAllStudents();
+                  refreshUnmatchedStudents();
                   return false;
                 })
                 .catch(() => {

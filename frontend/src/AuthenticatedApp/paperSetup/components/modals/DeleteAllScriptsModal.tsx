@@ -13,7 +13,7 @@ type Props = OwnProps;
 
 const DeleteAllScriptsModal: React.FC<Props> = props => {
   const paper = usePaper();
-  const { refreshScripts } = useScriptsAndStudents();
+  const { refreshScripts, refreshUnmatchedStudents } = useScriptsAndStudents();
   const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -37,6 +37,7 @@ const DeleteAllScriptsModal: React.FC<Props> = props => {
               toast.error(`Scripts could not be deleted.`);
             })
             .finally(() => {
+              refreshUnmatchedStudents();
               refreshScripts();
             });
         }}
