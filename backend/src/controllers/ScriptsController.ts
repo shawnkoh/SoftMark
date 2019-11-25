@@ -274,7 +274,7 @@ export async function index(request: Request, response: Response) {
       requester.role === PaperUserRole.Student
         ? { paper, student: requester, discardedAt: IsNull() }
         : { paper, discardedAt: IsNull() },
-    relations: ["student", "student.user"]
+    relations: ["student", "student.user", "questions", "questions.marks"]
   });
 
   const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);

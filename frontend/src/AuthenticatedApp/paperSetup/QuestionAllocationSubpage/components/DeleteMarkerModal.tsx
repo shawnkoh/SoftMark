@@ -31,9 +31,10 @@ const DeleteMarkerModal: React.FC<Props> = props => {
         handleConfirm={async () => {
           discardPaperUser(marker.id)
             .then(() => {
-              if (refreshMarkers) {
-                refreshMarkers();
-              }
+              toast.success(
+                `Marker ${userAsString} has been successfully deleted.`
+              );
+              refreshMarkers();
             })
             .catch(errors => {
               toast.error(

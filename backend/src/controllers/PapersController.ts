@@ -253,11 +253,17 @@ export async function grading(request: Request, response: Response) {
       const leaves = questions.filter(question =>
         descendantQuestionTemplateIds.includes(question.questionTemplateId)
       );
-      const totalScore = leaves.reduce((accumulator, currentValue) => {
-        const { maxScore } = currentValue;
-        accumulator = accumulator + maxScore;
-        return accumulator;
-      }, 0);
+      const totalScore = descendantQuestionTemplates.reduce(
+        (accumulator, currentValue) => {
+          const { score, discardedAt } = currentValue;
+          if (!score || !!discardedAt) {
+            return accumulator;
+          }
+          accumulator = accumulator + score;
+          return accumulator;
+        },
+        0
+      );
 
       const questionCount = leaves.length;
       const markCount = leaves.reduce((count, currentValue) => {
