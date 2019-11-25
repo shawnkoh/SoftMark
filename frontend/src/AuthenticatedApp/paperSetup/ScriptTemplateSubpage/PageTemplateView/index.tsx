@@ -25,14 +25,16 @@ const PageTemplateView: React.FC<{
   const [imgScale, setImgScale] = useState(1.0);
   const [imgLoaded, setImgLoaded] = useState(false);
   useLayoutEffect(() => {
-    if (imgRef.current) {
-      const imgEle = imgRef.current;
-      window.addEventListener("resize", () =>
-        setImgScale(imgEle.width / imgEle.naturalWidth)
-      );
-      setImgScale(imgEle.width / imgEle.naturalWidth);
-    }
-  }, [imgRef.current, imgLoaded]);
+    const handleResize = () => {
+      if (imgRef.current) {
+        const imgEle = imgRef.current;
+        setImgScale(imgEle.width / imgEle.naturalWidth);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [imgRef.current, imgLoaded, currentPageNo]);
 
   return (
     <Typography
