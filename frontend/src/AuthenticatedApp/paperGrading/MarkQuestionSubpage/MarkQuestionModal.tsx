@@ -1,12 +1,4 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Slider,
-  Typography,
-  Popover
-} from "@material-ui/core";
+import { DialogContent, Slider, Popover } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { useState } from "react";
