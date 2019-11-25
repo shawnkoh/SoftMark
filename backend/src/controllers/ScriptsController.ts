@@ -50,7 +50,7 @@ export async function create(request: Request, response: Response) {
       return response.sendStatus(400);
     }
     await getRepository(Script).save(existingScript);
-    const data = await existingScript.getData();
+    const data = await existingScript.getListData();
     return response.status(201).json({ script: data });
   }
 
@@ -116,7 +116,7 @@ export async function create(request: Request, response: Response) {
     }
   });
 
-  const data = await script.getData();
+  const data = await script.getListData();
   response.status(201).json({ script: data });
 }
 
