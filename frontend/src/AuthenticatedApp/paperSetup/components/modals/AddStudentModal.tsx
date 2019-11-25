@@ -21,7 +21,7 @@ const AddStudentModal: React.FC<Props> = props => {
   const paper = usePaper();
   const {
     refreshAllStudents,
-    refreshUnmatchedStudents
+    matchScriptsToStudents
   } = useScriptsAndStudents();
   const { render } = props;
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +73,7 @@ const AddStudentModal: React.FC<Props> = props => {
                 .createPaperUser(paper.id, newValues)
                 .then(resp => {
                   refreshAllStudents();
-                  refreshUnmatchedStudents();
+                  matchScriptsToStudents();
                   return false;
                 })
                 .catch(() => {

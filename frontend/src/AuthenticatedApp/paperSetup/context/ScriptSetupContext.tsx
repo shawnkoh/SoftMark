@@ -119,7 +119,9 @@ export const ScriptSetupProvider: React.FC = props => {
   >(null);
 
   // Load Script Template Setup Data
-  const refresh = () => {getScriptTemplateSetupData()};
+  const refresh = () => {
+    getScriptTemplateSetupData();
+  };
   const getScriptTemplateSetupData = async () => {
     try {
       const { data } = await api.papers.getScriptTemplateSetupData(

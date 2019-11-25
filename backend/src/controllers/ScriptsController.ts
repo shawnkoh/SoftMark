@@ -354,6 +354,7 @@ export async function discard(request: Request, response: Response) {
   }
 
   await getRepository(Script).update(scriptId, {
+    studentId: null,
     discardedAt: new Date(),
     hasVerifiedStudent: false
   });
