@@ -7,7 +7,7 @@ import api from "../../api";
 
 const UploadScriptsWrapper: React.FC = props => {
   const paper = usePaper();
-  const { refreshScripts } = useScriptsAndStudents();
+  const { refreshScripts, matchScriptsToStudents } = useScriptsAndStudents();
   const { children } = props;
 
   return (
@@ -50,8 +50,8 @@ const UploadScriptsWrapper: React.FC = props => {
               atLoadEnd
             );
           }
-          if (scriptsLeft <= 2) {
-            setTimeout(refreshScripts, 3000);
+          if (scriptsLeft <= 1) {
+            setTimeout(matchScriptsToStudents, 3000);
           }
         };
         const threads = 4;
