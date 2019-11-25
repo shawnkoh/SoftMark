@@ -128,6 +128,7 @@ export class Script extends Discardable {
     const add = (a: number, b: number) => a + b;
 
     const awardedMarks = questions
+      .filter(question => !question.discardedAt)
       .map(question => {
         const marksForQuestion = question.marks ? question.marks : [];
         return marksForQuestion.map(mark => mark.score).reduce(add, 0);
@@ -173,7 +174,7 @@ export class Script extends Discardable {
         where: { question: questions, discardedAt: IsNull() }
       });
       awardedMarks = marks
-        .map(questionTemplate => questionTemplate.score)
+        .map(mark => mark.score)
         .reduce((a: number, b: number) => a + b, 0);
     }
     return {
