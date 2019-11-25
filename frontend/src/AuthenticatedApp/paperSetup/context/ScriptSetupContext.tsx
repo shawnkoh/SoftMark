@@ -5,7 +5,10 @@ import LoadingSpinner from "components/LoadingSpinner";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
-import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import {
+  QuestionTemplateData,
+  QuestionTemplateTreeData
+} from "backend/src/types/questionTemplates";
 import QuestionTemplateDialog from "../ScriptTemplateSubpage/ScriptTemplateView/QuestionTemplateDialog";
 
 export interface QuestionGradebox {
@@ -35,9 +38,70 @@ interface StaticState {
   isLeaf: (id: number) => boolean;
 }
 
+interface WeightInfo {
+  page: number | null;
+  top?: number;
+  left?: number;
+}
+
 const ScriptSetupContext = createContext<
   (LocalState & ServerState & StaticState) | null
 >(null);
+
+const sortTrees = (
+  trees: QuestionTemplateTreeData[],
+  leaves: { [id: number]: QuestionGradebox }
+): { sortedTrees: QuestionTemplateTreeData[]; weightInfo: WeightInfo } => {
+  let weightedTrees: {
+    tree: QuestionTemplateTreeData;
+    weightInfo: WeightInfo;
+  }[] = trees.map(tree => {
+    if (tree.id in leaves) {
+      const leaf = leaves[tree.id];
+      return {
+        tree: tree,
+        weightInfo: {
+          page: tree.displayPage,
+          top: leaf.topOffset,
+          left: leaf.leftOffset
+        }
+      };
+    } else {
+      if (tree.childQuestionTemplates.length === 0)
+        return { tree: tree, weightInfo: { page: null } };
+      let newTree = tree;
+      const sortedChildren = sortTrees(tree.childQuestionTemplates, leaves);
+      newTree.childQuestionTemplates = sortedChildren.sortedTrees;
+      return { tree: newTree, weightInfo: sortedChildren.weightInfo };
+    }
+  });
+  weightedTrees.sort((x, y) => {
+    if (y.weightInfo.page === null) return -1;
+    if (x.weightInfo.page === null) return 1;
+    if (x.weightInfo.page < y.weightInfo.page) return -1;
+    if (x.weightInfo.page > y.weightInfo.page) return 1;
+    if (x.weightInfo.page === y.weightInfo.page) {
+      if (x.weightInfo.top && y.weightInfo.top) {
+        if (x.weightInfo.top < y.weightInfo.top) return -1;
+        if (x.weightInfo.top > y.weightInfo.top) return 1;
+        if (x.weightInfo.top === y.weightInfo.top) {
+          if (x.weightInfo.left && y.weightInfo.left) {
+            if (x.weightInfo.left < y.weightInfo.left) return -1;
+            if (x.weightInfo.left > y.weightInfo.left) return 1;
+          }
+          return 0;
+        }
+      }
+      return 0;
+    }
+    return 0;
+  });
+  return {
+    sortedTrees: weightedTrees.map(t => t.tree),
+    weightInfo:
+      weightedTrees.length === 0 ? { page: null } : weightedTrees[0].weightInfo
+  };
+};
 
 export const ScriptSetupProvider: React.FC = props => {
   const { paper_id } = useParams();
@@ -80,6 +144,11 @@ export const ScriptSetupProvider: React.FC = props => {
         newLeaves = update(newLeaves, { $merge: addLeaves });
       });
       setLeaves(newLeaves);
+
+      data.questionTemplates = sortTrees(
+        data.questionTemplates,
+        newLeaves
+      ).sortedTrees;
       setScriptTemplateSetupData(data);
     } catch (error) {
       setScriptTemplateSetupData(null);
