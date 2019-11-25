@@ -4,7 +4,8 @@ import {
   DialogActions,
   DialogContent,
   Slider,
-  Typography
+  Typography,
+  Popover
 } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
@@ -15,6 +16,7 @@ import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseB
 import useStyles from "./styles";
 
 interface OwnProps {
+  anchorEl: HTMLDivElement | null;
   isVisible: boolean;
   question: QuestionViewData;
   onSave: (score: number) => void;
@@ -24,6 +26,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const MarkQuestionModal: React.FC<Props> = ({
+  anchorEl,
   isVisible,
   question,
   onSave,
@@ -64,11 +67,20 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   return (
-    <Dialog open={isVisible} onClose={onCancel} fullWidth>
-      <CustomDialogTitle id="customized-dialog-title" onClose={onCancel}>
-        Q{name}
-      </CustomDialogTitle>
-      <DialogContent dividers>
+    <Popover
+      open={isVisible}
+      onClose={handleCancel}
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "left"
+      }}
+      transformOrigin={{
+        vertical: "bottom",
+        horizontal: "center"
+      }}
+    >
+      <DialogContent className={classes.popover}>
         <Typography variant="overline">Saved score</Typography>
         <Typography variant="h5">
           {score !== null
@@ -79,6 +91,7 @@ const MarkQuestionModal: React.FC<Props> = ({
           <Slider
             value={localScore}
             onChange={handleLocalScoreChange}
+            onChangeCommitted={handleSave}
             step={0.5}
             marks
             min={0}
@@ -87,15 +100,7 @@ const MarkQuestionModal: React.FC<Props> = ({
           />
         </div>
       </DialogContent>
-      <DialogActions>
-        <Button color="primary" onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button color="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
+    </Popover>
   );
 };
 

@@ -61,12 +61,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     slider: {
       width: "100%",
-      marginTop: theme.spacing(6)
+      marginTop: theme.spacing(4)
     },
     canvasWithToolbarContainer: {
       position: "relative",
       display: "flex",
       flexGrow: 1
+    },
+    popover: {
+      width: theme.spacing(32)
     }
   })
 );
