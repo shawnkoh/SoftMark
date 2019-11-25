@@ -22,9 +22,11 @@ export class ApiServer {
     this.connection = await createConnection(ormconfig);
 
     const app = express();
-    Sentry.init({
-      dsn: "https://5b635a518aa84ef592e783e2436ad7f4@sentry.io/1832519"
-    });
+    if (process.env.NODE_ENV === "production") {
+      Sentry.init({
+        dsn: "https://5b635a518aa84ef592e783e2436ad7f4@sentry.io/1832519"
+      });
+    }
     app.use(Sentry.Handlers.requestHandler());
     app.use(bodyParser.json({ limit: "20mb" }));
     app.use(bodyParser.urlencoded({ extended: true, limit: "20mb" }));
@@ -35,7 +37,9 @@ export class ApiServer {
       app.use(morgan("dev"));
     }
     app.use("/", routes);
-    app.use(Sentry.Handlers.errorHandler());
+    if (process.env.NODE_ENV === "production") {
+      app.use(Sentry.Handlers.errorHandler());
+    }
 
     this.server = app.listen(port);
     this.server.timeout = 1200000;
