@@ -32,7 +32,7 @@ const PageTemplateView: React.FC<{
       );
       setImgScale(imgEle.width / imgEle.naturalWidth);
     }
-  }, [imgRef.current, imgLoaded]);
+  }, [imgRef.current, imgLoaded, currentPageNo]);
 
   return (
     <Typography
