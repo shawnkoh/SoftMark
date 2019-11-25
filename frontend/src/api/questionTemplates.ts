@@ -22,12 +22,6 @@ export async function getQuestionTemplate(
   return client.get(`${URL}/${id}`);
 }
 
-export async function getQuestionTemplates(
-  id: number
-): Promise<AxiosResponse<{ questionTemplates: QuestionTemplateData[] }>> {
-  return client.get(`papers/${id}/question_templates`);
-}
-
 export async function getRootQuestionTemplates(id: number) {
   return await client.get<{ rootQuestionTemplates: QuestionTemplateData[] }>(
     `papers/${id}/root_question_templates`

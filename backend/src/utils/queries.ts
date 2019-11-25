@@ -11,7 +11,7 @@ export async function getActiveScriptTemplate(paperId: number) {
   });
 }
 
-export async function getActiveQuestionTemplates(paperId: number) {
+export async function getActiveQuestionTemplatesByPaperId(paperId: number) {
   const activeScriptTemplate = await getActiveScriptTemplate(paperId);
   return await getRepository(QuestionTemplate).find({
     scriptTemplateId: activeScriptTemplate.id,
@@ -32,10 +32,16 @@ export async function getAllocationsByQuestionTemplateIds(
     : [];
 }
 
+export async function getActiveRootQuestionTemplatesByPaperId(paperId: number) {
+  const activeQuestionTemplates = await getActiveQuestionTemplatesByPaperId(
+    paperId
+  );
+  return activeQuestionTemplates.filter(x => !x.parentQuestionTemplateId);
+}
+
 export async function getActiveRootAllocationsByPaperId(paperId: number) {
-  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
-  const activeRootQuestionTemplates = activeQuestionTemplates.filter(
-    x => !x.parentQuestionTemplateId
+  const activeRootQuestionTemplates = await getActiveRootQuestionTemplatesByPaperId(
+    paperId
   );
   const activeRootQuestionTemplateIds = activeRootQuestionTemplates.map(
     q => q.id
@@ -46,7 +52,9 @@ export async function getActiveRootAllocationsByPaperId(paperId: number) {
 }
 
 export async function getActiveAllocationsByPaperId(paperId: number) {
-  const activeQuestionTemplates = await getActiveQuestionTemplates(paperId);
+  const activeQuestionTemplates = await getActiveQuestionTemplatesByPaperId(
+    paperId
+  );
   const activeQuestionTemplateIds = activeQuestionTemplates.map(q => q.id);
   return await getAllocationsByQuestionTemplateIds(activeQuestionTemplateIds);
 }

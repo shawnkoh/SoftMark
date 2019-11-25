@@ -32,8 +32,6 @@ router.patch("/:id", PapersController.update);
 router.delete("/:id", PapersController.discard);
 router.patch("/:id/undiscard", PapersController.undiscard);
 
-router.get("/:id/question_templates", QuestionTemplatesController.index);
-
 router.get("/:id/grading", PapersController.grading);
 
 router.get(
