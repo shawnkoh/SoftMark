@@ -50,7 +50,7 @@ const UploadScriptsWrapper: React.FC = props => {
               atLoadEnd
             );
           }
-          if (scriptsLeft <= 1) {
+          if (scriptsLeft === 0) {
             setTimeout(matchScriptsToStudents, 3000);
           }
         };
