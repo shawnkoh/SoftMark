@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import api from "../../../api";
 import { QuestionViewData } from "backend/src/types/view";
+import { toast } from "react-toastify";
 
 import {
   Button,
@@ -12,6 +13,7 @@ import {
 } from "@material-ui/core";
 import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import useStyles from "./styles";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   isVisible: boolean;
@@ -29,6 +31,7 @@ const MarkQuestionModal: React.FC<Props> = ({
   onCancel
 }) => {
   const classes = useStyles();
+  const { refreshScripts } = useScriptsAndStudents();
 
   const { id, name, score, maxScore, topOffset, leftOffset } = question;
 
@@ -38,9 +41,18 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   const putMarkData = async (questionId: number, score: number) => {
-    const response = await api.marks.replaceMark(questionId, { score });
-    const newScore = response.data.mark.score;
-    return newScore;
+    return await api.marks
+      .replaceMark(questionId, { score })
+      .then(res => {
+        refreshScripts();
+        toast.success("Mark was saved.");
+        const newScore = res.data.mark.score;
+        return newScore;
+      })
+      .catch(() => {
+        toast.error("An error was made when saving. Try refreshing the page.");
+        return score;
+      });
   };
 
   const handleCancel = event => {

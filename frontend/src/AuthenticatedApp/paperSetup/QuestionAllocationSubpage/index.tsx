@@ -67,15 +67,15 @@ const QuestionAllocationPage: React.FC = props => {
   /** Markers hooks start */
   const [markers, setMarkers] = useState<PaperUserListData[]>([]);
   const [isLoadingMarkers, setIsLoadingMarkers] = useState(true);
-  const [refreshMarkersFlag, setRefreshMarkersFlag] = useState(0);
+
   const getMarkers = () => {
     api.paperUsers
       .getMarkers(paper.id)
       .then(resp => setMarkers(resp.data.paperUsers))
       .finally(() => setIsLoadingMarkers(false));
   };
-  useEffect(getMarkers, [refreshMarkersFlag]);
-  const refreshMarkers = () => setRefreshMarkersFlag(refreshMarkersFlag + 1);
+
+  useEffect(getMarkers, []);
   /** Markers hooks end */
 
   if (isLoadingQuestionTemplates) {
@@ -119,7 +119,7 @@ const QuestionAllocationPage: React.FC = props => {
             {`Click on chips to allocate questions to markers.`}
           </Typography>
           <AddMarkerModal
-            refreshMarkers={refreshMarkers}
+            refreshMarkers={getMarkers}
             render={toggleModal => (
               <Button
                 onClick={toggleModal}
@@ -174,7 +174,7 @@ const QuestionAllocationPage: React.FC = props => {
                     questionTemplates={questionTemplates}
                     index={index + 1}
                     marker={marker}
-                    refreshMarkers={refreshMarkers}
+                    refreshMarkers={getMarkers}
                   />
                 );
               })}
