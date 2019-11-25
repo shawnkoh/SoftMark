@@ -29,12 +29,13 @@ const UnauthenticatedApp: React.FC = () => {
     }
     const loggedIn = await api.auth.tokenLogin(refreshToken);
     if (!loggedIn) {
-      toast.error("Incorrect username or password");
       return;
     }
     const user = await api.users.getOwnUser();
     if (!user) {
-      toast.error("Something went wrong");
+      toast.error(
+        "An unexpected error occured when logging in. Please try refreshing the page."
+      );
       return;
     }
     dispatch(setUser(user));
