@@ -87,7 +87,7 @@ const ScriptMarkPage: React.FC = () => {
 
   interface HeaderProps {
     subtitle: string;
-    matriculationNumber?: string;
+    matriculationNumber?: string | null;
   }
   const Header: React.FC<HeaderProps> = props => (
     <AppBar position="static" color="primary" elevation={1}>
@@ -108,9 +108,9 @@ const ScriptMarkPage: React.FC = () => {
             <Typography variant="subtitle1">{props.subtitle}</Typography>
           </Grid>
         </Grid>
-        {props.matriculationNumber && (
-          <Typography variant="subtitle2">
-            {props.matriculationNumber}
+        {props.matriculationNumber !== undefined && (
+          <Typography variant="subtitle1" className={classes.text}>
+            {props.matriculationNumber || "(Unmatched script)"}
           </Typography>
         )}
         <Button
@@ -119,7 +119,7 @@ const ScriptMarkPage: React.FC = () => {
           startIcon={<NavigateBeforeIcon />}
           className={classes.button}
         >
-          Previous Script
+          Previous
         </Button>
         <Button
           color="inherit"
@@ -127,7 +127,7 @@ const ScriptMarkPage: React.FC = () => {
           startIcon={<NavigateNextIcon />}
           className={classes.button}
         >
-          Next Script
+          Next
         </Button>
       </Toolbar>
     </AppBar>
@@ -158,6 +158,7 @@ const ScriptMarkPage: React.FC = () => {
         <div className={classes.container}>
           <Header
             subtitle={`Marking script ID ${scriptId}, Q${rootQuestionTemplate.name}`}
+            matriculationNumber={matriculationNumber}
           />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
@@ -174,6 +175,7 @@ const ScriptMarkPage: React.FC = () => {
         <div className={classes.container}>
           <Header
             subtitle={`Marking script ID ${scriptId}, Q${rootQuestionTemplate.name}`}
+            matriculationNumber={matriculationNumber}
           />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
@@ -210,7 +212,10 @@ const ScriptMarkPage: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+        <Header
+          subtitle={`Marking Q${rootQuestionTemplate.name}`}
+          matriculationNumber={matriculationNumber}
+        />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
@@ -221,7 +226,6 @@ const ScriptMarkPage: React.FC = () => {
                   page={page}
                   questions={getCurrentPageQuestions()}
                   rootQuestionTemplate={rootQuestionTemplate}
-                  matriculationNumber={matriculationNumber}
                 />
               </div>
             );

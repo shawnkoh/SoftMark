@@ -44,5 +44,7 @@ export async function deleteAllocation(
 }
 
 export async function getSelfAllocations(paperId: number) {
-  return client.get<AllocationListData[]>(`papers/${paperId}/${URL}/self`);
+  return client.get<{ allocations: AllocationListData[] }>(
+    `papers/${paperId}/allocations/self`
+  );
 }

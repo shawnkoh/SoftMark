@@ -9,9 +9,11 @@ import api from "../../../api";
 import VerificationSwitch from "../../../components/misc/VerificationSwitch";
 import useStyles from "./styles";
 import MarkWhichQuestionModal from "./MarkWhichQuestionModal";
+import { QuestionTemplate } from "./types";
 
 interface Props {
   script: ScriptListData;
+  questionTemplates: QuestionTemplate[];
 }
 
 const ScriptsTableRow: React.FC<Props> = props => {
@@ -78,17 +80,17 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <Tooltip title={`Mark script of ${matriculationNumber}`}>
           <MarkWhichQuestionModal
             baseUrl={`${url}/${id}/mark`}
-            render={
+            questionTemplates={props.questionTemplates}
+            render={toggleVisibility => (
               <Button
-                component={Link}
-                to={`${url}/${id}/mark`}
+                onClick={toggleVisibility}
                 variant="contained"
                 color="primary"
                 className={classes.button}
               >
                 Mark
               </Button>
-            }
+            )}
           />
         </Tooltip>
         <Tooltip title={`View script of ${matriculationNumber}`}>

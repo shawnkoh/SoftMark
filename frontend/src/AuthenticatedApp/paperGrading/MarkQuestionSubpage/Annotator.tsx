@@ -22,7 +22,7 @@ interface OwnProps {
   page: PageViewData;
   questions: QuestionViewData[];
   rootQuestionTemplate: QuestionTemplateViewData;
-  matriculationNumber: string | null;
+  //matriculationNumber: string | null;
 }
 
 type Props = OwnProps;
@@ -30,9 +30,9 @@ type Props = OwnProps;
 const Annotator: React.FC<Props> = ({
   page,
   questions,
-  rootQuestionTemplate,
-  matriculationNumber
-}: Props) => {
+  rootQuestionTemplate
+}: //matriculationNumber
+Props) => {
   const classes = useStyles();
 
   interface QuestionState {
@@ -125,12 +125,13 @@ const Annotator: React.FC<Props> = ({
       ))}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          <Typography
+          {/*<Typography
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
             {matriculationNumber || "(Unmatched script)"} page {page.pageNo}
           </Typography>
+          */}
           <Chip
             label={"Q" + rootQuestionTemplate.name}
             variant="outlined"
