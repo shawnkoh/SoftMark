@@ -46,6 +46,7 @@ Props) => {
   const [questionStates, setQuestionStates] = useState<QuestionState[]>(
     initialQuestionStates
   );
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
   const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1.0);
@@ -61,33 +62,43 @@ Props) => {
     saveAnnotation(page.id, annotationPostData);
   };
 
-  const handleModalCancel = (index: number) =>
+  const handleModalCancel = (index: number) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
       })
     );
+    setAnchorEl(null);
+  };
 
-  const handleModalSave = (index: number, score: number) =>
+  const handleModalSave = (index: number, score: number) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
         draftState[index].question.score = score;
       })
     );
+    setAnchorEl(null);
+  };
 
-  const handleChipClick = (index: number) =>
+  const handleChipClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    setAnchorEl(event.currentTarget);
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = true;
       })
     );
+  };
 
   return (
     <div className={classes.canvasWithToolbarContainer}>
       {questionStates.map((questionState: QuestionState, index: number) => (
         <MarkQuestionModal
           key={index}
+          anchorEl={anchorEl}
           question={questionState.question}
           isVisible={questionState.isVisible}
           onCancel={() => handleModalCancel(index)}
@@ -107,7 +118,7 @@ Props) => {
       {questionStates.map((questionState: QuestionState, index: number) => (
         <ReversedChip
           key={index}
-          onClick={() => handleChipClick(index)}
+          onClick={event => handleChipClick(event, index)}
           label={"Q" + questionState.question.name}
           avatar={
             <Avatar>{`${
@@ -141,7 +152,7 @@ Props) => {
           {questionStates.map((questionState: QuestionState, index: number) => (
             <ReversedChip
               key={index}
-              onClick={() => handleChipClick(index)}
+              onClick={event => handleChipClick(event, index)}
               label={"Q" + questionState.question.name}
               avatar={
                 <Avatar>{`${
