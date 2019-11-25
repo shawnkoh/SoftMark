@@ -1,5 +1,4 @@
 import {
-  Box,
   Container,
   Grid,
   Paper,
@@ -16,8 +15,9 @@ import PublishIcon from "@material-ui/icons/Publish";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
 import { TableColumn } from "../../../components/tables/TableTypes";
@@ -25,7 +25,6 @@ import usePaper from "../../../contexts/PaperContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
-import api from "../../../api";
 import { QuestionTemplate } from "./types";
 
 const ScriptsSubpage: React.FC = () => {
@@ -130,12 +129,12 @@ const ScriptsSubpage: React.FC = () => {
 
   const columns: TableColumn[] = [
     {
-      name: "Script (File name)",
+      name: "Filename",
       key: "script",
       isSortable: true
     },
     {
-      name: "Student matriculation number",
+      name: "Matriculation Number",
       key: "matric",
       isSortable: true
     },
@@ -144,12 +143,12 @@ const ScriptsSubpage: React.FC = () => {
       key: "name"
     },
     {
-      name: "Score",
+      name: "Total Score",
       key: "score",
       isSortable: true
     },
     {
-      name: "Has been published?",
+      name: "Published",
       key: "published"
     },
     {
