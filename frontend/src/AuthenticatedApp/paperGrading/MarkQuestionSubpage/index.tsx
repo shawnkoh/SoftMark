@@ -111,7 +111,6 @@ const MarkQuestionPage: React.FC = () => {
 
   interface HeaderProps {
     subtitle: string;
-    matriculationNumber?: string | null;
   }
   const Header: React.FC<HeaderProps> = props => (
     <AppBar position="static" color="primary" elevation={1}>
@@ -132,13 +131,14 @@ const MarkQuestionPage: React.FC = () => {
             <Typography variant="subtitle1">{props.subtitle}</Typography>
           </Grid>
         </Grid>
-        {props.matriculationNumber !== undefined && (
+        {scriptMarkingData && (
           <Typography variant="subtitle1" className={classes.text}>
-            {props.matriculationNumber || "(Unmatched script)"}
+            {scriptMarkingData.matriculationNumber || "(Unmatched script)"}
           </Typography>
         )}
         <Button
           color="inherit"
+          disabled={!(scriptMarkingData && scriptMarkingData.previousScriptId)}
           onClick={handlePrevClick}
           startIcon={<NavigateBeforeIcon />}
           className={classes.button}
@@ -147,6 +147,7 @@ const MarkQuestionPage: React.FC = () => {
         </Button>
         <Button
           color="inherit"
+          disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
           onClick={handleNextClick}
           startIcon={<NavigateNextIcon />}
           className={classes.button}
@@ -189,10 +190,7 @@ const MarkQuestionPage: React.FC = () => {
     if (!canMark) {
       return (
         <div className={classes.container}>
-          <Header
-            subtitle={`Marking Q${rootQuestionTemplate.name}`}
-            matriculationNumber={matriculationNumber}
-          />
+          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               Cannot mark this script. Someone else may be marking it now. Try
@@ -206,10 +204,7 @@ const MarkQuestionPage: React.FC = () => {
     if (!pages) {
       return (
         <div className={classes.container}>
-          <Header
-            subtitle={`Marking Q${rootQuestionTemplate.name}`}
-            matriculationNumber={matriculationNumber}
-          />
+          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               No pages to display for this script.
@@ -245,10 +240,7 @@ const MarkQuestionPage: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header
-          subtitle={`Marking Q${rootQuestionTemplate.name}`}
-          matriculationNumber={matriculationNumber}
-        />
+        <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
