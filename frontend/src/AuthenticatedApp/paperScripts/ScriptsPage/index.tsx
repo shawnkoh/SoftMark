@@ -129,12 +129,12 @@ const ScriptsSubpage: React.FC = () => {
 
   const columns: TableColumn[] = [
     {
-      name: "Script (File name)",
+      name: "Filename",
       key: "script",
       isSortable: true
     },
     {
-      name: "Student matriculation number",
+      name: "Matriculation Number",
       key: "matric",
       isSortable: true
     },
@@ -143,7 +143,7 @@ const ScriptsSubpage: React.FC = () => {
       key: "name"
     },
     {
-      name: "Score",
+      name: "Total Score",
       key: "score",
       isSortable: true
     },
