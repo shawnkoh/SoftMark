@@ -15,7 +15,6 @@ import {
 import api from "api";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
-import useScriptTemplate from "contexts/ScriptTemplateContext";
 import {
   Field,
   FieldProps,
@@ -64,7 +63,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
     pageCount,
     refresh
   } = useScriptSetup();
-  const { refreshScriptTemplate } = useScriptTemplate();
   const {
     open,
     mode,
@@ -117,7 +115,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
       }
       toast.success("Question successfully updated");
       refresh();
-      refreshScriptTemplate();
       handleClose();
     } catch (error) {
       toast.error("An error occured while handling the questionTemplate");
@@ -135,7 +132,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
         } successfully deleted`
       );
       refresh();
-      refreshScriptTemplate();
       handleClose();
     } catch (error) {
       toast.error(
