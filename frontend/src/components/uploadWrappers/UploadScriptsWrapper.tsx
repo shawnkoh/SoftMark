@@ -40,7 +40,12 @@ const UploadScriptsWrapper: React.FC = props => {
             const onFail = () => {
               toast.error(`Script ${fileName} could not be uploaded.\n`);
             };
-            const atLoadEnd = () => asynchronousPostScript(index + 1, limit);
+            const atLoadEnd = () => {
+              if (scriptsLeft === 0) {
+                matchScriptsToStudents();
+              }
+              asynchronousPostScript(index + 1, limit)
+            };
             await api.scripts.postScript(
               paper.id,
               fileName,
@@ -49,9 +54,6 @@ const UploadScriptsWrapper: React.FC = props => {
               onFail,
               atLoadEnd
             );
-          }
-          if (scriptsLeft === 0) {
-            setTimeout(matchScriptsToStudents, 3000);
           }
         };
         const threads = 3;
