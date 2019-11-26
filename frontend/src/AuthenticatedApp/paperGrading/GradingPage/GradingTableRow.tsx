@@ -1,4 +1,8 @@
 import { Button, Grid, TableCell, TableRow, Tooltip } from "@material-ui/core";
+import {
+  MarkerGradingData,
+  QuestionTemplateGradingRootData
+} from "backend/src/types/grading";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
@@ -6,22 +10,15 @@ import BorderLinearProgress from "../../../components/BorderLinearProgress";
 import { getUser } from "../../../store/auth/selectors";
 
 interface Props {
-  questionTemplate: any;
+  questionTemplate: QuestionTemplateGradingRootData;
+  markers: MarkerGradingData[];
 }
 
 const GradingTableRow: React.FC<Props> = props => {
-  const currentUser = useSelector(getUser);
+  const { markers, questionTemplate } = props;
+  const { name, totalScore, questionCount, markCount } = questionTemplate;
   const { url } = useRouteMatch()!;
-
-  const { questionTemplate } = props;
-
-  const {
-    name,
-    totalScore,
-    markers,
-    questionCount,
-    markCount
-  } = questionTemplate;
+  const currentUser = useSelector(getUser);
 
   return (
     <TableRow>
@@ -29,10 +26,9 @@ const GradingTableRow: React.FC<Props> = props => {
       <TableCell>{totalScore}</TableCell>
       <TableCell>
         {markers.map(marker => {
-          const userName = marker.name ? marker.name : "-";
           return (
             <>
-              {userName}
+              {marker.name || `Pending <${marker.email}>`}
               <br />
             </>
           );
