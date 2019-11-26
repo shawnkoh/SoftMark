@@ -78,7 +78,7 @@ export async function postScript(
   filename: string,
   file: File,
   onSuccess: () => void,
-  onFail: () => void,
+  onFail: (error) => void,
   atLoadEnd: () => void
 ) {
   const reader = new FileReader();
