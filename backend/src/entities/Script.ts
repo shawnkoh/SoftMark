@@ -1,12 +1,12 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ScriptTemplateData } from "scriptTemplates";
 import {
   Column,
   Entity,
   getRepository,
   IsNull,
   ManyToOne,
-  OneToMany,
-  Unique
+  OneToMany
 } from "typeorm";
 import { ScriptData, ScriptListData } from "../types/scripts";
 import { sortByPageNo } from "../utils/sorts";
@@ -18,11 +18,8 @@ import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
 import { QuestionTemplate } from "./QuestionTemplate";
 import { ScriptTemplate } from "./ScriptTemplate";
-import { ScriptTemplateData } from "scriptTemplates";
 
 @Entity()
-@Unique(["paper", "filename"])
-@Unique(["paper", "sha256"])
 export class Script extends Discardable {
   entityName = "Script";
 
