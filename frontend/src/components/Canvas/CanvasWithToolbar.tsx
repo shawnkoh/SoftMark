@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-import useWindowSize from "@rehooks/window-size";
 import useImageSize from "@use-hooks/image-size";
 import useComponentSize from "@rehooks/component-size";
 
@@ -89,7 +88,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
     onForegroundAnnotationChange(thisForegroundAnnotation);
   }, [thisForegroundAnnotation]);
 
-  const defaultPosition = { x: 64, y: 128 };
+  const defaultPosition = { x: 0, y: 64 };
   const [position, setPosition] = useState<Point>(defaultPosition);
   const defaultScale = 1.0;
   const [scale, setScale] = useState<number>(defaultScale);
@@ -112,11 +111,27 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const ref = useRef(null);
   const { width, height } = useComponentSize(ref);
   const [imgWidth, imgHeight] = useImageSize(backgroundImageSource);
-  useEffect(() => {
-    if (height !== 0 && imgHeight !== 0) {
-      setScale((height - 2 * position.y) / imgHeight);
+  const fitToViewport = () => {
+    if (width !== 0 && height !== 0 && imgWidth !== 0 && imgHeight !== 0) {
+      const actualHeight = height - 128;
+      const scaleUsingWidth = width / imgWidth;
+      const scaleUsingHeight = actualHeight / imgHeight;
+      if (scaleUsingWidth < scaleUsingHeight) {
+        const scale = scaleUsingWidth;
+        setScale(scale);
+        const displayedImgHeight = scale * imgHeight;
+        const position = { x: 0, y: (actualHeight - displayedImgHeight) / 2 };
+        setPosition(position);
+      } else {
+        const scale = scaleUsingHeight;
+        setScale(scale);
+        const displayedImgWidth = scale * imgWidth;
+        const position = { x: (width - displayedImgWidth) / 2, y: 64 };
+        setPosition(position);
+      }
     }
-  }, [height, imgHeight]);
+  };
+  useEffect(fitToViewport, [width, height, imgHeight, imgWidth]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
     drawable ? CanvasMode.Pen : CanvasMode.View
@@ -212,6 +227,13 @@ const CanvasWithToolbar: React.FC<Props> = ({
                   <ZoomInIcon />
                 </IconButton>
               </div>
+              <Button
+                onClick={fitToViewport}
+                color="inherit"
+                className={classes.padding}
+              >
+                Fit to Viewport
+              </Button>
               <Button
                 onClick={handleResetViewClick}
                 color="inherit"
