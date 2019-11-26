@@ -111,7 +111,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const ref = useRef(null);
   const { width, height } = useComponentSize(ref);
   const [imgWidth, imgHeight] = useImageSize(backgroundImageSource);
-  useEffect(() => {
+  const fitToViewport = () => {
     if (width !== 0 && height !== 0 && imgWidth !== 0 && imgHeight !== 0) {
       const actualHeight = height - 128;
       const scaleUsingWidth = width / imgWidth;
@@ -130,7 +130,8 @@ const CanvasWithToolbar: React.FC<Props> = ({
         setPosition(position);
       }
     }
-  }, [width, height, imgHeight, imgWidth]);
+  };
+  useEffect(fitToViewport, [width, height, imgHeight, imgWidth]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
     drawable ? CanvasMode.Pen : CanvasMode.View
@@ -226,6 +227,13 @@ const CanvasWithToolbar: React.FC<Props> = ({
                   <ZoomInIcon />
                 </IconButton>
               </div>
+              <Button
+                onClick={fitToViewport}
+                color="inherit"
+                className={classes.padding}
+              >
+                Fit to Viewport
+              </Button>
               <Button
                 onClick={handleResetViewClick}
                 color="inherit"
