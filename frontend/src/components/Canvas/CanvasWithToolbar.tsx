@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
-import isEqual from "lodash/isEqual";
+import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
+import useWindowSize from "@rehooks/window-size";
+import useImageSize from "@use-hooks/image-size";
+import useComponentSize from "@rehooks/component-size";
 
 import { Annotation } from "backend/src/types/annotations";
 import { Point, CanvasMode, CanvasProps } from "./types";
@@ -107,6 +109,15 @@ const CanvasWithToolbar: React.FC<Props> = ({
   };
   useEffect(() => onViewChange(position, scale), [position, scale]);
 
+  const ref = useRef(null);
+  const { width, height } = useComponentSize(ref);
+  const [imgWidth, imgHeight] = useImageSize(backgroundImageSource);
+  useEffect(() => {
+    if (height !== 0 && imgHeight !== 0) {
+      setScale((height - 2 * position.y) / imgHeight);
+    }
+  }, [height, imgHeight]);
+
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
     drawable ? CanvasMode.Pen : CanvasMode.View
   );
@@ -123,7 +134,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const handlePenColorChange = event => setPenColor(event.target.value);
 
   return (
-    <div className={classes.container}>
+    <div ref={ref} className={classes.container}>
       <AppBar position="absolute" color="inherit">
         <Toolbar>
           {drawable && (
