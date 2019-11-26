@@ -16,7 +16,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
   const {
     refreshAllStudents,
     refreshUnmatchedStudents,
-    refreshScripts
+    matchScriptsToStudents
   } = useScriptsAndStudents();
   const { student, render } = props;
   const { user, matriculationNumber } = student;
@@ -38,7 +38,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
               toast.success(`Student ${name} has been deleted successfully.`);
               refreshAllStudents();
               refreshUnmatchedStudents();
-              refreshScripts();
+              matchScriptsToStudents();
             })
             .catch(errors => {
               toast.error(`Student ${name} could not be deleted.`);

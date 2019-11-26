@@ -14,8 +14,8 @@ type Props = OwnProps;
 const DeleteAllStudentsModal: React.FC<Props> = props => {
   const paper = usePaper();
   const {
+    matchScriptsToStudents,
     refreshAllStudents,
-    refreshScripts,
     refreshUnmatchedStudents
   } = useScriptsAndStudents();
   const { render } = props;
@@ -43,7 +43,7 @@ const DeleteAllStudentsModal: React.FC<Props> = props => {
             .finally(() => {
               refreshAllStudents();
               refreshUnmatchedStudents();
-              refreshScripts();
+              matchScriptsToStudents();
             });
         }}
       />
