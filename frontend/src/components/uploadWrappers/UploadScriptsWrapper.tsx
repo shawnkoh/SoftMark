@@ -16,7 +16,7 @@ const UploadScriptsWrapper: React.FC = props => {
       clickable
       multiple
       onSelectFiles={async files => {
-        toast("Attempting to upload files");
+        toast.info("Attempting to upload files");
         const keys = Object.keys(files);
         let scriptUploaded = 0;
         let scriptsLeft = keys.length;
@@ -37,8 +37,13 @@ const UploadScriptsWrapper: React.FC = props => {
                   ` script(s) uploaded successfully.`
               );
             };
-            const onFail = () => {
-              toast.error(`Script ${fileName} could not be uploaded.\n`);
+            const onFail = error => {
+              toast.error(
+                `Script ${fileName} could not be uploaded.\n${error.response.data}`,
+                {
+                  autoClose: false
+                }
+              );
             };
             const atLoadEnd = () => {
               if (scriptsLeft === 0) {
