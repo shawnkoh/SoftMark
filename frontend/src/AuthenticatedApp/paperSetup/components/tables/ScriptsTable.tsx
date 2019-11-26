@@ -23,11 +23,16 @@ import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
+import LoadingSpinner from "components/LoadingSpinner";
 
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
-  const { scripts, matchScriptsToStudents } = useScriptsAndStudents();
+  const {
+    scripts,
+    matchScriptsToStudents,
+    isMatchingScriptsToStudents
+  } = useScriptsAndStudents();
 
   const [searchText, setSearchText] = useState("");
 
@@ -149,7 +154,7 @@ const ScriptsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredScripts.length === 0 && (
+            {!isMatchingScriptsToStudents && filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />

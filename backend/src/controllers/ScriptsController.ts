@@ -242,16 +242,7 @@ export async function match(request: Request, response: Response) {
     );
   });
 
-  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
-
-  const data: ScriptListData[] = await Promise.all(
-    scripts
-      .sort(sortByFilename)
-      .map(script =>
-        script.getListDataWithScriptTemplate(activeScriptTemplateData)
-      )
-  );
-  response.status(200).json({ scripts: data });
+  return response.sendStatus(200);
 }
 
 export async function index(request: Request, response: Response) {

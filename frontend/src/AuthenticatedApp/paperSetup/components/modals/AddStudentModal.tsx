@@ -72,8 +72,8 @@ const AddStudentModal: React.FC<Props> = props => {
               api.paperUsers
                 .createPaperUser(paper.id, newValues)
                 .then(resp => {
-                  refreshAllStudents();
                   matchScriptsToStudents();
+                  refreshAllStudents();
                   return false;
                 })
                 .catch(() => {

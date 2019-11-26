@@ -374,7 +374,9 @@ export async function rootQuestionTemplates(
     .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .getMany();
 
-  const sortedRootQuestionTemplates = await sortRootQuestionTemplates(rootQuestionTemplates);
+  const sortedRootQuestionTemplates = await sortRootQuestionTemplates(
+    rootQuestionTemplates
+  );
 
   const rootQuestionTemplateData = await Promise.all(
     sortedRootQuestionTemplates.map(async rootQuestionTemplate => {

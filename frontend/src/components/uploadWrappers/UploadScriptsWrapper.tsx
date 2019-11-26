@@ -44,7 +44,7 @@ const UploadScriptsWrapper: React.FC = props => {
               if (scriptsLeft === 0) {
                 matchScriptsToStudents();
               }
-              asynchronousPostScript(index + 1, limit)
+              asynchronousPostScript(index + 1, limit);
             };
             await api.scripts.postScript(
               paper.id,
