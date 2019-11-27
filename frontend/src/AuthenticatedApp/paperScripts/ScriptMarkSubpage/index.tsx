@@ -201,8 +201,8 @@ const ScriptMarkPage: React.FC = () => {
         );
       });
 
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const getCurrentPageQuestions = (currentPageNo: number) => {
+      const currentPage = pages.find(page => page.pageNo === currentPageNo)!;
       const currentPageQuestions = questions.filter(question =>
         currentPage.questionIds.includes(question.id)
       );
@@ -220,14 +220,12 @@ const ScriptMarkPage: React.FC = () => {
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
             return (
-              <div className={classes.grow} key={index}>
-                <Annotator
-                  key={page.id}
-                  page={page}
-                  questions={getCurrentPageQuestions()}
-                  rootQuestionTemplate={rootQuestionTemplate}
-                />
-              </div>
+              <Annotator
+                key={page.id}
+                page={page}
+                questions={getCurrentPageQuestions(page.pageNo)}
+                rootQuestionTemplate={rootQuestionTemplate}
+              />
             );
           })}
         {pageNo !== pageNos[0] && (
