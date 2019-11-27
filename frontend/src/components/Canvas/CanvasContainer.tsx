@@ -65,8 +65,6 @@ const CanvasContainer: React.FC<Props> = ({
     if (currentCanvasContainerRef) {
       const width = currentCanvasContainerRef.clientWidth;
       const height = currentCanvasContainerRef.clientHeight;
-      console.log(width);
-      console.log(height);
       setWidth(width);
       setHeight(height);
     }
