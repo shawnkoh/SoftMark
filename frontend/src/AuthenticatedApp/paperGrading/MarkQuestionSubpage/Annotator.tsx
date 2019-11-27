@@ -57,10 +57,9 @@ Props) => {
     setScale(scale);
   };
 
-  const [
-    foregroundAnnotation,
-    setForegroundAnnotation
-  ] = useState<Annotation | null>(null);
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation | null>(
+    null
+  );
   const [
     isLoadingForegroundAnnotation,
     setIsLoadingForegroundAnnotation
@@ -73,7 +72,7 @@ Props) => {
         if (status === 200) {
           const savedAnnotation = res.data.annotation;
           setForegroundAnnotation(savedAnnotation.layer);
-        } else if (status === 204) {
+        } else if (status === 204) { 
           setForegroundAnnotation([]); // set no foreground annotation if none exists in db yet
         }
       })

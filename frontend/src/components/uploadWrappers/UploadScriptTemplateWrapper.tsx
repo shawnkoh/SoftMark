@@ -28,7 +28,6 @@ const UploadScriptTemplateWrapper: React.FC<Props> = props => {
           const onFail = () => {
             toast.error(`Script template has failed to be uploaded.`);
           };
-          toast("Attempting to upload master copy...");
           api.scriptTemplates.postScriptTemplate(
             paper.id,
             files[key],

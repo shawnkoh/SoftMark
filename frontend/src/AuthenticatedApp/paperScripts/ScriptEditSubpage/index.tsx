@@ -119,21 +119,19 @@ const ScriptEdit: React.FC = () => {
               : `Marking unmatched script ID ${scriptId}`
           }
         />
-        {pages.map((page, index) => (
-          <div
-            className={classes.grow}
-            key={index}
-            style={{ display: page.pageNo === pageNo ? "flex" : "none" }}
-          >
-            <Annotator
-              key={page.id}
-              page={page}
-              questions={getCurrentPageQuestions()}
-              rootQuestionTemplate={rootQuestionTemplate}
-              matriculationNumber={matriculationNumber}
-            />
-          </div>
-        ))}
+        {pages
+          .filter(page => page.pageNo === pageNo)
+          .map((page, index) => (
+            <div className={classes.grow} key={index}>
+              <Annotator
+                key={page.id}
+                page={page}
+                questions={getCurrentPageQuestions()}
+                rootQuestionTemplate={rootQuestionTemplate}
+                matriculationNumber={matriculationNumber}
+              />
+            </div>
+          ))}
         {pageNo !== 1 && (
           <IconButton
             onClick={decrementPageNo}

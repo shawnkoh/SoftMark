@@ -106,20 +106,18 @@ const ScriptView: React.FC = () => {
               : `Viewing unmatched script ID ${scriptId}`
           }
         />
-        {pages.map((page, index) => (
-          <div
-            className={classes.grow}
-            key={index}
-            style={{ display: page.pageNo === pageNo ? "flex" : "none" }}
-          >
-            <CanvasWithToolbar
-              backgroundImageSource={page.imageUrl}
-              backgroundAnnotations={page.annotations.map(
-                annotation => annotation["layer"]
-              )}
-            />
-          </div>
-        ))}
+        {pages
+          .filter(page => page.pageNo === pageNo)
+          .map((page, index) => (
+            <div className={classes.grow} key={index}>
+              <CanvasWithToolbar
+                backgroundImageSource={page.imageUrl}
+                backgroundAnnotations={page.annotations.map(
+                  annotation => annotation["layer"]
+                )}
+              />
+            </div>
+          ))}
         <AppBar
           position="fixed"
           color="inherit"
