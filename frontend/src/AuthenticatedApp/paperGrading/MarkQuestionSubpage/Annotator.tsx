@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import clsx from "clsx";
-import produce from "immer";
 
 import { getOwnAnnotation, saveAnnotation } from "../../../api/annotations";
+import produce from "immer";
+
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import {
   QuestionViewData,
@@ -10,13 +10,14 @@ import {
   QuestionTemplateViewData
 } from "backend/src/types/view";
 
-import { AppBar, Toolbar, Typography, Chip, Avatar } from "@material-ui/core";
+import { AppBar, Toolbar, Chip, Avatar } from "@material-ui/core";
 
 import ReversedChip from "../../../components/ReversedChip";
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import { Point } from "../../../components/Canvas/types";
 import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
+import LoadingSpinner from "components/LoadingSpinner";
 
 interface OwnProps {
   page: PageViewData;
@@ -34,32 +35,6 @@ const Annotator: React.FC<Props> = ({
 }: //matriculationNumber
 Props) => {
   const classes = useStyles();
-
-  const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation>(
-    page.annotations.length > 0 ? page.annotations[0].layer : []
-  );
-  const [
-    isLoadingForegroundAnnotation,
-    setIsLoadingForegroundAnnotation
-  ] = useState(true);
-
-  const getForegroundAnnotation = () => {
-    getOwnAnnotation(page.id)
-      .then(res => {
-        const savedAnnotation = res.data.annotation;
-        setForegroundAnnotation(savedAnnotation.layer || []);
-      })
-      .catch(() => setForegroundAnnotation([]))
-      .finally(() => setIsLoadingForegroundAnnotation(false));
-  };
-  useEffect(getForegroundAnnotation, []);
-
-  const handleForegroundAnnotationChange = (annotation: Annotation) => {
-    const annotationPostData: AnnotationPostData = {
-      layer: annotation
-    };
-    saveAnnotation(page.id, annotationPostData);
-  };
 
   interface QuestionState {
     isVisible: boolean;
@@ -79,6 +54,26 @@ Props) => {
   const handleViewChange = (position: Point, scale: number) => {
     setPosition(position);
     setScale(scale);
+  };
+
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation>([]);
+  const [isLoadingForegroundAnnotation, setIsLoadingForegroundAnnotation] = useState(true);
+
+  const getForegroundAnnotation = () => {
+    getOwnAnnotation(page.id).then(res => {
+      const savedAnnotation = res.data.annotation;
+      setForegroundAnnotation(savedAnnotation.layer);
+    })
+    .finally(() => setIsLoadingForegroundAnnotation(false));
+  }
+
+  useEffect(getForegroundAnnotation, []);
+
+  const handleForegroundAnnotationChange = (annotation: Annotation) => {
+    const annotationPostData: AnnotationPostData = {
+      layer: annotation
+    };
+    saveAnnotation(page.id, annotationPostData);
   };
 
   const handleModalCancel = (index: number) => {
@@ -111,6 +106,10 @@ Props) => {
       })
     );
   };
+
+  if(isLoadingForegroundAnnotation){
+    return <LoadingSpinner loadingMessage="Loading annotations..."/>;
+  }
 
   return (
     <div className={classes.canvasWithToolbarContainer}>

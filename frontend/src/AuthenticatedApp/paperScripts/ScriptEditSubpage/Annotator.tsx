@@ -53,13 +53,6 @@ const Annotator: React.FC<Props> = ({
     setScale(scale);
   };
 
-  const handleForegroundAnnotationChange = (annotation: Annotation) => {
-    const annotationPostData: AnnotationPostData = {
-      layer: annotation
-    };
-    saveAnnotation(page.id, annotationPostData);
-  };
-
   const handleModalCancel = (index: number) =>
     setQuestionStates(
       produce(questionStates, draftState => {
@@ -93,16 +86,6 @@ const Annotator: React.FC<Props> = ({
           onSave={score => handleModalSave(index, score)}
         />
       ))}
-      <CanvasWithToolbar
-        drawable
-        backgroundImageSource={page.imageUrl || ""}
-        backgroundAnnotations={[[]]}
-        foregroundAnnotation={
-          page.annotations.length > 0 ? page.annotations[0].layer : []
-        }
-        onForegroundAnnotationChange={handleForegroundAnnotationChange}
-        onViewChange={handleViewChange}
-      />
       {/*questionStates.map((questionState: QuestionState, index: number) => (
         <ReversedChip
           key={index}

@@ -56,7 +56,7 @@ export async function showSelf(request: Request, response: Response) {
   const pageId = request.params.id;
   const page = await getRepository(Page).findOne(pageId, {
     where: { discardedAt: IsNull() },
-    relations: ["script"]
+    relations: ["script", "annotations"]
   });
   if (!page) {
     response.sendStatus(404);
@@ -73,12 +73,16 @@ export async function showSelf(request: Request, response: Response) {
   }
   const { requester } = allowed;
 
-  const annotation = await getRepository(Annotation).findOneOrFail({
-    page,
-    paperUser: requester
-  });
+  const ownAnnotation = page.annotations!.find(annotation => (
+    annotation.pageId === page.id && annotation.paperUserId === requester.id
+  ));
 
-  const data = await annotation.getData();
+  if (!ownAnnotation) {
+    response.sendStatus(400);
+    return;
+  }
+
+  const data = await (ownAnnotation as Annotation).getListData();
   response.status(201).json({ annotation: data });
 }
 
