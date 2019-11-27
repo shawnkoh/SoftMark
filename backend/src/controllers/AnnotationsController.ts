@@ -73,9 +73,10 @@ export async function showSelf(request: Request, response: Response) {
   }
   const { requester } = allowed;
 
-  const ownAnnotation = page.annotations!.find(annotation => (
-    annotation.pageId === page.id && annotation.paperUserId === requester.id
-  ));
+  const ownAnnotation = page.annotations!.find(
+    annotation =>
+      annotation.pageId === page.id && annotation.paperUserId === requester.id
+  );
 
   if (!ownAnnotation) {
     return response.sendStatus(204);

@@ -216,18 +216,22 @@ const ScriptMarkPage: React.FC = () => {
             rootQuestionTemplate.name
           }`}
         />
-        {pages
-          .filter(page => page.pageNo === pageNo)
-          .map((page, index) => {
-            return (
+        {pages.map((page, index) => {
+          return (
+            <div
+              className={classes.grow}
+              key={index}
+              style={{ display: page.pageNo === pageNo ? "flex" : "none" }}
+            >
               <Annotator
                 key={page.id}
                 page={page}
                 questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
               />
-            );
-          })}
+            </div>
+          );
+        })}
         {pageNo !== pageNos[0] && (
           <IconButton
             onClick={decrementPageNo}
