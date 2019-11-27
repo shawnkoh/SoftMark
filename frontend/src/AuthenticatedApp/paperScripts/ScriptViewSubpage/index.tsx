@@ -85,7 +85,7 @@ const ScriptView: React.FC = () => {
 
     console.log(scriptViewData); // for debugging
 
-    const { matriculationNumber, questions, pages } = scriptViewData;
+    const { matriculationNumber, questions, pages, filename } = scriptViewData;
 
     /*
     const getCurrentPageQuestions = () => {
@@ -103,7 +103,7 @@ const ScriptView: React.FC = () => {
           subtitle={
             matriculationNumber
               ? `Viewing script of ${matriculationNumber}`
-              : `Viewing unmatched script ID ${scriptId}`
+              : `Viewing unmatched script ${filename}`
           }
         />
         {pages

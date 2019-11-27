@@ -4,7 +4,6 @@ import {
   QuestionTemplatePatchData,
   QuestionTemplatePostData
 } from "backend/src/types/questionTemplates";
-import { ScriptViewData } from "backend/src/types/view";
 import client from "./client";
 
 const URL = "/question_templates";
@@ -45,21 +44,6 @@ export async function editQuestionTemplate(
   questionPatchData: QuestionTemplatePatchData
 ): Promise<AxiosResponse<{ questionTemplate: QuestionTemplateData }>> {
   return client.patch(`${URL}/${id}`, questionPatchData);
-}
-
-/**
- * Only accessible to Marker
- */
-// DEPRECATED
-export async function getQuestionToMark(id: number) {
-  try {
-    const { data } = await client.get<ScriptViewData>(
-      `${URL}/${id}/question_to_mark`
-    );
-    return data;
-  } catch (error) {
-    return null;
-  }
 }
 
 export async function getNextScriptToMark(questionTemplateId: number) {
