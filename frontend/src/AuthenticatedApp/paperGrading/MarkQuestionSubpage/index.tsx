@@ -73,6 +73,8 @@ const MarkQuestionPage: React.FC = () => {
         nextScriptToMarkData.scriptId,
         nextScriptToMarkData.rootQuestionTemplateId
       );
+    } else {
+      setScriptMarkingData(null);
     }
   }, [nextScriptToMarkData]);
 
