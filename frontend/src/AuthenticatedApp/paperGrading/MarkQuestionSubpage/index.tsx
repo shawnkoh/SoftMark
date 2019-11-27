@@ -10,8 +10,8 @@ import {
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import { ScriptMarkingData } from "backend/src/types/view";
 import React, { useEffect, useState } from "react";
@@ -248,7 +248,9 @@ const MarkQuestionPage: React.FC = () => {
           .map((page, index) => {
             return (
               <Annotator
-                key={page.id}
+                // TODO: Stringifying the questions is a quick hack to work around the shallow check behaviour of react
+                // The more ideal solution is to abstract the questions into its own component and pass the flattened data as props
+                key={page.id + JSON.stringify(questions)}
                 page={page}
                 questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
