@@ -10,9 +10,8 @@ import {
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
-import SkipNextIcon from "@material-ui/icons/SkipNext";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import { ScriptMarkingData } from "backend/src/types/view";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -109,7 +108,8 @@ const ScriptMarkPage: React.FC = () => {
         </Grid>
         {scriptMarkingData && (
           <Typography variant="subtitle1" className={classes.text}>
-            {scriptMarkingData.matriculationNumber || "(Unmatched script)"}
+            {scriptMarkingData.matriculationNumber ||
+              `Unmatched Script ${scriptMarkingData.filename}`}
           </Typography>
         )}
         <Button
@@ -151,7 +151,8 @@ const ScriptMarkPage: React.FC = () => {
       rootQuestionTemplate,
       questions,
       pages,
-      canMark
+      canMark,
+      filename
     } = scriptMarkingData;
 
     if (!canMark) {
@@ -212,9 +213,8 @@ const ScriptMarkPage: React.FC = () => {
     return (
       <div className={classes.container}>
         <Header
-          subtitle={`Marking ${matriculationNumber || "unmatched script"} Q${
-            rootQuestionTemplate.name
-          }`}
+          subtitle={`Marking ${matriculationNumber ||
+            "unmatched script " + filename} Q${rootQuestionTemplate.name}`}
         />
         {pages
           .filter(page => page.pageNo === pageNo)

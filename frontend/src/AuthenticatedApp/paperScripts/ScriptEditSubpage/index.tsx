@@ -83,7 +83,8 @@ const ScriptEdit: React.FC = () => {
       matriculationNumber,
       rootQuestionTemplate,
       questions,
-      pages
+      pages,
+      filename
     } = scriptViewData;
 
     if (!pages) {
@@ -116,7 +117,7 @@ const ScriptEdit: React.FC = () => {
           subtitle={
             matriculationNumber
               ? `Marking script of ${matriculationNumber}`
-              : `Marking unmatched script ID ${scriptId}`
+              : `Marking unmatched script ${filename}`
           }
         />
         {pages
