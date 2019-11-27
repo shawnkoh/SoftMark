@@ -39,6 +39,7 @@ export interface ScriptViewData {
   rootQuestionTemplate: QuestionTemplateViewData;
   questions: QuestionViewData[];
   pages: PageViewData[];
+  filename: string;
 }
 
 export interface ScriptMarkingData extends ScriptViewData {
