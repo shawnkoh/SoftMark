@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
+import useComponentSize from "@rehooks/component-size";
 
 import { CanvasProps, CanvasMode } from "./types";
 
@@ -56,24 +57,8 @@ const CanvasContainer: React.FC<Props> = ({
 }: Props) => {
   const classes = useStyles();
 
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkSize = () => {
-      const currentCanvasContainerRef = canvasContainerRef.current;
-      if (currentCanvasContainerRef) {
-        const width = currentCanvasContainerRef.offsetWidth;
-        const height = currentCanvasContainerRef.offsetHeight;
-        setWidth(width);
-        setHeight(height);
-      }
-    };
-    checkSize();
-    window.addEventListener("resize", checkSize);
-    return () => window.removeEventListener("resize", checkSize);
-  }, []);
+  const { width, height } = useComponentSize(canvasContainerRef);
 
   return (
     <div ref={canvasContainerRef} className={classes.canvasContainer}>

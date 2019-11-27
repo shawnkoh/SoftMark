@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import produce from "immer";
 
-import { saveAnnotation } from "../../../api/annotations";
+import { getOwnAnnotation, saveAnnotation } from "../../../api/annotations";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import {
   QuestionViewData,
@@ -35,6 +35,34 @@ const Annotator: React.FC<Props> = ({
 Props) => {
   const classes = useStyles();
 
+  const [foregroundAnnotation, setForegroundAnnotation] = useState<Annotation>(
+    page.annotations.length > 0 ? page.annotations[0].layer : []
+  );
+  /*
+  const [
+    isLoadingForegroundAnnotation,
+    setIsLoadingForegroundAnnotation
+  ] = useState(true);
+
+  const getForegroundAnnotation = () => {
+    getOwnAnnotation(page.id)
+      .then(res => {
+        const savedAnnotation = res.data.annotation;
+        setForegroundAnnotation(savedAnnotation.layer || []);
+      })
+      .catch(() => setForegroundAnnotation([]))
+      .finally(() => setIsLoadingForegroundAnnotation(false));
+  };
+  useEffect(getForegroundAnnotation, []);
+  */
+
+  const handleForegroundAnnotationChange = (annotation: Annotation) => {
+    const annotationPostData: AnnotationPostData = {
+      layer: annotation
+    };
+    saveAnnotation(page.id, annotationPostData);
+  };
+
   interface QuestionState {
     isVisible: boolean;
     question: QuestionViewData;
@@ -53,13 +81,6 @@ Props) => {
   const handleViewChange = (position: Point, scale: number) => {
     setPosition(position);
     setScale(scale);
-  };
-
-  const handleForegroundAnnotationChange = (annotation: Annotation) => {
-    const annotationPostData: AnnotationPostData = {
-      layer: annotation
-    };
-    saveAnnotation(page.id, annotationPostData);
   };
 
   const handleModalCancel = (index: number) => {
@@ -109,9 +130,7 @@ Props) => {
         drawable
         backgroundImageSource={page.imageUrl || ""}
         backgroundAnnotations={[[]]}
-        foregroundAnnotation={
-          page.annotations.length > 0 ? page.annotations[0].layer : []
-        }
+        foregroundAnnotation={foregroundAnnotation}
         onForegroundAnnotationChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
       />

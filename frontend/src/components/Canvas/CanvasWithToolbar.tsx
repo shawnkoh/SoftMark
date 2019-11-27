@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
+import isEqual from "lodash/isEqual";
 import useImageSize from "@use-hooks/image-size";
 import useComponentSize from "@rehooks/component-size";
 
@@ -85,7 +86,8 @@ const CanvasWithToolbar: React.FC<Props> = ({
   const handleClearAllClick = event => setThisForegroundAnnotation([]);
 
   useEffect(() => {
-    onForegroundAnnotationChange(thisForegroundAnnotation);
+    if (!isEqual(foregroundAnnotation, thisForegroundAnnotation))
+      onForegroundAnnotationChange(thisForegroundAnnotation);
   }, [thisForegroundAnnotation]);
 
   const defaultPosition = { x: 0, y: 64 };
