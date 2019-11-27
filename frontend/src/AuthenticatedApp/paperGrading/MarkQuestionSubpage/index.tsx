@@ -245,13 +245,12 @@ const MarkQuestionPage: React.FC = () => {
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
             return (
-              <div className={classes.grow} key={page.id}>
-                <Annotator
-                  page={page}
-                  questions={getCurrentPageQuestions()}
-                  rootQuestionTemplate={rootQuestionTemplate}
-                />
-              </div>
+              <Annotator
+                key={page.id}
+                page={page}
+                questions={getCurrentPageQuestions()}
+                rootQuestionTemplate={rootQuestionTemplate}
+              />
             );
           })}
         {pageNo !== pageNos[0] && (
