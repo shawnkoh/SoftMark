@@ -388,9 +388,7 @@ export async function rootQuestionTemplates(
       const descendants: QuestionTemplate[] = await getTreeRepository(
         QuestionTemplate
       ).findDescendants(rootQuestionTemplate);
-      const rootQuestionTemplateScore = rootQuestionTemplate.score || 0;
       rootQuestionTemplate.score =
-        rootQuestionTemplateScore +
         descendants
           .map(QuestionTemplate => QuestionTemplate.score || 0)
           .reduce((a, b) => a + b, 0);

@@ -230,8 +230,8 @@ const MarkQuestionPage: React.FC = () => {
         );
       });
 
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
+    const getCurrentPageQuestions = (currentPageNo: number) => {
+      const currentPage = pages.find(page => page.pageNo === currentPageNo)!;
       const currentPageQuestions = questions.filter(question =>
         currentPage.questionIds.includes(question.id)
       );
