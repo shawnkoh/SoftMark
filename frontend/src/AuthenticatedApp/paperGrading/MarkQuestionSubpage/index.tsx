@@ -230,7 +230,7 @@ const MarkQuestionPage: React.FC = () => {
         );
       });
 
-    const getCurrentPageQuestions = (pageNo: number) => {
+    const getCurrentPageQuestions = () => {
       const currentPage = pages.find(page => page.pageNo === pageNo)!;
       const currentPageQuestions = questions.filter(question =>
         currentPage.questionIds.includes(question.id)
@@ -241,22 +241,19 @@ const MarkQuestionPage: React.FC = () => {
     return (
       <div className={classes.container}>
         <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
-        {pages.map((page, index) => {
-          return (
-            <div
-              className={classes.grow}
-              key={index}
-              style={{ display: page.pageNo === pageNo ? "flex" : "none" }}
-            >
-              <Annotator
-                key={page.id}
-                page={page}
-                questions={getCurrentPageQuestions(page.pageNo)}
-                rootQuestionTemplate={rootQuestionTemplate}
-              />
-            </div>
-          );
-        })}
+        {pages
+          .filter(page => page.pageNo === pageNo)
+          .map((page, index) => {
+            return (
+              <div className={classes.grow} key={page.id}>
+                <Annotator
+                  page={page}
+                  questions={getCurrentPageQuestions()}
+                  rootQuestionTemplate={rootQuestionTemplate}
+                />
+              </div>
+            );
+          })}
         {pageNo !== pageNos[0] && (
           <IconButton
             onClick={decrementPageNo}
