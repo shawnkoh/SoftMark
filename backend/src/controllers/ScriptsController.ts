@@ -35,26 +35,30 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  // TODO: if there is a script with the same sha256 WITH a student, reject
-
-  // Case: if identical script is stored in db
-  const existingScript = await getRepository(Script).findOne({
+  // TODO: Can compress this into one query using a subquery in the andWhere but for now this will do
+  // Even better if these were in a ValidatorConstraint because they check and return all the errors
+  const existingFilename = await getRepository(Script).findOne({
     paperId,
-    sha256
+    filename,
+    discardedAt: IsNull()
   });
-  if (existingScript) {
-    existingScript.filename = filename;
-    existingScript.discardedAt = null;
-    const errors = await validate(existingScript);
-    if (errors.length > 0) {
-      return response.sendStatus(400);
-    }
-    await getRepository(Script).save(existingScript);
-    const data = await existingScript.getListData();
-    return response.status(201).json({ script: data });
+
+  const existingSha256 = await getRepository(Script).findOne({
+    paperId,
+    sha256,
+    discardedAt: IsNull()
+  });
+
+  if (existingFilename) {
+    response.status(400).send("Duplicate filename");
+    return;
   }
 
-  // Case: new script
+  if (existingSha256) {
+    response.status(400).send("Duplicate sha256");
+    return;
+  }
+
   const script = new Script(
     paperId,
     filename,
@@ -64,7 +68,7 @@ export async function create(request: Request, response: Response) {
   const errors = await validate(script);
 
   if (errors.length > 0) {
-    response.sendStatus(400);
+    response.status(400).json(errors);
     return;
   }
 
@@ -80,15 +84,10 @@ export async function create(request: Request, response: Response) {
       )
     );
   } catch (error) {
-    response.sendStatus(400);
+    response.status(400).json(error);
     return;
   }
 
-  // Create questions based on the current script template, if any.
-  const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-    relations: ["questionTemplates"],
-    where: { paperId, discardedAt: IsNull() }
-  });
   const questionTemplates = await getRepository(QuestionTemplate)
     .createQueryBuilder("questionTemplate")
     .where("questionTemplate.discardedAt IS NULL")
@@ -242,16 +241,7 @@ export async function match(request: Request, response: Response) {
     );
   });
 
-  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
-
-  const data: ScriptListData[] = await Promise.all(
-    scripts
-      .sort(sortByFilename)
-      .map(script =>
-        script.getListDataWithScriptTemplate(activeScriptTemplateData)
-      )
-  );
-  response.status(200).json({ scripts: data });
+  return response.sendStatus(200);
 }
 
 export async function index(request: Request, response: Response) {

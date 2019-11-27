@@ -1,6 +1,6 @@
 import {
-  Grid,
   Container,
+  Grid,
   Paper,
   Table,
   TableBody,
@@ -10,16 +10,13 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
-import {
-  GradingData,
-  MarkerGradingData,
-  QuestionTemplateGradingRootData
-} from "backend/src/types/grading";
+import { GradingData, MarkerGradingData } from "backend/src/types/grading";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import BorderLinearProgress from "../../../components/BorderLinearProgress";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
 import GradingTableRow from "./GradingTableRow";
@@ -35,28 +32,37 @@ const GradingSubpage: React.FC = () => {
     totalQuestionCount: 0,
     totalMarkCount: 0
   });
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.papers
-      .getGradingData(paper.id)
-      .then(res => setGradingData(res.data))
-      // TODO: Handle this better
-      .catch(error => toast.error("Failed to get GradingData"));
+    const getGradingData = async () => {
+      try {
+        const response = await api.papers.getGradingData(paper.id);
+        setGradingData(response.data);
+      } catch (error) {
+        toast.error(
+          "An error occured while fetching the grading data. Please try refreshing the page"
+        );
+      }
+      setLoading(false);
+    };
+    setLoading(true);
+    getGradingData();
   }, [paper]);
-  /** root question template hooks end */
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   const {
-    rootQuestionTemplates = [],
+    rootQuestionTemplates,
     totalQuestionCount,
     totalMarkCount,
     markers
   } = gradingData;
 
-  const userMap = new Map<number, MarkerGradingData>();
-  for (let i = 0; i < markers.length; i++) {
-    const marker = markers[i];
-    userMap.set(marker.id, marker);
-  }
+  const markerById = new Map<number, MarkerGradingData>();
+  markers.forEach(marker => markerById.set(marker.id, marker));
 
   const columns: TableColumn[] = [
     {
@@ -147,23 +153,18 @@ const GradingSubpage: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            {rootQuestionTemplates.map(
-              (
-                rootQuestionTemplate: QuestionTemplateGradingRootData,
-                index
-              ) => {
-                const modifiedTemplate: any = rootQuestionTemplate;
-                modifiedTemplate.markers = rootQuestionTemplate.markers
-                  .map(markerId => userMap.get(markerId))
-                  .filter(marker => marker);
-                return (
-                  <GradingTableRow
-                    key={rootQuestionTemplate.id}
-                    questionTemplate={rootQuestionTemplate}
-                  />
-                );
-              }
-            )}
+            {rootQuestionTemplates.map((rootQuestionTemplate, index) => {
+              const mappedMarkers = rootQuestionTemplate.markers
+                .filter(id => markerById.has(id))
+                .map(id => markerById.get(id)!);
+              return (
+                <GradingTableRow
+                  key={index}
+                  questionTemplate={rootQuestionTemplate}
+                  markers={mappedMarkers}
+                />
+              );
+            })}
           </TableBody>
         </Table>
       </Paper>

@@ -27,6 +27,12 @@ import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
 import { QuestionTemplate } from "./types";
 
+const ASC = "asc";
+const DESC = "desc";
+const MATRIC = "matric";
+const SCRIPT = "script";
+const SCORE = "score";
+
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -71,71 +77,61 @@ const ScriptsSubpage: React.FC = () => {
 
   const [searchText, setSearchText] = useState("");
 
-  const ASC = "asc";
-  const DESC = "desc";
   const [order, setOrder] = React.useState(DESC);
-  const [orderBy, setOrderBy] = React.useState("script");
-  const resetOrder = () => {
-    setOrder(ASC);
-    setOrderBy("script");
+  const [orderBy, setOrderBy] = React.useState(SCRIPT);
+
+  const getTableComparator = (order: string, orderBy: string) => {
+    return (a: ScriptListData, b: ScriptListData) => {
+      let res = 0;
+      const studentA = a.student;
+      const studentB = b.student;
+
+      if (orderBy === SCRIPT) {
+        const filenameA = a.filename.toLowerCase();
+        const filenameB = b.filename.toLowerCase();
+        res = filenameA.localeCompare(filenameB);
+      } else if (orderBy === MATRIC) {
+        const matriculationNumberA = (studentA && studentA.matriculationNumber
+          ? studentA.matriculationNumber
+          : ""
+        ).toLowerCase();
+        const matriculationNumberB = (studentB && studentB.matriculationNumber
+          ? studentB.matriculationNumber
+          : ""
+        ).toLowerCase();
+        res = matriculationNumberA.localeCompare(matriculationNumberB);
+      } else if (orderBy === SCORE) {
+        res = a.awardedMarks - b.awardedMarks;
+      }
+      if (order === ASC) {
+        res *= -1;
+      }
+      return res;
+    };
   };
 
-  const tableComparator = (a: ScriptListData, b: ScriptListData) => {
-    let res = 0;
-    const studentA = a.student;
-    const studentB = b.student;
-
-    if (orderBy === "script") {
-      const filenameA = a.filename.toLowerCase();
-      const filenameB = b.filename.toLowerCase();
-      res = filenameA.localeCompare(filenameB);
-    } else if (orderBy === "matric") {
-      const matriculationNumberA = (studentA && studentA.matriculationNumber
-        ? studentA.matriculationNumber
-        : ""
-      ).toLowerCase();
-      const matriculationNumberB = (studentB && studentB.matriculationNumber
-        ? studentB.matriculationNumber
-        : ""
-      ).toLowerCase();
-      res = matriculationNumberA.localeCompare(matriculationNumberB);
-    } else if (orderBy === "score") {
-      res = a.awardedMarks - b.awardedMarks;
-    }
-    if (order === DESC) {
-      res *= -1;
-    }
-    return res;
-  };
-
-  const sortTable = () => {
-    setScripts(scripts.sort(tableComparator));
-  };
-
-  const sortBy = (str: string) => {
-    if (str === orderBy) {
-      setOrder(order === ASC ? DESC : ASC);
+  const sortBy = (newOrderBy: string) => {
+    setScripts([]);
+    let newOrder = order;
+    if (newOrderBy === orderBy) {
+      newOrder = order === ASC ? DESC : ASC;
     } else {
-      setOrder(DESC);
+      newOrder = DESC;
     }
-    setOrderBy(str);
+    setOrder(newOrder);
+    setOrderBy(newOrderBy);
+    setScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
   };
-
-  /*useEffect(() => {
-    if (!isLoadingScripts) {
-      setTimeout(sortTable, 1000);
-    }
-  }, [order, orderBy]);*/
 
   const columns: TableColumn[] = [
     {
       name: "Filename",
-      key: "script",
+      key: SCRIPT,
       isSortable: true
     },
     {
       name: "Matriculation Number",
-      key: "matric",
+      key: MATRIC,
       isSortable: true
     },
     {
@@ -144,7 +140,7 @@ const ScriptsSubpage: React.FC = () => {
     },
     {
       name: "Total Score",
-      key: "score",
+      key: SCORE,
       isSortable: true
     },
     {

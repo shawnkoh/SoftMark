@@ -21,9 +21,9 @@ export async function createScript(
     timeout: 250000
   });
 }
-export async function matchScriptsToPaperUsers(
+export async function matchScriptsToStudents(
   id: number
-): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
+): Promise<AxiosResponse> {
   return client.patch(`/papers/${id}/scripts/match`, {}, { timeout: 120000 });
 }
 
@@ -78,7 +78,7 @@ export async function postScript(
   filename: string,
   file: File,
   onSuccess: () => void,
-  onFail: () => void,
+  onFail: (error) => void,
   atLoadEnd: () => void
 ) {
   const reader = new FileReader();

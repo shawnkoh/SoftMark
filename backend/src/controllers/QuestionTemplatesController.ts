@@ -22,8 +22,7 @@ import {
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import { generatePages, isPageValid } from "../utils/questionTemplate";
-import { getActiveRootQuestionTemplatesByPaperId } from "../utils/queries";
-import { sortByCreatedAt, sortRootQuestionTemplates } from "../utils/sorts";
+import { sortRootQuestionTemplates } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -95,7 +94,10 @@ export async function create(request: Request, response: Response) {
   // create Question for all the Paper's Scripts if the questionTemplate is a leaf
   let questions: Question[] = [];
   if (displayPage) {
-    const scripts = await getRepository(Script).find({ paper });
+    const scripts = await getRepository(Script).find({
+      paper,
+      discardedAt: IsNull()
+    });
     questions = scripts.map(script => new Question(script, questionTemplate));
   }
 
@@ -275,7 +277,10 @@ export async function discard(request: Request, response: Response) {
   }
 
   const { paper } = allowed;
-  const scripts = await getRepository(Script).find({ paper });
+  const scripts = await getRepository(Script).find({
+    paper,
+    discardedAt: IsNull()
+  });
   const descendants = await getTreeRepository(QuestionTemplate).findDescendants(
     questionTemplate
   );
@@ -374,7 +379,9 @@ export async function rootQuestionTemplates(
     .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .getMany();
 
-  const sortedRootQuestionTemplates = await sortRootQuestionTemplates(rootQuestionTemplates);
+  const sortedRootQuestionTemplates = await sortRootQuestionTemplates(
+    rootQuestionTemplates
+  );
 
   const rootQuestionTemplateData = await Promise.all(
     sortedRootQuestionTemplates.map(async rootQuestionTemplate => {

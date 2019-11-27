@@ -66,7 +66,6 @@ const QuestionEditDialog: React.FC<Props> = props => {
   const {
     open,
     mode,
-    handleClose,
     onSuccess,
     initialValues = {
       title: "",
@@ -76,6 +75,10 @@ const QuestionEditDialog: React.FC<Props> = props => {
   } = props;
   const [deleteWarning, setDeleteWarning] = React.useState(false);
   const [isParent, setIsParent] = React.useState(false);
+  const handleClose = () => {
+    setIsParent(false);
+    props.handleClose();
+  };
   const onSubmit = async (values: NewQuestionTemplateValues) => {
     try {
       if (mode === "create") {
