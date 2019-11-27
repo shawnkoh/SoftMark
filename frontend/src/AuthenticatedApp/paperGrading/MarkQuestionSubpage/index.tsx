@@ -248,7 +248,7 @@ const MarkQuestionPage: React.FC = () => {
               <Annotator
                 key={page.id}
                 page={page}
-                questions={getCurrentPageQuestions()}
+                questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
               />
             );
