@@ -241,18 +241,21 @@ const MarkQuestionPage: React.FC = () => {
     return (
       <div className={classes.container}>
         <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
-        {pages
-          .filter(page => page.pageNo === pageNo)
-          .map((page, index) => {
-            return (
+        {pages.map((page, index) => {
+          return (
+            <div
+              className={classes.grow}
+              key={page.id}
+              style={{ display: page.pageNo === pageNo ? "flex" : "none" }}
+            >
               <Annotator
-                key={page.id}
                 page={page}
                 questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
               />
-            );
-          })}
+            </div>
+          );
+        })}
         {pageNo !== pageNos[0] && (
           <IconButton
             onClick={decrementPageNo}
