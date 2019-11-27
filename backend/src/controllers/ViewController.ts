@@ -508,11 +508,28 @@ export async function nextScriptToMark(request: Request, response: Response) {
       .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
       .andWhere("mark IS NULL")
       .select("script.id", "id")
+      .orderBy("script.id", "ASC")
       .getRawOne();
   }
   if (!script) {
-    response.sendStatus(204);
-    return;
+    // Select the last script that was marked for this question template
+    // TODO: Reuse the query above - its almost the same
+    script = await getRepository(Question)
+      .createQueryBuilder("question")
+      .where("question.discardedAt IS NULL")
+      .andWhere("question.questionTemplateId IN (:...ids)", {
+        ids: descendantQuestionTemplateIds
+      })
+      .innerJoin("question.script", "script", "script.discardedAt IS NULL")
+      .innerJoin(
+        "question.questionTemplate",
+        "questionTemplate",
+        "questionTemplate.discardedAt IS NULL"
+      )
+      .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+      .select("script.id", "id")
+      .orderBy("script.id", "ASC")
+      .getRawOne();
   }
   const data = {
     scriptId: script.id,

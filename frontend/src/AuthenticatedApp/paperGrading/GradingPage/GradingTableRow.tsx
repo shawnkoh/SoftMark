@@ -61,7 +61,6 @@ const GradingTableRow: React.FC<Props> = props => {
               variant="contained"
               color="primary"
               style={{ borderRadius: 24 }}
-              disabled={markCount === questionCount}
             >
               Mark
             </Button>
