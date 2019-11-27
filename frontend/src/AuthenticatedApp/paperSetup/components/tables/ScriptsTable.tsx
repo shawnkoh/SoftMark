@@ -10,20 +10,17 @@ import {
   Tooltip,
   Typography
 } from "@material-ui/core";
-import DeleteAllIcon from "@material-ui/icons/DeleteForever";
 import UploadIcon from "@material-ui/icons/CloudUpload";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import React, { useState } from "react";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
-import DeleteAllScriptsModal from "../modals/DeleteAllScriptsModal";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
-import useScriptTemplate from "contexts/ScriptTemplateContext";
-import LoadingSpinner from "components/LoadingSpinner";
 
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
@@ -117,7 +114,7 @@ const ScriptsTable: React.FC = () => {
             </RoundedButton>
           </Tooltip>
         </Grid>
-        <Grid item>
+        {/* <Grid item>
           <DeleteAllScriptsModal
             render={toggleModal => (
               <RoundedButton
@@ -130,7 +127,7 @@ const ScriptsTable: React.FC = () => {
               </RoundedButton>
             )}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>

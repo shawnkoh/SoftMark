@@ -9,7 +9,6 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
-import DeleteAllIcon from "@material-ui/icons/DeleteForever";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useState } from "react";
@@ -20,7 +19,6 @@ import UploadNominalRollWrapper from "../../../../components/uploadWrappers/Uplo
 import useScriptsAndStudents from "../../../../contexts/ScriptsAndStudentsContext";
 import { StudentListData } from "../../../../types/paperUsers";
 import AddStudentModal from "../modals/AddStudentModal";
-import DeleteAllStudentsModal from "../modals/DeleteAllStudentsModal";
 import StudentsTableRow from "./StudentsTableRow";
 import useStyles from "./styles";
 
@@ -116,7 +114,7 @@ const StudentsTable: React.FC = () => {
             )}
           />
         </Grid>
-        <Grid item>
+        {/* <Grid item>
           <DeleteAllStudentsModal
             render={toggleVisibility => (
               <RoundedButton
@@ -129,7 +127,7 @@ const StudentsTable: React.FC = () => {
               </RoundedButton>
             )}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
       <Paper className={classes.tableWrapper}>
         <Table>
