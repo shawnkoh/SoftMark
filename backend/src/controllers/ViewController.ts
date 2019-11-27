@@ -527,16 +527,18 @@ export async function markScript(request: Request, response: Response) {
 
   // Lock all the script's questions for the root template's descendants
   // Can't use questionsQuery because of the joins and the different syntax required (no using question.)
-  await getRepository(Question)
-    .createQueryBuilder("question")
-    .update()
-    .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
-    .where("discardedAt IS NULL")
-    .andWhere("scriptId = :scriptId", { scriptId })
-    .andWhere("questionTemplateId IN (:...ids)", {
-      ids: descendantQuestionTemplateIds
-    })
-    .execute();
+  if (canMark) {
+    await getRepository(Question)
+      .createQueryBuilder("question")
+      .update()
+      .set({ currentMarker: requester, currentMarkerUpdatedAt: new Date() })
+      .where("discardedAt IS NULL")
+      .andWhere("scriptId = :scriptId", { scriptId })
+      .andWhere("questionTemplateId IN (:...ids)", {
+        ids: descendantQuestionTemplateIds
+      })
+      .execute();
+  }
 
   const pageNosData: {
     pageNo: number;
