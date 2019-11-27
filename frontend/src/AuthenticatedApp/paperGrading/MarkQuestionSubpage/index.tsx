@@ -245,9 +245,8 @@ const MarkQuestionPage: React.FC = () => {
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
             return (
-              <div className={classes.grow} key={index}>
+              <div className={classes.grow} key={page.id}>
                 <Annotator
-                  key={page.id}
                   page={page}
                   questions={getCurrentPageQuestions()}
                   rootQuestionTemplate={rootQuestionTemplate}
