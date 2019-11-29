@@ -1,14 +1,13 @@
+import { Box, Button, Container, Grid, Typography } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "contexts/ScriptTemplateContext";
 import React from "react";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
-
-import { Button, Box, Container, Grid, Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import UploadNominalRollWrapper from "../../../components/uploadWrappers/UploadNominalRollWrapper";
 import UploadScriptsWrapper from "../../../components/uploadWrappers/UploadScriptsWrapper";
 import UploadScriptTemplateWrapper from "../../../components/uploadWrappers/UploadScriptTemplateWrapper";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
-import useScriptTemplate from "contexts/ScriptTemplateContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,7 +45,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
 
   const rowDetails = [
     {
-      title: "Upload master copy",
+      title: "Master Script",
       button: (
         <UploadScriptTemplateWrapper>
           <Button
@@ -61,10 +60,10 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Upload student scripts " +
+        "Scripts · " +
         (scriptTemplate
-          ? "(" + scripts.length + " scripts)"
-          : " (Upload master copy first)"),
+          ? scripts.length + " scripts"
+          : "Upload master copy first"),
       button: (
         <UploadScriptsWrapper>
           <Button
@@ -81,12 +80,10 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     {
       title: (
         <>
-          Upload student list / nominal roll .csv file (Format: [matriculation
-          number], [name], [email] -
+          Student List ·{" "}
           <a href="https://www.dropbox.com/s/5ed14dzpg0sgiwy/NominalRoll.csv?dl=1">
-            download sample
+            sample
           </a>
-          )
         </>
       ),
       button: (
@@ -120,7 +117,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Set up question structure" +
+        "Marking Template" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
@@ -137,7 +134,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Allocate questions to markers" +
+        "Question Allocation" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
