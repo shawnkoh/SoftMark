@@ -528,7 +528,7 @@ export async function nextScriptToMark(request: Request, response: Response) {
       )
       .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
       .select("script.id", "id")
-      .orderBy("script.id", "ASC")
+      .orderBy("script.id", "DESC")
       .getRawOne();
   }
   const data = {

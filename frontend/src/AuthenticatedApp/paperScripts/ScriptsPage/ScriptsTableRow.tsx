@@ -41,6 +41,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
 
   return (
     <TableRow>
+      <TableCell>{id}</TableCell>
       <TableCell>{filename}</TableCell>
       <TableCell>{matriculationNumber}</TableCell>
       <TableCell>

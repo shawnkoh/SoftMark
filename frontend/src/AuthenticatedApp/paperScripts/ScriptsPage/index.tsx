@@ -29,9 +29,42 @@ import { QuestionTemplate } from "./types";
 
 const ASC = "asc";
 const DESC = "desc";
+const ID = "id";
 const MATRIC = "matric";
 const SCRIPT = "script";
 const SCORE = "score";
+
+const getTableComparator = (order: string, orderBy: string) => {
+  return (a: ScriptListData, b: ScriptListData) => {
+    let res = 0;
+    const studentA = a.student;
+    const studentB = b.student;
+
+    if (orderBy === ID) {
+      res = a.id - b.id;
+    } else if (orderBy === SCRIPT) {
+      const filenameA = a.filename.toLowerCase();
+      const filenameB = b.filename.toLowerCase();
+      res = filenameA.localeCompare(filenameB);
+    } else if (orderBy === MATRIC) {
+      const matriculationNumberA = (studentA && studentA.matriculationNumber
+        ? studentA.matriculationNumber
+        : ""
+      ).toLowerCase();
+      const matriculationNumberB = (studentB && studentB.matriculationNumber
+        ? studentB.matriculationNumber
+        : ""
+      ).toLowerCase();
+      res = matriculationNumberA.localeCompare(matriculationNumberB);
+    } else if (orderBy === SCORE) {
+      res = a.awardedMarks - b.awardedMarks;
+    }
+    if (order === ASC) {
+      res *= -1;
+    }
+    return res;
+  };
+};
 
 const ScriptsSubpage: React.FC = () => {
   const classes = useStyles();
@@ -39,8 +72,10 @@ const ScriptsSubpage: React.FC = () => {
   const paper = usePaper();
   const scriptsAndStudents = useScriptsAndStudents();
 
+  const [order, setOrder] = React.useState(DESC);
+  const [orderBy, setOrderBy] = React.useState(ID);
   const [scripts, setScripts] = useState<ScriptListData[]>(
-    scriptsAndStudents.scripts
+    scriptsAndStudents.scripts.sort(getTableComparator(order, orderBy))
   );
 
   const [questionTemplates, setQuestionTemplates] = useState<
@@ -77,39 +112,6 @@ const ScriptsSubpage: React.FC = () => {
 
   const [searchText, setSearchText] = useState("");
 
-  const [order, setOrder] = React.useState(DESC);
-  const [orderBy, setOrderBy] = React.useState(SCRIPT);
-
-  const getTableComparator = (order: string, orderBy: string) => {
-    return (a: ScriptListData, b: ScriptListData) => {
-      let res = 0;
-      const studentA = a.student;
-      const studentB = b.student;
-
-      if (orderBy === SCRIPT) {
-        const filenameA = a.filename.toLowerCase();
-        const filenameB = b.filename.toLowerCase();
-        res = filenameA.localeCompare(filenameB);
-      } else if (orderBy === MATRIC) {
-        const matriculationNumberA = (studentA && studentA.matriculationNumber
-          ? studentA.matriculationNumber
-          : ""
-        ).toLowerCase();
-        const matriculationNumberB = (studentB && studentB.matriculationNumber
-          ? studentB.matriculationNumber
-          : ""
-        ).toLowerCase();
-        res = matriculationNumberA.localeCompare(matriculationNumberB);
-      } else if (orderBy === SCORE) {
-        res = a.awardedMarks - b.awardedMarks;
-      }
-      if (order === ASC) {
-        res *= -1;
-      }
-      return res;
-    };
-  };
-
   const sortBy = (newOrderBy: string) => {
     setScripts([]);
     let newOrder = order;
@@ -124,6 +126,7 @@ const ScriptsSubpage: React.FC = () => {
   };
 
   const columns: TableColumn[] = [
+    { name: "ID", key: ID, isSortable: true },
     {
       name: "Filename",
       key: SCRIPT,
