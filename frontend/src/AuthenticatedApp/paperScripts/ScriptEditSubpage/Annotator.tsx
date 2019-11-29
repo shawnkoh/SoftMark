@@ -1,31 +1,28 @@
-import React, { useState } from "react";
+import { AppBar, Avatar, Toolbar, Typography } from "@material-ui/core";
+import {
+  PageViewData,
+  QuestionTemplateViewData,
+  QuestionViewData
+} from "backend/src/types/view";
 import clsx from "clsx";
 import produce from "immer";
-
-import { saveAnnotation } from "../../../api/annotations";
-import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
-import {
-  QuestionViewData,
-  PageViewData,
-  QuestionTemplateViewData
-} from "backend/src/types/view";
-
-import { AppBar, Toolbar, Typography, Avatar } from "@material-ui/core";
-
-import ReversedChip from "../../../components/ReversedChip";
-import { CanvasWithToolbar } from "../../../components/Canvas";
+import React, { useState } from "react";
 import { Point } from "../../../components/Canvas/types";
+import ReversedChip from "../../../components/ReversedChip";
 import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
 
-interface OwnProps {
+interface Props {
   page: PageViewData;
   questions: QuestionViewData[];
   rootQuestionTemplate: QuestionTemplateViewData;
   matriculationNumber: string | null;
 }
 
-type Props = OwnProps;
+interface QuestionState {
+  isVisible: boolean;
+  question: QuestionViewData;
+}
 
 const Annotator: React.FC<Props> = ({
   page,
@@ -34,10 +31,6 @@ const Annotator: React.FC<Props> = ({
 }: Props) => {
   const classes = useStyles();
 
-  interface QuestionState {
-    isVisible: boolean;
-    question: QuestionViewData;
-  }
   const initialQuestionStates = questions.map(question => ({
     isVisible: false,
     question
@@ -107,7 +100,7 @@ const Annotator: React.FC<Props> = ({
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
-            {matriculationNumber || "(Unmatched script)"} page {page.pageNo}
+            {matriculationNumber} page {page.pageNo}
           </Typography>
           {questionStates.map((questionState: QuestionState, index: number) => (
             <ReversedChip

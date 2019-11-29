@@ -1,30 +1,27 @@
-import React, { useState, useEffect } from "react";
-
-import { getOwnAnnotation, saveAnnotation } from "../../../api/annotations";
-import produce from "immer";
-
+import { AppBar, Avatar, Chip, Toolbar, Typography } from "@material-ui/core";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import {
-  QuestionViewData,
   PageViewData,
-  QuestionTemplateViewData
+  QuestionTemplateViewData,
+  QuestionViewData
 } from "backend/src/types/view";
-
-import { AppBar, Toolbar, Chip, Avatar } from "@material-ui/core";
+import clsx from "clsx";
+import LoadingSpinner from "components/LoadingSpinner";
+import produce from "immer";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
-import ReversedChip from "../../../components/ReversedChip";
+import { getOwnAnnotation, saveAnnotation } from "../../../api/annotations";
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import { Point } from "../../../components/Canvas/types";
+import ReversedChip from "../../../components/ReversedChip";
 import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
-import LoadingSpinner from "components/LoadingSpinner";
 
 interface OwnProps {
   page: PageViewData;
   questions: QuestionViewData[];
   rootQuestionTemplate: QuestionTemplateViewData;
-  //matriculationNumber: string | null;
+  matriculationNumber: string | null;
 }
 
 type Props = OwnProps;
@@ -32,9 +29,9 @@ type Props = OwnProps;
 const Annotator: React.FC<Props> = ({
   page,
   questions,
-  rootQuestionTemplate
-}: //matriculationNumber
-Props) => {
+  rootQuestionTemplate,
+  matriculationNumber
+}: Props) => {
   const classes = useStyles();
 
   interface QuestionState {
@@ -179,13 +176,13 @@ Props) => {
       ))}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          {/*<Typography
+          <Typography
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
-            {matriculationNumber || "(Unmatched script)"} page {page.pageNo}
+            {matriculationNumber} page {page.pageNo}
           </Typography>
-          */}
+
           <Chip
             label={"Q" + rootQuestionTemplate.name}
             variant="outlined"

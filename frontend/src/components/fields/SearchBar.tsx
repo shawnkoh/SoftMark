@@ -1,20 +1,16 @@
-import React, { Component, FocusEventHandler, RefObject } from "react";
+import { createStyles, MenuItem, Typography } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import Input from "@material-ui/core/Input";
 import Paper from "@material-ui/core/Paper";
+import { WithStyles } from "@material-ui/core/styles/withStyles";
 import ClearIcon from "@material-ui/icons/Clear";
 import SearchIcon from "@material-ui/icons/Search";
-import { WithStyles } from "@material-ui/core/styles/withStyles";
-import {
-  createStyles,
-  MenuItem,
-  Typography,
-  withStyles
-} from "@material-ui/core";
-import Autosuggest from "react-autosuggest";
+import { withStyles } from "@material-ui/styles";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { AxiosResponse } from "axios";
+import React, { Component, FocusEventHandler, RefObject } from "react";
+import Autosuggest from "react-autosuggest";
 
 const styles = (theme: any) =>
   createStyles({
@@ -321,7 +317,7 @@ function renderSuggestion(
 
   return (
     <MenuItem selected={isHighlighted} component="div">
-      <Typography variant="inherit" noWrap>
+      <Typography variant="inherit">
         {parts.map(part => (
           <span
             key={part.text}
