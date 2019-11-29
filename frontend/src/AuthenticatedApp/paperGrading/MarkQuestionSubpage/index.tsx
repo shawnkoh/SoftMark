@@ -135,11 +135,7 @@ const MarkQuestionPage: React.FC = () => {
         </Grid>
         {scriptMarkingData && (
           <>
-            <Typography
-              variant="subtitle1"
-              className={classes.text}
-              noWrap
-            >
+            <Typography variant="subtitle1" className={classes.text}>
               {scriptMarkingData.matriculationNumber ||
                 `Unmatched script: ${scriptMarkingData.filename}`}
             </Typography>
