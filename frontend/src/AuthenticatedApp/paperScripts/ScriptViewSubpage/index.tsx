@@ -99,13 +99,7 @@ const ScriptView: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header
-          subtitle={
-            matriculationNumber
-              ? `Viewing script of ${matriculationNumber}`
-              : `Viewing unmatched script ${filename}`
-          }
-        />
+        <Header subtitle={matriculationNumber || filename} />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => (
@@ -125,8 +119,7 @@ const ScriptView: React.FC = () => {
         >
           <Toolbar>
             <Typography variant="button" className={classes.questionBarItem}>
-              {matriculationNumber || "(Unmatched script)"} Page {pageNo} of{" "}
-              {pages.length}
+              {matriculationNumber || filename} Page {pageNo} of {pages.length}
             </Typography>
             {questions.map(question => (
               <ReversedChip

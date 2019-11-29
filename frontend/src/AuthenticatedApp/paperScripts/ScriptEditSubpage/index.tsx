@@ -77,8 +77,6 @@ const ScriptEdit: React.FC = () => {
   }
 
   if (scriptViewData) {
-    console.log(scriptViewData); // for debugging
-
     const {
       matriculationNumber,
       rootQuestionTemplate,
@@ -90,7 +88,7 @@ const ScriptEdit: React.FC = () => {
     if (!pages) {
       return (
         <div className={classes.container}>
-          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Header subtitle={`Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">No pages to display.</Typography>
           </Container>
@@ -113,13 +111,7 @@ const ScriptEdit: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header
-          subtitle={
-            matriculationNumber
-              ? `Marking script of ${matriculationNumber}`
-              : `Marking unmatched script ${filename}`
-          }
-        />
+        <Header subtitle={matriculationNumber || filename} />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => (
