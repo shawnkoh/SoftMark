@@ -70,6 +70,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     popover: {
       width: theme.spacing(32)
+    },
+    flexWrap: {
+      flexWrap: "wrap"
     }
   })
 );

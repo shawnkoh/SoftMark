@@ -5,7 +5,8 @@ import {
   Grid,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
+  Hidden
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
@@ -22,6 +23,8 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 import usePaper from "../../../contexts/PaperContext";
 import Annotator from "./Annotator";
 import useStyles from "./styles";
+import { useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const MarkQuestionPage: React.FC = () => {
   const classes = useStyles();
@@ -114,63 +117,99 @@ const MarkQuestionPage: React.FC = () => {
   interface HeaderProps {
     subtitle: string;
   }
-  const Header: React.FC<HeaderProps> = props => (
-    <AppBar position="static" color="primary" elevation={1}>
-      <Toolbar>
-        <IconButton
-          color="inherit"
-          component={Link}
-          to={`/papers/${paper.id}/grading`}
-          className={classes.backButton}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <Grid container className={classes.grow}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle1">{props.subtitle}</Typography>
-          </Grid>
-        </Grid>
-        {scriptMarkingData && (
-          <>
-            <Typography variant="subtitle1" className={classes.text}>
-              {scriptMarkingData.matriculationNumber ||
-                scriptMarkingData.filename}
-            </Typography>
-            <Typography variant="subtitle1" className={classes.text}>
-              ID: {scriptMarkingData.id}
-            </Typography>
-          </>
-        )}
-        <Button
-          color="inherit"
-          disabled={!(scriptMarkingData && scriptMarkingData.previousScriptId)}
-          onClick={handlePrevClick}
-          startIcon={<NavigateBeforeIcon />}
-          className={classes.button}
-        >
-          Previous
-        </Button>
-        <Button
-          color="inherit"
-          disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
-          onClick={handleNextClick}
-          startIcon={<NavigateNextIcon />}
-          className={classes.button}
-        >
-          Next
-        </Button>
-        <Button
-          color="inherit"
-          variant="outlined"
-          onClick={handleNextUnmarkedClick}
-          startIcon={<SkipNextIcon />}
-          className={classes.button}
-        >
-          Next Unmarked
-        </Button>
-      </Toolbar>
-    </AppBar>
-  );
+  const Header: React.FC<HeaderProps> = props => {
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
+    return (
+      <AppBar position="static" color="primary" elevation={1}>
+        <Toolbar className={matches ? undefined : classes.flexWrap}>
+          <IconButton
+            color="inherit"
+            component={Link}
+            to={`/papers/${paper.id}/grading`}
+            className={classes.backButton}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" className={classes.grow}>
+            {props.subtitle}
+          </Typography>
+          {scriptMarkingData && (
+            <>
+              <Typography variant="subtitle1" className={classes.text}>
+                {scriptMarkingData.matriculationNumber ||
+                  scriptMarkingData.filename}
+              </Typography>
+              <Typography variant="subtitle1" className={classes.text}>
+                ID: {scriptMarkingData.id}
+              </Typography>
+            </>
+          )}
+          <Hidden lgUp>
+            <IconButton
+              color="inherit"
+              disabled={
+                !(scriptMarkingData && scriptMarkingData.previousScriptId)
+              }
+              onClick={handlePrevClick}
+              className={classes.button}
+            >
+              <NavigateBeforeIcon />
+            </IconButton>
+          </Hidden>
+          <Hidden mdDown>
+            <Button
+              color="inherit"
+              disabled={
+                !(scriptMarkingData && scriptMarkingData.previousScriptId)
+              }
+              onClick={handlePrevClick}
+              startIcon={<NavigateBeforeIcon />}
+              className={classes.button}
+            >
+              Previous
+            </Button>
+          </Hidden>
+          <Hidden lgUp>
+            <IconButton
+              color="inherit"
+              disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
+              onClick={handleNextClick}
+            >
+              <NavigateNextIcon />
+            </IconButton>
+          </Hidden>
+          <Hidden mdDown>
+            <Button
+              color="inherit"
+              disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
+              onClick={handleNextClick}
+              startIcon={<NavigateNextIcon />}
+              className={classes.button}
+            >
+              Next
+            </Button>
+          </Hidden>
+          <Hidden mdUp>
+            <IconButton color="inherit" onClick={handleNextUnmarkedClick}>
+              <SkipNextIcon />
+            </IconButton>
+          </Hidden>
+          <Hidden smDown>
+            <Button
+              color="inherit"
+              variant="outlined"
+              onClick={handleNextUnmarkedClick}
+              startIcon={<SkipNextIcon />}
+              className={classes.button}
+            >
+              Next Unmarked
+            </Button>
+          </Hidden>
+        </Toolbar>
+      </AppBar>
+    );
+  };
 
   if (isLoading) {
     return (

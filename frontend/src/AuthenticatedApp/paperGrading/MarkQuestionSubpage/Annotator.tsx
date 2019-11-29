@@ -182,7 +182,6 @@ const Annotator: React.FC<Props> = ({
           >
             {matriculationNumber} page {page.pageNo}
           </Typography>
-
           <Chip
             label={"Q" + rootQuestionTemplate.name}
             variant="outlined"
