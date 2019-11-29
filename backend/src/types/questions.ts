@@ -7,6 +7,12 @@ export interface QuestionListData extends DiscardableData {
   scriptId: number;
   currentMarkerId: number | null;
   currentMarkerUpdatedAt: Date | null;
+  name: string;
+  displayPage: number | null;
+  topOffset: number | null;
+  leftOffset: number | null;
+  awardedMarks: number;
+  totalMarks: number | null;
   marksCount: number;
   bookmarksCount: number;
 }

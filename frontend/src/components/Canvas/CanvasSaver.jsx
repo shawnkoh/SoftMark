@@ -1,5 +1,5 @@
 import React from "react";
-import { Stage, Layer, Line } from "react-konva";
+import { Stage, Layer, Line, Text } from "react-konva";
 
 import UrlImage from "./UrlImage";
 
@@ -38,6 +38,7 @@ class CanvasSaver extends React.Component {
         scaleY={1}
         x={0}
         y={0}
+        fill="red"
       >
         <Layer>
           <UrlImage
@@ -45,6 +46,17 @@ class CanvasSaver extends React.Component {
             onLoad={this.handleLoad}
           />
         </Layer>
+        {this.props.questions.map((question, index) => (
+          <Layer key={index + " " + question.id}>
+            <Text fontSize={30} 
+              text={`Marks: ${question.awardedMarks} / ${question.totalMarks}`} 
+              wrap="char"
+              x={question.leftOffset}
+              y={question.topOffset}
+              fill="red"
+            />
+          </Layer>
+        ))}
         {this.props.backgroundAnnotations.map(
           (backgroundAnnotationLines, i) => (
             <Layer key={i}>

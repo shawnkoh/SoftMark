@@ -198,15 +198,44 @@ export class Script extends Discardable {
         where: { scriptId: this.id },
         order: { pageNo: "ASC" }
       }));
+
+    const scriptTemplate = await getRepository(ScriptTemplate).findOne({
+      where: { paperId: this.paperId, discardedAt: IsNull() },
+      relations: ["questionTemplates"]
+    });
+
+    const questionTemplates = scriptTemplate
+      ? scriptTemplate.questionTemplates!
+      : [];
+
+    const questionTemplateIds = questionTemplates.map(q => q.id);
+
     const questions =
-      this.questions ||
-      (await getRepository(Question).find({ scriptId: this.id }));
+      questionTemplateIds.length > 0
+        ? await getRepository(Question)
+            .createQueryBuilder("question")
+            .leftJoinAndSelect("question.questionTemplate", "questionTemplate")
+            .leftJoinAndSelect(
+              "question.marks",
+              "mark",
+              "mark.discardedAt IS NULL"
+            )
+            .where("question.scriptId = :scriptId", { scriptId: this.id })
+            .andWhere(
+              "question.questionTemplateId IN (:...questionTemplateIds)",
+              {
+                questionTemplateIds
+              }
+            )
+            .andWhere("question.discardedAt IS NULL")
+            .getMany()
+        : [];
 
     return {
       ...(await this.getListData()),
       pages: await Promise.all(pages.map(page => page.getData())),
       questions: await Promise.all(
-        questions.map(question => question.getListData())
+        questions.map(question => question.getData())
       )
     };
   };

@@ -88,6 +88,17 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
     }
   };
 
+  const getQuestionsOnPage = (pageNo: number) => {
+    return script.questions.filter(
+      question =>
+        question.displayPage === pageNo &&
+        question.leftOffset &&
+        question.topOffset &&
+        question.totalMarks &&
+        !question.discardedAt
+    );
+  };
+
   return (
     <div style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}>
       <Dialog open={isDownloading}>
@@ -107,6 +118,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
             callBackImageUrl={callBackImageUrl}
             backgroundAnnotations={backgroundAnnotations}
             backgroundImageSource={page.imageUrl}
+            questions={getQuestionsOnPage(page.pageNo)}
           />
         );
       })}
