@@ -78,7 +78,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const [thisForegroundAnnotation, setThisForegroundAnnotation] = useState<
     Annotation
-  >(foregroundAnnotation);
+  >([]);
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state
@@ -89,6 +89,10 @@ const CanvasWithToolbar: React.FC<Props> = ({
     if (!isEqual(foregroundAnnotation, thisForegroundAnnotation))
       onForegroundAnnotationChange(thisForegroundAnnotation);
   }, [thisForegroundAnnotation]);
+
+  useEffect(() => {
+    setThisForegroundAnnotation(foregroundAnnotation);
+  }, [foregroundAnnotation]);
 
   const defaultPosition = { x: 0, y: 64 };
   const [position, setPosition] = useState<Point>(defaultPosition);

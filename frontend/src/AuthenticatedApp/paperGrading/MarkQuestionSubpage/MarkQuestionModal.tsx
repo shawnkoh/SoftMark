@@ -1,4 +1,4 @@
-import { DialogContent, Slider, Popover } from "@material-ui/core";
+import { DialogContent, Slider, Popover, Box, Button } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -35,8 +35,8 @@ const MarkQuestionModal: React.FC<Props> = ({
     return await api.marks
       .replaceMark(questionId, { score })
       .then(res => {
-        const newScore = res.data.mark.score;
-        return newScore;
+        if (res.data.mark) return res.data.mark.score;
+        return -1;
       })
       .catch(() => {
         toast.error("An error was made when saving. Try refreshing the page.");
@@ -51,6 +51,11 @@ const MarkQuestionModal: React.FC<Props> = ({
 
   const handleSave = async event => {
     const newScore = await putMarkData(id, localScore);
+    onSave(newScore);
+  };
+
+  const handleUnmark = async event => {
+    const newScore = await putMarkData(id, -1); // -1 -> unmark the question
     onSave(newScore);
   };
 
@@ -90,6 +95,9 @@ const MarkQuestionModal: React.FC<Props> = ({
             valueLabelDisplay="on"
           />
         </div>
+        <Button onClick={handleUnmark} fullWidth>
+          Unmark
+        </Button>
       </DialogContent>
     </Popover>
   );

@@ -26,12 +26,16 @@ import {
 import React from "react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
-import { isPageValid } from "../../../../utils/questionTemplateUtil";
+import {
+  isPageValid,
+  generatePages
+} from "../../../../utils/questionTemplateUtil";
 import QuestionTemplateSelect from "./QuestionTemplateSelect";
 
 export interface NewQuestionTemplateValues {
   title: string;
   score?: number;
+  displayPage?: number;
   pageCovered?: string;
   parentQuestionTemplateId?: string;
 }
@@ -70,6 +74,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
     initialValues = {
       title: "",
       score: 1,
+      displayPage: currentPageNo,
       pageCovered: `${currentPageNo}`
     }
   } = props;
@@ -91,7 +96,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
               name: values.title,
               score: values.score,
               pageCovered: values.pageCovered,
-              displayPage: currentPageNo,
+              displayPage: values.displayPage,
               parentQuestionTemplateId: Number(values.parentQuestionTemplateId)
             };
         const response = await api.questionTemplates.createQuestionTemplate(
@@ -105,7 +110,8 @@ const QuestionEditDialog: React.FC<Props> = props => {
             ? {
                 name: values.title,
                 score: values.score,
-                pageCovered: values.pageCovered
+                pageCovered: values.pageCovered,
+                displayPage: values.displayPage
               }
             : {
                 name: values.title
@@ -158,12 +164,16 @@ const QuestionEditDialog: React.FC<Props> = props => {
           const errors: FormikErrors<NewQuestionTemplateValues> = {};
           if (isParent) return errors;
           if (values.score! <= 0) errors.score = "Score should be positive";
-          const pageError = isPageValid(
-            values.pageCovered!,
-            currentPageNo,
-            pageCount
-          );
-          if (pageError) errors.pageCovered = pageError;
+          if (values.pageCovered) {
+            const pageError = isPageValid(values.pageCovered, pageCount);
+            if (pageError) errors.pageCovered = pageError;
+            else if (
+              values.displayPage &&
+              !generatePages(values.pageCovered).has(Number(values.displayPage))
+            )
+              errors.displayPage =
+                "Should be included in the range of page covered";
+          }
           return errors;
         }}
       >
@@ -231,7 +241,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
 
                 {((mode === "create" && !isParent) || mode === "editLeaf") && (
                   <>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                       <Field name="score">
                         {({
                           field,
@@ -250,7 +260,7 @@ const QuestionEditDialog: React.FC<Props> = props => {
                         )}
                       </Field>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                       <Field name="pageCovered">
                         {({
                           field,
@@ -262,6 +272,25 @@ const QuestionEditDialog: React.FC<Props> = props => {
                             label="Pages covered"
                             helperText={meta.error}
                             placeholder="1, 2, 4-5"
+                            required
+                            fullWidth
+                            {...field}
+                          />
+                        )}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Field name="displayPage">
+                        {({
+                          field,
+                          meta
+                        }: FieldProps<NewQuestionTemplateValues>) => (
+                          <TextField
+                            error={!!meta.error}
+                            margin="dense"
+                            label="Display page"
+                            type="number"
+                            helperText={meta.error}
                             required
                             fullWidth
                             {...field}

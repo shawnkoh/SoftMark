@@ -232,7 +232,7 @@ export const ScriptSetupProvider: React.FC = props => {
             qt.topOffset &&
             qt.displayPage &&
             qt.leftOffset
-          )
+          ) {
             setLeaves(
               update(leaves, {
                 $merge: {
@@ -247,6 +247,8 @@ export const ScriptSetupProvider: React.FC = props => {
                 }
               })
             );
+            setCurrentPageNo(qt.displayPage);
+          }
         }}
       />
       {Object.keys(leaves).map(id => (
@@ -259,15 +261,19 @@ export const ScriptSetupProvider: React.FC = props => {
           initialValues={{
             title: leaves[id].name,
             score: leaves[id].score,
-            pageCovered: leaves[id].pageCovered
+            pageCovered: leaves[id].pageCovered,
+            displayPage: leaves[id].displayPage
           }}
           onSuccess={(qt: QuestionTemplateData) => {
-            if (qt.score && qt.pageCovered)
+            if (qt.score && qt.pageCovered && qt.displayPage) {
               updateLeaf(qt.id, {
                 name: qt.name,
                 score: qt.score,
-                pageCovered: qt.pageCovered
+                pageCovered: qt.pageCovered,
+                displayPage: qt.displayPage
               });
+              setCurrentPageNo(qt.displayPage);
+            }
           }}
         />
       ))}

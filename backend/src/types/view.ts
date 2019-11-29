@@ -9,6 +9,7 @@ export interface QuestionViewData {
   maxScore: number;
   topOffset: number;
   leftOffset: number;
+  displayPage: number;
 }
 
 export interface AnnotationViewData {

@@ -31,6 +31,7 @@ function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
     .addSelect("questionTemplate.score", "maxScore")
     .addSelect("questionTemplate.topOffset", "topOffset")
     .addSelect("questionTemplate.leftOffset", "leftOffset")
+    .addSelect("questionTemplate.displayPage", "displayPage")
     .orderBy("questionTemplate.displayPage", "ASC")
     .addOrderBy("questionTemplate.topOffset", "ASC")
     .addOrderBy("questionTemplate.leftOffset", "ASC");

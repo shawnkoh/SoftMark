@@ -10,6 +10,7 @@ import InvitePage from "../UnauthenticatedApp/InvitePage";
 import PaperIndex from "./PaperIndexPage";
 import PaperView from "./PaperViewPage";
 import theme from "./theme";
+import { MarkQuestionProvider } from "./paperGrading/MarkQuestionSubpage/MarkQuestionContext";
 
 const AuthenticatedApp: React.FC = () => {
   return (
