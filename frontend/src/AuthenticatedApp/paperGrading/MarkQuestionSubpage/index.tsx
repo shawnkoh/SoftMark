@@ -127,9 +127,6 @@ const MarkQuestionPage: React.FC = () => {
         </IconButton>
         <Grid container className={classes.grow}>
           <Grid item xs={12}>
-            <Typography variant="h6">{paper.name}</Typography>
-          </Grid>
-          <Grid item xs={12}>
             <Typography variant="subtitle1">{props.subtitle}</Typography>
           </Grid>
         </Grid>
@@ -137,7 +134,7 @@ const MarkQuestionPage: React.FC = () => {
           <>
             <Typography variant="subtitle1" className={classes.text}>
               {scriptMarkingData.matriculationNumber ||
-                `Unmatched script: ${scriptMarkingData.filename}`}
+                scriptMarkingData.filename}
             </Typography>
             <Typography variant="subtitle1" className={classes.text}>
               ID: {scriptMarkingData.id}
@@ -198,7 +195,7 @@ const MarkQuestionPage: React.FC = () => {
     if (!canMark) {
       return (
         <div className={classes.container}>
-          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Header subtitle={`Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               Cannot mark this script. Someone else may be marking it now. Try
@@ -212,7 +209,7 @@ const MarkQuestionPage: React.FC = () => {
     if (!pages) {
       return (
         <div className={classes.container}>
-          <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+          <Header subtitle={`Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               No pages to display for this script.
@@ -248,7 +245,7 @@ const MarkQuestionPage: React.FC = () => {
 
     return (
       <div className={classes.container}>
-        <Header subtitle={`Marking Q${rootQuestionTemplate.name}`} />
+        <Header subtitle={`Q${rootQuestionTemplate.name}`} />
         {pages
           .filter(page => page.pageNo === pageNo)
           .map((page, index) => {
@@ -260,6 +257,7 @@ const MarkQuestionPage: React.FC = () => {
                 page={page}
                 questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
+                matriculationNumber={matriculationNumber}
               />
             );
           })}

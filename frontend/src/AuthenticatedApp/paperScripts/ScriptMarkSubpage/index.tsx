@@ -110,8 +110,9 @@ const ScriptMarkPage: React.FC = () => {
           <>
             <Typography variant="subtitle1" className={classes.text}>
               {scriptMarkingData.matriculationNumber ||
-                `Unmatched script ${scriptMarkingData.filename}`}
+                scriptMarkingData.filename}
             </Typography>
+            <br />
             <Typography variant="subtitle1" className={classes.text}>
               ID: {scriptMarkingData.id}
             </Typography>
@@ -218,8 +219,9 @@ const ScriptMarkPage: React.FC = () => {
     return (
       <div className={classes.container}>
         <Header
-          subtitle={`Marking ${matriculationNumber ||
-            "unmatched script " + filename} Q${rootQuestionTemplate.name}`}
+          subtitle={`${matriculationNumber || filename} Q${
+            rootQuestionTemplate.name
+          }`}
         />
         {pages
           .filter(page => page.pageNo === pageNo)
@@ -232,6 +234,7 @@ const ScriptMarkPage: React.FC = () => {
                 page={page}
                 questions={getCurrentPageQuestions(page.pageNo)}
                 rootQuestionTemplate={rootQuestionTemplate}
+                matriculationNumber={matriculationNumber}
               />
             );
           })}
