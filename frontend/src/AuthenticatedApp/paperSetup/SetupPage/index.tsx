@@ -45,7 +45,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
 
   const rowDetails = [
     {
-      title: "Upload master copy",
+      title: "Master Script",
       button: (
         <UploadScriptTemplateWrapper>
           <Button
@@ -60,10 +60,10 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Upload student scripts " +
+        "Scripts · " +
         (scriptTemplate
-          ? "(" + scripts.length + " scripts)"
-          : " (Upload master copy first)"),
+          ? scripts.length + " scripts"
+          : "Upload master copy first"),
       button: (
         <UploadScriptsWrapper>
           <Button
@@ -80,9 +80,9 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     {
       title: (
         <>
-          Student List{" "}
+          Student List ·{" "}
           <a href="https://www.dropbox.com/s/5ed14dzpg0sgiwy/NominalRoll.csv?dl=1">
-            (sample)
+            sample
           </a>
         </>
       ),
@@ -117,7 +117,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Set up question structure" +
+        "Marking Template" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
@@ -134,7 +134,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       title:
-        "Allocate questions to markers" +
+        "Question Allocation" +
         (scriptTemplate ? "" : " (Upload master copy first)"),
       button: (
         <Button
