@@ -134,9 +134,15 @@ const MarkQuestionPage: React.FC = () => {
           </Grid>
         </Grid>
         {scriptMarkingData && (
-          <Typography variant="subtitle1" className={classes.text}>
-            {scriptMarkingData.matriculationNumber || "(Unmatched script)"}
-          </Typography>
+          <>
+            <Typography variant="subtitle1" className={classes.text}>
+              {scriptMarkingData.matriculationNumber ||
+                `Unmatched script: ${scriptMarkingData.filename}`}
+            </Typography>
+            <Typography variant="subtitle1" className={classes.text}>
+              ID: {scriptMarkingData.id}
+            </Typography>
+          </>
         )}
         <Button
           color="inherit"
