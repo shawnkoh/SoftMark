@@ -61,7 +61,7 @@ const ScriptView: React.FC = () => {
             <Typography variant="h6">{paper.name}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle1">{subtitle}</Typography>
+            <Typography variant="subtitle1" noWrap>{subtitle}</Typography>
           </Grid>
         </Grid>
       </Toolbar>
