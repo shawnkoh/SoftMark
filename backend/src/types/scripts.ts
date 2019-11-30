@@ -1,4 +1,4 @@
-import { DiscardableData, isDiscardableData } from "./entities";
+import { DiscardableData, isDiscardableData, isValidDate } from "./entities";
 import { isPageListData, PageData } from "./pages";
 import { StudentListData } from "./paperUsers";
 import { isQuestionListData, QuestionListData } from "./questions";
@@ -19,6 +19,7 @@ export interface ScriptListData extends DiscardableData {
   paperId: number;
   student: StudentListData | null;
   hasVerifiedStudent: boolean;
+  publishedDate: Date | null;
   filename: string;
   awardedMarks: number;
   pagesCount: number;
@@ -33,6 +34,7 @@ export function isScriptListData(data: any): data is ScriptListData {
   return (
     typeof data.paperId === "number" &&
     typeof data.pagesCount === "number" &&
+    isValidDate(data.publishedDate) &&
     isDiscardableData(data)
   );
 }
