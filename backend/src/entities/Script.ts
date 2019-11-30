@@ -28,7 +28,8 @@ export class Script extends Discardable {
     filename: string,
     sha256: string,
     pageCount: number,
-    student?: number | PaperUser
+    student?: number | PaperUser,
+    publishedDate?: Date | null
   ) {
     super();
     if (typeof paper === "number") {
@@ -48,7 +49,7 @@ export class Script extends Discardable {
     }
     this.pageCount = pageCount;
     this.hasVerifiedStudent = false;
-    this.hasBeenPublished = false;
+    this.publishedDate = publishedDate || null;
   }
 
   @Column()
@@ -78,14 +79,14 @@ export class Script extends Discardable {
 
   @Column("boolean")
   @IsNotEmpty()
-  hasVerifiedStudent!: boolean;
-
-  @Column("boolean")
-  @IsNotEmpty()
-  hasBeenPublished!: boolean;
+  hasVerifiedStudent: boolean;
 
   @Column({ type: "int" })
-  pageCount!: number;
+  pageCount: number;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  publishedDate: Date | null;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -138,7 +139,6 @@ export class Script extends Discardable {
       filename: this.filename,
       student: paperUser ? await paperUser.getStudentData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
-      hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
       pagesCount: this.pageCount
     };
@@ -180,7 +180,6 @@ export class Script extends Discardable {
       filename: this.filename,
       student: paperUser ? await paperUser.getStudentData() : null,
       hasVerifiedStudent: this.hasVerifiedStudent,
-      hasBeenPublished: this.hasBeenPublished,
       awardedMarks,
       pagesCount: this.pages
         ? this.pages.length
