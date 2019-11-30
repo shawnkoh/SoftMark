@@ -181,6 +181,9 @@ export async function grading(request: Request, response: Response) {
     .andWhere("questionTemplate.parentQuestionTemplateId IS NULL")
     .select("questionTemplate.id", "id")
     .addSelect("questionTemplate.name", "name")
+    .orderBy("questionTemplate.displayPage", "ASC")
+    .addOrderBy("questionTemplate.topOffset", "ASC")
+    .addOrderBy("questionTemplate.leftOffset", "ASC")
     .getRawMany();
 
   const rootQuestionTemplateIds = rootQuestionTemplatesData.map(
