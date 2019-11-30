@@ -108,15 +108,9 @@ const ScriptMarkPage: React.FC = () => {
             {props.subtitle}
           </Typography>
           {scriptMarkingData && (
-            <>
-              <Typography variant="subtitle1" className={classes.text}>
-                {scriptMarkingData.matriculationNumber ||
-                  scriptMarkingData.filename}
-              </Typography>
-              <Typography variant="subtitle1" className={classes.text}>
-                ID: {scriptMarkingData.id}
-              </Typography>
-            </>
+            <Typography variant="subtitle1" className={classes.text}>
+              Script #{scriptMarkingData.id}
+            </Typography>
           )}
           <Hidden lgUp>
             <IconButton
