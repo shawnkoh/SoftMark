@@ -71,6 +71,9 @@ const ScriptsSubpage: React.FC = () => {
   const history = useHistory();
   const paper = usePaper();
   const scriptsAndStudents = useScriptsAndStudents();
+  const { refreshScripts } = scriptsAndStudents;
+
+  useEffect(refreshScripts, []);
 
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState(ID);

@@ -1,10 +1,8 @@
 import { DialogContent, Slider, Popover } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
-import CustomDialogTitle from "../../../components/dialogs/DialogTitleWithCloseButton";
 import useStyles from "./styles";
 
 interface OwnProps {
@@ -25,7 +23,6 @@ const MarkQuestionModal: React.FC<Props> = ({
   onCancel
 }) => {
   const classes = useStyles();
-  const { refreshScripts } = useScriptsAndStudents();
 
   const { id, name, score, maxScore, topOffset, leftOffset } = question;
 
@@ -38,7 +35,6 @@ const MarkQuestionModal: React.FC<Props> = ({
     return await api.marks
       .replaceMark(questionId, { score })
       .then(res => {
-        refreshScripts();
         const newScore = res.data.mark.score;
         return newScore;
       })

@@ -207,7 +207,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
               </Grid>
             </>
           )}
-          {canvasMode === CanvasMode.Eraser && (
+          {/*canvasMode === CanvasMode.Eraser && (
             <Button
               onClick={handleClearAllClick}
               color="inherit"
@@ -215,7 +215,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
             >
               Clear All
             </Button>
-          )}
+          )*/}
           {canvasMode === CanvasMode.View && (
             <>
               <div className={classes.padding}>
