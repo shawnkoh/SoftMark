@@ -38,13 +38,13 @@ export interface ScriptViewData {
   // 2. or there is no student tagged to it
   studentId: number | null; // refers to paperUserId
   matriculationNumber: string | null;
-  rootQuestionTemplate: QuestionTemplateViewData;
   questions: QuestionViewData[];
   pages: PageViewData[];
   filename: string;
 }
 
 export interface ScriptMarkingData extends ScriptViewData {
+  rootQuestionTemplate: QuestionTemplateViewData;
   canMark: boolean;
   previousScriptId: number | null;
   nextScriptId: number | null;

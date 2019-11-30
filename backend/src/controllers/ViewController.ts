@@ -116,18 +116,6 @@ export async function viewScript(request: Request, response: Response) {
     .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
     .getRawMany();
 
-  // TODO: Not sure how useful rootQuestionTemplate is in viewScript
-  const rootQuestionTemplate = await questionsQuery()
-    .orderBy("questionTemplate.displayPage", "ASC")
-    .select("questionTemplate.id", "id")
-    .addSelect("questionTemplate.name", "name")
-    .getRawOne();
-
-  if (!rootQuestionTemplate) {
-    response.sendStatus(204);
-    return;
-  }
-
   const pagesData: Array<{
     id: number;
     pageNo: number;
@@ -179,7 +167,6 @@ export async function viewScript(request: Request, response: Response) {
     id,
     studentId,
     matriculationNumber,
-    rootQuestionTemplate,
     questions,
     pages: Object.values(pages) as any,
     filename
