@@ -135,11 +135,10 @@ export async function update(request: Request, response: Response) {
     return;
   }
 
-  const { filename, hasVerifiedStudent, studentId, hasBeenPublished } = pick(
+  const { filename, hasVerifiedStudent, studentId } = pick(
     request.body,
     "filename",
     "hasVerifiedStudent",
-    "hasBeenPublished",
     "studentId"
   );
 
@@ -148,9 +147,6 @@ export async function update(request: Request, response: Response) {
   }
   if (hasVerifiedStudent !== undefined) {
     script.hasVerifiedStudent = hasVerifiedStudent;
-  }
-  if (hasBeenPublished !== undefined) {
-    script.hasBeenPublished = hasBeenPublished;
   }
   if (studentId !== undefined) {
     script.student = studentId
@@ -437,7 +433,6 @@ export async function publishScripts(request: Request, response: Response) {
       where: {
         paperId,
         studentId: Not(IsNull()),
-        hasBeenPublished: false,
         discardedAt: IsNull()
       },
       relations: ["student", "student.user", "student.paper"]
@@ -448,7 +443,6 @@ export async function publishScripts(request: Request, response: Response) {
         scripts.map(async script => {
           if (script.student) {
             script.hasVerifiedStudent = true;
-            script.hasBeenPublished = true;
             sendScriptEmail(script.student);
             await getRepository(Script).save(script);
           }

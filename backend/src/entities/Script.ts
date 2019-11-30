@@ -138,6 +138,7 @@ export class Script extends Discardable {
       paperId: this.paperId,
       filename: this.filename,
       student: paperUser ? await paperUser.getStudentData() : null,
+      publishedDate: this.publishedDate,
       hasVerifiedStudent: this.hasVerifiedStudent,
       awardedMarks,
       pagesCount: this.pageCount
@@ -179,6 +180,7 @@ export class Script extends Discardable {
       paperId: this.paperId,
       filename: this.filename,
       student: paperUser ? await paperUser.getStudentData() : null,
+      publishedDate: this.publishedDate,
       hasVerifiedStudent: this.hasVerifiedStudent,
       awardedMarks,
       pagesCount: this.pages

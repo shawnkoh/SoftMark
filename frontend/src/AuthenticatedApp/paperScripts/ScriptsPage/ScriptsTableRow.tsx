@@ -28,7 +28,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
   const { url } = useRouteMatch()!;
 
   const [script, setScript] = useState(props.script);
-  const { student, filename, id, awardedMarks, hasBeenPublished } = script;
+  const { student, filename, id, awardedMarks, publishedDate } = script;
   let matriculationNumber = "-";
   let name = "-";
   let email = "";
@@ -52,7 +52,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
       <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
       <TableCell>
         <Container>
-          {hasBeenPublished ? (
+          {publishedDate ? (
             <CheckRounded color="secondary" />
           ) : (
             <CancelRounded color="error" />

@@ -38,6 +38,7 @@ export class Paper extends Discardable {
   getData = (role: PaperUserRole): PaperData => ({
     ...this.getBase(),
     name: this.name,
+    publishedDate: this.publishedDate,
     role
   });
 }
