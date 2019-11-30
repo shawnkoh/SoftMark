@@ -197,7 +197,7 @@ const Annotator: React.FC<Props> = ({
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
-            {matriculationNumber} page {page.pageNo}
+            Page {page.pageNo}
           </Typography>
           <Chip
             label={"Q" + rootQuestionTemplate.name}
