@@ -9,7 +9,7 @@ interface OwnProps {
   anchorEl: HTMLDivElement | null;
   isVisible: boolean;
   question: QuestionViewData;
-  onSave: (score: number) => void;
+  onSave: (score: number | null) => void;
   onCancel: () => void;
 }
 
@@ -35,12 +35,21 @@ const MarkQuestionModal: React.FC<Props> = ({
     return await api.marks
       .replaceMark(questionId, { score })
       .then(res => {
-        if (res.data.mark) return res.data.mark.score;
-        return -1;
+        if (res.data.mark)
+          return res.data.mark.score;
+        return null;
       })
       .catch(() => {
         toast.error("An error was made when saving. Try refreshing the page.");
         return score;
+      });
+  };
+
+  const deleteMarkData = async (questionId: number) => {
+    return await api.marks
+      .unMark(questionId)
+      .catch(() => {
+        toast.error("An error was made when discarding. Try refreshing the page.");
       });
   };
 
@@ -55,8 +64,8 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   const handleUnmark = async event => {
-    const newScore = await putMarkData(id, -1); // -1 -> unmark the question
-    onSave(newScore);
+    await deleteMarkData(id);
+    onSave(null);
   };
 
   return (

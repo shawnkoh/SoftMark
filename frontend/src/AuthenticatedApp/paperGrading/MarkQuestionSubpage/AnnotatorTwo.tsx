@@ -73,11 +73,11 @@ const Annotator: React.FC<Props> = ({
     setAnchorEl(null);
   };
 
-  const handleModalSave = (index: number, score: number) => {
+  const handleModalSave = (index: number, score: number | null) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
-        draftState[index].question.score = score !== -1 ? score : null;
+        draftState[index].question.score = score;
       })
     );
     setAnchorEl(null);

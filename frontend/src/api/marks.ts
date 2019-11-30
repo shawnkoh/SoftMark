@@ -11,6 +11,10 @@ export async function replaceMark(
   return client.put(`/questions/${questionId}/mark`, data);
 }
 
+export async function unMark(questionId: number) {
+  return client.delete(`/questions/${questionId}/mark`);
+}
+
 export async function discardMark(markId: number) {
   return client.delete(`${URL}/${markId}`);
 }

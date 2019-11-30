@@ -70,6 +70,52 @@ export async function replace(request: Request, response: Response) {
   response.status(200).json({ mark: data });
 }
 
+export async function unmark(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const requesterId = payload.userId;
+  const questionId = request.params.id;
+  const question = await getRepository(Question).findOne(questionId, {
+    where: { discardedAt: IsNull() },
+    relations: ["script", "questionTemplate", "questionTemplate.allocations"]
+  });
+  if (!question) {
+    response.sendStatus(404);
+    return;
+  }
+  const paperId = question.script!.paperId;
+  const questionTemplate = question.questionTemplate!;
+  const allowed = await allowedRequester(
+    requesterId,
+    paperId,
+    PaperUserRole.Marker
+  );
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+  const { requester } = allowed;
+  if (
+    requester.role === PaperUserRole.Marker &&
+    !(await isAllocated(questionTemplate, requester.id))
+  ) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const mark = await getRepository(Mark).findOne({ question, marker: requester });
+  if (mark) {
+    mark.discardedAt = new Date();
+    const errors = await validate(mark);
+    if (errors.length > 0) {
+      response.sendStatus(400);
+      return;
+    }
+    await getRepository(Mark).save(mark);
+  }
+
+  response.status(200);
+}
+
 export async function discard(request: Request, response: Response) {
   const mark: Mark = response.locals.mark;
 
