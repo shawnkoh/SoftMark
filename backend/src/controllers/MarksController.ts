@@ -5,7 +5,6 @@ import { getRepository, IsNull } from "typeorm";
 import { Mark } from "../entities/Mark";
 import { Question } from "../entities/Question";
 import { isAllocated } from "../middlewares/canModifyMark";
-import { MarkPatchData } from "../types/marks";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -47,22 +46,6 @@ export async function replace(request: Request, response: Response) {
     (await getRepository(Mark).findOne({ question, marker: requester })) ||
     new Mark(question, requester, score);
   mark.score = score;
-  const errors = await validate(mark);
-  if (errors.length > 0) {
-    response.sendStatus(400);
-    return;
-  }
-  await getRepository(Mark).save(mark);
-
-  const data = mark.getData();
-  response.status(200).json({ mark: data });
-}
-
-export async function update(request: Request, response: Response) {
-  const mark = response.locals.mark;
-  const patchData: MarkPatchData = pick(request.body, "score");
-
-  mark.score = patchData.score;
   const errors = await validate(mark);
   if (errors.length > 0) {
     response.sendStatus(400);
