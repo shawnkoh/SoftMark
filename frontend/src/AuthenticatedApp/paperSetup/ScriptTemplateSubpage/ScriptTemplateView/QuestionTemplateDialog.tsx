@@ -15,6 +15,7 @@ import {
 import api from "api";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
+import { generatePages, isPageValid } from "backend/src/utils/questionTemplate";
 import {
   Field,
   FieldProps,
@@ -26,10 +27,6 @@ import {
 import React from "react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
-import {
-  isPageValid,
-  generatePages
-} from "../../../../utils/questionTemplateUtil";
 import QuestionTemplateSelect from "./QuestionTemplateSelect";
 
 export interface NewQuestionTemplateValues {
@@ -166,7 +163,8 @@ const QuestionEditDialog: React.FC<Props> = props => {
           if (values.score! <= 0) errors.score = "Score should be positive";
           if (values.pageCovered) {
             const pageError = isPageValid(values.pageCovered, pageCount);
-            if (pageError) errors.pageCovered = pageError;
+            if (pageError)
+              errors.pageCovered = "Current page needs to be included";
             else if (
               values.displayPage &&
               !generatePages(values.pageCovered).has(Number(values.displayPage))
