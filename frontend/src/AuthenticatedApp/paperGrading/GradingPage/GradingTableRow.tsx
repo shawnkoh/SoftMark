@@ -37,11 +37,9 @@ const GradingTableRow: React.FC<Props> = props => {
       <TableCell>
         <Grid container alignItems="center" spacing={2}>
           <Grid item xs={12} sm={6}>
-            {`${markCount}/${questionCount} (${(
-              markCount / questionCount
-            ).toLocaleString(undefined, {
-              style: "percent"
-            })}) of questions marked`}
+            {`${markCount}/${questionCount} (${Math.floor(
+              (markCount / questionCount) * 100
+            )}) of questions marked`}
           </Grid>
           <Grid item xs={12} sm={6}>
             <BorderLinearProgress
