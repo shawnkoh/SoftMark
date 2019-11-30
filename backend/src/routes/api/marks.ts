@@ -8,7 +8,6 @@ export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 router.use(canModifyMark);
-router.patch("/:id", MarksController.update);
 router.delete("/:id", MarksController.discard);
 router.patch("/:id/undiscard", MarksController.undiscard);
 
