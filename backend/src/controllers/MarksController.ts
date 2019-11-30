@@ -42,16 +42,29 @@ export async function replace(request: Request, response: Response) {
     return;
   }
 
-  const mark =
-    (await getRepository(Mark).findOne({ question, marker: requester })) ||
-    new Mark(question, requester, score);
-  mark.score = score;
+  let mark = new Mark(question, requester, score);
   const errors = await validate(mark);
   if (errors.length > 0) {
     response.sendStatus(400);
     return;
   }
-  await getRepository(Mark).save(mark);
+  try {
+    await getRepository(Mark).save(mark);
+  } catch (error) {
+    if (
+      error.message ===
+      'duplicate key value violates unique constraint "mark_unique_constraint"'
+    ) {
+      mark = await getRepository(Mark).findOneOrFail({
+        question,
+        marker: requester
+      });
+      mark.score = score;
+      await getRepository(Mark).update(mark.id, { score: mark.score });
+    } else {
+      throw error;
+    }
+  }
 
   const data = mark.getData();
   response.status(200).json({ mark: data });
