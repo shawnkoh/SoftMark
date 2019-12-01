@@ -69,10 +69,6 @@ export async function undiscardScript(
   return client.patch(`${URL}/${id}/undiscard`);
 }
 
-export async function publishScripts(paperId: number): Promise<AxiosResponse> {
-  return client.patch(`/papers/${paperId}/publish_scripts`);
-}
-
 export async function postScript(
   paper_id: number,
   filename: string,

@@ -56,3 +56,7 @@ export async function getScriptTemplateSetupData(paperId: number) {
 export async function getGradingData(paperId: number) {
   return await client.get<GradingData>(`${URL}/${paperId}/grading`);
 }
+
+export async function publish(paperId: number) {
+  return await client.post(`${URL}/${paperId}/publish`);
+}
