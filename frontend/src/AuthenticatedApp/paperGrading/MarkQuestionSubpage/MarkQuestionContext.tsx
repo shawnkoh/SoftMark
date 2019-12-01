@@ -19,6 +19,7 @@ interface DynamicState {
   currentPageIdx: number;
   currentQns: QuestionViewData[];
   isLoading: boolean;
+  isPageLoading: boolean;
   viewPosition: Point;
   viewScale: number;
 }
@@ -50,6 +51,7 @@ export const MarkQuestionProvider: React.FC = props => {
     setScriptMarkingData
   ] = useState<ScriptMarkingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [currentPageIdx, setCurrentPageIdx] = useState<number>(0);
   const [currentQns, setCurrentQns] = useState<QuestionViewData[]>([]);
   const [pages, setPages] = useState<PageViewData[]>([]);
@@ -123,6 +125,7 @@ export const MarkQuestionProvider: React.FC = props => {
         "An error occured while trying to load the annotations. Please refresh."
       );
     }
+    setIsPageLoading(false);
     setIsLoading(false);
   };
 
@@ -133,6 +136,7 @@ export const MarkQuestionProvider: React.FC = props => {
 
   useEffect(() => {
     if (scriptMarkingData) {
+      setIsPageLoading(true);
       getForegroundAnnotations(scriptMarkingData.pages);
     }
   }, [scriptMarkingData, currentPageIdx]);
@@ -214,6 +218,7 @@ export const MarkQuestionProvider: React.FC = props => {
               currentQns,
               pages,
               isLoading,
+              isPageLoading,
               viewPosition,
               viewScale,
               updateQuestion,

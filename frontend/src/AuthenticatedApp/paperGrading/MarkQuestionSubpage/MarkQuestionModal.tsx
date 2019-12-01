@@ -1,6 +1,6 @@
 import { Button, DialogContent, Popover, Slider } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import useStyles from "./styles";
@@ -24,9 +24,14 @@ const MarkQuestionModal: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const { id, name, markId, score, maxScore, topOffset, leftOffset } = question;
+  const { id, markId, score, maxScore } = question;
 
   const [localScore, setLocalScore] = useState<number>(score || 0);
+
+  useEffect(() => {
+    setLocalScore(score || 0);
+  }, [id, score]);
+
   const handleLocalScoreChange = (newValue: number | number[]) => {
     setLocalScore(newValue as number);
   };

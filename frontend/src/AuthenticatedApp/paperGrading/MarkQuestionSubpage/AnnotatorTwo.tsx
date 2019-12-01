@@ -41,7 +41,7 @@ const Annotator: React.FC<Props> = ({
   const [questionStates, setQuestionStates] = useState<QuestionState[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
-  const { viewPosition, viewScale, currentQns, updateQuestion, handleViewChange } = useMarkQuestion();
+  const { viewPosition, viewScale, currentQns, isPageLoading, updateQuestion, handleViewChange } = useMarkQuestion();
 
   useEffect(() => {
     setQuestionStates(
@@ -115,6 +115,7 @@ const Annotator: React.FC<Props> = ({
         foregroundAnnotation={foregroundAnnotation}
         onForegroundAnnotationChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
+        isLoading={isPageLoading}
       />
       {questionStates.map((questionState: QuestionState, index: number) => (
         <ReversedChip
