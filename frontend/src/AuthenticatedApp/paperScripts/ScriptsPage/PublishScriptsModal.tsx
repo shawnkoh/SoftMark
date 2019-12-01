@@ -1,40 +1,53 @@
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
-import usePaper from "contexts/PaperContext";
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
-interface OwnProps {
+interface Props {
   render: (toggleVisibility: () => void) => ReactNode;
 }
 
-type Props = OwnProps;
-
 const PublishScriptsModal: React.FC<Props> = props => {
-  const paper = usePaper();
-  const { refreshScripts } = useScriptsAndStudents();
   const { render } = props;
+  const paper = usePaper();
+  const { scripts, refreshScripts } = useScriptsAndStudents();
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
+
+  const publishCount = scripts.reduce((count, script) => {
+    if (!script.publishedDate && script.studentId) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+
+  const unmatchedCount = scripts.reduce((count, script) => {
+    if (!script.publishedDate && !script.studentId) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
 
   return (
     <>
       <ConfirmationDialog
-        title={`Publish all unpublished scripts with students`}
-        message={`This action is irreversible. Do you still want to publish the scripts?`}
+        title={`Publish Scripts`}
+        message={`Are you sure you want to publish scripts to ${publishCount} students? There are ${unmatchedCount} unmatched scripts. <b>Only matched scripts will be published.</b> This action cannot be undone.`}
         open={isOpen}
         handleClose={toggleVisibility}
         handleConfirm={() => {
           toggleVisibility();
-          toast("Attempting to publish scripts...");
-          api.scripts
-            .publishScripts(paper.id)
+          api.papers
+            .publish(paper.id)
             .then(() => {
               toast.success(`Scripts have been published successfully.`);
             })
             .catch(errors => {
-              toast.error(`Scripts could not be published.`);
+              toast.error(
+                `An unexpected error occured while publishing the scripts. Try refreshing the page.`
+              );
             })
             .finally(() => refreshScripts());
         }}
