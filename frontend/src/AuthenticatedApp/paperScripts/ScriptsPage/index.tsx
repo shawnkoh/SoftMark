@@ -37,8 +37,6 @@ const SCORE = "score";
 const getTableComparator = (order: string, orderBy: string) => {
   return (a: ScriptListData, b: ScriptListData) => {
     let res = 0;
-    const studentA = a.student;
-    const studentB = b.student;
 
     if (orderBy === ID) {
       res = a.id - b.id;
@@ -47,14 +45,8 @@ const getTableComparator = (order: string, orderBy: string) => {
       const filenameB = b.filename.toLowerCase();
       res = filenameA.localeCompare(filenameB);
     } else if (orderBy === MATRIC) {
-      const matriculationNumberA = (studentA && studentA.matriculationNumber
-        ? studentA.matriculationNumber
-        : ""
-      ).toLowerCase();
-      const matriculationNumberB = (studentB && studentB.matriculationNumber
-        ? studentB.matriculationNumber
-        : ""
-      ).toLowerCase();
+      const matriculationNumberA = (a.matriculationNumber || "").toLowerCase();
+      const matriculationNumberB = (b.matriculationNumber || "").toLowerCase();
       res = matriculationNumberA.localeCompare(matriculationNumberB);
     } else if (orderBy === SCORE) {
       res = a.awardedMarks - b.awardedMarks;
@@ -160,19 +152,16 @@ const ScriptsSubpage: React.FC = () => {
   ];
 
   const filteredScripts = scripts.filter(script => {
-    const { filename, student } = script;
-    const matricNo =
-      student && student.matriculationNumber ? student.matriculationNumber : "";
-    const studentName =
-      student && student.user && student.user.name ? student.user.name : "";
-    const email = student && student.user ? student.user.email : "";
+    const { filename, matriculationNumber, studentName, studentEmail } = script;
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
       filename.toLowerCase().includes(lowerCaseSearchText) ||
-      matricNo.toLowerCase().includes(lowerCaseSearchText) ||
-      studentName.toLowerCase().includes(lowerCaseSearchText) ||
-      email.toLowerCase().includes(lowerCaseSearchText)
+      (matriculationNumber &&
+        matriculationNumber.toLowerCase().includes(lowerCaseSearchText)) ||
+      (studentName &&
+        studentName.toLowerCase().includes(lowerCaseSearchText)) ||
+      studentEmail.toLowerCase().includes(lowerCaseSearchText)
     );
   });
 
