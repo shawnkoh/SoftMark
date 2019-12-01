@@ -44,23 +44,13 @@ const Header: React.FC = () => {
         <Typography variant="h6" className={classes.grow}>
           {`Q${rootQuestionTemplate.name}`}
         </Typography>
-        {scriptMarkingData && (
-          <>
-            <Typography variant="subtitle1" className={classes.text}>
-              {scriptMarkingData.matriculationNumber ||
-                scriptMarkingData.filename}
-            </Typography>
-            <Typography variant="subtitle1" className={classes.text}>
-              ID: {scriptMarkingData.id}
-            </Typography>
-          </>
-        )}
+        <Typography variant="subtitle1" className={classes.text}>
+          Script #{scriptMarkingData.id}
+        </Typography>
         <Hidden lgUp>
           <IconButton
             color="inherit"
-            disabled={
-              !(scriptMarkingData && scriptMarkingData.previousScriptId)
-            }
+            disabled={!scriptMarkingData.previousScriptId}
             onClick={handlePrevClick}
             className={classes.button}
           >
@@ -70,9 +60,7 @@ const Header: React.FC = () => {
         <Hidden mdDown>
           <Button
             color="inherit"
-            disabled={
-              !(scriptMarkingData && scriptMarkingData.previousScriptId)
-            }
+            disabled={!scriptMarkingData.previousScriptId}
             onClick={handlePrevClick}
             startIcon={<NavigateBeforeIcon />}
             className={classes.button}
@@ -83,7 +71,7 @@ const Header: React.FC = () => {
         <Hidden lgUp>
           <IconButton
             color="inherit"
-            disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
+            disabled={!scriptMarkingData.nextScriptId}
             onClick={handleNextClick}
           >
             <NavigateNextIcon />
@@ -92,7 +80,7 @@ const Header: React.FC = () => {
         <Hidden mdDown>
           <Button
             color="inherit"
-            disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
+            disabled={!scriptMarkingData.nextScriptId}
             onClick={handleNextClick}
             startIcon={<NavigateNextIcon />}
             className={classes.button}
