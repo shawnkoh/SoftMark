@@ -73,11 +73,12 @@ const Annotator: React.FC<Props> = ({
     setAnchorEl(null);
   };
 
-  const handleModalSave = (index: number, score: number) => {
+  const handleModalSave = (index: number, score: number | null, markId: number | null) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
-        draftState[index].question.score = score !== -1 ? score : null;
+        draftState[index].question.score = score;
+        draftState[index].question.markId = markId;
       })
     );
     setAnchorEl(null);
@@ -104,7 +105,7 @@ const Annotator: React.FC<Props> = ({
           question={questionState.question}
           isVisible={questionState.isVisible}
           onCancel={() => handleModalCancel(index)}
-          onSave={score => handleModalSave(index, score)}
+          onSave={(score, markId) => handleModalSave(index, score, markId)}
         />
       ))}
       <CanvasWithToolbar

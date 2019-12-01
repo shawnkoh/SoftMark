@@ -1,4 +1,4 @@
-import { DialogContent, Slider, Popover, Box, Button } from "@material-ui/core";
+import { Button, DialogContent, Popover, Slider } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -9,7 +9,7 @@ interface OwnProps {
   anchorEl: HTMLDivElement | null;
   isVisible: boolean;
   question: QuestionViewData;
-  onSave: (score: number | null) => void;
+  onSave: (score: number | null, markId: number | null) => void;
   onCancel: () => void;
 }
 
@@ -24,7 +24,7 @@ const MarkQuestionModal: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const { id, name, score, maxScore, topOffset, leftOffset } = question;
+  const { id, name, markId, score, maxScore, topOffset, leftOffset } = question;
 
   const [localScore, setLocalScore] = useState<number>(score || 0);
   const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
@@ -36,21 +36,21 @@ const MarkQuestionModal: React.FC<Props> = ({
       .replaceMark(questionId, { score })
       .then(res => {
         if (res.data.mark)
-          return res.data.mark.score;
-        return null;
+          return { score: res.data.mark.score, markId: res.data.mark.id};
+        return { score: score, markId: null };
       })
       .catch(() => {
         toast.error("An error was made when saving. Try refreshing the page.");
-        return score;
+        return { score: score, markId: null };
       });
   };
 
-  const deleteMarkData = async (questionId: number) => {
-    return await api.marks
-      .unMark(questionId)
-      .catch(() => {
-        toast.error("An error was made when discarding. Try refreshing the page.");
-      });
+  const deleteMarkData = async (markId: number) => {
+    return await api.marks.discardMark(markId).catch(() => {
+      toast.error(
+        "An error was made when discarding. Try refreshing the page."
+      );
+    });
   };
 
   const handleCancel = event => {
@@ -59,13 +59,14 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   const handleSave = async event => {
-    const newScore = await putMarkData(id, localScore);
-    onSave(newScore);
+    const newMark = await putMarkData(id, localScore);
+    onSave(newMark.score, newMark.markId);
   };
 
   const handleUnmark = async event => {
-    await deleteMarkData(id);
-    onSave(null);
+    markId && await deleteMarkData(markId);
+    onSave(null, null);
+    handleLocalScoreChange(event, 0);
   };
 
   return (
@@ -104,9 +105,11 @@ const MarkQuestionModal: React.FC<Props> = ({
             valueLabelDisplay="on"
           />
         </div>
-        <Button onClick={handleUnmark} fullWidth>
-          Unmark
-        </Button>
+        {markId !== null && (
+          <Button onClick={handleUnmark} fullWidth>
+            Unmark
+          </Button>
+        )}
       </DialogContent>
     </Popover>
   );

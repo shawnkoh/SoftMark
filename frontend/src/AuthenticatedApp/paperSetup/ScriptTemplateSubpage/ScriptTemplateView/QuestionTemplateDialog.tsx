@@ -15,7 +15,10 @@ import {
 import api from "api";
 import useScriptSetup from "AuthenticatedApp/paperSetup/context/ScriptSetupContext";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
-import { generatePages, isPageValid } from "backend/src/utils/questionTemplate";
+import {
+  generatePages,
+  isPageValid
+} from "frontend/src/utils/questionTemplate";
 import {
   Field,
   FieldProps,
@@ -162,9 +165,8 @@ const QuestionEditDialog: React.FC<Props> = props => {
           if (isParent) return errors;
           if (values.score! <= 0) errors.score = "Score should be positive";
           if (values.pageCovered) {
-            const pageError = isPageValid(values.pageCovered, pageCount);
-            if (pageError)
-              errors.pageCovered = "Current page needs to be included";
+            if (!isPageValid(values.pageCovered, pageCount))
+              errors.pageCovered = "Syntax incorrect or page out of range";
             else if (
               values.displayPage &&
               !generatePages(values.pageCovered).has(Number(values.displayPage))

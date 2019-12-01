@@ -5,6 +5,7 @@ import { AnnotationLine } from "./annotations";
 export interface QuestionViewData {
   id: number;
   name: string;
+  markId: number | null;
   score: number | null;
   maxScore: number;
   topOffset: number;

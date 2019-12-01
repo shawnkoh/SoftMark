@@ -13,6 +13,7 @@ import {
   QuestionTemplateViewData,
   QuestionViewData
 } from "backend/src/types/view";
+import { MarkData } from "backend/src/types/marks";
 import clsx from "clsx";
 import LoadingSpinner from "components/LoadingSpinner";
 import produce from "immer";
@@ -113,11 +114,12 @@ const Annotator: React.FC<Props> = ({
     setAnchorEl(null);
   };
 
-  const handleModalSave = (index: number, score: number | null) => {
+  const handleModalSave = (index: number, score: number | null, markId: number | null) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
         draftState[index].question.score = score;
+        draftState[index].question.markId = markId;
       })
     );
     setAnchorEl(null);
@@ -157,7 +159,7 @@ const Annotator: React.FC<Props> = ({
           question={questionState.question}
           isVisible={questionState.isVisible}
           onCancel={() => handleModalCancel(index)}
-          onSave={score => handleModalSave(index, score)}
+          onSave={(score, markId) => handleModalSave(index, score, markId)}
         />
       ))}
       <CanvasWithToolbar

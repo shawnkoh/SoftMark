@@ -115,7 +115,7 @@ export const MarkQuestionProvider: React.FC = props => {
       );
       if (response.status === 200)
         setForegroundAnnotation(response.data.annotation.layer);
-      else setForegroundAnnotation([]);
+      else if (response.status === 204) setForegroundAnnotation([]);
     } catch (error) {
       toast.error(
         "An error occured while trying to load the annotations. Please refresh."

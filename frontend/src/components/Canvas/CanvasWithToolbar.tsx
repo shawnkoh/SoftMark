@@ -78,7 +78,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const [thisForegroundAnnotation, setThisForegroundAnnotation] = useState<
     Annotation
-  >([]);
+  >(foregroundAnnotation);
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     setThisForegroundAnnotation(annotation); // update state

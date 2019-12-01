@@ -27,10 +27,10 @@ const GradingTableRow: React.FC<Props> = props => {
       <TableCell>
         {markers.map(marker => {
           return (
-            <>
+            <div key={marker.id}>
               {marker.name || `Pending <${marker.email}>`}
               <br />
-            </>
+            </div>
           );
         })}
       </TableCell>
