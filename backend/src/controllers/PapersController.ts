@@ -1,11 +1,12 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import _ from "lodash";
-import { getRepository, getTreeRepository } from "typeorm";
+import { getConnection, getRepository, getTreeRepository } from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import QuestionTemplate from "../entities/QuestionTemplate";
+import { Script } from "../entities/Script";
 import { selectPaperData } from "../selectors/papers";
 import {
   GradingData,
@@ -15,6 +16,7 @@ import {
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import { sendScriptEmail } from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -99,7 +101,7 @@ export async function update(request: Request, response: Response) {
   }
   await getRepository(Paper).save(paper);
 
-  const data = await paper.getData(requester.role);
+  const data = paper.getData(requester.role);
   response.status(200).json({ paper: data });
 }
 
@@ -140,8 +142,69 @@ export async function undiscard(request: Request, response: Response) {
     discardedAt: undefined
   });
 
-  const data = await paper.getData(requester.role);
+  const data = paper.getData(requester.role);
   response.status(200).json({ paper: data });
+}
+
+export async function publish(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const { paperId } = request.params;
+
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const { paper } = allowed;
+  if (paper.publishedDate) {
+    response.sendStatus(400);
+    return;
+  }
+
+  const scripts: {
+    id: number;
+    studentId: number;
+    email: string;
+    userName: string;
+  }[] = await getRepository(Script)
+    .createQueryBuilder("script")
+    .where("script.paperId = :paperId", { paperId })
+    .andWhere("script.discardedAt is null")
+    .innerJoin("script.student", "student", "student.discardedAt is null")
+    .innerJoin("student.user", "user", "user.discardedAt is null")
+    .select("script.id", "id")
+    .addSelect("student.id", "studentId")
+    .addSelect("user.email", "email")
+    .addSelect("user.name", "name")
+    .getRawMany();
+
+  const publishedDate = new Date();
+
+  getConnection().transaction(async manager => {
+    await manager.getRepository(Paper).update(paper.id, { publishedDate });
+    await manager
+      .getRepository(Script)
+      .createQueryBuilder("script")
+      .update()
+      .where("script.id IN (:...ids)", {
+        ids: scripts.map(script => script.id)
+      })
+      .set({ publishedDate })
+      .execute();
+  });
+
+  scripts.forEach(script => {
+    sendScriptEmail(
+      paper.name,
+      script.studentId,
+      script.email,
+      script.userName
+    );
+  });
+
+  response.sendStatus(204);
 }
 
 export async function grading(request: Request, response: Response) {

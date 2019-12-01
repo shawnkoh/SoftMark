@@ -12,7 +12,6 @@ import { PaperUserRole } from "../types/paperUsers";
 import { ScriptListData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
-import { sendScriptEmail } from "../utils/sendgrid";
 import { sortByFilename } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
@@ -405,47 +404,6 @@ export async function discardScripts(request: Request, response: Response) {
           await getRepository(Script).update(script.id, {
             discardedAt: new Date()
           });
-        })
-      );
-    });
-
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-  }
-}
-
-export async function publishScripts(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.userId;
-    const paperId = Number(request.params.id);
-    const allowed = await allowedRequester(
-      userId,
-      paperId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      return response.sendStatus(404);
-    }
-
-    const scripts = await getRepository(Script).find({
-      where: {
-        paperId,
-        studentId: Not(IsNull()),
-        discardedAt: IsNull()
-      },
-      relations: ["student", "student.user", "student.paper"]
-    });
-
-    await getManager().transaction(async manager => {
-      await Promise.all(
-        scripts.map(async script => {
-          if (script.student) {
-            script.hasVerifiedStudent = true;
-            sendScriptEmail(script.student);
-            await getRepository(Script).save(script);
-          }
         })
       );
     });
