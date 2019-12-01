@@ -2,7 +2,7 @@ import { Button, DialogContent, Popover, Slider } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import api from "../../../api";
+import api from "../../api";
 import useStyles from "./styles";
 
 interface OwnProps {
@@ -66,7 +66,6 @@ const MarkQuestionModal: React.FC<Props> = ({
   const handleUnmark = async event => {
     markId && await deleteMarkData(markId);
     onSave(null, null);
-    handleLocalScoreChange(event, 0);
   };
 
   return (

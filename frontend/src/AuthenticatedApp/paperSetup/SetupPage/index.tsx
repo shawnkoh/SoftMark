@@ -32,8 +32,8 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
   const { scriptTemplate } = useScriptTemplate();
   const { scripts } = useScriptsAndStudents();
 
-  const createGridRow = ({ title, button }) => (
-    <Grid item xs={12}>
+  const createGridRow = ({ title, button }, key) => (
+    <Grid key={key} item xs={12}>
       <Box display="flex" alignItems="center" justifyContent="center">
         <Typography variant="subtitle1" className={classes.grow}>
           {title}
@@ -155,7 +155,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     <Container maxWidth={false} className={classes.container}>
       <Typography variant="h4">Setup</Typography>
       <Grid container spacing={4} className={classes.grid}>
-        {rowDetails.map(row => createGridRow(row))}
+        {rowDetails.map((row, index) => createGridRow(row, index))}
       </Grid>
     </Container>
   );

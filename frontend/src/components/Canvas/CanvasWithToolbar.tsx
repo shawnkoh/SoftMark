@@ -90,6 +90,10 @@ const CanvasWithToolbar: React.FC<Props> = ({
       onForegroundAnnotationChange(thisForegroundAnnotation);
   }, [thisForegroundAnnotation]);
 
+  useEffect(() => {
+    setThisForegroundAnnotation(foregroundAnnotation);
+  }, [foregroundAnnotation]);
+
   const defaultPosition = { x: 0, y: 64 };
   const [position, setPosition] = useState<Point>(defaultPosition);
   const defaultScale = 1.0;

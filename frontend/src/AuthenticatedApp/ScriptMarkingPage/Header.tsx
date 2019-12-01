@@ -1,109 +1,22 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import usePaper from "contexts/PaperContext";
-import useMarkQuestion from "./MarkQuestionContext";
-
-import useStyles from "./styles";
 import {
   AppBar,
-  Toolbar,
-  IconButton,
-  Grid,
-  Typography,
   Button,
-  Container,
-  Hidden
+  Hidden,
+  IconButton,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme
 } from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
-import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
-import SkipNextIcon from "@material-ui/icons/SkipNext";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-
-import { MarkQuestionProvider } from "./MarkQuestionContext";
-import LoadingSpinner from "components/LoadingSpinner";
-import AnnotatorTwo from "./AnnotatorTwo";
-
-const MarkQuestionPage: React.FC = () => {
-  const classes = useStyles();
-  const {
-    isLoading,
-    scriptMarkingData,
-    foregroundAnnotation,
-    currentPageIdx,
-    currentQns,
-    decrementPageNo,
-    incrementPageNo
-  } = useMarkQuestion();
-  const {
-    matriculationNumber,
-    rootQuestionTemplate,
-    pages,
-    canMark
-  } = scriptMarkingData;
-
-  if (isLoading) {
-    return <LoadingSpinner loadingMessage="Loading script..." />;
-  }
-
-  if (!canMark) {
-    return (
-      <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">
-          Cannot mark this script. Someone else may be marking it now. Try
-          another script.
-        </Typography>
-      </Container>
-    );
-  }
-
-  if (!pages) {
-    return (
-      <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">
-          No pages to display for this script.
-        </Typography>
-      </Container>
-    );
-  }
-
-  return (
-    <>
-      <AnnotatorTwo
-        // TODO: Stringifying the questions is a quick hack to work around the shallow check behaviour of react
-        // The more ideal solution is to abstract the questions into its own component and pass the flattened data as props
-        page={pages[currentPageIdx]}
-        foregroundAnnotation={foregroundAnnotation}
-        questions={currentQns}
-        rootQuestionTemplate={rootQuestionTemplate}
-        matriculationNumber={matriculationNumber}
-      />
-      {currentPageIdx > 0 && (
-        <IconButton
-          onClick={decrementPageNo}
-          className={classes.prevPageButton}
-          color="inherit"
-          aria-label="previous page"
-        >
-          <ArrowLeftIcon />
-        </IconButton>
-      )}
-      {currentPageIdx < pages.length - 1 && (
-        <IconButton
-          onClick={incrementPageNo}
-          className={classes.nextPageButton}
-          color="inherit"
-          aria-label="next page"
-        >
-          <ArrowRightIcon />
-        </IconButton>
-      )}
-    </>
-  );
-};
+import SkipNextIcon from "@material-ui/icons/SkipNext";
+import React from "react";
+import { Link } from "react-router-dom";
+import usePaper from "../../contexts/PaperContext";
+import useMarkQuestion from "./MarkQuestionContext";
+import useStyles from "./styles";
 
 const Header: React.FC = () => {
   const classes = useStyles();
@@ -208,16 +121,4 @@ const Header: React.FC = () => {
   );
 };
 
-const MarkQuestionPageWrapper: React.FC = () => {
-  const classes = useStyles();
-  return (
-    <MarkQuestionProvider>
-      <div className={classes.container}>
-        <Header />
-        <MarkQuestionPage />
-      </div>
-    </MarkQuestionProvider>
-  );
-};
-
-export default MarkQuestionPageWrapper;
+export default Header;

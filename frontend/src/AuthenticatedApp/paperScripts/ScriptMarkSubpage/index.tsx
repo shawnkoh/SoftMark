@@ -2,7 +2,6 @@ import {
   AppBar,
   Button,
   Container,
-  Grid,
   IconButton,
   Toolbar,
   Typography,
@@ -179,8 +178,7 @@ const ScriptMarkPage: React.FC = () => {
       rootQuestionTemplate,
       questions,
       pages,
-      canMark,
-      filename
+      canMark
     } = scriptMarkingData;
 
     if (!canMark) {
