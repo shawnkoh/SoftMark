@@ -51,6 +51,7 @@ export const MarkQuestionProvider: React.FC = props => {
     setScriptMarkingData
   ] = useState<ScriptMarkingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchedNewScript, setFetchedNewScript] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [currentPageIdx, setCurrentPageIdx] = useState<number>(0);
   const [currentQns, setCurrentQns] = useState<QuestionViewData[]>([]);
@@ -110,6 +111,7 @@ export const MarkQuestionProvider: React.FC = props => {
         "An error occured while trying to load the script. Please refresh."
       );
     }
+    setFetchedNewScript(!fetchedNewScript);
   };
 
   const getForegroundAnnotations = async (pages: PageViewData[]) => {
@@ -137,9 +139,10 @@ export const MarkQuestionProvider: React.FC = props => {
   useEffect(() => {
     if (scriptMarkingData) {
       setIsPageLoading(true);
+      setForegroundAnnotation([]);
       getForegroundAnnotations(scriptMarkingData.pages);
     }
-  }, [scriptMarkingData, currentPageIdx]);
+  }, [fetchedNewScript, currentPageIdx]);
 
   useEffect(() => {
     if (scriptMarkingData && pages.length > 0) {

@@ -1,10 +1,6 @@
 import { AppBar, Avatar, Chip, Toolbar, Typography } from "@material-ui/core";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
-import {
-  PageViewData,
-  QuestionTemplateViewData,
-  QuestionViewData
-} from "backend/src/types/view";
+import { PageViewData, QuestionViewData } from "backend/src/types/view";
 import clsx from "clsx";
 import produce from "immer";
 import React, { useEffect, useState } from "react";
@@ -12,15 +8,12 @@ import { toast } from "react-toastify";
 import { saveAnnotation } from "../../../api/annotations";
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import ReversedChip from "../../../components/ReversedChip";
+import useMarkQuestion from "./MarkQuestionContext";
 import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
-import useMarkQuestion from "./MarkQuestionContext";
 
-interface OwnProps {
+interface Props {
   page: PageViewData;
-  foregroundAnnotation: Annotation;
-  rootQuestionTemplate: QuestionTemplateViewData;
-  matriculationNumber: string | null;
 }
 
 interface QuestionState {
@@ -28,20 +21,24 @@ interface QuestionState {
   question: QuestionViewData;
 }
 
-type Props = OwnProps;
-
-const Annotator: React.FC<Props> = ({
-  page,
-  foregroundAnnotation,
-  rootQuestionTemplate,
-  matriculationNumber
-}: Props) => {
+const Annotator: React.FC<Props> = ({ page }: Props) => {
   const classes = useStyles();
 
   const [questionStates, setQuestionStates] = useState<QuestionState[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
-  const { viewPosition, viewScale, currentQns, isPageLoading, updateQuestion, handleViewChange } = useMarkQuestion();
+  const {
+    isPageLoading,
+    viewPosition,
+    viewScale,
+    currentQns,
+    updateQuestion,
+    handleViewChange,
+    foregroundAnnotation,
+    scriptMarkingData
+  } = useMarkQuestion();
+
+  const { matriculationNumber, rootQuestionTemplate } = scriptMarkingData;
 
   useEffect(() => {
     setQuestionStates(
@@ -72,7 +69,11 @@ const Annotator: React.FC<Props> = ({
     setAnchorEl(null);
   };
 
-  const handleModalSave = (index: number, score: number | null, markId: number | null) => {
+  const handleModalSave = (
+    index: number,
+    score: number | null,
+    markId: number | null
+  ) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
