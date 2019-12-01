@@ -19,9 +19,13 @@ import useMarkQuestion from "./MarkQuestionContext";
 interface OwnProps {
   page: PageViewData;
   foregroundAnnotation: Annotation;
-  questions: QuestionViewData[];
   rootQuestionTemplate: QuestionTemplateViewData;
   matriculationNumber: string | null;
+}
+
+interface QuestionState {
+  isVisible: boolean;
+  question: QuestionViewData;
 }
 
 type Props = OwnProps;
@@ -29,29 +33,24 @@ type Props = OwnProps;
 const Annotator: React.FC<Props> = ({
   page,
   foregroundAnnotation,
-  questions,
   rootQuestionTemplate,
   matriculationNumber
 }: Props) => {
   const classes = useStyles();
 
-  interface QuestionState {
-    isVisible: boolean;
-    question: QuestionViewData;
-  }
   const [questionStates, setQuestionStates] = useState<QuestionState[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
-  const { viewPosition, viewScale, handleViewChange } = useMarkQuestion();
+  const { viewPosition, viewScale, currentQns, updateQuestion, handleViewChange } = useMarkQuestion();
 
   useEffect(() => {
     setQuestionStates(
-      questions.map(question => ({
+      currentQns.map(question => ({
         isVisible: false,
         question
       }))
     );
-  }, [questions]);
+  }, [currentQns]);
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     const annotationPostData: AnnotationPostData = {
@@ -81,6 +80,7 @@ const Annotator: React.FC<Props> = ({
         draftState[index].question.markId = markId;
       })
     );
+    updateQuestion(questionStates[index].question.id, score, markId);
     setAnchorEl(null);
   };
 

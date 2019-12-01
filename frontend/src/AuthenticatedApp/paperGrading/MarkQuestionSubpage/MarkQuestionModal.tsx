@@ -27,7 +27,7 @@ const MarkQuestionModal: React.FC<Props> = ({
   const { id, name, markId, score, maxScore, topOffset, leftOffset } = question;
 
   const [localScore, setLocalScore] = useState<number>(score || 0);
-  const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
+  const handleLocalScoreChange = (newValue: number | number[]) => {
     setLocalScore(newValue as number);
   };
 
@@ -53,20 +53,20 @@ const MarkQuestionModal: React.FC<Props> = ({
     });
   };
 
-  const handleCancel = event => {
+  const handleCancel = () => {
     setLocalScore(score || 0);
     onCancel();
   };
 
-  const handleSave = async event => {
+  const handleSave = async () => {
     const newMark = await putMarkData(id, localScore);
     onSave(newMark.score, newMark.markId);
   };
 
-  const handleUnmark = async event => {
+  const handleUnmark = async () => {
     markId && await deleteMarkData(markId);
     onSave(null, null);
-    handleLocalScoreChange(event, 0);
+    handleLocalScoreChange(0);
   };
 
   return (
@@ -87,7 +87,7 @@ const MarkQuestionModal: React.FC<Props> = ({
         <div className={classes.slider}>
           <Slider
             value={localScore}
-            onChange={handleLocalScoreChange}
+            onChange={(e, v) => {handleLocalScoreChange(v);}}
             onChangeCommitted={handleSave}
             step={0.5}
             marks={[

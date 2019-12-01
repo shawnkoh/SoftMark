@@ -34,7 +34,6 @@ const MarkQuestionPage: React.FC = () => {
     scriptMarkingData,
     foregroundAnnotation,
     currentPageIdx,
-    currentQns,
     decrementPageNo,
     incrementPageNo
   } = useMarkQuestion();
@@ -77,7 +76,6 @@ const MarkQuestionPage: React.FC = () => {
         // The more ideal solution is to abstract the questions into its own component and pass the flattened data as props
         page={pages[currentPageIdx]}
         foregroundAnnotation={foregroundAnnotation}
-        questions={currentQns}
         rootQuestionTemplate={rootQuestionTemplate}
         matriculationNumber={matriculationNumber}
       />

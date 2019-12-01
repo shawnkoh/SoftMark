@@ -6,6 +6,7 @@ import {
   QuestionViewData
 } from "backend/src/types/view";
 import api from "api";
+import produce from "immer";
 import { useParams } from "react-router";
 import LoadingSpinner from "components/LoadingSpinner";
 import { toast } from "react-toastify";
@@ -23,6 +24,7 @@ interface DynamicState {
 }
 
 interface StaticState {
+  updateQuestion: (questionId: number, score: number | null, markId: number | null) => void;
   handlePrevClick: () => void;
   handleNextClick: () => void;
   handleNextUnmarkedClick: () => void;
@@ -143,11 +145,24 @@ export const MarkQuestionProvider: React.FC = props => {
         )
       );
     }
-  }, [currentPageIdx, pages]);
+  }, [scriptMarkingData, currentPageIdx, pages]);
 
   if (isLoading) return <LoadingSpinner />;
 
   // Page data methods
+  const updateQuestion = (questionId: number, score: number | null, markId: number | null) => {
+    if (scriptMarkingData !== null)
+      setScriptMarkingData(
+        produce(scriptMarkingData, draftState => {
+          draftState.questions.map(q => {
+            if (q.id === questionId)
+              return produce(q, ds => { ds.score = score; ds.markId = markId });
+            return q;
+          })
+        })
+      )
+  };
+
   const handlePrevClick = () => {
     if (scriptMarkingData) {
       const prevScriptId = scriptMarkingData.previousScriptId;
@@ -201,6 +216,7 @@ export const MarkQuestionProvider: React.FC = props => {
               isLoading,
               viewPosition,
               viewScale,
+              updateQuestion,
               handlePrevClick,
               handleNextClick,
               handleNextUnmarkedClick,
