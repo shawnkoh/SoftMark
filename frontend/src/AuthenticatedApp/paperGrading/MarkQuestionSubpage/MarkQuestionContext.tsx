@@ -6,6 +6,7 @@ import {
   QuestionViewData
 } from "backend/src/types/view";
 import api from "api";
+import produce from "immer";
 import { useParams } from "react-router";
 import LoadingSpinner from "components/LoadingSpinner";
 import { toast } from "react-toastify";
@@ -18,11 +19,13 @@ interface DynamicState {
   currentPageIdx: number;
   currentQns: QuestionViewData[];
   isLoading: boolean;
+  isPageLoading: boolean;
   viewPosition: Point;
   viewScale: number;
 }
 
 interface StaticState {
+  updateQuestion: (questionId: number, score: number | null, markId: number | null) => void;
   handlePrevClick: () => void;
   handleNextClick: () => void;
   handleNextUnmarkedClick: () => void;
@@ -48,6 +51,8 @@ export const MarkQuestionProvider: React.FC = props => {
     setScriptMarkingData
   ] = useState<ScriptMarkingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchedNewScript, setFetchedNewScript] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [currentPageIdx, setCurrentPageIdx] = useState<number>(0);
   const [currentQns, setCurrentQns] = useState<QuestionViewData[]>([]);
   const [pages, setPages] = useState<PageViewData[]>([]);
@@ -106,6 +111,7 @@ export const MarkQuestionProvider: React.FC = props => {
         "An error occured while trying to load the script. Please refresh."
       );
     }
+    setFetchedNewScript(!fetchedNewScript);
   };
 
   const getForegroundAnnotations = async (pages: PageViewData[]) => {
@@ -121,6 +127,7 @@ export const MarkQuestionProvider: React.FC = props => {
         "An error occured while trying to load the annotations. Please refresh."
       );
     }
+    setIsPageLoading(false);
     setIsLoading(false);
   };
 
@@ -131,9 +138,11 @@ export const MarkQuestionProvider: React.FC = props => {
 
   useEffect(() => {
     if (scriptMarkingData) {
+      setIsPageLoading(true);
+      setForegroundAnnotation([]);
       getForegroundAnnotations(scriptMarkingData.pages);
     }
-  }, [scriptMarkingData, currentPageIdx]);
+  }, [fetchedNewScript, currentPageIdx]);
 
   useEffect(() => {
     if (scriptMarkingData && pages.length > 0) {
@@ -143,11 +152,24 @@ export const MarkQuestionProvider: React.FC = props => {
         )
       );
     }
-  }, [currentPageIdx, pages]);
+  }, [scriptMarkingData, currentPageIdx, pages]);
 
   if (isLoading) return <LoadingSpinner />;
 
   // Page data methods
+  const updateQuestion = (questionId: number, score: number | null, markId: number | null) => {
+    if (scriptMarkingData !== null)
+      setScriptMarkingData(
+        produce(scriptMarkingData, draftState => {
+          draftState.questions.map(q => {
+            if (q.id === questionId)
+              return produce(q, ds => { ds.score = score; ds.markId = markId });
+            return q;
+          })
+        })
+      )
+  };
+
   const handlePrevClick = () => {
     if (scriptMarkingData) {
       const prevScriptId = scriptMarkingData.previousScriptId;
@@ -199,8 +221,10 @@ export const MarkQuestionProvider: React.FC = props => {
               currentQns,
               pages,
               isLoading,
+              isPageLoading,
               viewPosition,
               viewScale,
+              updateQuestion,
               handlePrevClick,
               handleNextClick,
               handleNextUnmarkedClick,

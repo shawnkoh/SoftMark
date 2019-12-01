@@ -1,6 +1,6 @@
 import { Button, DialogContent, Popover, Slider } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import useStyles from "./styles";
@@ -24,10 +24,15 @@ const MarkQuestionModal: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const { id, name, markId, score, maxScore, topOffset, leftOffset } = question;
+  const { id, markId, score, maxScore } = question;
 
   const [localScore, setLocalScore] = useState<number>(score || 0);
-  const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
+
+  useEffect(() => {
+    setLocalScore(score || 0);
+  }, [id, score]);
+
+  const handleLocalScoreChange = (newValue: number | number[]) => {
     setLocalScore(newValue as number);
   };
 
@@ -53,20 +58,20 @@ const MarkQuestionModal: React.FC<Props> = ({
     });
   };
 
-  const handleCancel = event => {
+  const handleCancel = () => {
     setLocalScore(score || 0);
     onCancel();
   };
 
-  const handleSave = async event => {
+  const handleSave = async () => {
     const newMark = await putMarkData(id, localScore);
     onSave(newMark.score, newMark.markId);
   };
 
-  const handleUnmark = async event => {
+  const handleUnmark = async () => {
     markId && await deleteMarkData(markId);
     onSave(null, null);
-    handleLocalScoreChange(event, 0);
+    handleLocalScoreChange(0);
   };
 
   return (
@@ -87,7 +92,7 @@ const MarkQuestionModal: React.FC<Props> = ({
         <div className={classes.slider}>
           <Slider
             value={localScore}
-            onChange={handleLocalScoreChange}
+            onChange={(e, v) => {handleLocalScoreChange(v);}}
             onChangeCommitted={handleSave}
             step={0.5}
             marks={[

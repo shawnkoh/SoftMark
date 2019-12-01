@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getRepository, IsNull } from "typeorm";
-
 import { Allocation } from "../entities/Allocation";
 import { Mark } from "../entities/Mark";
 import { QuestionTemplate } from "../entities/QuestionTemplate";
-import { AccessTokenSignedPayload } from "../types/tokens";
 import { PaperUserRole } from "../types/paperUsers";
+import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
 export async function canModifyMark(
@@ -16,8 +15,8 @@ export async function canModifyMark(
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterUserId = payload.userId;
   const markId = request.params.id;
-  const mark = await getRepository(Mark).findOne(markId, {
-    where: { discardedAt: IsNull() },
+  const mark = await getRepository(Mark).findOne({
+    where: { id: markId, discardedAt: IsNull() },
     relations: [
       "question",
       "question.script",
