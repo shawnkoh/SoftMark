@@ -5,7 +5,6 @@ import {
   IsOptional,
   IsString
 } from "class-validator";
-import { sign } from "jsonwebtoken";
 import {
   Column,
   Entity,
@@ -20,7 +19,6 @@ import {
   PaperUserRole,
   StudentListData
 } from "../types/paperUsers";
-import { BearerTokenType, InviteTokenPayload } from "../types/tokens";
 import { Allocation } from "./Allocation";
 import { Annotation } from "./Annotation";
 import { Bookmark } from "./Bookmark";
@@ -111,15 +109,6 @@ export class PaperUser extends Discardable {
 
   @OneToMany(type => Question, question => question.currentMarker)
   questionsBeingMarked?: Question[];
-
-  createInviteToken = (expiresIn: string) => {
-    const payload: InviteTokenPayload = {
-      tokenType: BearerTokenType.InviteToken,
-      paperUserId: this.id
-    };
-    const token = sign(payload, process.env.JWT_SECRET!, { expiresIn });
-    return token;
-  };
 
   getListData = async (): Promise<PaperUserListData> => ({
     ...this.getBase(),
