@@ -1,7 +1,12 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import _ from "lodash";
-import { getConnection, getRepository, getTreeRepository } from "typeorm";
+import {
+  createQueryBuilder,
+  getConnection,
+  getRepository,
+  getTreeRepository
+} from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
@@ -163,18 +168,30 @@ export async function publish(request: Request, response: Response) {
     return;
   }
 
+  const unpublishedScriptsQuery = createQueryBuilder()
+    .select("script.id", "id")
+    .from(Script, "script")
+    .where("script.paperId = :paperId", { paperId })
+    .andWhere("script.discardedAt IS NULL")
+    .andWhere("script.publishedDate IS NULL")
+    .innerJoin("script.student", "student", "student.discardedAt IS NULL")
+    .innerJoin("student.user", "user", "user.discardedAt IS NULL");
+
+  const incompleteScriptsQuery = createQueryBuilder()
+    .select("script.id", "id")
+    .from(Script, "script")
+    .where(`script.id IN (${unpublishedScriptsQuery.getQuery()})`)
+    .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
+    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+    .andWhere("mark IS NULL");
+
   const scripts: {
     id: number;
     studentId: number;
     email: string;
     userName: string;
-  }[] = await getRepository(Script)
-    .createQueryBuilder("script")
-    .where("script.paperId = :paperId", { paperId })
-    .andWhere("script.discardedAt is null")
-    .innerJoin("script.student", "student", "student.discardedAt is null")
-    .innerJoin("student.user", "user", "user.discardedAt is null")
-    .select("script.id", "id")
+  }[] = await unpublishedScriptsQuery
+    .andWhere(`script.id NOT IN (${incompleteScriptsQuery.getQuery()})`)
     .addSelect("student.id", "studentId")
     .addSelect("user.email", "email")
     .addSelect("user.name", "name")
