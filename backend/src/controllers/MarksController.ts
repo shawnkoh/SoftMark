@@ -57,7 +57,8 @@ export async function replace(request: Request, response: Response) {
     ) {
       mark = await getRepository(Mark).findOneOrFail({
         question,
-        marker: requester
+        marker: requester,
+        discardedAt: IsNull()
       });
       mark.score = score;
       await getRepository(Mark).update(mark.id, { score: mark.score });
