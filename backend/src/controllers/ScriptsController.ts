@@ -261,7 +261,7 @@ export async function index(request: Request, response: Response) {
       script."updatedAt",
       script."discardedAt",
       student.*,
-      page."pageCount"::INTEGER,
+      page."pageCount",
       question."totalScore",
       question."completedMarking"
 
@@ -281,7 +281,7 @@ export async function index(request: Request, response: Response) {
     INNER JOIN (
       SELECT
         script.id "scriptId",
-        COUNT(page.id) "pageCount"
+        COUNT(page.id)::INTEGER "pageCount"
       FROM script
       INNER JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
       WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL

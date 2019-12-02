@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, getConnection, ManyToOne, OneToMany } from "typeorm";
+import { ScriptListData } from "../types/scripts";
 import { Discardable } from "./Discardable";
 import { Page } from "./Page";
 import { Paper } from "./Paper";
@@ -73,4 +74,57 @@ export class Script extends Discardable {
 
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
+
+  getListData = async (): Promise<ScriptListData> => {
+    return await getConnection().query(`
+      SELECT
+        script.id,
+        script.filename,
+        script."createdAt",
+        script."updatedAt",
+        script."discardedAt",
+        student.*,
+        page."pageCount",
+        question."totalScore",
+        question."completedMarking"
+
+      FROM script
+
+      LEFT JOIN (
+        SELECT
+          "student".id "studentId",
+          "student"."matriculationNumber",
+          "user".name "studentName",
+          "user".email "studentEmail"
+        FROM "paper_user" "student"
+        INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      ) student ON script."studentId" = student."studentId"
+
+      INNER JOIN (
+        SELECT
+          script.id "scriptId",
+          COUNT(page.id)::INTEGER "pageCount"
+        FROM script
+        INNER JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+        GROUP BY script.id
+      ) page ON page."scriptId" = script.id
+
+      INNER JOIN (
+        SELECT
+          script.id "scriptId",
+          COALESCE(SUM(question.score), 0) "totalScore",
+          CASE WHEN COUNT(question.score) = COUNT(question."questionId") THEN true ELSE false END "completedMarking"
+        FROM script
+        LEFT JOIN (
+          SELECT question."scriptId", question.id "questionId", mark.score
+          FROM question
+          LEFT JOIN mark ON mark."questionId" = question.id AND mark."discardedAt" IS NULL
+          WHERE question."discardedAt" IS NULL
+        ) question ON script.id = question."scriptId"
+        GROUP BY script.id
+      ) question ON script.id = question."scriptId"
+
+      WHERE script.id = ${this.id}
+    `);
+  };
 }
