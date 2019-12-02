@@ -15,16 +15,16 @@ export type ScriptPatchData = Partial<{
 }>;
 
 export interface ScriptListData extends DiscardableData {
-  hasVerifiedStudent: boolean;
-  publishedDate: Date | null;
-  filename: string;
-  awardedMarks: number;
-  pageCount: number;
   completedMarking: boolean;
-  studentId: number | null;
+  filename: string;
+  hasVerifiedStudent: boolean;
   matriculationNumber: string | null;
-  studentName: string | null;
+  pageCount: number;
+  publishedDate: Date | null;
   studentEmail: string | null;
+  studentId: number | null;
+  studentName: string | null;
+  totalScore: number;
 }
 
 export interface ScriptData extends ScriptListData {

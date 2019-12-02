@@ -49,7 +49,7 @@ const getTableComparator = (order: string, orderBy: string) => {
       const matriculationNumberB = (b.matriculationNumber || "").toLowerCase();
       res = matriculationNumberA.localeCompare(matriculationNumberB);
     } else if (orderBy === SCORE) {
-      res = a.awardedMarks - b.awardedMarks;
+      res = a.totalScore - b.totalScore;
     }
     if (order === ASC) {
       res *= -1;

@@ -241,6 +241,12 @@ export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const userId = payload.userId;
   const paperId = Number(request.params.id);
+  // Defend against SQL Injection
+  if (isNaN(paperId)) {
+    response.sendStatus(400);
+    return;
+  }
+
   const allowed = await allowedRequester(
     userId,
     paperId,
@@ -252,43 +258,64 @@ export async function index(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  // TODO: Use typeORM's syntax instead as this is prone to SQL injection
   const scripts = await getConnection().query(`
-    SELECT script.*, COUNT(page.id), student.*
+    SELECT
+      script.id,
+      script.filename,
+      script."createdAt",
+      script."updatedAt",
+      script."discardedAt",
+      student.*,
+      page."pageCount"::INTEGER,
+      question."totalScore",
+      question."completedMarking"
+
     FROM script
-    INNER JOIN page ON script.id = page."scriptId" AND page."discardedAt" IS NULL
+    
     LEFT JOIN (
-      SELECT "student".id "studentId", "student"."matriculationNumber", "user".name "studentName", "user".email "studentEmail"
-      FROM "paper_user" "student" INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      SELECT
+        "student".id "studentId",
+        "student"."matriculationNumber",
+        "user".name "studentName",
+        "user".email "studentEmail"
+      FROM "paper_user" "student"
+      INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
       WHERE "student"."paperId" = ${paperId}
     ) student ON script."studentId" = student."studentId"
-    WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
-    GROUP BY script.id, student."studentId", student."matriculationNumber", student."studentName", student."studentEmail"
+    
+    INNER JOIN (
+      SELECT
+        script.id "scriptId",
+        COUNT(page.id) "pageCount"
+      FROM script
+      INNER JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+      WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
+      GROUP BY script.id
+    ) page ON page."scriptId" = script.id
+    
+    INNER JOIN (
+      SELECT
+        script.id "scriptId",
+        COALESCE(SUM(question.score), 0) "totalScore",
+        CASE WHEN COUNT(question.score) = COUNT(question."questionId") THEN true ELSE false END "completedMarking"
+      FROM script
+      LEFT JOIN (
+        SELECT question."scriptId", question.id "questionId", mark.score
+        FROM question
+        LEFT JOIN mark ON mark."questionId" = question.id AND mark."discardedAt" IS NULL
+        WHERE question."discardedAt" IS NULL
+      ) question ON script.id = question."scriptId"
+      WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
+      GROUP BY script.id
+    ) question ON script.id = question."scriptId"
+    
+    WHERE script."discardedAt" IS NULL AND script."paperId" = ${paperId}
+    
     ORDER BY script.id
   `);
 
   console.log(scripts);
   response.status(200).json({ scripts });
-  // .leftJoin(subQueryFactory, alias);
-
-  // const scripts = await getRepository(Script).find({
-  //   where:
-  //     requester.role === PaperUserRole.Student
-  //       ? { paper, student: requester, discardedAt: IsNull() }
-  //       : { paper, discardedAt: IsNull() },
-  //   relations: ["student", "student.user", "questions", "questions.marks"]
-  // });
-
-  // const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
-
-  // const data: ScriptListData[] = await Promise.all(
-  //   scripts
-  //     .sort(sortByFilename)
-  //     .map(script =>
-  //       script.getListDataWithScriptTemplate(activeScriptTemplateData)
-  //     )
-  // );
-  // response.status(200).json({ scripts: data });
 }
 
 export async function show(request: Request, response: Response) {
@@ -330,7 +357,7 @@ export async function show(request: Request, response: Response) {
     return;
   }
 
-  // const data = await script.getData();
+  const data = await script.getData();
   response.status(200).json({ script: data });
 }
 

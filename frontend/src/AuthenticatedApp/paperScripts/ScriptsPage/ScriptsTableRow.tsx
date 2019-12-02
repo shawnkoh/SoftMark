@@ -34,7 +34,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
     matriculationNumber,
     filename,
     id,
-    awardedMarks,
+    totalScore,
     publishedDate
   } = script;
 
@@ -48,7 +48,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <br />
         {studentEmail}
       </TableCell>
-      <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
+      <TableCell>{`${totalScore} / ${totalMarks}`}</TableCell>
       <TableCell>
         <Container>
           {publishedDate ? (
