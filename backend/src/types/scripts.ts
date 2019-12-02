@@ -34,9 +34,17 @@ export interface ScriptData extends ScriptListData {
 
 export function isScriptListData(data: any): data is ScriptListData {
   return (
-    typeof data.paperId === "number" &&
-    typeof data.pagesCount === "number" &&
+    typeof data.completedMarking === "boolean" &&
+    typeof data.filename === "string" &&
+    typeof data.hasVerifiedStudent === "boolean" &&
+    (typeof data.matriculationNumber === "string" ||
+      data.matriculationNumber === null) &&
+    typeof data.pageCount === "number" &&
     isValidDate(data.publishedDate) &&
+    (typeof data.studentEmail === "string" || data.studentEmail === null) &&
+    (typeof data.studentId === "number" || data.studentId === null) &&
+    (typeof data.studentName === "string" || data.studentName === null) &&
+    typeof data.totalScore === "number" &&
     isDiscardableData(data)
   );
 }
