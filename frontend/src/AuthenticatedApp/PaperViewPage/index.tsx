@@ -1,29 +1,26 @@
-import React, { useState } from "react";
-import { RouteComponentProps, withRouter, Redirect } from "react-router";
-import { Link, Route, Switch } from "react-router-dom";
-
-import usePaper from "contexts/PaperContext";
-
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import Check from "@material-ui/icons/Check";
 import People from "@material-ui/icons/People";
 import Settings from "@material-ui/icons/Settings";
-
-import useStyles from "./styles";
-import PaperViewHeader from "./components/PaperViewHeader";
-import SetupPage, {
-  ScriptMappingSubpage,
-  QuestionAllocationSubpage,
-  ScriptTemplateSubpage
-} from "../paperSetup";
-import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
-import ScriptsPage, {
-  ScriptViewSubpage,
-  ScriptMarkSubpage
-} from "../paperScripts";
+import usePaper from "contexts/PaperContext";
+import React, { useState } from "react";
+import { Redirect, RouteComponentProps, withRouter } from "react-router";
+import { Link, Route, Switch } from "react-router-dom";
 import { PaperUserRole } from "../../types/paperUsers";
 import DownloadAllScriptsPage from "../DownloadScriptsPages/DownloadAllScriptsPage";
 import DownloadSingleScriptPage from "../DownloadScriptsPages/DownloadSingleScriptPage";
+import GradingPage, { MarkQuestionSubpage } from "../paperGrading";
+import ScriptIndexPage, {
+  ScriptMarkSubpage,
+  ScriptViewSubpage
+} from "../paperScripts";
+import SetupPage, {
+  QuestionAllocationSubpage,
+  ScriptMappingSubpage,
+  ScriptTemplateSubpage
+} from "../paperSetup";
+import PaperViewHeader from "./components/PaperViewHeader";
+import useStyles from "./styles";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -146,7 +143,7 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
       {(routeProps: RouteComponentProps) => (
         <>
           <PaperViewHeader />
-          <ScriptsPage />
+          <ScriptIndexPage />
           <BottomNav />
         </>
       )}
