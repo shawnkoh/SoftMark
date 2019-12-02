@@ -84,7 +84,7 @@ export class Script extends Discardable {
   @Column({ type: "int" })
   pageCount: number;
 
-  @Column({ nullable: true })
+  @Column({ type: "timestamp without time zone", nullable: true })
   @IsOptional()
   publishedDate: Date | null;
 

@@ -22,7 +22,7 @@ export class Paper extends Discardable {
   @IsString()
   name!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "timestamp without time zone", nullable: true })
   @IsOptional()
   publishedDate: Date | null;
 
