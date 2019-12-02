@@ -2,9 +2,7 @@ import { AnnotationListData, isAnnotationListData } from "./annotations";
 import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface PageListData extends DiscardableData {
-  scriptId: number;
   pageNo: number;
-  annotationsCount: number;
   imageUrl: string;
 }
 
@@ -14,8 +12,8 @@ export interface PageData extends PageListData {
 
 export function isPageListData(data: any): data is PageListData {
   return (
-    typeof data.scriptId === "number" &&
-    typeof data.annotationsCount === "number" &&
+    typeof data.pageNo === "number" &&
+    typeof data.imageUrl === "string" &&
     isDiscardableData(data)
   );
 }

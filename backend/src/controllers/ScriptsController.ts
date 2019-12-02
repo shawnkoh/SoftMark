@@ -9,6 +9,7 @@ import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
+import { ScriptData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 
@@ -318,16 +319,7 @@ export async function show(request: Request, response: Response) {
   const scriptId = request.params.id;
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() },
-    relations: [
-      "student",
-      "pages",
-      "pages.annotations",
-      "questions",
-      "questions.bookmarks",
-      "questions.comments",
-      "questions.marks",
-      "questions.questionTemplate"
-    ]
+    relations: ["pages", "pages.annotations"]
   });
   if (!script) {
     response.sendStatus(404);
@@ -351,7 +343,13 @@ export async function show(request: Request, response: Response) {
     return;
   }
 
-  const data = await script.getData();
+  const data: ScriptData = {
+    filename: script.filename,
+    pages: script.pages!.map(page => ({
+      ...page.getListData(),
+      annotations: page.annotations!
+    }))
+  };
   response.status(200).json({ script: data });
 }
 
@@ -414,7 +412,7 @@ export async function undiscard(request: Request, response: Response) {
   }
   await getRepository(Script).save(script);
 
-  const data = await script.getData();
+  const data = await script.getListData();
   response.status(200).json({ script: data });
 }
 

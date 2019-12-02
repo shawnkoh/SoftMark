@@ -1,5 +1,5 @@
-import { Column, Entity, getRepository, ManyToOne, OneToMany } from "typeorm";
-import { PageData, PageListData } from "../types/pages";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { PageListData } from "../types/pages";
 import { Annotation } from "./Annotation";
 import { Discardable } from "./Discardable";
 import { Script } from "./Script";
@@ -30,26 +30,9 @@ export class Page extends Discardable {
   @OneToMany(type => Annotation, annotation => annotation.page)
   annotations?: Annotation[];
 
-  getListData = async (): Promise<PageListData> => ({
+  getListData = (): PageListData => ({
     ...this.getBase(),
-    scriptId: this.scriptId,
-    pageNo: this.pageNo ? this.pageNo : -1,
-    imageUrl: this.imageUrl ? this.imageUrl : "",
-    annotationsCount: this.annotations
-      ? this.annotations.length
-      : await getRepository(Annotation).count({ pageId: this.id })
+    pageNo: this.pageNo || -1,
+    imageUrl: this.imageUrl || ""
   });
-
-  getData = async (): Promise<PageData> => {
-    const annotations =
-      this.annotations ||
-      (await getRepository(Annotation).find({ pageId: this.id }));
-
-    return {
-      ...(await this.getListData()),
-      annotations: await Promise.all(
-        annotations.map(annotation => annotation.getListData())
-      )
-    };
-  };
 }
