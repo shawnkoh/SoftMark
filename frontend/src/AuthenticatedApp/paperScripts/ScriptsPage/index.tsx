@@ -14,12 +14,13 @@ import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
 import PublishScriptsModal from "./PublishScriptsModal";
@@ -58,20 +59,64 @@ const getTableComparator = (order: string, orderBy: string) => {
   };
 };
 
-const ScriptsSubpage: React.FC = () => {
+const columns: TableColumn[] = [
+  { name: "ID", key: ID, isSortable: true },
+  {
+    name: "Filename",
+    key: SCRIPT,
+    isSortable: true
+  },
+  {
+    name: "Matriculation Number",
+    key: MATRIC,
+    isSortable: true
+  },
+  {
+    name: "Name / Email",
+    key: "name"
+  },
+  {
+    name: "Total Score",
+    key: SCORE,
+    isSortable: true
+  },
+  {
+    name: "Published",
+    key: "published"
+  },
+  {
+    name: "",
+    key: ""
+  }
+];
+
+const ScriptIndex: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const paper = usePaper();
-  const scriptsAndStudents = useScriptsAndStudents();
-  const { refreshScripts } = scriptsAndStudents;
 
-  useEffect(refreshScripts, []);
-
+  const [isLoading, setLoading] = useState(true);
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState(ID);
-  const [scripts, setScripts] = useState<ScriptListData[]>(
-    scriptsAndStudents.scripts.sort(getTableComparator(order, orderBy))
-  );
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const getScripts = async () => {
+      try {
+        const response = await api.scripts.getScripts(paper.id);
+        const { scripts } = response.data;
+        setScripts(scripts.sort(getTableComparator(order, orderBy)));
+      } catch (error) {
+        toast.error(
+          "An unexpected error occured when fetching the scripts. Please refresh the page."
+        );
+      }
+    };
+    setLoading(true);
+    getScripts();
+    setLoading(false);
+  }, [paper]);
 
   const [questionTemplates, setQuestionTemplates] = useState<
     QuestionTemplate[]
@@ -105,8 +150,6 @@ const ScriptsSubpage: React.FC = () => {
     getQuestionTemplates();
   }, []);
 
-  const [searchText, setSearchText] = useState("");
-
   const sortBy = (newOrderBy: string) => {
     setScripts([]);
     let newOrder = order;
@@ -119,37 +162,6 @@ const ScriptsSubpage: React.FC = () => {
     setOrderBy(newOrderBy);
     setScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
   };
-
-  const columns: TableColumn[] = [
-    { name: "ID", key: ID, isSortable: true },
-    {
-      name: "Filename",
-      key: SCRIPT,
-      isSortable: true
-    },
-    {
-      name: "Matriculation Number",
-      key: MATRIC,
-      isSortable: true
-    },
-    {
-      name: "Name / Email",
-      key: "name"
-    },
-    {
-      name: "Total Score",
-      key: SCORE,
-      isSortable: true
-    },
-    {
-      name: "Published",
-      key: "published"
-    },
-    {
-      name: "",
-      key: ""
-    }
-  ];
 
   const filteredScripts = scripts.filter(script => {
     const { filename, matriculationNumber, studentName, studentEmail } = script;
@@ -241,7 +253,8 @@ const ScriptsSubpage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredScripts.length === 0 && (
+            {isLoading && <LoadingSpinner />}
+            {!isLoading && filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
@@ -250,15 +263,16 @@ const ScriptsSubpage: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            {filteredScripts.map((script: ScriptListData, index) => {
-              return (
-                <ScriptsTableRow
-                  key={script.id}
-                  script={script}
-                  questionTemplates={questionTemplates}
-                />
-              );
-            })}
+            {!isLoading &&
+              filteredScripts.map((script: ScriptListData, index) => {
+                return (
+                  <ScriptsTableRow
+                    key={script.id}
+                    script={script}
+                    questionTemplates={questionTemplates}
+                  />
+                );
+              })}
           </TableBody>
         </Table>
       </Paper>
@@ -266,4 +280,4 @@ const ScriptsSubpage: React.FC = () => {
   );
 };
 
-export default ScriptsSubpage;
+export default ScriptIndex;

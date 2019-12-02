@@ -43,9 +43,9 @@ export async function viewScript(id: number): Promise<ScriptViewData | null> {
 }
 
 export async function getScripts(
-  id: number
+  paperId: number
 ): Promise<AxiosResponse<{ scripts: ScriptListData[] }>> {
-  return client.get(`/papers/${id}/scripts`);
+  return client.get(`/papers/${paperId}/scripts`);
 }
 
 export async function patchScript(
