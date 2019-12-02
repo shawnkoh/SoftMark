@@ -1,24 +1,10 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { ScriptTemplateData } from "scriptTemplates";
-import {
-  Column,
-  Entity,
-  getRepository,
-  IsNull,
-  ManyToOne,
-  OneToMany
-} from "typeorm";
-import { ScriptData, ScriptListData } from "../types/scripts";
-import { sortByPageNo } from "../utils/sorts";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Discardable } from "./Discardable";
-import { Mark } from "./Mark";
 import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
-import { QuestionTemplate } from "./QuestionTemplate";
-import { ScriptTemplate } from "./ScriptTemplate";
-
 @Entity()
 export class Script extends Discardable {
   entityName = "Script";
@@ -85,7 +71,6 @@ export class Script extends Discardable {
   pageCount: number;
 
   @Column({ type: "timestamp without time zone", nullable: true })
-  @IsOptional()
   publishedDate: Date | null;
 
   @OneToMany(type => Page, page => page.script)
@@ -93,122 +78,4 @@ export class Script extends Discardable {
 
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
-
-  getListDataWithScriptTemplate = async (
-    scriptTemplateData: ScriptTemplateData | undefined
-  ): Promise<ScriptListData> => {
-    const paperUser =
-      this.student ||
-      (this.studentId &&
-        (await getRepository(PaperUser).findOne(this.studentId))) ||
-      null;
-
-    const questionTemplateIds = scriptTemplateData
-      ? scriptTemplateData.questionTemplates.map(
-          questionTemplate => questionTemplate.id
-        )
-      : [-1]; // stub in case of weird behavior of empty arrays
-
-    const questions = (
-      this.questions ||
-      (await getRepository(Question).find({
-        where: {
-          scriptId: this.id,
-          questionTemplateId: questionTemplateIds,
-          discardedAt: IsNull()
-        },
-        relations: ["marks"]
-      }))
-    ).filter(question =>
-      questionTemplateIds.includes(question.questionTemplateId)
-    );
-
-    const add = (a: number, b: number) => a + b;
-
-    const awardedMarks = questions
-      .filter(question => !question.discardedAt)
-      .map(question => {
-        const marksForQuestion = question.marks ? question.marks : [];
-        return marksForQuestion.map(mark => mark.score).reduce(add, 0);
-      })
-      .reduce(add, 0);
-
-    return {
-      ...this.getBase(),
-      paperId: this.paperId,
-      filename: this.filename,
-      student: paperUser ? await paperUser.getStudentData() : null,
-      publishedDate: this.publishedDate,
-      hasVerifiedStudent: this.hasVerifiedStudent,
-      awardedMarks,
-      pagesCount: this.pageCount
-    };
-  };
-
-  getListData = async () => {
-    const paperUser = this.studentId
-      ? await getRepository(PaperUser).findOne(this.studentId)
-      : null;
-
-    const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-      where: { paperId: this.paperId, discardedAt: IsNull() },
-      relations: ["questionTemplates"]
-    });
-
-    let awardedMarks = 0;
-
-    if (scriptTemplate) {
-      const questionTemplates = await getRepository(QuestionTemplate).find({
-        where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
-      });
-      const questions = await getRepository(Question).find({
-        where: {
-          scriptId: this.id,
-          questionTemplate: questionTemplates,
-          discardedAt: IsNull()
-        }
-      });
-      const marks = await getRepository(Mark).find({
-        where: { question: questions, discardedAt: IsNull() }
-      });
-      awardedMarks = marks
-        .map(mark => mark.score)
-        .reduce((a: number, b: number) => a + b, 0);
-    }
-    return {
-      ...this.getBase(),
-      paperId: this.paperId,
-      filename: this.filename,
-      student: paperUser ? await paperUser.getStudentData() : null,
-      publishedDate: this.publishedDate,
-      hasVerifiedStudent: this.hasVerifiedStudent,
-      awardedMarks,
-      pagesCount: this.pages
-        ? this.pages.length
-        : await getRepository(Page).count({ scriptId: this.id })
-    };
-  };
-
-  getData = async (): Promise<ScriptData> => {
-    if (this.pages) {
-      this.pages.sort(sortByPageNo);
-    }
-    const pages =
-      this.pages ||
-      (await getRepository(Page).find({
-        where: { scriptId: this.id },
-        order: { pageNo: "ASC" }
-      }));
-    const questions =
-      this.questions ||
-      (await getRepository(Question).find({ scriptId: this.id }));
-
-    return {
-      ...(await this.getListData()),
-      pages: await Promise.all(pages.map(page => page.getData())),
-      questions: await Promise.all(
-        questions.map(question => question.getListData())
-      )
-    };
-  };
 }

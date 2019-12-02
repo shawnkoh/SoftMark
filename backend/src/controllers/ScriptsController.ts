@@ -1,7 +1,7 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getManager, getRepository, IsNull, Not } from "typeorm";
+import { getConnection, getManager, getRepository, IsNull, Not } from "typeorm";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
@@ -9,10 +9,8 @@ import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
-import { ScriptListData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
-import { sortByFilename } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -254,24 +252,43 @@ export async function index(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  const scripts = await getRepository(Script).find({
-    where:
-      requester.role === PaperUserRole.Student
-        ? { paper, student: requester, discardedAt: IsNull() }
-        : { paper, discardedAt: IsNull() },
-    relations: ["student", "student.user", "questions", "questions.marks"]
-  });
+  // TODO: Use typeORM's syntax instead as this is prone to SQL injection
+  const scripts = await getConnection().query(`
+    SELECT script.*, COUNT(page.id), student.*
+    FROM script
+    INNER JOIN page ON script.id = page."scriptId" AND page."discardedAt" IS NULL
+    LEFT JOIN (
+      SELECT "student".id "studentId", "student"."matriculationNumber", "user".name "studentName", "user".email "studentEmail"
+      FROM "paper_user" "student" INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      WHERE "student"."paperId" = ${paperId}
+    ) student ON script."studentId" = student."studentId"
+    WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
+    GROUP BY script.id, student."studentId", student."matriculationNumber", student."studentName", student."studentEmail"
+    ORDER BY script.id
+  `);
 
-  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
+  console.log(scripts);
+  response.status(200).json({ scripts });
+  // .leftJoin(subQueryFactory, alias);
 
-  const data: ScriptListData[] = await Promise.all(
-    scripts
-      .sort(sortByFilename)
-      .map(script =>
-        script.getListDataWithScriptTemplate(activeScriptTemplateData)
-      )
-  );
-  response.status(200).json({ scripts: data });
+  // const scripts = await getRepository(Script).find({
+  //   where:
+  //     requester.role === PaperUserRole.Student
+  //       ? { paper, student: requester, discardedAt: IsNull() }
+  //       : { paper, discardedAt: IsNull() },
+  //   relations: ["student", "student.user", "questions", "questions.marks"]
+  // });
+
+  // const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
+
+  // const data: ScriptListData[] = await Promise.all(
+  //   scripts
+  //     .sort(sortByFilename)
+  //     .map(script =>
+  //       script.getListDataWithScriptTemplate(activeScriptTemplateData)
+  //     )
+  // );
+  // response.status(200).json({ scripts: data });
 }
 
 export async function show(request: Request, response: Response) {
@@ -313,7 +330,7 @@ export async function show(request: Request, response: Response) {
     return;
   }
 
-  const data = await script.getData();
+  // const data = await script.getData();
   response.status(200).json({ script: data });
 }
 

@@ -1,6 +1,5 @@
 import { DiscardableData, isDiscardableData, isValidDate } from "./entities";
 import { isPageListData, PageData } from "./pages";
-import { StudentListData } from "./paperUsers";
 import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface ScriptPostData {
@@ -16,17 +15,16 @@ export type ScriptPatchData = Partial<{
 }>;
 
 export interface ScriptListData extends DiscardableData {
-  paperId: number;
-  student: StudentListData | null;
-  studentId: number | null;
-  studentName: string | null;
-  studentEmail: string | null;
-  matriculationNumber: string | null;
   hasVerifiedStudent: boolean;
   publishedDate: Date | null;
   filename: string;
   awardedMarks: number;
-  pagesCount: number;
+  pageCount: number;
+  completedMarking: boolean;
+  studentId: number | null;
+  matriculationNumber: string | null;
+  studentName: string | null;
+  studentEmail: string | null;
 }
 
 export interface ScriptData extends ScriptListData {
