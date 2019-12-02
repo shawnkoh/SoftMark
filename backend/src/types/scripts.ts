@@ -1,6 +1,5 @@
 import { DiscardableData, isDiscardableData, isValidDate } from "./entities";
 import { isPageListData, PageData } from "./pages";
-import { isQuestionListData, QuestionListData } from "./questions";
 
 export interface ScriptPostData {
   filename: string;
@@ -27,9 +26,9 @@ export interface ScriptListData extends DiscardableData {
   totalScore: number;
 }
 
-export interface ScriptData extends ScriptListData {
+export interface ScriptData {
+  filename: string;
   pages: PageData[];
-  questions: QuestionListData[];
 }
 
 export function isScriptListData(data: any): data is ScriptListData {
@@ -51,8 +50,7 @@ export function isScriptListData(data: any): data is ScriptListData {
 
 export function isScriptData(data: any): data is ScriptData {
   return (
-    data.pages.every((page: any) => isPageListData(page)) &&
-    data.questions.every((question: any) => isQuestionListData(question)) &&
-    isScriptListData(data)
+    typeof data.filename === "string" &&
+    data.pages.every((page: any) => isPageListData(page))
   );
 }
