@@ -56,12 +56,7 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const script = new Script(
-    paperId,
-    filename,
-    sha256,
-    (imageUrls as string[]).length
-  );
+  const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
 
   if (errors.length > 0) {
@@ -314,7 +309,6 @@ export async function index(request: Request, response: Response) {
     ORDER BY script.id
   `);
 
-  console.log(scripts);
   response.status(200).json({ scripts });
 }
 

@@ -13,7 +13,6 @@ export class Script extends Discardable {
     paper: number | Paper,
     filename: string,
     sha256: string,
-    pageCount: number,
     student?: number | PaperUser,
     publishedDate?: Date | null
   ) {
@@ -33,7 +32,6 @@ export class Script extends Discardable {
     } else {
       this.student = student;
     }
-    this.pageCount = pageCount;
     this.hasVerifiedStudent = false;
     this.publishedDate = publishedDate || null;
   }
@@ -66,9 +64,6 @@ export class Script extends Discardable {
   @Column("boolean")
   @IsNotEmpty()
   hasVerifiedStudent: boolean;
-
-  @Column({ type: "int" })
-  pageCount: number;
 
   @Column({ type: "timestamp without time zone", nullable: true })
   publishedDate: Date | null;
