@@ -76,7 +76,7 @@ export class Script extends Discardable {
   questions?: Question[];
 
   getListData = async (): Promise<ScriptListData> => {
-    return await getConnection().query(`
+    const results = await getConnection().query(`
       SELECT
         script.id,
         script.filename,
@@ -126,5 +126,9 @@ export class Script extends Discardable {
 
       WHERE script.id = ${this.id}
     `);
+    if (results.length !== 1) {
+      throw new Error("Unexpected error occured");
+    }
+    return results[0];
   };
 }
