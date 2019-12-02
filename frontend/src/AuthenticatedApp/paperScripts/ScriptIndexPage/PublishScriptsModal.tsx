@@ -1,3 +1,4 @@
+import { DialogContentText } from "@material-ui/core";
 import usePaper from "contexts/PaperContext";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { ReactNode, useState } from "react";
@@ -17,7 +18,7 @@ const PublishScriptsModal: React.FC<Props> = props => {
   const toggleVisibility = () => setIsOpen(!isOpen);
 
   const publishCount = scripts.reduce((count, script) => {
-    if (!script.publishedDate && script.studentId) {
+    if (!script.publishedDate && script.studentId && script.completedMarking) {
       return count + 1;
     }
     return count;
@@ -30,11 +31,17 @@ const PublishScriptsModal: React.FC<Props> = props => {
     return count;
   }, 0);
 
+  const unmarkedCount = scripts.reduce((count, script) => {
+    if (!script.publishedDate && !script.completedMarking) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+
   return (
     <>
       <ConfirmationDialog
         title={`Publish Scripts`}
-        message={`Are you sure you want to publish scripts to ${publishCount} students? There are ${unmatchedCount} unmatched scripts. <b>Only matched scripts will be published.</b> This action cannot be undone.`}
         open={isOpen}
         handleClose={toggleVisibility}
         handleConfirm={() => {
@@ -51,7 +58,25 @@ const PublishScriptsModal: React.FC<Props> = props => {
             })
             .finally(() => refreshScripts());
         }}
-      />
+      >
+        <DialogContentText>
+          Are you sure you want to publish {paper.name}?
+        </DialogContentText>
+        <DialogContentText>
+          <b>Only matched and marked scripts will be published.</b>
+        </DialogContentText>
+        <DialogContentText>
+          Of {scripts.length} scripts, {publishCount} are ready to be published.
+          There are {unmatchedCount} unmatched and {unmarkedCount} unmarked
+          scripts.
+        </DialogContentText>
+        <DialogContentText>
+          If you publish this paper, the unpublished scripts will automatically
+          be published when they have been matched and marked.
+          <br />
+          This action cannot be undone.
+        </DialogContentText>
+      </ConfirmationDialog>
       {render(toggleVisibility)}
     </>
   );
