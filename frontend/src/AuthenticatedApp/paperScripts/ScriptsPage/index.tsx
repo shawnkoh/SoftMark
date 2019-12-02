@@ -161,7 +161,7 @@ const ScriptsSubpage: React.FC = () => {
         matriculationNumber.toLowerCase().includes(lowerCaseSearchText)) ||
       (studentName &&
         studentName.toLowerCase().includes(lowerCaseSearchText)) ||
-      studentEmail.toLowerCase().includes(lowerCaseSearchText)
+      (studentEmail && studentEmail.toLowerCase().includes(lowerCaseSearchText))
     );
   });
 
