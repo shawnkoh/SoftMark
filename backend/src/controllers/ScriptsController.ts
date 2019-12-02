@@ -7,7 +7,6 @@ import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
 import { ScriptData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
@@ -284,7 +283,7 @@ export async function index(request: Request, response: Response) {
         script.id "scriptId",
         COUNT(page.id)::INTEGER "pageCount"
       FROM script
-      INNER JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+      LEFT JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
       WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
       GROUP BY script.id
     ) page ON page."scriptId" = script.id
@@ -305,7 +304,14 @@ export async function index(request: Request, response: Response) {
       GROUP BY script.id
     ) question ON script.id = question."scriptId"
     
-    WHERE script."discardedAt" IS NULL AND script."paperId" = ${paperId}
+    WHERE
+      script."discardedAt" IS NULL
+      AND script."paperId" = ${paperId}
+      ${
+        requester.role === PaperUserRole.Student
+          ? 'AND script."studentId" = ' + requester.id
+          : ""
+      }
     
     ORDER BY script.id
   `);
@@ -345,7 +351,7 @@ export async function show(request: Request, response: Response) {
 
   const data: ScriptData = {
     filename: script.filename,
-    pages: script.pages!.map(page => ({
+    pages: (script.pages as Page[]).map((page: Page) => ({
       ...page.getListData(),
       annotations: page.annotations!
     }))
@@ -449,11 +455,3 @@ export async function discardScripts(request: Request, response: Response) {
     response.sendStatus(400);
   }
 }
-
-const getActiveScriptTemplateData = async (paperId: number) => {
-  const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-    where: { paperId: paperId, discardedAt: IsNull() },
-    relations: ["questionTemplates"]
-  });
-  return scriptTemplate ? await scriptTemplate.getData() : scriptTemplate;
-};

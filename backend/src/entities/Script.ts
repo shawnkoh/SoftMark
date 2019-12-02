@@ -105,7 +105,7 @@ export class Script extends Discardable {
           script.id "scriptId",
           COUNT(page.id)::INTEGER "pageCount"
         FROM script
-        INNER JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+        LEFT JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
         GROUP BY script.id
       ) page ON page."scriptId" = script.id
 

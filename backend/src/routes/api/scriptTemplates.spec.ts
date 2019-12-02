@@ -1,17 +1,10 @@
 import request from "supertest";
 import { getRepository } from "typeorm";
-import { PageQuestionTemplate } from "../../entities/PageQuestionTemplate";
-import { PageTemplate } from "../../entities/PageTemplate";
 import { Paper } from "../../entities/Paper";
 import { Question } from "../../entities/Question";
-import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
 import { ApiServer } from "../../server";
-import {
-  isPageQuestionTemplateData,
-  PageQuestionTemplatePostData
-} from "../../types/pageQuestionTemplates";
 import { PaperUserRole } from "../../types/paperUsers";
 import {
   isQuestionTemplateData,
@@ -199,7 +192,6 @@ describe("POST /script_templates/:id/question_templates", () => {
         fixtures.paper,
         `SCRIPT${i}.pdf`,
         `SCRIPT${i}.pdf`,
-        1,
         student
       );
       paper1Scripts.push(script);
@@ -216,7 +208,6 @@ describe("POST /script_templates/:id/question_templates", () => {
         paper2,
         `SCRIPT${i}.pdf`,
         `SCRIPT${i}.pdf`,
-        1,
         student
       );
       paper2Scripts.push(script);
