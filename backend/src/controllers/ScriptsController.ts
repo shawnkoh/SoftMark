@@ -201,9 +201,9 @@ export async function match(request: Request, response: Response) {
   const boundedPaperUsersMap: Map<number | null, boolean> = new Map();
   for (let i = 0; i < paperUsers.length; i++) {
     const paperUser = paperUsers[i];
-    const scriptFilename = paperUser.scriptFilename;
-    if (scriptFilename) {
-      paperUsersMap.set(scriptFilename, paperUser);
+    const matriculationNumber = paperUser.matriculationNumber;
+    if (matriculationNumber) {
+      paperUsersMap.set(matriculationNumber, paperUser);
     }
   }
 
@@ -219,7 +219,9 @@ export async function match(request: Request, response: Response) {
   for (let i = 0; i < scripts.length; i++) {
     const script = scripts[i];
     const student = paperUsersMap.get(script.filename);
-    const isBoundedStudent = student && boundedPaperUsersMap.get(student.id);
+    const isBoundedStudent = student
+      ? boundedPaperUsersMap.get(student.id)
+      : false;
     if (!script.hasVerifiedStudent && student && !isBoundedStudent) {
       script.student = await getRepository(PaperUser).findOne(student.id);
     } else if (!script.hasVerifiedStudent) {

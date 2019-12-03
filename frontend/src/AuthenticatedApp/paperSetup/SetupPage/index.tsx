@@ -80,7 +80,7 @@ const SetupSubpage: React.FC<RouteComponentProps> = ({ match }) => {
     {
       title: (
         <>
-          Upload student list .csv ([matriculation number], [name], [email], [script filename]) ·{" "}
+          Upload student list .csv ([matriculation number], [name], [email]) ·{" "}
           <a href="https://www.dropbox.com/s/5ed14dzpg0sgiwy/NominalRoll.csv?dl=1">
             sample
           </a>

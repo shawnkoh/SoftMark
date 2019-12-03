@@ -41,7 +41,7 @@ const MarkQuestionModal: React.FC<Props> = ({
       .replaceMark(questionId, { score })
       .then(res => {
         if (res.data.mark)
-          return { score: res.data.mark.score, markId: res.data.mark.id };
+          return { score: res.data.mark.score, markId: res.data.mark.id};
         return { score: score, markId: null };
       })
       .catch(() => {
