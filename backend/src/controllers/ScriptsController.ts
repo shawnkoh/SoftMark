@@ -8,7 +8,10 @@ import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
-import { PaperUserRole } from "../types/paperUsers";
+import {
+  PaperUserRole,
+  ScriptStudentMappingPatchData
+} from "../types/paperUsers";
 import { ScriptData, ScriptPatchData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -209,60 +212,71 @@ export async function match(request: Request, response: Response) {
     paperId,
     discardedAt: IsNull()
   });
-  const paperUsers = await getRepository(PaperUser).find({
+  const allStudents = await getRepository(PaperUser).find({
     paperId,
     role: PaperUserRole.Student,
     discardedAt: IsNull()
   });
 
   /** Matching algorithm start */
-  const paperUsersMap: Map<string, PaperUser> = new Map();
-  const boundedPaperUsersMap: Map<number | null, boolean> = new Map();
-  for (let i = 0; i < paperUsers.length; i++) {
-    const paperUser = paperUsers[i];
-    const matriculationNumber = paperUser.matriculationNumber;
+  const studentsMap: Map<string, PaperUser> = new Map(); // matric to student
+  for (let i = 0; i < allStudents.length; i++) {
+    const student = allStudents[i];
+    const matriculationNumber = student.matriculationNumber;
     if (matriculationNumber) {
-      paperUsersMap.set(matriculationNumber, paperUser);
+      studentsMap.set(matriculationNumber.toLocaleUpperCase(), student);
     }
   }
 
-  // Unbind unverified associations
+  const scriptsMap: Map<string, Script> = new Map(); // filename to script
   for (let i = 0; i < scripts.length; i++) {
     const script = scripts[i];
-    if (script.hasVerifiedStudent && script.studentId) {
-      boundedPaperUsersMap.set(script.studentId, true);
-    }
+    scriptsMap.set(script.filename.toLocaleUpperCase(), script);
   }
 
-  // Bind unmatched students with scripts with same filename
-  for (let i = 0; i < scripts.length; i++) {
-    const script = scripts[i];
-    const student = paperUsersMap.get(script.filename);
-    const isBoundedStudent = student
-      ? boundedPaperUsersMap.get(student.id)
-      : false;
-    if (!script.hasVerifiedStudent && student && !isBoundedStudent) {
-      script.student = await getRepository(PaperUser).findOne(student.id);
-    } else if (!script.hasVerifiedStudent) {
-      script.student = null;
-    } else if (script.studentId) {
-      script.student = await getRepository(PaperUser).findOne(script.studentId);
+  const { csvFile } = request.body as ScriptStudentMappingPatchData;
+  let successfullyMatched = "";
+  let failedToBeMatched = "";
+  const rows: string[] = csvFile.split("\n");
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const cells = row.split("\r")[0].split(",");
+    if (cells.length >= 2) {
+      const matriculationNumber = cells[0].toLocaleUpperCase();
+      const filename = cells[1].toLocaleUpperCase();
+      const mappingDetails = matriculationNumber + " " + filename;
+      console.log(mappingDetails);
+
+      const student = studentsMap.get(matriculationNumber);
+      const script = scriptsMap.get(filename);
+
+      if (!script || !student) {
+        failedToBeMatched +=
+          mappingDetails +
+          " (script/student name doesn't exist or has already been matched)\n";
+        continue;
+      }
+
+      script.student = student;
+      const errors = await validate(script);
+      //this is not good practice for error handling, but it will do for now
+      if (errors.length === 0) {
+        await getRepository(Script).save(script);
+        successfullyMatched += mappingDetails + "\n";
+
+        // ensures 1 to 1 mapping within the list but not within the system
+        studentsMap.delete(matriculationNumber);
+        scriptsMap.delete(filename);
+      } else {
+        failedToBeMatched += mappingDetails + " (Error: " + errors[0] + ")\n";
+      }
     }
   }
 
   /** Matching algorithm end */
-
-  await getManager().transaction(async manager => {
-    await Promise.all(
-      scripts.map(async script => {
-        await manager.save(script);
-      })
-    );
-  });
-
   await publishScripts(paper.id, paper.name, paper.publishedDate);
 
-  return response.sendStatus(200);
+  return response.status(200).json({ successfullyMatched, failedToBeMatched });
 }
 
 export async function index(request: Request, response: Response) {

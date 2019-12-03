@@ -263,7 +263,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
         </Toolbar>
       </AppBar>
       {isLoading ? (
-        <LoadingSpinner loadingMessage="Loading page"/>
+        <LoadingSpinner loadingMessage="Loading page" />
       ) : (
         <CanvasContainer
           backgroundImageSource={backgroundImageSource}

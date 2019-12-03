@@ -15,8 +15,6 @@ type ScriptsAndStudentsContextProps =
       refreshUnmatchedStudents: () => void;
       scripts: ScriptListData[];
       refreshScripts: () => void;
-      matchScriptsToStudents: () => void;
-      isMatchingScriptsToStudents: boolean;
     })
   | null;
 
@@ -88,28 +86,6 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
     setIsLoadingScripts(false);
   }, [paper_id]);
 
-  const [
-    isMatchingScriptsToStudents,
-    setIsMatchingScriptsToStudents
-  ] = useState(false);
-
-  const matchScriptsToStudents = () => {
-    setIsMatchingScriptsToStudents(true);
-    toast("Attempting to match scripts to students...");
-    api.scripts
-      .matchScriptsToStudents(paperId)
-      .then(() => {
-        setScripts([]);
-        getScripts();
-        getUnmatchedStudents();
-        toast.success("Matching algorithm ran successfully");
-      })
-      .catch(() => {
-        toast.error("An error occurred when matching.");
-      })
-      .finally(() => setIsMatchingScriptsToStudents(false));
-  };
-
   if (isLoadingAllStudents) {
     return <LoadingSpinner loadingMessage="Loading students..." />;
   } else if (isLoadingScripts) {
@@ -135,9 +111,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
               unmatchedStudents,
               refreshUnmatchedStudents: getUnmatchedStudents,
               scripts,
-              refreshScripts: getScripts,
-              matchScriptsToStudents,
-              isMatchingScriptsToStudents
+              refreshScripts: getScripts
             }
           : null
       }

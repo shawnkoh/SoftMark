@@ -19,17 +19,14 @@ import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
+import UploadScriptStudentMappingWrapper from "../../../../components/uploadWrappers/UploadScriptStudentMappingWrapper";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
 
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
-  const {
-    scripts,
-    matchScriptsToStudents,
-    isMatchingScriptsToStudents
-  } = useScriptsAndStudents();
+  const { scripts } = useScriptsAndStudents();
 
   const [searchText, setSearchText] = useState("");
 
@@ -69,6 +66,8 @@ const ScriptsTable: React.FC = () => {
     );
   });
 
+  console.log(filteredScripts.map(script => JSON.stringify(script)));
+
   return (
     <>
       <Typography variant="overline" className={classes.margin}>
@@ -102,16 +101,17 @@ const ScriptsTable: React.FC = () => {
           </UploadScriptsWrapper>
         </Grid>
         <Grid item>
-          <Tooltip title="Match students to scripts">
-            <RoundedButton
-              variant="contained"
-              color="primary"
-              startIcon={<MatchIcon />}
-              onClick={matchScriptsToStudents}
-            >
-              Match
-            </RoundedButton>
-          </Tooltip>
+          <UploadScriptStudentMappingWrapper>
+            <Tooltip title="Match students to scripts">
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                startIcon={<MatchIcon />}
+              >
+                Match
+              </RoundedButton>
+            </Tooltip>
+          </UploadScriptStudentMappingWrapper>
         </Grid>
         {/* <Grid item>
           <DeleteAllScriptsModal
@@ -150,7 +150,7 @@ const ScriptsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {!isMatchingScriptsToStudents && filteredScripts.length === 0 && (
+            {filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
@@ -161,7 +161,7 @@ const ScriptsTable: React.FC = () => {
             )}
             {filteredScripts.map(script => (
               <ScriptsTableRow
-                key={script.id}
+                key={JSON.stringify(script)}
                 scriptTemplatePagesCount={
                   scriptTemplate ? scriptTemplate.pageCount : -1
                 }

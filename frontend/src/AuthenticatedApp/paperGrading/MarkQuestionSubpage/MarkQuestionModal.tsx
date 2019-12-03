@@ -41,7 +41,7 @@ const MarkQuestionModal: React.FC<Props> = ({
       .replaceMark(questionId, { score })
       .then(res => {
         if (res.data.mark)
-          return { score: res.data.mark.score, markId: res.data.mark.id};
+          return { score: res.data.mark.score, markId: res.data.mark.id };
         return { score: score, markId: null };
       })
       .catch(() => {
@@ -69,7 +69,7 @@ const MarkQuestionModal: React.FC<Props> = ({
   };
 
   const handleUnmark = async () => {
-    markId && await deleteMarkData(markId);
+    markId && (await deleteMarkData(markId));
     onSave(null, null);
     handleLocalScoreChange(0);
   };
@@ -92,7 +92,9 @@ const MarkQuestionModal: React.FC<Props> = ({
         <div className={classes.slider}>
           <Slider
             value={localScore}
-            onChange={(e, v) => {handleLocalScoreChange(v);}}
+            onChange={(e, v) => {
+              handleLocalScoreChange(v);
+            }}
             onChangeCommitted={handleSave}
             step={0.5}
             marks={[

@@ -23,6 +23,10 @@ export interface NominalRollPostData {
   csvFile: string;
 }
 
+export interface ScriptStudentMappingPatchData {
+  csvFile: string;
+}
+
 export type PaperUserPatchData = Partial<{
   role: PaperUserRole;
   matriculationNumber: string | null;

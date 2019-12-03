@@ -25,7 +25,11 @@ interface DynamicState {
 }
 
 interface StaticState {
-  updateQuestion: (questionId: number, score: number | null, markId: number | null) => void;
+  updateQuestion: (
+    questionId: number,
+    score: number | null,
+    markId: number | null
+  ) => void;
   handlePrevClick: () => void;
   handleNextClick: () => void;
   handleNextUnmarkedClick: () => void;
@@ -157,17 +161,24 @@ export const MarkQuestionProvider: React.FC = props => {
   if (isLoading) return <LoadingSpinner />;
 
   // Page data methods
-  const updateQuestion = (questionId: number, score: number | null, markId: number | null) => {
+  const updateQuestion = (
+    questionId: number,
+    score: number | null,
+    markId: number | null
+  ) => {
     if (scriptMarkingData !== null)
       setScriptMarkingData(
         produce(scriptMarkingData, draftState => {
           draftState.questions.map(q => {
             if (q.id === questionId)
-              return produce(q, ds => { ds.score = score; ds.markId = markId });
+              return produce(q, ds => {
+                ds.score = score;
+                ds.markId = markId;
+              });
             return q;
-          })
+          });
         })
-      )
+      );
   };
 
   const handlePrevClick = () => {
