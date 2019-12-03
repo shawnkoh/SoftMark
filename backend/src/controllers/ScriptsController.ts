@@ -11,6 +11,8 @@ import { PaperUserRole } from "../types/paperUsers";
 import { ScriptData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import publishScripts from "../utils/publication";
+import { sendScriptEmail } from "../utils/sendgrid";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -127,6 +129,8 @@ export async function update(request: Request, response: Response) {
     return;
   }
 
+  const { paper } = allowed;
+
   const { filename, hasVerifiedStudent, studentId } = pick(
     request.body,
     "filename",
@@ -137,13 +141,13 @@ export async function update(request: Request, response: Response) {
   if (filename) {
     script.filename = filename.toUpperCase();
   }
-  if (hasVerifiedStudent !== undefined) {
-    script.hasVerifiedStudent = hasVerifiedStudent;
-  }
-  if (studentId !== undefined) {
-    script.student = studentId
-      ? await getRepository(PaperUser).findOne(studentId)
-      : null;
+  script.hasVerifiedStudent = hasVerifiedStudent || false;
+  if (studentId && studentId !== script.studentId) {
+    script.student = (studentId as unknown) as PaperUser;
+    script.publishedDate = null;
+  } else if (studentId === null) {
+    script.student = null;
+    script.publishedDate = null;
   }
 
   const errors = await validate(script);
@@ -158,6 +162,26 @@ export async function update(request: Request, response: Response) {
   }
 
   const data = await script.getListData();
+  // Optimisation: Makes use of script.getListData instead of publication util to save a query
+  if (
+    paper.publishedDate &&
+    !data.publishedDate &&
+    data.completedMarking &&
+    data.studentId &&
+    data.studentEmail
+  ) {
+    sendScriptEmail(
+      paper.name,
+      data.studentId,
+      data.studentEmail,
+      data.studentName
+    );
+    const publishedDate = new Date();
+    await getRepository(Script).update(script.id, {
+      publishedDate
+    });
+    data.publishedDate = publishedDate;
+  }
   response.status(201).json({ script: data });
 }
 
@@ -173,6 +197,8 @@ export async function match(request: Request, response: Response) {
   if (!allowed) {
     return response.sendStatus(404);
   }
+
+  const { paper } = allowed;
 
   const scripts = await getRepository(Script).find({
     paperId,
@@ -228,6 +254,8 @@ export async function match(request: Request, response: Response) {
       })
     );
   });
+
+  await publishScripts(paper.id, paper.name);
 
   return response.sendStatus(200);
 }

@@ -1,17 +1,11 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import _ from "lodash";
-import {
-  createQueryBuilder,
-  getConnection,
-  getRepository,
-  getTreeRepository
-} from "typeorm";
+import { getRepository, getTreeRepository } from "typeorm";
 import { Allocation } from "../entities/Allocation";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import QuestionTemplate from "../entities/QuestionTemplate";
-import { Script } from "../entities/Script";
 import { selectPaperData } from "../selectors/papers";
 import {
   GradingData,
@@ -21,7 +15,7 @@ import {
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
-import { sendScriptEmail } from "../utils/sendgrid";
+import publishScripts from "../utils/publication";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -168,64 +162,8 @@ export async function publish(request: Request, response: Response) {
     return;
   }
 
-  const matchedScriptsQuery = createQueryBuilder()
-    .select("script.id", "id")
-    .from(Script, "script")
-    .innerJoin("script.student", "student", "student.discardedAt IS NULL")
-    .innerJoin("student.user", "user", "user.discardedAt IS NULL")
-    .where("script.paperId = :paperId", { paperId })
-    .andWhere("script.discardedAt IS NULL")
-    .andWhere("script.publishedDate IS NULL");
-
-  const unmarkedScriptsQuery = createQueryBuilder()
-    .select("script.id", "id")
-    .from(Script, "script")
-    .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
-    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
-    .where(`script.id IN (${matchedScriptsQuery.getQuery()})`)
-    .andWhere("mark IS NULL");
-
-  const scripts: {
-    id: number;
-    studentId: number;
-    email: string;
-    userName: string;
-  }[] = await matchedScriptsQuery
-    .addSelect("student.id", "studentId")
-    .addSelect("user.email", "email")
-    .addSelect("user.name", "name")
-    .andWhere(`script.id NOT IN (${unmarkedScriptsQuery.getQuery()})`)
-    .getRawMany();
-
-  const publishedDate = new Date();
-
-  if (scripts.length === 0) {
-    await getRepository(Paper).update(paper.id, { publishedDate });
-    response.sendStatus(204);
-    return;
-  }
-
-  getConnection().transaction(async manager => {
-    await manager.getRepository(Paper).update(paper.id, { publishedDate });
-    await manager
-      .getRepository(Script)
-      .createQueryBuilder("script")
-      .update()
-      .where("script.id IN (:...ids)", {
-        ids: scripts.map(script => script.id)
-      })
-      .set({ publishedDate })
-      .execute();
-  });
-
-  scripts.forEach(script => {
-    sendScriptEmail(
-      paper.name,
-      script.studentId,
-      script.email,
-      script.userName
-    );
-  });
+  await getRepository(Paper).update(paper.id, { publishedDate: new Date() });
+  await publishScripts(paper.id, paper.name);
 
   response.sendStatus(204);
 }
