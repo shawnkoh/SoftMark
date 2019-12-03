@@ -6,6 +6,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 
 type ScriptTemplateContextProps =
   | ({
+      isLoadingScriptTemplate: boolean;
       scriptTemplate: ScriptTemplateData | null;
       refreshScriptTemplate: () => void;
     })
@@ -49,6 +50,7 @@ export const ScriptTemplateProvider: React.FC = props => {
       value={
         paperId
           ? {
+              isLoadingScriptTemplate,
               scriptTemplate,
               refreshScriptTemplate: getScriptTemplate
             }

@@ -197,6 +197,11 @@ export async function publish(request: Request, response: Response) {
     .addSelect("user.name", "name")
     .getRawMany();
 
+  if (scripts.length === 0) {
+    response.sendStatus(400);
+    return;
+  }
+
   const publishedDate = new Date();
 
   getConnection().transaction(async manager => {

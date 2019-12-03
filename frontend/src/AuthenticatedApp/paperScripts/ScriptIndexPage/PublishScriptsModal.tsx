@@ -1,19 +1,21 @@
 import { DialogContentText } from "@material-ui/core";
+import { ScriptListData } from "backend/src/types/scripts";
 import usePaper from "contexts/PaperContext";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
+import useScriptsAndStudents from "../../../contexts/ScriptsAndStudentsContext";
 
 interface Props {
+  scripts: ScriptListData[];
   render: (toggleVisibility: () => void) => ReactNode;
 }
 
 const PublishScriptsModal: React.FC<Props> = props => {
-  const { render } = props;
+  const { scripts, render } = props;
   const paper = usePaper();
-  const { scripts, refreshScripts } = useScriptsAndStudents();
+  const { refreshScripts } = useScriptsAndStudents();
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 

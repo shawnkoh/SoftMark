@@ -12,21 +12,22 @@ import {
 } from "@material-ui/core";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { toast } from "react-toastify";
 import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
+import useScriptsAndStudents from "../../../contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "../../../contexts/ScriptTemplateContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
-import { QuestionTemplate } from "./types";
 
 const ASC = "asc";
 const DESC = "desc";
@@ -94,45 +95,34 @@ const ScriptIndex: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const paper = usePaper();
+  const {
+    isLoadingScriptTemplate,
+    scriptTemplate,
+    refreshScriptTemplate
+  } = useScriptTemplate();
+  const { isLoadingScripts, scripts, refreshScripts } = useScriptsAndStudents();
+  const isLoading = isLoadingScriptTemplate || isLoadingScripts;
 
-  const [isLoading, setLoading] = useState(true);
-  const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState(ID);
   const [searchText, setSearchText] = useState("");
-
-  useEffect(() => {
-    const getScripts = async () => {
-      try {
-        const response = await api.scripts.getScripts(paper.id);
-        const { scripts } = response.data;
-        setScripts(scripts.sort(getTableComparator(order, orderBy)));
-      } catch (error) {
-        toast.error(
-          "An unexpected error occured when fetching the scripts. Please refresh the page."
-        );
-      }
-    };
-    setLoading(true);
-    getScripts();
-    setLoading(false);
-  }, [paper]);
-
+  const [sortedScripts, setSortedScripts] = useState<ScriptListData[]>(
+    scripts.sort(getTableComparator(order, orderBy))
+  );
   const [questionTemplates, setQuestionTemplates] = useState<
-    QuestionTemplate[]
+    QuestionTemplateData[]
   >([]);
 
-  const mapQuestionTemplateIds = async (questionTemplateIds: number[]) => {
-    return Promise.all(
-      questionTemplateIds.map(async questionTemplateId => {
-        const response = await api.questionTemplates.getQuestionTemplate(
-          questionTemplateId
-        );
-        const questionTemplate = response.data.questionTemplate;
-        return { id: questionTemplateId, name: questionTemplate.name };
-      })
-    );
-  };
+  useEffect(() => {
+    // TODO: Make refresh script template faster
+    // refreshScriptTemplate();
+    refreshScripts();
+    getQuestionTemplates();
+  }, []);
+
+  useEffect(() => {
+    setSortedScripts(scripts.sort(getTableComparator(order, orderBy)));
+  }, [scripts]);
 
   const getQuestionTemplates = async () => {
     const allocationsResponse = await api.allocations.getSelfAllocations(
@@ -142,16 +132,19 @@ const ScriptIndex: React.FC = () => {
     const questionTemplateIds = allocations.map(
       allocation => allocation.questionTemplateId
     );
-    const questionTemplates = await mapQuestionTemplateIds(questionTemplateIds);
-    setQuestionTemplates(questionTemplates);
+    if (scriptTemplate) {
+      const questionTemplates = questionTemplateIds
+        .map(id =>
+          scriptTemplate.questionTemplates.find(
+            questionTemplate => id === questionTemplate.id
+          )
+        )
+        .filter(questionTemplate => !!questionTemplate);
+      setQuestionTemplates(questionTemplates as QuestionTemplateData[]);
+    }
   };
 
-  useEffect(() => {
-    getQuestionTemplates();
-  }, []);
-
   const sortBy = (newOrderBy: string) => {
-    setScripts([]);
     let newOrder = order;
     if (newOrderBy === orderBy) {
       newOrder = order === ASC ? DESC : ASC;
@@ -160,10 +153,10 @@ const ScriptIndex: React.FC = () => {
     }
     setOrder(newOrder);
     setOrderBy(newOrderBy);
-    setScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
+    setSortedScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
   };
 
-  const filteredScripts = scripts.filter(script => {
+  const filteredScripts = sortedScripts.filter(script => {
     const { filename, matriculationNumber, studentName, studentEmail } = script;
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
@@ -206,6 +199,7 @@ const ScriptIndex: React.FC = () => {
         </Grid>
         <Grid item>
           <PublishScriptsModal
+            scripts={scripts}
             render={toggleModal => (
               <RoundedButton
                 variant="contained"
