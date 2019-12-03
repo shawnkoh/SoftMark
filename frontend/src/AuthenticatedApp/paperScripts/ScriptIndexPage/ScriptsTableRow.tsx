@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Container,
   TableCell,
   TableRow,
@@ -29,13 +30,14 @@ const ScriptsTableRow: React.FC<Props> = props => {
   const { url } = useRouteMatch()!;
 
   const {
-    studentName,
-    studentEmail,
-    matriculationNumber,
+    completedMarking,
     filename,
     id,
-    totalScore,
-    publishedDate
+    matriculationNumber,
+    publishedDate,
+    studentEmail,
+    studentName,
+    totalScore
   } = script;
 
   return (
@@ -48,7 +50,12 @@ const ScriptsTableRow: React.FC<Props> = props => {
         <br />
         {studentEmail}
       </TableCell>
-      <TableCell>{`${totalScore} / ${totalMarks}`}</TableCell>
+      <TableCell>
+        <Chip
+          label={`${totalScore} / ${totalMarks}`}
+          color={completedMarking ? "secondary" : "default"}
+        />
+      </TableCell>
       <TableCell>
         <Container>
           {publishedDate ? (

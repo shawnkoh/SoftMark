@@ -257,6 +257,7 @@ export async function index(request: Request, response: Response) {
     SELECT
       script.id,
       script.filename,
+      script."publishedDate",
       script."createdAt",
       script."updatedAt",
       script."discardedAt",
