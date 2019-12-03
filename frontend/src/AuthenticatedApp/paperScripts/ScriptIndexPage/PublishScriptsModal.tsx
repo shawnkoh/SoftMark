@@ -58,7 +58,10 @@ const PublishScriptsModal: React.FC<Props> = props => {
                 `An unexpected error occured while publishing the scripts. Try refreshing the page.`
               );
             })
-            .finally(() => refreshScripts());
+            .finally(() => {
+              paper.refreshPaper();
+              refreshScripts();
+            });
         }}
       >
         <DialogContentText>
