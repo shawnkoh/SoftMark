@@ -10,7 +10,7 @@ export interface ScriptPostData {
 export type ScriptPatchData = Partial<{
   filename: string;
   hasVerifiedStudent: boolean;
-  studentId: number;
+  studentId: number | null;
 }>;
 
 export interface ScriptListData extends DiscardableData {
