@@ -79,6 +79,8 @@ export class Script extends Discardable {
     const results = await getConnection().query(`
       SELECT
         script.id,
+        script."hasVerifiedStudent",
+        script."publishedDate",
         script.filename,
         script."createdAt",
         script."updatedAt",

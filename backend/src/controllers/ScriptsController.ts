@@ -256,8 +256,9 @@ export async function index(request: Request, response: Response) {
   const scripts = await getConnection().query(`
     SELECT
       script.id,
-      script.filename,
+      script."hasVerifiedStudent",
       script."publishedDate",
+      script.filename,
       script."createdAt",
       script."updatedAt",
       script."discardedAt",
