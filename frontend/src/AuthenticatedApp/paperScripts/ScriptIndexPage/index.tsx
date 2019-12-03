@@ -206,6 +206,7 @@ const ScriptIndex: React.FC = () => {
                 color="primary"
                 onClick={toggleModal}
                 startIcon={<PublishIcon />}
+                disabled={!!paper.publishedDate}
               >
                 Publish
               </RoundedButton>
