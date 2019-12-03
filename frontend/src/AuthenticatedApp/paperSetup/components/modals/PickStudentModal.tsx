@@ -102,7 +102,7 @@ const PickStudentModal: React.FC<Props> = props => {
             color="primary"
             onClick={async () => {
               const scriptPatchData: ScriptPatchData = {
-                studentId: chosenStudent ? chosenStudent.studentId : undefined
+                studentId: chosenStudent ? chosenStudent.studentId : null
               };
               api.scripts
                 .patchScript(script.id, scriptPatchData)

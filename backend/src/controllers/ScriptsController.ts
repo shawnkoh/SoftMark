@@ -2,13 +2,14 @@ import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
 import { getConnection, getManager, getRepository, IsNull, Not } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { PaperUserRole } from "../types/paperUsers";
-import { ScriptData } from "../types/scripts";
+import { ScriptData, ScriptPatchData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 import publishScripts from "../utils/publication";
@@ -131,23 +132,24 @@ export async function update(request: Request, response: Response) {
 
   const { paper } = allowed;
 
-  const { filename, hasVerifiedStudent, studentId } = pick(
+  const { filename, hasVerifiedStudent, studentId }: ScriptPatchData = pick(
     request.body,
     "filename",
     "hasVerifiedStudent",
     "studentId"
   );
 
-  if (filename) {
-    script.filename = filename.toUpperCase();
-  }
-  script.hasVerifiedStudent = hasVerifiedStudent || false;
+  const patchData: QueryDeepPartialEntity<Script> = {
+    filename: filename ? filename.toUpperCase() : script.filename,
+    hasVerifiedStudent: hasVerifiedStudent || script.hasVerifiedStudent
+  };
+
   if (studentId && studentId !== script.studentId) {
-    script.student = (studentId as unknown) as PaperUser;
-    script.publishedDate = null;
+    patchData.studentId = studentId;
+    patchData.publishedDate = null;
   } else if (studentId === null) {
-    script.student = null;
-    script.publishedDate = null;
+    patchData.studentId = null;
+    patchData.publishedDate = null;
   }
 
   const errors = await validate(script);
@@ -156,7 +158,7 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-    await getRepository(Script).save(script);
+    await getRepository(Script).update(script.id, patchData);
   } catch (error) {
     return response.sendStatus(400);
   }
