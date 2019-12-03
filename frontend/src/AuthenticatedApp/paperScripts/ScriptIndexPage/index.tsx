@@ -193,7 +193,7 @@ const ScriptIndex: React.FC = () => {
         <Grid item className={classes.grow}>
           <SearchBar
             value={""}
-            placeholder="Search..."
+            placeholder="Search by matric number, name or email"
             onChange={str => setSearchText(str)}
           />
         </Grid>
