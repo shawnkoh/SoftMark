@@ -17,6 +17,7 @@ export interface PaperUserPostData {
   role: PaperUserRole;
   name?: string;
   matriculationNumber?: string;
+  scriptFilename?: string;
 }
 
 export interface NominalRollPostData {
@@ -41,6 +42,7 @@ export interface StudentListData extends DiscardableData {
   user: UserData; // intentionally nested
   role: PaperUserRole;
   matriculationNumber: string | null;
+  scriptFilename: string | null;
 }
 
 export interface InviteData {

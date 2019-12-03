@@ -42,7 +42,8 @@ export class PaperUser extends Discardable {
     user: User | number,
     role: PaperUserRole,
     acceptedInvite: boolean = false,
-    matriculationNumber?: string | null
+    matriculationNumber?: string | null,
+    scriptFilename?: string | null
   ) {
     super();
     if (typeof paper === "number") {
@@ -60,6 +61,7 @@ export class PaperUser extends Discardable {
     this.matriculationNumber = matriculationNumber
       ? matriculationNumber.toUpperCase()
       : null;
+    this.scriptFilename = scriptFilename || null;
   }
 
   @Column()
@@ -86,6 +88,11 @@ export class PaperUser extends Discardable {
   @IsOptional()
   @IsString()
   matriculationNumber: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  @IsOptional()
+  @IsString()
+  scriptFilename: string | null;
 
   @Column()
   @IsBoolean()
@@ -155,6 +162,7 @@ export class PaperUser extends Discardable {
       ? this.user.getData()
       : (await getRepository(User).findOneOrFail(this.userId)).getData(),
     role: this.role,
-    matriculationNumber: this.matriculationNumber
+    matriculationNumber: this.matriculationNumber,
+    scriptFilename: this.scriptFilename
   });
 }

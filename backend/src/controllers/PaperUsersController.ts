@@ -42,6 +42,7 @@ export async function create(request: Request, response: Response) {
       email,
       role,
       matriculationNumber,
+      scriptFilename,
       name
     } = request.body as PaperUserPostData;
 
@@ -64,6 +65,7 @@ export async function create(request: Request, response: Response) {
     }
 
     paperUser.matriculationNumber = matriculationNumber || null;
+    paperUser.scriptFilename = scriptFilename || null;
     paperUser.discardedAt = null;
     paperUser.acceptedInvite = false;
     const errors = await validate(paperUser);
@@ -210,9 +212,12 @@ export async function update(request: Request, response: Response) {
     return;
   }
 
-  Object.assign(paperUser, pick(request.body, "role", "matriculationNumber"));
+  Object.assign(paperUser, pick(request.body, "role", "matriculationNumber", "scriptFilename"));
   if (paperUser.matriculationNumber) {
     paperUser.matriculationNumber = paperUser.matriculationNumber.toUpperCase();
+  }
+  if (paperUser.scriptFilename) {
+    paperUser.scriptFilename = paperUser.scriptFilename.toUpperCase();
   }
   const errors = await validate(paperUser);
   if (errors.length > 0) {
@@ -485,10 +490,11 @@ export async function createMultipleStudents(
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const cells = row.split("\r")[0].split(",");
-      if (cells.length >= 3) {
+      if (cells.length >= 4) {
         const matriculationNumber = cells[0];
         const name = cells[1];
         const email = cells[2];
+        const scriptFilename = cells[3];
         const role = PaperUserRole.Student;
         const studentDetails = matriculationNumber + " " + name + " " + email;
 
@@ -507,9 +513,10 @@ export async function createMultipleStudents(
               discardedAt: Not(IsNull())
             },
             { relations: ["user", "paper"] }
-          )) || new PaperUser(paper, user, role, false, matriculationNumber);
+          )) || new PaperUser(paper, user, role, false, matriculationNumber, scriptFilename);
 
         paperUser.matriculationNumber = matriculationNumber || null;
+        paperUser.scriptFilename = scriptFilename || null;
         paperUser.discardedAt = null;
         paperUser.acceptedInvite = false;
         const paperUserErrors = await validate(paperUser);
@@ -538,8 +545,8 @@ export async function createMultipleStudents(
     }
 
     return response.status(200).json({
-      successfullyAdded: successfullyAdded ? successfullyAdded : "None",
-      failedToBeAdded: failedToBeAdded ? failedToBeAdded : "None"
+      successfullyAdded: successfullyAdded || "None",
+      failedToBeAdded: failedToBeAdded || "None"
     });
   } catch (error) {
     return response.sendStatus(400);
