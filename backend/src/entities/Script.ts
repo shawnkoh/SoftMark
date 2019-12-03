@@ -134,3 +134,5 @@ export class Script extends Discardable {
     return results[0];
   };
 }
+
+export default Script;

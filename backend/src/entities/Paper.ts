@@ -42,3 +42,5 @@ export class Paper extends Discardable {
     role
   });
 }
+
+export default Paper;
