@@ -168,21 +168,21 @@ export async function publish(request: Request, response: Response) {
     return;
   }
 
-  const unpublishedScriptsQuery = createQueryBuilder()
+  const matchedScriptsQuery = createQueryBuilder()
     .select("script.id", "id")
     .from(Script, "script")
+    .innerJoin("script.student", "student", "student.discardedAt IS NULL")
+    .innerJoin("student.user", "user", "user.discardedAt IS NULL")
     .where("script.paperId = :paperId", { paperId })
     .andWhere("script.discardedAt IS NULL")
-    .andWhere("script.publishedDate IS NULL")
-    .innerJoin("script.student", "student", "student.discardedAt IS NULL")
-    .innerJoin("student.user", "user", "user.discardedAt IS NULL");
+    .andWhere("script.publishedDate IS NULL");
 
-  const incompleteScriptsQuery = createQueryBuilder()
+  const unmarkedScriptsQuery = createQueryBuilder()
     .select("script.id", "id")
     .from(Script, "script")
-    .where(`script.id IN (${unpublishedScriptsQuery.getQuery()})`)
     .innerJoin("script.questions", "question", "question.discardedAt IS NULL")
     .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+    .where(`script.id IN (${matchedScriptsQuery.getQuery()})`)
     .andWhere("mark IS NULL");
 
   const scripts: {
@@ -190,19 +190,20 @@ export async function publish(request: Request, response: Response) {
     studentId: number;
     email: string;
     userName: string;
-  }[] = await unpublishedScriptsQuery
-    .andWhere(`script.id NOT IN (${incompleteScriptsQuery.getQuery()})`)
+  }[] = await matchedScriptsQuery
     .addSelect("student.id", "studentId")
     .addSelect("user.email", "email")
     .addSelect("user.name", "name")
+    .andWhere(`script.id NOT IN (${unmarkedScriptsQuery.getQuery()})`)
     .getRawMany();
 
+  const publishedDate = new Date();
+
   if (scripts.length === 0) {
-    response.sendStatus(400);
+    await getRepository(Paper).update(paper.id, { publishedDate });
+    response.sendStatus(204);
     return;
   }
-
-  const publishedDate = new Date();
 
   getConnection().transaction(async manager => {
     await manager.getRepository(Paper).update(paper.id, { publishedDate });
