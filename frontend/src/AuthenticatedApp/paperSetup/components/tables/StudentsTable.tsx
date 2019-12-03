@@ -45,10 +45,6 @@ const StudentsTable: React.FC = () => {
       key: "email"
     },
     {
-      name: "Script filename",
-      key: "scriptFilename"
-    },
-    {
       name: "Matching script?",
       key: "hasMatchingScript"
     },

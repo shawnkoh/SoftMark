@@ -21,7 +21,7 @@ type Props = OwnProps;
 const EditStudentModal: React.FC<Props> = props => {
   const { matchScriptsToStudents } = useScriptsAndStudents();
   const { student, callbackStudentData, render } = props;
-  const { matriculationNumber, user, scriptFilename } = student;
+  const { matriculationNumber, user } = student;
   const { name, email } = user;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
@@ -29,8 +29,7 @@ const EditStudentModal: React.FC<Props> = props => {
   const values = {
     name,
     email,
-    matriculationNumber,
-    scriptFilename
+    matriculationNumber
   };
 
   const formMetadata: FormMetadataType<any> = {
@@ -42,14 +41,7 @@ const EditStudentModal: React.FC<Props> = props => {
       sm: 12
     },
     name: { label: "Name", required: true, options: null, xs: 12, sm: 12 },
-    email: { label: "Email", required: true, options: null, xs: 12, sm: 12 },
-    scriptFilename: {
-      label: "Script filename",
-      required: true,
-      options: null,
-      xs: 12,
-      sm: 12
-    }
+    email: { label: "Email", required: true, options: null, xs: 12, sm: 12 }
   };
   const validationSchema = Yup.object({
     matriculationNumber: Yup.string().required(
@@ -58,8 +50,7 @@ const EditStudentModal: React.FC<Props> = props => {
     name: Yup.string().required("Name is required"),
     email: Yup.string()
       .email("Enter a valid email")
-      .required("Email is required"),
-    scriptFilename: Yup.string().required("Name is required")
+      .required("Email is required")
   });
 
   return (
