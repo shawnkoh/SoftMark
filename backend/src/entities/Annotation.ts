@@ -1,10 +1,6 @@
 import { IsNotEmpty } from "class-validator";
-import { Column, Entity, getRepository, ManyToOne } from "typeorm";
-import {
-  AnnotationData,
-  AnnotationLine,
-  AnnotationListData
-} from "../types/annotations";
+import { Column, Entity, ManyToOne } from "typeorm";
+import { AnnotationData, AnnotationLine } from "../types/annotations";
 import { Base } from "./Base";
 import { Page } from "./Page";
 import { PaperUser } from "./PaperUser";
@@ -44,26 +40,12 @@ export class Annotation extends Base {
   @IsNotEmpty()
   layer: AnnotationLine[];
 
-  getListData = (): AnnotationListData => {
+  getData = (): AnnotationData => {
     return {
       ...this.getBase(),
       pageId: this.pageId,
       paperUserId: this.paperUserId,
       layer: this.layer
-    };
-  };
-
-  getData = async (): Promise<AnnotationData> => {
-    const page =
-      this.page || (await getRepository(Page).findOneOrFail(this.pageId));
-    const paperUser =
-      this.paperUser ||
-      (await getRepository(PaperUser).findOneOrFail(this.paperUserId));
-
-    return {
-      ...this.getListData(),
-      page: await page.getListData(),
-      paperUser: await paperUser.getListData()
     };
   };
 }

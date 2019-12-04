@@ -1,6 +1,4 @@
 import { BaseData, isBaseData } from "./entities";
-import { isPageListData, PageListData } from "./pages";
-import { isPaperUserListData, PaperUserListData } from "./paperUsers";
 
 export interface AnnotationLine {
   points: number[];
@@ -19,15 +17,10 @@ export interface AnnotationPatchData {
   layer: AnnotationLine[];
 }
 
-export interface AnnotationListData extends BaseData {
+export interface AnnotationData extends BaseData {
   pageId: number;
   paperUserId: number;
   layer: AnnotationLine[];
-}
-
-export interface AnnotationData extends AnnotationListData {
-  page: PageListData;
-  paperUser: PaperUserListData;
 }
 
 export function isValidLayer(layer: AnnotationLine[]) {
@@ -38,19 +31,11 @@ export function isAnnotationPostData(data: any): data is AnnotationPostData {
   return isValidLayer(data.layer);
 }
 
-export function isAnnotationListData(data: any): data is AnnotationListData {
+export function isAnnotationData(data: any): data is AnnotationData {
   return (
     typeof data.pageId === "number" &&
     typeof data.paperUserId === "number" &&
     isValidLayer(data.layer) &&
     isBaseData(data)
-  );
-}
-
-export function isAnnotationData(data: any): data is AnnotationData {
-  return (
-    isPageListData(data.page) &&
-    isPaperUserListData(data.paperUser) &&
-    isAnnotationListData(data)
   );
 }
