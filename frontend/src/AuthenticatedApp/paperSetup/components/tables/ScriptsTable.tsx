@@ -163,7 +163,7 @@ const ScriptsTable: React.FC = () => {
               <ScriptsTableRow
                 key={script.id}
                 scriptTemplatePagesCount={
-                  scriptTemplate ? scriptTemplate.pageTemplates.length : -1
+                  scriptTemplate ? scriptTemplate.pageCount : -1
                 }
                 script={script}
               />

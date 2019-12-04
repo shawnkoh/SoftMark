@@ -1,15 +1,14 @@
-import { IsNotEmpty, IsString, Validate } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import {
   Column,
   Entity,
   getRepository,
+  IsNull,
   ManyToOne,
   OneToMany,
   Unique
 } from "typeorm";
-import IsUniqueSha256 from "../constraints/IsUniqueSha256";
 import { ScriptTemplateData } from "../types/scriptTemplates";
-import { sortByPageNo } from "../utils/sorts";
 import { Discardable } from "./Discardable";
 import { PageTemplate } from "./PageTemplate";
 import { Paper } from "./Paper";
@@ -63,24 +62,16 @@ export class ScriptTemplate extends Discardable {
       .filter(score => score)
       .reduce((a: number, b: number | null) => (b ? a + b : a), 0);
 
-    const pageTemplates = (
-      this.pageTemplates ||
-      (await getRepository(PageTemplate).find({
-        where: { scriptTemplate: this },
-        order: { pageNo: "ASC" }
-      }))
-    ).sort(sortByPageNo);
+    const pageCount = await getRepository(PageTemplate).count({
+      where: { scriptTemplateId: this.id, discardedAt: IsNull() }
+    });
 
     return {
       ...this.getBase(),
       totalMarks,
-      pageTemplates: pageTemplates.map(pageTemplate =>
-        pageTemplate.getListData()
-      ),
-      questionTemplates: await Promise.all(
-        questionTemplates.map(async questionTemplate =>
-          questionTemplate.getData()
-        )
+      pageCount,
+      questionTemplates: questionTemplates.map(questionTemplate =>
+        questionTemplate.getData()
       )
     };
   };
