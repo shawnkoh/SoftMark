@@ -1,7 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getRepository, IsNull } from "typeorm";
+import { createQueryBuilder, getRepository, IsNull } from "typeorm";
 import { Annotation } from "../entities/Annotation";
 import { Page } from "../entities/Page";
 import { AnnotationPatchData, AnnotationPostData } from "../types/annotations";
@@ -12,19 +12,23 @@ import { allowedRequester } from "../utils/papers";
 export async function replace(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const requesterUserId = payload.userId;
-  const pageId = request.params.id;
+  const pageId = Number(request.params.id);
   const postData: AnnotationPostData = pick(request.body, "layer");
-  const page = await getRepository(Page).findOne(pageId, {
-    where: { discardedAt: IsNull() },
-    relations: ["script"]
-  });
+  const page: { paperId: number } = await createQueryBuilder()
+    .select("script.paperId", "paperId")
+    .from(Page, "page")
+    .innerJoin("page.script", "script", "script.discardedAt IS NULL")
+    .where("page.id = :pageId", { pageId })
+    .andWhere("page.discardedAt IS NULL")
+    .getRawOne();
+
   if (!page) {
     response.sendStatus(404);
     return;
   }
   const allowed = await allowedRequester(
     requesterUserId,
-    page.script!.paperId,
+    page.paperId,
     PaperUserRole.Marker
   );
   if (!allowed) {
@@ -34,10 +38,10 @@ export async function replace(request: Request, response: Response) {
   const { requester } = allowed;
 
   let annotation = await getRepository(Annotation).findOne({
-    page,
-    paperUser: requester
+    pageId,
+    paperUserId: requester.id
   });
-  annotation = annotation || new Annotation(page, requester, postData.layer);
+  annotation = annotation || new Annotation(pageId, requester, postData.layer);
   annotation.layer = postData.layer;
   const errors = await validate(annotation);
   if (errors.length > 0) {
