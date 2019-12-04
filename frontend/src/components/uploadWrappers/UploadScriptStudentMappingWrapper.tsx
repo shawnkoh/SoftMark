@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import api from "../../api";
-import { DropAreaBase } from "material-ui-file-dropzone";
-import { Dialog, DialogContent, DialogContentText } from "@material-ui/core";
-import { ScriptStudentMappingPatchData } from "backend/src/types/paperUsers";
-import { toast } from "react-toastify";
-import usePaper from "contexts/PaperContext";
-import { DialogTitle } from "@material-ui/core";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from "@material-ui/core";
+import { ScriptMappingData } from "backend/src/types/paperUsers";
 import LoadingSpinner from "components/LoadingSpinner";
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import { DropAreaBase } from "material-ui-file-dropzone";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../../api";
 
 const NONE = "None";
 
@@ -78,11 +82,11 @@ const UploadScriptStudentMappingWrapper: React.FC<Props> = props => {
           const file = files[key];
           const reader = new FileReader();
           reader.onloadend = async (e: any) => {
-            const scriptStudentMappingPatchData: ScriptStudentMappingPatchData = {
+            const scriptMappingData: ScriptMappingData = {
               csvFile: e.target.result
             };
             api.scripts
-              .matchScriptsToStudents(paper.id, scriptStudentMappingPatchData)
+              .matchScriptsToStudents(paper.id, scriptMappingData)
               .then(resp => {
                 setStudentsFailedToBeMatched(resp.data.failedToBeMatched);
                 setStudentsMatched(resp.data.successfullyMatched);

@@ -23,7 +23,7 @@ export interface NominalRollPostData {
   csvFile: string;
 }
 
-export interface ScriptStudentMappingPatchData {
+export interface ScriptMappingData {
   csvFile: string;
 }
 

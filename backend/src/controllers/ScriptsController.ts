@@ -8,10 +8,7 @@ import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
-import {
-  PaperUserRole,
-  ScriptStudentMappingPatchData
-} from "../types/paperUsers";
+import { PaperUserRole, ScriptMappingData } from "../types/paperUsers";
 import { ScriptData, ScriptPatchData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
@@ -234,7 +231,7 @@ export async function match(request: Request, response: Response) {
     scriptsMap.set(script.filename.toLocaleUpperCase(), script);
   }
 
-  const { csvFile } = request.body as ScriptStudentMappingPatchData;
+  const { csvFile } = request.body as ScriptMappingData;
   let successfullyMatched = "";
   let failedToBeMatched = "";
   const rows: string[] = csvFile.split("\n");

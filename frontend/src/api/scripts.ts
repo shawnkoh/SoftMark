@@ -1,11 +1,11 @@
 import { AxiosResponse } from "axios";
+import { ScriptMappingData } from "backend/src/types/paperUsers";
 import {
   ScriptData,
   ScriptListData,
   ScriptPatchData,
   ScriptPostData
 } from "backend/src/types/scripts";
-import { ScriptStudentMappingPatchData } from "backend/src/types/paperUsers";
 import { ScriptMarkingData, ScriptViewData } from "backend/src/types/view";
 import { sha256 } from "js-sha256";
 import PDFJS from "pdfjs-dist/webpack";
@@ -25,15 +25,13 @@ export async function createScript(
 
 export async function matchScriptsToStudents(
   id: number,
-  scriptStudentMappingPatchData: ScriptStudentMappingPatchData
+  scriptMappingData: ScriptMappingData
 ): Promise<
   AxiosResponse<{ successfullyMatched: string; failedToBeMatched: string }>
 > {
-  return client.patch(
-    `/papers/${id}/scripts/match`,
-    scriptStudentMappingPatchData,
-    { timeout: 120000 }
-  );
+  return client.patch(`/papers/${id}/scripts/match`, scriptMappingData, {
+    timeout: 120000
+  });
 }
 
 export async function getScript(
