@@ -13,9 +13,17 @@ import { PaperUser } from "./PaperUser";
 export class Annotation extends Base {
   entityName = "Annotation";
 
-  constructor(page: Page, paperUser: PaperUser, layer: AnnotationLine[]) {
+  constructor(
+    page: number | Page,
+    paperUser: PaperUser,
+    layer: AnnotationLine[]
+  ) {
     super();
-    this.page = page;
+    if (typeof page === "number") {
+      this.pageId = page;
+    } else {
+      this.page = page;
+    }
     this.paperUser = paperUser;
     this.layer = layer;
   }
