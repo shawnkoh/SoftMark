@@ -1,10 +1,19 @@
-import { AppBar, Avatar, Chip, Toolbar, Typography } from "@material-ui/core";
+import {
+  AppBar,
+  Avatar,
+  Chip,
+  Toolbar,
+  Typography,
+  FormControlLabel,
+  Switch
+} from "@material-ui/core";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import {
   PageViewData,
   QuestionTemplateViewData,
   QuestionViewData
 } from "backend/src/types/view";
+import { MarkData } from "backend/src/types/marks";
 import clsx from "clsx";
 import LoadingSpinner from "components/LoadingSpinner";
 import produce from "immer";
@@ -33,6 +42,12 @@ const Annotator: React.FC<Props> = ({
   matriculationNumber
 }: Props) => {
   const classes = useStyles();
+
+  const [showMarkingChipsOnPage, setShowMarkingChipsOnPage] = useState<boolean>(
+    true
+  );
+  const toggleShowMarkingChipsOnPage = () =>
+    setShowMarkingChipsOnPage(prev => !prev);
 
   interface QuestionState {
     isVisible: boolean;
@@ -99,11 +114,12 @@ const Annotator: React.FC<Props> = ({
     setAnchorEl(null);
   };
 
-  const handleModalSave = (index: number, score: number) => {
+  const handleModalSave = (index: number, score: number | null, markId: number | null) => {
     setQuestionStates(
       produce(questionStates, draftState => {
         draftState[index].isVisible = false;
         draftState[index].question.score = score;
+        draftState[index].question.markId = markId;
       })
     );
     setAnchorEl(null);
@@ -143,7 +159,7 @@ const Annotator: React.FC<Props> = ({
           question={questionState.question}
           isVisible={questionState.isVisible}
           onCancel={() => handleModalCancel(index)}
-          onSave={score => handleModalSave(index, score)}
+          onSave={(score, markId) => handleModalSave(index, score, markId)}
         />
       ))}
       <CanvasWithToolbar
@@ -154,33 +170,36 @@ const Annotator: React.FC<Props> = ({
         onForegroundAnnotationChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
       />
-      {questionStates.map((questionState: QuestionState, index: number) => (
-        <ReversedChip
-          key={index}
-          onClick={event => handleChipClick(event, index)}
-          label={"Q" + questionState.question.name}
-          avatar={
-            <Avatar>{`${
-              questionState.question.score === null
-                ? "-"
-                : questionState.question.score
-            } / ${questionState.question.maxScore || "-"}`}</Avatar>
-          }
-          color={questionState.question.score === null ? "default" : "primary"}
-          style={{
-            position: "absolute",
-            left: questionState.question.leftOffset * scale + position.x,
-            top: questionState.question.topOffset * scale + position.y
-          }}
-        />
-      ))}
+      {showMarkingChipsOnPage &&
+        questionStates.map((questionState: QuestionState, index: number) => (
+          <ReversedChip
+            key={index}
+            onClick={event => handleChipClick(event, index)}
+            label={"Q" + questionState.question.name}
+            avatar={
+              <Avatar>{`${
+                questionState.question.score === null
+                  ? "-"
+                  : questionState.question.score
+              } / ${questionState.question.maxScore || "-"}`}</Avatar>
+            }
+            color={
+              questionState.question.score === null ? "default" : "primary"
+            }
+            style={{
+              position: "absolute",
+              left: questionState.question.leftOffset * scale + position.x,
+              top: questionState.question.topOffset * scale + position.y
+            }}
+          />
+        ))}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
           <Typography
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
-            {matriculationNumber} page {page.pageNo}
+            Page {page.pageNo}
           </Typography>
           <Chip
             label={"Q" + rootQuestionTemplate.name}
@@ -205,6 +224,16 @@ const Annotator: React.FC<Props> = ({
               className={classes.questionBarItem}
             />
           ))}
+          <FormControlLabel
+            control={
+              <Switch
+                color="primary"
+                checked={showMarkingChipsOnPage}
+                onChange={toggleShowMarkingChipsOnPage}
+              />
+            }
+            label="Show on page"
+          />
         </Toolbar>
       </AppBar>
     </div>

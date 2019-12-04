@@ -1,7 +1,6 @@
+import ScriptMarkSubpage from "./ScriptMarkSubpage";
 import ScriptsPage from "./ScriptsPage";
 import ScriptViewSubpage from "./ScriptViewSubpage";
-import ScriptEditSubpage from "./ScriptEditSubpage";
-import ScriptMarkSubpage from "./ScriptMarkSubpage";
 
-export { ScriptMarkSubpage, ScriptEditSubpage, ScriptViewSubpage };
+export { ScriptMarkSubpage, ScriptViewSubpage };
 export default ScriptsPage;

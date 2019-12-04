@@ -170,6 +170,7 @@ export async function update(request: Request, response: Response) {
     "leftOffset",
     "name",
     "pageCovered",
+    "displayPage",
     "parentQuestionTemplateId",
     "score",
     "topOffset"
@@ -179,6 +180,7 @@ export async function update(request: Request, response: Response) {
     leftOffset,
     name,
     pageCovered,
+    displayPage,
     parentQuestionTemplateId,
     score,
     topOffset
@@ -219,6 +221,7 @@ export async function update(request: Request, response: Response) {
     if (topOffset) questionTemplate.topOffset = topOffset;
     if (leftOffset) questionTemplate.leftOffset = leftOffset;
     if (score) questionTemplate.score = score;
+    if (displayPage) questionTemplate.displayPage = displayPage;
     if (parentQuestionTemplate)
       questionTemplate.parentQuestionTemplate = parentQuestionTemplate;
     if (questionTemplate.scriptTemplate && pageCovered) {

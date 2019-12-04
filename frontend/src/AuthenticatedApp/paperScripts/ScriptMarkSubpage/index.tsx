@@ -2,7 +2,6 @@ import {
   AppBar,
   Button,
   Container,
-  Grid,
   IconButton,
   Toolbar,
   Typography,
@@ -108,15 +107,9 @@ const ScriptMarkPage: React.FC = () => {
             {props.subtitle}
           </Typography>
           {scriptMarkingData && (
-            <>
-              <Typography variant="subtitle1" className={classes.text}>
-                {scriptMarkingData.matriculationNumber ||
-                  scriptMarkingData.filename}
-              </Typography>
-              <Typography variant="subtitle1" className={classes.text}>
-                ID: {scriptMarkingData.id}
-              </Typography>
-            </>
+            <Typography variant="subtitle1" className={classes.text}>
+              Script #{scriptMarkingData.id}
+            </Typography>
           )}
           <Hidden lgUp>
             <IconButton
@@ -185,8 +178,7 @@ const ScriptMarkPage: React.FC = () => {
       rootQuestionTemplate,
       questions,
       pages,
-      canMark,
-      filename
+      canMark
     } = scriptMarkingData;
 
     if (!canMark) {

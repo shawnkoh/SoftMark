@@ -39,7 +39,7 @@ export const postgres: ConnectionOptions = {
   port: Number(POSTGRES_PORT),
   database: POSTGRES_NAME,
   ssl: POSTGRES_DISABLE_SSL ? false : true,
-  synchronize: false,
+  synchronize: process.env.NODE_ENV !== "production",
   logging: false,
   entities: [`${__dirname}/src/entities/**/*.js`, "src/entities/**/*.ts"],
   migrations: [`${__dirname}/src/migrations/**/*.js`, "src/migrations/**/*.ts"],

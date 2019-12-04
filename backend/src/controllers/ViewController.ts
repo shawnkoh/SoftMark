@@ -27,10 +27,12 @@ function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
   return queryBuilder
     .select("question.id", "id")
     .addSelect("questionTemplate.name", "name")
+    .addSelect("mark.id", "markId")
     .addSelect("mark.score", "score")
     .addSelect("questionTemplate.score", "maxScore")
     .addSelect("questionTemplate.topOffset", "topOffset")
     .addSelect("questionTemplate.leftOffset", "leftOffset")
+    .addSelect("questionTemplate.displayPage", "displayPage")
     .orderBy("questionTemplate.displayPage", "ASC")
     .addOrderBy("questionTemplate.topOffset", "ASC")
     .addOrderBy("questionTemplate.leftOffset", "ASC");

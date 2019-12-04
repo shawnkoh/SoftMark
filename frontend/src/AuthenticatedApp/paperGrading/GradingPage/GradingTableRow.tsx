@@ -27,21 +27,19 @@ const GradingTableRow: React.FC<Props> = props => {
       <TableCell>
         {markers.map(marker => {
           return (
-            <>
+            <div key={marker.id}>
               {marker.name || `Pending <${marker.email}>`}
               <br />
-            </>
+            </div>
           );
         })}
       </TableCell>
       <TableCell>
         <Grid container alignItems="center" spacing={2}>
           <Grid item xs={12} sm={6}>
-            {`${markCount}/${questionCount} (${(
-              markCount / questionCount
-            ).toLocaleString(undefined, {
-              style: "percent"
-            })}) of questions marked`}
+            {`${markCount}/${questionCount} (${Math.floor(
+              (markCount / questionCount) * 100
+            )}%) of questions marked`}
           </Grid>
           <Grid item xs={12} sm={6}>
             <BorderLinearProgress

@@ -61,13 +61,11 @@ const PageTemplateView: React.FC<{
             onLoad={() => setImgLoaded(true)}
           />
 
-          {Object.keys(leafQuestions).map(key =>
-            leafQuestions[key].displayPage === currentPageNo ? (
+          {Object.keys(leafQuestions)
+            .filter(key => leafQuestions[key].displayPage === currentPageNo)
+            .map(key => (
               <ScriptTemplateQuestion key={key} id={+key} imgScale={imgScale} />
-            ) : (
-              <></>
-            )
-          )}
+            ))}
         </div>
         <IconButton
           onClick={() => goPage(currentPageNo + 1)}

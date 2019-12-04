@@ -28,6 +28,7 @@ import HelpIcon from "@material-ui/icons/Help";
 
 import CanvasContainer from "./CanvasContainer";
 import HelpModal from "./CanvasWithToolbarHelpModal";
+import LoadingSpinner from "components/LoadingSpinner";
 
 type DrilledProps = Partial<
   Pick<
@@ -43,6 +44,7 @@ type DrilledProps = Partial<
 type OwnProps = {
   transparentToolbar?: boolean;
   drawable?: boolean;
+  isLoading?: boolean;
 };
 
 type Props = DrilledProps & OwnProps;
@@ -72,7 +74,8 @@ const CanvasWithToolbar: React.FC<Props> = ({
   onForegroundAnnotationChange = annotation => {},
   onViewChange = (position, scale) => {},
   transparentToolbar = false,
-  drawable = false
+  drawable = false,
+  isLoading = false
 }: Props) => {
   const classes = useStyles({});
 
@@ -89,6 +92,10 @@ const CanvasWithToolbar: React.FC<Props> = ({
     if (!isEqual(foregroundAnnotation, thisForegroundAnnotation))
       onForegroundAnnotationChange(thisForegroundAnnotation);
   }, [thisForegroundAnnotation]);
+
+  useEffect(() => {
+    setThisForegroundAnnotation(foregroundAnnotation);
+  }, [foregroundAnnotation]);
 
   const defaultPosition = { x: 0, y: 64 };
   const [position, setPosition] = useState<Point>(defaultPosition);
@@ -255,18 +262,22 @@ const CanvasWithToolbar: React.FC<Props> = ({
           />
         </Toolbar>
       </AppBar>
-      <CanvasContainer
-        backgroundImageSource={backgroundImageSource}
-        backgroundAnnotations={backgroundAnnotations}
-        foregroundAnnotation={thisForegroundAnnotation}
-        onForegroundAnnotationChange={handleForegroundAnnotationChange}
-        onViewChange={handleViewChange}
-        mode={canvasMode}
-        penColor={penColor}
-        penWidth={penWidth}
-        position={position}
-        scale={scale}
-      />
+      {isLoading ? (
+        <LoadingSpinner loadingMessage="Loading page"/>
+      ) : (
+        <CanvasContainer
+          backgroundImageSource={backgroundImageSource}
+          backgroundAnnotations={backgroundAnnotations}
+          foregroundAnnotation={thisForegroundAnnotation}
+          onForegroundAnnotationChange={handleForegroundAnnotationChange}
+          onViewChange={handleViewChange}
+          mode={canvasMode}
+          penColor={penColor}
+          penWidth={penWidth}
+          position={position}
+          scale={scale}
+        />
+      )}
     </div>
   );
 };

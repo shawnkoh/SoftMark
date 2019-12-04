@@ -1,6 +1,6 @@
-import { DialogContent, Slider, Popover } from "@material-ui/core";
+import { Button, DialogContent, Popover, Slider } from "@material-ui/core";
 import { QuestionViewData } from "backend/src/types/view";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import useStyles from "./styles";
@@ -9,7 +9,7 @@ interface OwnProps {
   anchorEl: HTMLDivElement | null;
   isVisible: boolean;
   question: QuestionViewData;
-  onSave: (score: number) => void;
+  onSave: (score: number | null, markId: number | null) => void;
   onCancel: () => void;
 }
 
@@ -24,10 +24,15 @@ const MarkQuestionModal: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const { id, name, score, maxScore, topOffset, leftOffset } = question;
+  const { id, markId, score, maxScore } = question;
 
   const [localScore, setLocalScore] = useState<number>(score || 0);
-  const handleLocalScoreChange = (event: any, newValue: number | number[]) => {
+
+  useEffect(() => {
+    setLocalScore(score || 0);
+  }, [id, score]);
+
+  const handleLocalScoreChange = (newValue: number | number[]) => {
     setLocalScore(newValue as number);
   };
 
@@ -35,23 +40,38 @@ const MarkQuestionModal: React.FC<Props> = ({
     return await api.marks
       .replaceMark(questionId, { score })
       .then(res => {
-        const newScore = res.data.mark.score;
-        return newScore;
+        if (res.data.mark)
+          return { score: res.data.mark.score, markId: res.data.mark.id};
+        return { score: score, markId: null };
       })
       .catch(() => {
         toast.error("An error was made when saving. Try refreshing the page.");
-        return score;
+        return { score: score, markId: null };
       });
   };
 
-  const handleCancel = event => {
+  const deleteMarkData = async (markId: number) => {
+    return await api.marks.discardMark(markId).catch(() => {
+      toast.error(
+        "An error was made when discarding. Try refreshing the page."
+      );
+    });
+  };
+
+  const handleCancel = () => {
     setLocalScore(score || 0);
     onCancel();
   };
 
-  const handleSave = async event => {
-    const newScore = await putMarkData(id, localScore);
-    onSave(newScore);
+  const handleSave = async () => {
+    const newMark = await putMarkData(id, localScore);
+    onSave(newMark.score, newMark.markId);
+  };
+
+  const handleUnmark = async () => {
+    markId && await deleteMarkData(markId);
+    onSave(null, null);
+    handleLocalScoreChange(0);
   };
 
   return (
@@ -72,7 +92,7 @@ const MarkQuestionModal: React.FC<Props> = ({
         <div className={classes.slider}>
           <Slider
             value={localScore}
-            onChange={handleLocalScoreChange}
+            onChange={(e, v) => {handleLocalScoreChange(v);}}
             onChangeCommitted={handleSave}
             step={0.5}
             marks={[
@@ -90,6 +110,11 @@ const MarkQuestionModal: React.FC<Props> = ({
             valueLabelDisplay="on"
           />
         </div>
+        {markId !== null && (
+          <Button onClick={handleUnmark} fullWidth>
+            Unmark
+          </Button>
+        )}
       </DialogContent>
     </Popover>
   );
