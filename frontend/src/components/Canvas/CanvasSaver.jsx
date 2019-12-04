@@ -49,7 +49,7 @@ class CanvasSaver extends React.Component {
         {this.props.questions.map((question, index) => (
           <Layer key={index + " " + question.id}>
             <Text fontSize={30} 
-              text={`Marks: ${question.awardedMarks} / ${question.totalMarks}`} 
+              text={`${question.awardedMarks} / ${question.totalMarks}`} 
               wrap="char"
               x={question.leftOffset}
               y={question.topOffset}
