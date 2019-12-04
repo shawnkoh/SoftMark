@@ -141,7 +141,7 @@ export async function update(request: Request, response: Response) {
 
   const patchData: QueryDeepPartialEntity<Script> = {
     filename: filename ? filename.toUpperCase() : script.filename,
-    hasVerifiedStudent: hasVerifiedStudent || script.hasVerifiedStudent
+    hasVerifiedStudent: hasVerifiedStudent
   };
 
   if (studentId && studentId !== script.studentId) {
