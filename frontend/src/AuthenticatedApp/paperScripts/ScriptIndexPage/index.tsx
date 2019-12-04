@@ -12,20 +12,22 @@ import {
 } from "@material-ui/core";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
+import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
 import SearchBar from "../../../components/fields/SearchBar";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
+import useScriptsAndStudents from "../../../contexts/ScriptsAndStudentsContext";
+import useScriptTemplate from "../../../contexts/ScriptTemplateContext";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
-import { QuestionTemplate } from "./types";
 
 const ASC = "asc";
 const DESC = "desc";
@@ -37,8 +39,6 @@ const SCORE = "score";
 const getTableComparator = (order: string, orderBy: string) => {
   return (a: ScriptListData, b: ScriptListData) => {
     let res = 0;
-    const studentA = a.student;
-    const studentB = b.student;
 
     if (orderBy === ID) {
       res = a.id - b.id;
@@ -47,17 +47,11 @@ const getTableComparator = (order: string, orderBy: string) => {
       const filenameB = b.filename.toLowerCase();
       res = filenameA.localeCompare(filenameB);
     } else if (orderBy === MATRIC) {
-      const matriculationNumberA = (studentA && studentA.matriculationNumber
-        ? studentA.matriculationNumber
-        : ""
-      ).toLowerCase();
-      const matriculationNumberB = (studentB && studentB.matriculationNumber
-        ? studentB.matriculationNumber
-        : ""
-      ).toLowerCase();
+      const matriculationNumberA = (a.matriculationNumber || "").toLowerCase();
+      const matriculationNumberB = (b.matriculationNumber || "").toLowerCase();
       res = matriculationNumberA.localeCompare(matriculationNumberB);
     } else if (orderBy === SCORE) {
-      res = a.awardedMarks - b.awardedMarks;
+      res = a.totalScore - b.totalScore;
     }
     if (order === ASC) {
       res *= -1;
@@ -66,36 +60,69 @@ const getTableComparator = (order: string, orderBy: string) => {
   };
 };
 
-const ScriptsSubpage: React.FC = () => {
+const columns: TableColumn[] = [
+  { name: "ID", key: ID, isSortable: true },
+  {
+    name: "Filename",
+    key: SCRIPT,
+    isSortable: true
+  },
+  {
+    name: "Matriculation Number",
+    key: MATRIC,
+    isSortable: true
+  },
+  {
+    name: "Name / Email",
+    key: "name"
+  },
+  {
+    name: "Total Score",
+    key: SCORE,
+    isSortable: true
+  },
+  {
+    name: "Published",
+    key: "published"
+  },
+  {
+    name: "",
+    key: ""
+  }
+];
+
+const ScriptIndex: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const paper = usePaper();
-  const scriptsAndStudents = useScriptsAndStudents();
-  const { refreshScripts } = scriptsAndStudents;
-
-  useEffect(refreshScripts, []);
+  const {
+    isLoadingScriptTemplate,
+    scriptTemplate,
+    refreshScriptTemplate
+  } = useScriptTemplate();
+  const { isLoadingScripts, scripts, refreshScripts } = useScriptsAndStudents();
+  const isLoading = isLoadingScriptTemplate || isLoadingScripts;
 
   const [order, setOrder] = React.useState(DESC);
   const [orderBy, setOrderBy] = React.useState(ID);
-  const [scripts, setScripts] = useState<ScriptListData[]>(
-    scriptsAndStudents.scripts.sort(getTableComparator(order, orderBy))
+  const [searchText, setSearchText] = useState("");
+  const [sortedScripts, setSortedScripts] = useState<ScriptListData[]>(
+    scripts.sort(getTableComparator(order, orderBy))
   );
-
   const [questionTemplates, setQuestionTemplates] = useState<
-    QuestionTemplate[]
+    QuestionTemplateData[]
   >([]);
 
-  const mapQuestionTemplateIds = async (questionTemplateIds: number[]) => {
-    return Promise.all(
-      questionTemplateIds.map(async questionTemplateId => {
-        const response = await api.questionTemplates.getQuestionTemplate(
-          questionTemplateId
-        );
-        const questionTemplate = response.data.questionTemplate;
-        return { id: questionTemplateId, name: questionTemplate.name };
-      })
-    );
-  };
+  useEffect(() => {
+    // TODO: Make refresh script template faster
+    // refreshScriptTemplate();
+    refreshScripts();
+    getQuestionTemplates();
+  }, []);
+
+  useEffect(() => {
+    setSortedScripts(scripts.sort(getTableComparator(order, orderBy)));
+  }, [scripts]);
 
   const getQuestionTemplates = async () => {
     const allocationsResponse = await api.allocations.getSelfAllocations(
@@ -105,18 +132,19 @@ const ScriptsSubpage: React.FC = () => {
     const questionTemplateIds = allocations.map(
       allocation => allocation.questionTemplateId
     );
-    const questionTemplates = await mapQuestionTemplateIds(questionTemplateIds);
-    setQuestionTemplates(questionTemplates);
+    if (scriptTemplate) {
+      const questionTemplates = questionTemplateIds
+        .map(id =>
+          scriptTemplate.questionTemplates.find(
+            questionTemplate => id === questionTemplate.id
+          )
+        )
+        .filter(questionTemplate => !!questionTemplate);
+      setQuestionTemplates(questionTemplates as QuestionTemplateData[]);
+    }
   };
 
-  useEffect(() => {
-    getQuestionTemplates();
-  }, []);
-
-  const [searchText, setSearchText] = useState("");
-
   const sortBy = (newOrderBy: string) => {
-    setScripts([]);
     let newOrder = order;
     if (newOrderBy === orderBy) {
       newOrder = order === ASC ? DESC : ASC;
@@ -125,54 +153,20 @@ const ScriptsSubpage: React.FC = () => {
     }
     setOrder(newOrder);
     setOrderBy(newOrderBy);
-    setScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
+    setSortedScripts(scripts.sort(getTableComparator(newOrder, newOrderBy)));
   };
 
-  const columns: TableColumn[] = [
-    { name: "ID", key: ID, isSortable: true },
-    {
-      name: "Filename",
-      key: SCRIPT,
-      isSortable: true
-    },
-    {
-      name: "Matriculation Number",
-      key: MATRIC,
-      isSortable: true
-    },
-    {
-      name: "Name / Email",
-      key: "name"
-    },
-    {
-      name: "Total Score",
-      key: SCORE,
-      isSortable: true
-    },
-    {
-      name: "Published",
-      key: "published"
-    },
-    {
-      name: "",
-      key: ""
-    }
-  ];
-
-  const filteredScripts = scripts.filter(script => {
-    const { filename, student } = script;
-    const matricNo =
-      student && student.matriculationNumber ? student.matriculationNumber : "";
-    const studentName =
-      student && student.user && student.user.name ? student.user.name : "";
-    const email = student && student.user ? student.user.email : "";
+  const filteredScripts = sortedScripts.filter(script => {
+    const { filename, matriculationNumber, studentName, studentEmail } = script;
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
       filename.toLowerCase().includes(lowerCaseSearchText) ||
-      matricNo.toLowerCase().includes(lowerCaseSearchText) ||
-      studentName.toLowerCase().includes(lowerCaseSearchText) ||
-      email.toLowerCase().includes(lowerCaseSearchText)
+      (matriculationNumber &&
+        matriculationNumber.toLowerCase().includes(lowerCaseSearchText)) ||
+      (studentName &&
+        studentName.toLowerCase().includes(lowerCaseSearchText)) ||
+      (studentEmail && studentEmail.toLowerCase().includes(lowerCaseSearchText))
     );
   });
 
@@ -199,18 +193,20 @@ const ScriptsSubpage: React.FC = () => {
         <Grid item className={classes.grow}>
           <SearchBar
             value={""}
-            placeholder="Search..."
+            placeholder="Search by matric number, name or email"
             onChange={str => setSearchText(str)}
           />
         </Grid>
         <Grid item>
           <PublishScriptsModal
+            scripts={scripts}
             render={toggleModal => (
               <RoundedButton
                 variant="contained"
                 color="primary"
                 onClick={toggleModal}
                 startIcon={<PublishIcon />}
+                disabled={!!paper.publishedDate}
               >
                 Publish
               </RoundedButton>
@@ -252,7 +248,8 @@ const ScriptsSubpage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredScripts.length === 0 && (
+            {isLoading && <LoadingSpinner />}
+            {!isLoading && filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
@@ -261,15 +258,16 @@ const ScriptsSubpage: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            {filteredScripts.map((script: ScriptListData, index) => {
-              return (
-                <ScriptsTableRow
-                  key={script.id}
-                  script={script}
-                  questionTemplates={questionTemplates}
-                />
-              );
-            })}
+            {!isLoading &&
+              filteredScripts.map((script: ScriptListData, index) => {
+                return (
+                  <ScriptsTableRow
+                    key={script.id}
+                    script={script}
+                    questionTemplates={questionTemplates}
+                  />
+                );
+              })}
           </TableBody>
         </Table>
       </Paper>
@@ -277,4 +275,4 @@ const ScriptsSubpage: React.FC = () => {
   );
 };
 
-export default ScriptsSubpage;
+export default ScriptIndex;

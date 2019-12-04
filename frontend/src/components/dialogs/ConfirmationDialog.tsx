@@ -1,31 +1,33 @@
-import React from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import React from "react";
 
 interface ConfirmationDialogProps {
   title: string;
-  message: string;
+  message?: string;
   open: boolean;
   handleClose: (e?: any) => void;
   handleConfirm: (e?: any) => void;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = props => {
+  const { title, message, open, handleClose, handleConfirm, children } = props;
   return (
-    <Dialog open={props.open} onClose={props.handleClose}>
-      <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{props.message}</DialogContentText>
+        {message && <DialogContentText>{message}</DialogContentText>}
+        {children}
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} color="primary">
+        <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={props.handleConfirm} color="primary" autoFocus>
+        <Button onClick={handleConfirm} color="primary" autoFocus>
           Confirm
         </Button>
       </DialogActions>

@@ -1,24 +1,11 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { ScriptTemplateData } from "scriptTemplates";
-import {
-  Column,
-  Entity,
-  getRepository,
-  IsNull,
-  ManyToOne,
-  OneToMany
-} from "typeorm";
-import { ScriptData, ScriptListData } from "../types/scripts";
-import { sortByPageNo } from "../utils/sorts";
+import { Column, Entity, getConnection, ManyToOne, OneToMany } from "typeorm";
+import { ScriptListData } from "../types/scripts";
 import { Discardable } from "./Discardable";
-import { Mark } from "./Mark";
 import { Page } from "./Page";
 import { Paper } from "./Paper";
 import { PaperUser } from "./PaperUser";
 import { Question } from "./Question";
-import { QuestionTemplate } from "./QuestionTemplate";
-import { ScriptTemplate } from "./ScriptTemplate";
-
 @Entity()
 export class Script extends Discardable {
   entityName = "Script";
@@ -27,8 +14,8 @@ export class Script extends Discardable {
     paper: number | Paper,
     filename: string,
     sha256: string,
-    pageCount: number,
-    student?: number | PaperUser
+    student?: number | PaperUser,
+    publishedDate?: Date | null
   ) {
     super();
     if (typeof paper === "number") {
@@ -46,9 +33,8 @@ export class Script extends Discardable {
     } else {
       this.student = student;
     }
-    this.pageCount = pageCount;
     this.hasVerifiedStudent = false;
-    this.hasBeenPublished = false;
+    this.publishedDate = publishedDate || null;
   }
 
   @Column()
@@ -78,14 +64,10 @@ export class Script extends Discardable {
 
   @Column("boolean")
   @IsNotEmpty()
-  hasVerifiedStudent!: boolean;
+  hasVerifiedStudent: boolean;
 
-  @Column("boolean")
-  @IsNotEmpty()
-  hasBeenPublished!: boolean;
-
-  @Column({ type: "int" })
-  pageCount!: number;
+  @Column({ type: "timestamp without time zone", nullable: true })
+  publishedDate: Date | null;
 
   @OneToMany(type => Page, page => page.script)
   pages?: Page[];
@@ -93,121 +75,64 @@ export class Script extends Discardable {
   @OneToMany(type => Question, question => question.script)
   questions?: Question[];
 
-  getListDataWithScriptTemplate = async (
-    scriptTemplateData: ScriptTemplateData | undefined
-  ): Promise<ScriptListData> => {
-    const paperUser =
-      this.student ||
-      (this.studentId &&
-        (await getRepository(PaperUser).findOne(this.studentId))) ||
-      null;
+  getListData = async (): Promise<ScriptListData> => {
+    const results = await getConnection().query(`
+      SELECT
+        script.id,
+        script."hasVerifiedStudent",
+        script."publishedDate",
+        script.filename,
+        script."createdAt",
+        script."updatedAt",
+        script."discardedAt",
+        student.*,
+        page."pageCount",
+        question."totalScore",
+        question."completedMarking"
 
-    const questionTemplateIds = scriptTemplateData
-      ? scriptTemplateData.questionTemplates.map(
-          questionTemplate => questionTemplate.id
-        )
-      : [-1]; // stub in case of weird behavior of empty arrays
+      FROM script
 
-    const questions = (
-      this.questions ||
-      (await getRepository(Question).find({
-        where: {
-          scriptId: this.id,
-          questionTemplateId: questionTemplateIds,
-          discardedAt: IsNull()
-        },
-        relations: ["marks"]
-      }))
-    ).filter(question =>
-      questionTemplateIds.includes(question.questionTemplateId)
-    );
+      LEFT JOIN (
+        SELECT
+          "student".id "studentId",
+          "student"."matriculationNumber",
+          "user".name "studentName",
+          "user".email "studentEmail"
+        FROM "paper_user" "student"
+        INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      ) student ON script."studentId" = student."studentId"
 
-    const add = (a: number, b: number) => a + b;
+      INNER JOIN (
+        SELECT
+          script.id "scriptId",
+          COUNT(page.id)::INTEGER "pageCount"
+        FROM script
+        LEFT JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+        GROUP BY script.id
+      ) page ON page."scriptId" = script.id
 
-    const awardedMarks = questions
-      .filter(question => !question.discardedAt)
-      .map(question => {
-        const marksForQuestion = question.marks ? question.marks : [];
-        return marksForQuestion.map(mark => mark.score).reduce(add, 0);
-      })
-      .reduce(add, 0);
+      INNER JOIN (
+        SELECT
+          script.id "scriptId",
+          COALESCE(SUM(question.score), 0) "totalScore",
+          CASE WHEN COUNT(question.score) = COUNT(question."questionId") THEN true ELSE false END "completedMarking"
+        FROM script
+        LEFT JOIN (
+          SELECT question."scriptId", question.id "questionId", mark.score
+          FROM question
+          LEFT JOIN mark ON mark."questionId" = question.id AND mark."discardedAt" IS NULL
+          WHERE question."discardedAt" IS NULL
+        ) question ON script.id = question."scriptId"
+        GROUP BY script.id
+      ) question ON script.id = question."scriptId"
 
-    return {
-      ...this.getBase(),
-      paperId: this.paperId,
-      filename: this.filename,
-      student: paperUser ? await paperUser.getStudentData() : null,
-      hasVerifiedStudent: this.hasVerifiedStudent,
-      hasBeenPublished: this.hasBeenPublished,
-      awardedMarks,
-      pagesCount: this.pageCount
-    };
-  };
-
-  getListData = async () => {
-    const paperUser = this.studentId
-      ? await getRepository(PaperUser).findOne(this.studentId)
-      : null;
-
-    const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-      where: { paperId: this.paperId, discardedAt: IsNull() },
-      relations: ["questionTemplates"]
-    });
-
-    let awardedMarks = 0;
-
-    if (scriptTemplate) {
-      const questionTemplates = await getRepository(QuestionTemplate).find({
-        where: { scriptTemplateId: scriptTemplate.id, discardedAt: IsNull() }
-      });
-      const questions = await getRepository(Question).find({
-        where: {
-          scriptId: this.id,
-          questionTemplate: questionTemplates,
-          discardedAt: IsNull()
-        }
-      });
-      const marks = await getRepository(Mark).find({
-        where: { question: questions, discardedAt: IsNull() }
-      });
-      awardedMarks = marks
-        .map(mark => mark.score)
-        .reduce((a: number, b: number) => a + b, 0);
+      WHERE script.id = ${this.id}
+    `);
+    if (results.length !== 1) {
+      throw new Error("Unexpected error occured");
     }
-    return {
-      ...this.getBase(),
-      paperId: this.paperId,
-      filename: this.filename,
-      student: paperUser ? await paperUser.getStudentData() : null,
-      hasVerifiedStudent: this.hasVerifiedStudent,
-      hasBeenPublished: this.hasBeenPublished,
-      awardedMarks,
-      pagesCount: this.pages
-        ? this.pages.length
-        : await getRepository(Page).count({ scriptId: this.id })
-    };
-  };
-
-  getData = async (): Promise<ScriptData> => {
-    if (this.pages) {
-      this.pages.sort(sortByPageNo);
-    }
-    const pages =
-      this.pages ||
-      (await getRepository(Page).find({
-        where: { scriptId: this.id },
-        order: { pageNo: "ASC" }
-      }));
-    const questions =
-      this.questions ||
-      (await getRepository(Question).find({ scriptId: this.id }));
-
-    return {
-      ...(await this.getListData()),
-      pages: await Promise.all(pages.map(page => page.getData())),
-      questions: await Promise.all(
-        questions.map(question => question.getListData())
-      )
-    };
+    return results[0];
   };
 }
+
+export default Script;

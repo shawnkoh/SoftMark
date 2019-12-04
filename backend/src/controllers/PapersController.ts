@@ -15,6 +15,7 @@ import {
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import publishScripts from "../utils/publication";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -99,7 +100,7 @@ export async function update(request: Request, response: Response) {
   }
   await getRepository(Paper).save(paper);
 
-  const data = await paper.getData(requester.role);
+  const data = paper.getData(requester.role);
   response.status(200).json({ paper: data });
 }
 
@@ -140,8 +141,36 @@ export async function undiscard(request: Request, response: Response) {
     discardedAt: undefined
   });
 
-  const data = await paper.getData(requester.role);
+  const data = paper.getData(requester.role);
   response.status(200).json({ paper: data });
+}
+
+export async function publish(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const { paperId } = request.params;
+
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
+  if (!allowed) {
+    response.sendStatus(404);
+    return;
+  }
+
+  const { paper } = allowed;
+  if (paper.publishedDate) {
+    response.sendStatus(400);
+    return;
+  }
+
+  const publishedDate = new Date();
+  await getRepository(Paper).update(paper.id, { publishedDate });
+  const publishedCount = await publishScripts(
+    paper.id,
+    paper.name,
+    publishedDate
+  );
+
+  response.status(200).json({ publishedCount });
 }
 
 export async function grading(request: Request, response: Response) {

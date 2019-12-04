@@ -2,7 +2,6 @@ import request from "supertest";
 import { getManager, getRepository } from "typeorm";
 import { Allocation } from "../../entities/Allocation";
 import { PaperUser } from "../../entities/PaperUser";
-import { Question } from "../../entities/Question";
 import { QuestionTemplate } from "../../entities/QuestionTemplate";
 import { Script } from "../../entities/Script";
 import { ScriptTemplate } from "../../entities/ScriptTemplate";
@@ -13,7 +12,7 @@ import {
   isAllocationListData
 } from "../../types/allocations";
 import { PaperUserRole } from "../../types/paperUsers";
-import { isScriptData, ScriptData, ScriptListData } from "../../types/scripts";
+import { ScriptListData } from "../../types/scripts";
 import {
   isScriptTemplateData,
   ScriptTemplatePostData
@@ -389,10 +388,9 @@ describe("GET /papers/:id/scripts", () => {
         fixtures.paper,
         "A0185892L.pdf",
         "A0185892L",
-        1,
         fixtures.student
       ),
-      new Script(fixtures.paper, "A0123456L.pdf", "A0123456L", 1, student)
+      new Script(fixtures.paper, "A0123456L.pdf", "A0123456L", student)
     ];
     await getRepository(User).save(student.user!);
     await getRepository(PaperUser).save(student);

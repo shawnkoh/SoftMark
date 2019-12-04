@@ -1,19 +1,19 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getManager, getRepository, IsNull, Not } from "typeorm";
+import { getConnection, getManager, getRepository, IsNull, Not } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
 import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
-import { ScriptTemplate } from "../entities/ScriptTemplate";
 import { PaperUserRole } from "../types/paperUsers";
-import { ScriptListData } from "../types/scripts";
+import { ScriptData, ScriptPatchData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import publishScripts from "../utils/publication";
 import { sendScriptEmail } from "../utils/sendgrid";
-import { sortByFilename } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -59,12 +59,7 @@ export async function create(request: Request, response: Response) {
     return;
   }
 
-  const script = new Script(
-    paperId,
-    filename,
-    sha256,
-    (imageUrls as string[]).length
-  );
+  const script = new Script(paperId, filename, sha256);
   const errors = await validate(script);
 
   if (errors.length > 0) {
@@ -135,27 +130,29 @@ export async function update(request: Request, response: Response) {
     return;
   }
 
-  const { filename, hasVerifiedStudent, studentId, hasBeenPublished } = pick(
+  const { paper } = allowed;
+
+  const { filename, hasVerifiedStudent, studentId }: ScriptPatchData = pick(
     request.body,
     "filename",
     "hasVerifiedStudent",
-    "hasBeenPublished",
     "studentId"
   );
 
-  if (filename) {
-    script.filename = filename.toUpperCase();
-  }
-  if (hasVerifiedStudent !== undefined) {
-    script.hasVerifiedStudent = hasVerifiedStudent;
-  }
-  if (hasBeenPublished !== undefined) {
-    script.hasBeenPublished = hasBeenPublished;
-  }
-  if (studentId !== undefined) {
-    script.student = studentId
-      ? await getRepository(PaperUser).findOne(studentId)
-      : null;
+  const patchData: QueryDeepPartialEntity<Script> = {
+    filename: filename ? filename.toUpperCase() : script.filename,
+    hasVerifiedStudent:
+      hasVerifiedStudent !== undefined
+        ? hasVerifiedStudent
+        : script.hasVerifiedStudent
+  };
+
+  if (studentId && studentId !== script.studentId) {
+    patchData.studentId = studentId;
+    patchData.publishedDate = null;
+  } else if (studentId === null) {
+    patchData.studentId = null;
+    patchData.publishedDate = null;
   }
 
   const errors = await validate(script);
@@ -164,12 +161,32 @@ export async function update(request: Request, response: Response) {
   }
 
   try {
-    await getRepository(Script).save(script);
+    await getRepository(Script).update(script.id, patchData);
   } catch (error) {
     return response.sendStatus(400);
   }
 
   const data = await script.getListData();
+  // Optimisation: Makes use of script.getListData instead of publication util to save a query
+  if (
+    paper.publishedDate &&
+    !data.publishedDate &&
+    data.completedMarking &&
+    data.studentId &&
+    data.studentEmail
+  ) {
+    sendScriptEmail(
+      paper.name,
+      data.studentId,
+      data.studentEmail,
+      data.studentName
+    );
+    const publishedDate = new Date();
+    await getRepository(Script).update(script.id, {
+      publishedDate
+    });
+    data.publishedDate = publishedDate;
+  }
   response.status(201).json({ script: data });
 }
 
@@ -185,6 +202,8 @@ export async function match(request: Request, response: Response) {
   if (!allowed) {
     return response.sendStatus(404);
   }
+
+  const { paper } = allowed;
 
   const scripts = await getRepository(Script).find({
     paperId,
@@ -241,6 +260,8 @@ export async function match(request: Request, response: Response) {
     );
   });
 
+  await publishScripts(paper.id, paper.name, paper.publishedDate);
+
   return response.sendStatus(200);
 }
 
@@ -248,6 +269,12 @@ export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const userId = payload.userId;
   const paperId = Number(request.params.id);
+  // Defend against SQL Injection
+  if (isNaN(paperId)) {
+    response.sendStatus(400);
+    return;
+  }
+
   const allowed = await allowedRequester(
     userId,
     paperId,
@@ -259,24 +286,72 @@ export async function index(request: Request, response: Response) {
   }
   const { paper, requester } = allowed;
 
-  const scripts = await getRepository(Script).find({
-    where:
-      requester.role === PaperUserRole.Student
-        ? { paper, student: requester, discardedAt: IsNull() }
-        : { paper, discardedAt: IsNull() },
-    relations: ["student", "student.user", "questions", "questions.marks"]
-  });
+  const scripts = await getConnection().query(`
+    SELECT
+      script.id,
+      script."hasVerifiedStudent",
+      script."publishedDate",
+      script.filename,
+      script."createdAt",
+      script."updatedAt",
+      script."discardedAt",
+      student.*,
+      page."pageCount",
+      question."totalScore",
+      question."completedMarking"
 
-  const activeScriptTemplateData = await getActiveScriptTemplateData(paperId);
+    FROM script
+    
+    LEFT JOIN (
+      SELECT
+        "student".id "studentId",
+        "student"."matriculationNumber",
+        "user".name "studentName",
+        "user".email "studentEmail"
+      FROM "paper_user" "student"
+      INNER JOIN "user" ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      WHERE "student"."paperId" = ${paperId}
+    ) student ON script."studentId" = student."studentId"
+    
+    INNER JOIN (
+      SELECT
+        script.id "scriptId",
+        COUNT(page.id)::INTEGER "pageCount"
+      FROM script
+      LEFT JOIN page on script.id = page."scriptId" AND page."discardedAt" IS NULL
+      WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
+      GROUP BY script.id
+    ) page ON page."scriptId" = script.id
+    
+    INNER JOIN (
+      SELECT
+        script.id "scriptId",
+        COALESCE(SUM(question.score), 0) "totalScore",
+        CASE WHEN COUNT(question.score) = COUNT(question."questionId") THEN true ELSE false END "completedMarking"
+      FROM script
+      LEFT JOIN (
+        SELECT question."scriptId", question.id "questionId", mark.score
+        FROM question
+        LEFT JOIN mark ON mark."questionId" = question.id AND mark."discardedAt" IS NULL
+        WHERE question."discardedAt" IS NULL
+      ) question ON script.id = question."scriptId"
+      WHERE script."paperId" = ${paperId} AND script."discardedAt" IS NULL
+      GROUP BY script.id
+    ) question ON script.id = question."scriptId"
+    
+    WHERE
+      script."discardedAt" IS NULL
+      AND script."paperId" = ${paperId}
+      ${
+        requester.role === PaperUserRole.Student
+          ? 'AND script."studentId" = ' + requester.id
+          : ""
+      }
+    
+    ORDER BY script.id
+  `);
 
-  const data: ScriptListData[] = await Promise.all(
-    scripts
-      .sort(sortByFilename)
-      .map(script =>
-        script.getListDataWithScriptTemplate(activeScriptTemplateData)
-      )
-  );
-  response.status(200).json({ scripts: data });
+  response.status(200).json({ scripts });
 }
 
 export async function show(request: Request, response: Response) {
@@ -285,16 +360,7 @@ export async function show(request: Request, response: Response) {
   const scriptId = request.params.id;
   const script = await getRepository(Script).findOne(scriptId, {
     where: { discardedAt: IsNull() },
-    relations: [
-      "student",
-      "pages",
-      "pages.annotations",
-      "questions",
-      "questions.bookmarks",
-      "questions.comments",
-      "questions.marks",
-      "questions.questionTemplate"
-    ]
+    relations: ["pages", "pages.annotations"]
   });
   if (!script) {
     response.sendStatus(404);
@@ -318,7 +384,13 @@ export async function show(request: Request, response: Response) {
     return;
   }
 
-  const data = await script.getData();
+  const data: ScriptData = {
+    filename: script.filename,
+    pages: (script.pages as Page[]).map((page: Page) => ({
+      ...page.getListData(),
+      annotations: page.annotations!
+    }))
+  };
   response.status(200).json({ script: data });
 }
 
@@ -381,7 +453,7 @@ export async function undiscard(request: Request, response: Response) {
   }
   await getRepository(Script).save(script);
 
-  const data = await script.getData();
+  const data = await script.getListData();
   response.status(200).json({ script: data });
 }
 
@@ -418,54 +490,3 @@ export async function discardScripts(request: Request, response: Response) {
     response.sendStatus(400);
   }
 }
-
-export async function publishScripts(request: Request, response: Response) {
-  try {
-    const payload = response.locals.payload as AccessTokenSignedPayload;
-    const userId = payload.userId;
-    const paperId = Number(request.params.id);
-    const allowed = await allowedRequester(
-      userId,
-      paperId,
-      PaperUserRole.Owner
-    );
-    if (!allowed) {
-      return response.sendStatus(404);
-    }
-
-    const scripts = await getRepository(Script).find({
-      where: {
-        paperId,
-        studentId: Not(IsNull()),
-        hasBeenPublished: false,
-        discardedAt: IsNull()
-      },
-      relations: ["student", "student.user", "student.paper"]
-    });
-
-    await getManager().transaction(async manager => {
-      await Promise.all(
-        scripts.map(async script => {
-          if (script.student) {
-            script.hasVerifiedStudent = true;
-            script.hasBeenPublished = true;
-            sendScriptEmail(script.student);
-            await getRepository(Script).save(script);
-          }
-        })
-      );
-    });
-
-    response.sendStatus(204);
-  } catch (error) {
-    response.sendStatus(400);
-  }
-}
-
-const getActiveScriptTemplateData = async (paperId: number) => {
-  const scriptTemplate = await getRepository(ScriptTemplate).findOne({
-    where: { paperId: paperId, discardedAt: IsNull() },
-    relations: ["questionTemplates"]
-  });
-  return scriptTemplate ? await scriptTemplate.getData() : scriptTemplate;
-};

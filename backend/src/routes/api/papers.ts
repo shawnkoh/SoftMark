@@ -49,7 +49,6 @@ router.post("/:id/scripts", ScriptsController.create);
 router.get("/:id/scripts", ScriptsController.index);
 router.patch("/:id/scripts/match", ScriptsController.match);
 router.delete("/:id/all_scripts", ScriptsController.discardScripts);
-router.patch("/:id/publish_scripts", ScriptsController.publishScripts);
 
 router.get("/:id/allocations", AllocationsController.index);
 router.get("/:id/root_allocations", AllocationsController.getRootAllocations);
@@ -60,5 +59,7 @@ router.get(
 );
 
 router.get("/:paperId/allocations/self", AllocationsController.selfAllocations);
+
+router.post("/:paperId/publish", PapersController.publish);
 
 export default router;

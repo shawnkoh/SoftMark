@@ -1,24 +1,29 @@
-import { ScriptListData, ScriptPatchData } from "backend/src/types/scripts";
-import { StudentListData } from "../../../../types/paperUsers";
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import {
   Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   TextField
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-
-import api from "../../../../api";
+import { ScriptListData, ScriptPatchData } from "backend/src/types/scripts";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import api from "../../../../api";
+import { StudentListData } from "../../../../types/paperUsers";
 
 interface Props {
   script: ScriptListData;
   render: any;
   callbackScript: (s: ScriptListData) => void;
+}
+
+interface StudentOption {
+  studentId: number;
+  matriculationNumber: string | null;
+  studentEmail: string;
 }
 
 const PickStudentModal: React.FC<Props> = props => {
@@ -30,19 +35,31 @@ const PickStudentModal: React.FC<Props> = props => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
-  const [chosenStudent, setChosenStudent] = useState<StudentListData | null>(
-    script.student
+  const currentStudent: StudentOption | null =
+    script.studentId && script.studentEmail
+      ? {
+          studentId: script.studentId,
+          matriculationNumber: script.matriculationNumber,
+          studentEmail: script.studentEmail
+        }
+      : null;
+
+  const [chosenStudent, setChosenStudent] = useState<StudentOption | null>(
+    currentStudent
   );
 
-  const [options, setOptions] = useState<Array<StudentListData | null>>([]);
+  const [options, setOptions] = useState<StudentOption[]>([]);
 
   useEffect(() => {
     if (isOpen) {
-      const newOptions: Array<StudentListData | null> = [...unmatchedStudents];
+      const newOptions: StudentOption[] = unmatchedStudents.map(student => ({
+        studentId: student.id,
+        matriculationNumber: student.matriculationNumber,
+        studentEmail: student.user.email
+      }));
       if (chosenStudent) {
         newOptions.push(chosenStudent);
       }
-      newOptions.push(null);
       setOptions(newOptions);
     }
   }, [isOpen]);
@@ -76,7 +93,7 @@ const PickStudentModal: React.FC<Props> = props => {
             color="primary"
             onClick={() => {
               toggleVisibility();
-              setChosenStudent(script.student);
+              setChosenStudent(currentStudent);
             }}
           >
             Cancel
@@ -85,16 +102,13 @@ const PickStudentModal: React.FC<Props> = props => {
             color="primary"
             onClick={async () => {
               const scriptPatchData: ScriptPatchData = {
-                studentId: chosenStudent ? chosenStudent.id : undefined
+                studentId: chosenStudent ? chosenStudent.studentId : null
               };
               api.scripts
                 .patchScript(script.id, scriptPatchData)
                 .then(resp => {
                   callbackScript(resp.data.script);
                   toggleVisibility();
-                  toast(
-                    `Script ${script.filename} has been updated successfully.`
-                  );
                   refreshUnmatchedStudents();
                 })
                 .catch(errors => {

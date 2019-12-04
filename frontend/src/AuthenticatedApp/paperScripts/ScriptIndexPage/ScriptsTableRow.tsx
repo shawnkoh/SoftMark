@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Container,
   TableCell,
   TableRow,
@@ -9,7 +10,7 @@ import CancelRounded from "@material-ui/icons/CancelRounded";
 import CheckRounded from "@material-ui/icons/CheckRounded";
 import { ScriptListData } from "backend/src/types/scripts";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
-import React, { useState } from "react";
+import React from "react";
 import { useRouteMatch } from "react-router";
 import { Link } from "react-router-dom";
 import MarkWhichQuestionModal from "./MarkWhichQuestionModal";
@@ -22,37 +23,42 @@ interface Props {
 }
 
 const ScriptsTableRow: React.FC<Props> = props => {
+  const { script, questionTemplates } = props;
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
   const totalMarks = scriptTemplate ? scriptTemplate.totalMarks : 0;
   const { url } = useRouteMatch()!;
 
-  const [script, setScript] = useState(props.script);
-  const { student, filename, id, awardedMarks, hasBeenPublished } = script;
-  let matriculationNumber = "-";
-  let name = "-";
-  let email = "";
-  if (student) {
-    matriculationNumber = student.matriculationNumber || matriculationNumber;
-    const { user } = student;
-    name = user.name || name;
-    email = user.email;
-  }
+  const {
+    completedMarking,
+    filename,
+    id,
+    matriculationNumber,
+    publishedDate,
+    studentEmail,
+    studentName,
+    totalScore
+  } = script;
 
   return (
     <TableRow>
       <TableCell>{id}</TableCell>
       <TableCell>{filename}</TableCell>
-      <TableCell>{matriculationNumber}</TableCell>
+      <TableCell>{matriculationNumber || "-"}</TableCell>
       <TableCell>
-        {name}
+        {studentName || "-"}
         <br />
-        {email}
+        {studentEmail}
       </TableCell>
-      <TableCell>{`${awardedMarks} / ${totalMarks}`}</TableCell>
+      <TableCell>
+        <Chip
+          label={`${totalScore} / ${totalMarks}`}
+          color={completedMarking ? "secondary" : "default"}
+        />
+      </TableCell>
       <TableCell>
         <Container>
-          {hasBeenPublished ? (
+          {publishedDate ? (
             <CheckRounded color="secondary" />
           ) : (
             <CancelRounded color="error" />
@@ -60,10 +66,10 @@ const ScriptsTableRow: React.FC<Props> = props => {
         </Container>
       </TableCell>
       <TableCell>
-        <Tooltip title={`Mark script of ${matriculationNumber}`}>
+        <Tooltip title={`Mark script of ${matriculationNumber || "-"}`}>
           <MarkWhichQuestionModal
             baseUrl={`${url}/${id}/mark`}
-            questionTemplates={props.questionTemplates}
+            questionTemplates={questionTemplates}
             render={toggleVisibility => (
               <Button
                 onClick={toggleVisibility}
@@ -76,7 +82,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             )}
           />
         </Tooltip>
-        <Tooltip title={`View script of ${matriculationNumber}`}>
+        <Tooltip title={`View script of ${matriculationNumber || "-"}`}>
           <Button
             component={Link}
             to={`${url}/${id}`}
@@ -87,7 +93,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             View
           </Button>
         </Tooltip>
-        <Tooltip title={`Download script of ${matriculationNumber}`}>
+        <Tooltip title={`Download script of ${matriculationNumber || "-"}`}>
           <Button
             component={Link}
             to={`${url}/${id}/save_script`}

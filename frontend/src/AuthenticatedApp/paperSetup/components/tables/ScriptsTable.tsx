@@ -56,17 +56,16 @@ const ScriptsTable: React.FC = () => {
     }
   ];
 
-  const unmatchedScriptsCount = scripts.filter(s => !s.student).length;
+  const unmatchedScriptsCount = scripts.filter(s => !s.studentId).length;
 
   const filteredScripts = scripts.filter(script => {
-    const { filename, student } = script;
-    const matriculationNumber =
-      student && student.matriculationNumber ? student.matriculationNumber : "";
+    const { filename, matriculationNumber } = script;
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
       filename.toLowerCase().includes(lowerCaseSearchText) ||
-      matriculationNumber.toLowerCase().includes(lowerCaseSearchText)
+      (matriculationNumber &&
+        matriculationNumber.toLowerCase().includes(lowerCaseSearchText))
     );
   });
 

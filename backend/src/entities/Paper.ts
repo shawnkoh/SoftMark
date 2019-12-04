@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity, OneToMany } from "typeorm";
 import { PaperData } from "../types/papers";
 import { PaperUserRole } from "../types/paperUsers";
@@ -11,15 +11,20 @@ import { ScriptTemplate } from "./ScriptTemplate";
 export class Paper extends Discardable {
   entityName = "Paper";
 
-  constructor(name: string) {
+  constructor(name: string, publishedDate?: Date | null) {
     super();
     this.name = name;
+    this.publishedDate = publishedDate || null;
   }
 
   @Column()
   @IsNotEmpty()
   @IsString()
   name!: string;
+
+  @Column({ type: "timestamp without time zone", nullable: true })
+  @IsOptional()
+  publishedDate: Date | null;
 
   @OneToMany(type => PaperUser, paperUser => paperUser.paper)
   paperUsers?: PaperUser[];
@@ -33,6 +38,9 @@ export class Paper extends Discardable {
   getData = (role: PaperUserRole): PaperData => ({
     ...this.getBase(),
     name: this.name,
+    publishedDate: this.publishedDate,
     role
   });
 }
+
+export default Paper;

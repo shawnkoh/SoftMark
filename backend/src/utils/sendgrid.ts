@@ -1,7 +1,9 @@
 import { MailData } from "@sendgrid/helpers/classes/mail";
 import sendgrid from "@sendgrid/mail";
+import { sign } from "jsonwebtoken";
 import { PaperUser } from "../entities/PaperUser";
 import { User } from "../entities/User";
+import { BearerTokenType, InviteTokenPayload } from "../types/tokens";
 
 const APP_NAME = "SoftMark";
 const APP_URL =
@@ -19,14 +21,14 @@ const VERIFY_EMAIL_URL = `${APP_URL}/users/verify_email`;
 
 const INVITE_URL = `${APP_URL}/invite`;
 
-function send(user: User, subject: string, message: string) {
+function send(user: User | string, subject: string, message: string) {
   if (!process.env.SENDGRID_API_KEY) {
     return;
   }
 
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
   const data: MailData = {
-    to: user.email,
+    to: typeof user === "string" ? user : user.email,
     from: "no-reply@softmark.io",
     subject,
     text: message,
@@ -59,7 +61,7 @@ export function sendInviteEmail(paperUser: PaperUser, expiresIn?: string) {
   if (!paper || !user) {
     throw new Error("paperUser is not loaded properly");
   }
-  const token = paperUser.createInviteToken("14d");
+  const token = createInviteToken(paperUser.id, "14d");
 
   const message =
     `<p>You have been invited as a ${paperUser.role} to ${paper.name}</p>` +
@@ -84,19 +86,29 @@ export function sendResetPasswordEmail(user: User) {
   send(user, `[${APP_NAME}] Please reset your password`, message);
 }
 
-export function sendScriptEmail(paperUser: PaperUser) {
-  const { paper, user } = paperUser;
-  if (!paper || !user) {
-    throw new Error("paperUser is not loaded properly");
-  }
-  const token = paperUser.createInviteToken("28d"); // TODO: change this
+export function createInviteToken(paperUserId: number, expiresIn: string) {
+  const payload: InviteTokenPayload = {
+    tokenType: BearerTokenType.InviteToken,
+    paperUserId
+  };
+  const token = sign(payload, process.env.JWT_SECRET!, { expiresIn });
+  return token;
+}
+
+export function sendScriptEmail(
+  paperName: string,
+  paperUserId: number,
+  email: string,
+  userName: string | null
+) {
+  const token = createInviteToken(paperUserId, "28d"); // TODO: change this into a setting
 
   const message =
-    `<p>Dear ${user.name || "User"}</p>` +
-    `<p>You may view your [${paper.name}] script here.</p>` +
+    `<p>Dear ${userName || "User"}</p>` +
+    `<p>You may view your ${paperName} script here.</p>` +
     "<br />" +
     `<p>You may view it by <a href='${APP_URL}/invite/${token}'>clicking on this link</a></p>` +
     `<p>Alternatively, you may log into your email at ${LOGIN_URL} to view the script</p>`;
 
-  send(user, `[${APP_NAME}] View your ${paper.name} marks here!`, message);
+  send(email, `[${APP_NAME}] View your ${paperName} marks here!`, message);
 }

@@ -1,13 +1,14 @@
-import { StudentListData } from "../../types/paperUsers";
 import { ScriptListData } from "backend/src/types/scripts";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { toast } from "react-toastify";
 import api from "../../api";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { StudentListData } from "../../types/paperUsers";
 
 type ScriptsAndStudentsContextProps =
   | ({
+      isLoadingScripts: boolean;
       allStudents: StudentListData[];
       refreshAllStudents: () => void;
       unmatchedStudents: StudentListData[];
@@ -70,16 +71,22 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   const [scripts, setScripts] = useState<ScriptListData[]>([]);
   const [isLoadingScripts, setIsLoadingScripts] = useState(true);
 
-  const getScripts = () => {
-    api.scripts
-      .getScripts(paperId)
-      .then(resp => {
-        setScripts(resp.data.scripts);
-      })
-      .finally(() => setIsLoadingScripts(false));
+  const getScripts = async () => {
+    try {
+      const response = await api.scripts.getScripts(paperId);
+      setScripts(response.data.scripts);
+    } catch (error) {
+      toast.error(
+        "An unexpected error occured while fetching the scripts. Please refresh."
+      );
+    }
   };
 
-  useEffect(getScripts, [paper_id]);
+  useEffect(() => {
+    setIsLoadingScripts(true);
+    getScripts();
+    setIsLoadingScripts(false);
+  }, [paper_id]);
 
   const [
     isMatchingScriptsToStudents,
@@ -122,6 +129,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
       value={
         paperId
           ? {
+              isLoadingScripts,
               allStudents,
               refreshAllStudents: getStudents,
               unmatchedStudents,

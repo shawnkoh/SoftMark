@@ -9,6 +9,7 @@ import {
 import DeleteIcon from "@material-ui/icons/DeleteForever";
 import EditIcon from "@material-ui/icons/Edit";
 import { ScriptListData } from "backend/src/types/scripts";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import ViewIcon from "mdi-material-ui/FileFind";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -20,7 +21,6 @@ import DeleteScriptModal from "../modals/DeleteScriptModal";
 import PickStudentModal from "../modals/PickStudentModal";
 import ViewScriptModal from "../modals/ViewScriptModal";
 import useStyles from "./styles";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface Props {
   script: ScriptListData;
@@ -35,7 +35,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
   const [script, setScript] = useState<ScriptListData>(props.script);
 
   const patchScript = newValues => {
-    newValues.studentId = script.student ? script.student.id : null;
+    newValues.studentId = studentId || null;
     return api.scripts
       .patchScript(script.id, newValues)
       .then(resp => {
@@ -49,7 +49,13 @@ const ScriptsTableRow: React.FC<Props> = props => {
       });
   };
 
-  const { filename, student, hasVerifiedStudent, pagesCount } = script;
+  const {
+    filename,
+    studentId,
+    hasVerifiedStudent,
+    pageCount,
+    matriculationNumber
+  } = script;
 
   return (
     <TableRow>
@@ -66,14 +72,14 @@ const ScriptsTableRow: React.FC<Props> = props => {
       <TableCell>
         <Typography
           className={
-            pagesCount === scriptTemplatePagesCount ? undefined : classes.red
+            pageCount === scriptTemplatePagesCount ? undefined : classes.red
           }
         >
-          {pagesCount}
+          {pageCount}
         </Typography>
       </TableCell>
       <TableCell>
-        {student ? student.matriculationNumber : "No match found"}
+        {studentId ? matriculationNumber : "No match found"}
         <PickStudentModal
           callbackScript={setScript}
           script={script}
