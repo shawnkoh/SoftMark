@@ -62,3 +62,15 @@ export async function publish(paperId: number) {
     `${URL}/${paperId}/publish`
   );
 }
+
+export async function getUnmatchedScripts(paperId: number) {
+  return await client.get<{ scripts: string[] }>(
+    `${URL}/${paperId}/unmatched_scripts`
+  );
+}
+
+export async function getUnmatchedStudents(paperId: number) {
+  return await client.get<{ students: string[] }>(
+    `${URL}/${paperId}/unmatched_students`
+  );
+}
