@@ -252,9 +252,14 @@ export async function match(request: Request, response: Response) {
           mappingDetails +
           " (script/student name doesn't exist or has already been matched)\n";
         continue;
+      } else if (script.studentId === student.id) {
+        failedToBeMatched +=
+          mappingDetails + " (already matched to each other)";
+        continue;
       }
 
       script.student = student;
+      script.publishedDate = null;
       const errors = await validate(script);
       //this is not good practice for error handling, but it will do for now
       if (errors.length === 0) {
