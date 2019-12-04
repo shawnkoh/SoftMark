@@ -1,9 +1,5 @@
 import { DiscardableData } from "./entities";
-import {
-  isPageTemplateListData,
-  PageTemplateListData,
-  PageTemplateSetupData
-} from "./pageTemplates";
+import { isPageTemplateListData, PageTemplateSetupData } from "./pageTemplates";
 import {
   isQuestionTemplateData,
   QuestionTemplateData,
@@ -18,7 +14,7 @@ export interface ScriptTemplatePostData {
 // potentially deprecated
 export interface ScriptTemplateData extends DiscardableData {
   totalMarks: number;
-  pageTemplates: PageTemplateListData[];
+  pageCount: number;
   questionTemplates: QuestionTemplateData[];
 }
 
