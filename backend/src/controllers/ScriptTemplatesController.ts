@@ -126,7 +126,7 @@ export async function showActive(request: Request, response: Response) {
   try {
     const scriptTemplate = await getRepository(ScriptTemplate).findOne({
       where: { paper, discardedAt: IsNull() },
-      relations: ["pageTemplates", "questionTemplates"]
+      relations: ["questionTemplates"]
     });
 
     const data = scriptTemplate ? await scriptTemplate.getData() : null;
