@@ -18,8 +18,8 @@ import React, { useState } from "react";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
-import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import UploadScriptStudentMappingWrapper from "../../../../components/uploadWrappers/UploadScriptStudentMappingWrapper";
+import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
 
@@ -65,8 +65,6 @@ const ScriptsTable: React.FC = () => {
         matriculationNumber.toLowerCase().includes(lowerCaseSearchText))
     );
   });
-
-  console.log(filteredScripts.map(script => JSON.stringify(script)));
 
   return (
     <>
