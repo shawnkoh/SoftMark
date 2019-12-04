@@ -239,29 +239,30 @@ export async function match(request: Request, response: Response) {
     const row = rows[i];
     const cells = row.split("\r")[0].split(",");
     if (cells.length >= 2) {
-      const matriculationNumber = cells[0].toLocaleUpperCase();
-      const filename = cells[1].toLocaleUpperCase();
+      const filename = cells[0].toLocaleUpperCase();
+      const matriculationNumber = cells[1].toLocaleUpperCase();
       const mappingDetails = matriculationNumber + " " + filename;
-      console.log(mappingDetails);
 
       const student = studentsMap.get(matriculationNumber);
       const script = scriptsMap.get(filename);
 
-      if (!script || !student) {
+      if (!script) {
+        failedToBeMatched += mappingDetails + " (filename not found)\n";
+        continue;
+      } else if (!student) {
         failedToBeMatched +=
-          mappingDetails +
-          " (script/student name doesn't exist or has already been matched)\n";
+          mappingDetails + " (matriculation number not found)\n";
         continue;
       } else if (script.studentId === student.id) {
         failedToBeMatched +=
-          mappingDetails + " (already matched to each other)";
+          mappingDetails + " (already matched to each other)\n";
         continue;
       }
 
       script.student = student;
       script.publishedDate = null;
       const errors = await validate(script);
-      //this is not good practice for error handling, but it will do for now
+      // this is not good practice for error handling, but it will do for now
       if (errors.length === 0) {
         await getRepository(Script).save(script);
         successfullyMatched += mappingDetails + "\n";
