@@ -1,8 +1,6 @@
 import { CssBaseline } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/core/styles";
 import { PaperProvider } from "contexts/PaperContext";
-import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
-import { ScriptTemplateProvider } from "contexts/ScriptTemplateContext";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import NotFoundPage from "../App/NotFoundPage";
@@ -10,7 +8,6 @@ import InvitePage from "../UnauthenticatedApp/InvitePage";
 import PaperIndex from "./PaperIndexPage";
 import PaperView from "./PaperViewPage";
 import theme from "./theme";
-import { MarkQuestionProvider } from "./paperGrading/MarkQuestionSubpage/MarkQuestionContext";
 
 const AuthenticatedApp: React.FC = () => {
   return (
@@ -25,11 +22,7 @@ const AuthenticatedApp: React.FC = () => {
         </Route>
         <Route path="/papers/:paper_id">
           <PaperProvider>
-            <ScriptTemplateProvider>
-              <ScriptsAndStudentsProvider>
-                <PaperView />
-              </ScriptsAndStudentsProvider>
-            </ScriptTemplateProvider>
+            <PaperView />
           </PaperProvider>
         </Route>
         <Route exact path="/invite/:token">

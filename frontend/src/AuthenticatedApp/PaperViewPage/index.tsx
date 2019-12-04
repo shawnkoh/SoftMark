@@ -21,6 +21,8 @@ import SetupPage, {
 } from "../paperSetup";
 import PaperViewHeader from "./components/PaperViewHeader";
 import useStyles from "./styles";
+import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
+import { ScriptTemplateProvider } from "contexts/ScriptTemplateContext";
 
 const SETUP = "setup";
 const GRADING = "grading";
@@ -169,37 +171,45 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
 
   return (
     <>
-      {role === PaperUserRole.Owner && (
-        <Switch>
-          {downloadAllScriptsRoute}
-          {downloadSingleScriptRoute}
-          {scriptMarkRoute}
-          {questionAllocationRoute}
-          {setupScriptTemplateRoute}
-          {scriptMappingRoute}
-          {scriptViewRoute}
-          {markQuestionRoute}
-          {setupRoute}
-          {gradingRoute}
-          {scriptsListingRoute}
-        </Switch>
-      )}
-      {role === PaperUserRole.Marker && (
-        <Switch>
-          {downloadAllScriptsRoute}
-          {downloadSingleScriptRoute}
-          {scriptMarkRoute}
-          {markQuestionRoute}
-          {scriptViewRoute}
-          {gradingRoute}
-          {scriptsListingRoute}
-        </Switch>
-      )}
       {role === PaperUserRole.Student && (
         <Switch>
           {scriptViewRoute}
           {studentRedirectRoute}
         </Switch>
+      )}
+
+      {(role === PaperUserRole.Owner || role === PaperUserRole.Marker) && (
+        <ScriptTemplateProvider>
+          <ScriptsAndStudentsProvider>
+            {role === PaperUserRole.Owner && (
+              <Switch>
+                {downloadAllScriptsRoute}
+                {downloadSingleScriptRoute}
+                {scriptMarkRoute}
+                {questionAllocationRoute}
+                {setupScriptTemplateRoute}
+                {scriptMappingRoute}
+                {scriptViewRoute}
+                {markQuestionRoute}
+                {setupRoute}
+                {gradingRoute}
+                {scriptsListingRoute}
+              </Switch>
+            )}
+
+            {role === PaperUserRole.Marker && (
+              <Switch>
+                {downloadAllScriptsRoute}
+                {downloadSingleScriptRoute}
+                {scriptMarkRoute}
+                {markQuestionRoute}
+                {scriptViewRoute}
+                {gradingRoute}
+                {scriptsListingRoute}
+              </Switch>
+            )}
+          </ScriptsAndStudentsProvider>
+        </ScriptTemplateProvider>
       )}
     </>
   );
