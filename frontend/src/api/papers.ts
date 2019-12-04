@@ -64,13 +64,13 @@ export async function publish(paperId: number) {
 }
 
 export async function getUnmatchedScripts(paperId: number) {
-  return await client.get<{ scripts: string[] }>(
+  return await client.get<{ scripts: { filename: string }[] }>(
     `${URL}/${paperId}/unmatched_scripts`
   );
 }
 
 export async function getUnmatchedStudents(paperId: number) {
-  return await client.get<{ students: string[] }>(
+  return await client.get<{ students: { matriculationNumber: string }[] }>(
     `${URL}/${paperId}/unmatched_students`
   );
 }
