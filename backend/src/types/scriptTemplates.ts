@@ -1,5 +1,5 @@
 import { DiscardableData } from "./entities";
-import { isPageTemplateListData, PageTemplateSetupData } from "./pageTemplates";
+import { PageTemplateSetupData } from "./pageTemplates";
 import {
   isQuestionTemplateData,
   QuestionTemplateData,
@@ -26,9 +26,7 @@ export interface ScriptTemplateSetupData {
 
 export function isScriptTemplateData(data: any): data is ScriptTemplateData {
   return (
-    data.pageTemplates.every((pageTemplate: any) =>
-      isPageTemplateListData(pageTemplate)
-    ) &&
+    typeof data.pageCount === "number" &&
     data.questionTemplates.every((questionTemplate: any) =>
       isQuestionTemplateData(questionTemplate)
     )
