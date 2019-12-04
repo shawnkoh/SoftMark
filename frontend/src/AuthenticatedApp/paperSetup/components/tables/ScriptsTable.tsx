@@ -10,6 +10,7 @@ import {
   Tooltip,
   Typography
 } from "@material-ui/core";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
@@ -110,6 +111,15 @@ const ScriptsTable: React.FC = () => {
               </RoundedButton>
             </Tooltip>
           </UploadScriptStudentMappingWrapper>
+        </Grid>
+        <Grid item>
+          <RoundedButton
+            variant="contained"
+            color="primary"
+            startIcon={<CloudDownload />}
+          >
+            Export Unmatched
+          </RoundedButton>
         </Grid>
         {/* <Grid item>
           <DeleteAllScriptsModal

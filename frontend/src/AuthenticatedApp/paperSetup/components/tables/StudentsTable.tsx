@@ -9,6 +9,7 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useState } from "react";
@@ -113,6 +114,15 @@ const StudentsTable: React.FC = () => {
               </RoundedButton>
             )}
           />
+        </Grid>
+        <Grid item>
+          <RoundedButton
+            variant="contained"
+            color="primary"
+            startIcon={<CloudDownload />}
+          >
+            Export Unmatched
+          </RoundedButton>
         </Grid>
         {/* <Grid item>
           <DeleteAllStudentsModal
