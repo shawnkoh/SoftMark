@@ -141,7 +141,10 @@ export async function update(request: Request, response: Response) {
 
   const patchData: QueryDeepPartialEntity<Script> = {
     filename: filename ? filename.toUpperCase() : script.filename,
-    hasVerifiedStudent: hasVerifiedStudent
+    hasVerifiedStudent:
+      hasVerifiedStudent !== undefined
+        ? hasVerifiedStudent
+        : script.hasVerifiedStudent
   };
 
   if (studentId && studentId !== script.studentId) {
@@ -257,7 +260,9 @@ export async function match(request: Request, response: Response) {
     );
   });
 
-  await publishScripts(paper.id, paper.name);
+  if (paper.publishedDate) {
+    await publishScripts(paper.id, paper.name);
+  }
 
   return response.sendStatus(200);
 }
