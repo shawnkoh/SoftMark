@@ -549,7 +549,7 @@ export async function createMultipleStudents(
 export async function unmatchedStudents(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;
-  const paperId = Number(request.params.id);
+  const { paperId } = request.params;
   const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
   if (!allowed) {
     response.sendStatus(404);
