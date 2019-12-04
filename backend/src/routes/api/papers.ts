@@ -61,5 +61,10 @@ router.get(
 router.get("/:paperId/allocations/self", AllocationsController.selfAllocations);
 
 router.post("/:paperId/publish", PapersController.publish);
+router.get("/:paperId/unmatched_scripts", ScriptsController.unmatchedScripts);
+router.get(
+  "/:paperId/unmatched_students",
+  PaperUsersController.unmatchedStudents
+);
 
 export default router;

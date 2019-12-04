@@ -545,3 +545,23 @@ export async function createMultipleStudents(
     return response.sendStatus(400);
   }
 }
+
+export async function unmatchedStudents(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const paperId = Number(request.params.id);
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
+  if (!allowed) {
+    response.sendStatus(404);
+  }
+
+  const students = await createQueryBuilder()
+    .select("student.matriculationNumber", "matriculationNumber")
+    .from(PaperUser, "student")
+    .innerJoin("student.scripts", "script", "script.discardedAt IS NULL")
+    .where("student.paperId = :paperId", { paperId })
+    .andWhere("student.discardedAt IS NULL")
+    .getRawMany();
+
+  response.status(200).json({ students });
+}

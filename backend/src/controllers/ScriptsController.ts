@@ -1,7 +1,14 @@
 import { validate, validateOrReject } from "class-validator";
 import { Request, Response } from "express";
 import { pick } from "lodash";
-import { getConnection, getManager, getRepository, IsNull, Not } from "typeorm";
+import {
+  createQueryBuilder,
+  getConnection,
+  getManager,
+  getRepository,
+  IsNull,
+  Not
+} from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Page } from "../entities/Page";
 import { PaperUser } from "../entities/PaperUser";
@@ -188,6 +195,26 @@ export async function update(request: Request, response: Response) {
     data.publishedDate = publishedDate;
   }
   response.status(201).json({ script: data });
+}
+
+export async function unmatchedScripts(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const paperId = Number(request.params.id);
+  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
+  if (!allowed) {
+    response.sendStatus(404);
+  }
+
+  const scripts = await createQueryBuilder()
+    .select("script.filename", "filename")
+    .from(Script, "script")
+    .where("script.paperId = :paperId", { paperId })
+    .andWhere("script.discardedAt IS NULL")
+    .andWhere("script.studentId IS NULL")
+    .getRawMany();
+
+  response.status(200).json({ scripts });
 }
 
 export async function match(request: Request, response: Response) {
