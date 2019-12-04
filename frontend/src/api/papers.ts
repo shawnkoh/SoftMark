@@ -58,5 +58,7 @@ export async function getGradingData(paperId: number) {
 }
 
 export async function publish(paperId: number) {
-  return await client.post(`${URL}/${paperId}/publish`);
+  return await client.post<{ publishedCount: number }>(
+    `${URL}/${paperId}/publish`
+  );
 }

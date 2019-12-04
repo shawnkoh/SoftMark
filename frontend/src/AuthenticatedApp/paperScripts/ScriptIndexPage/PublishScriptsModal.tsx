@@ -50,8 +50,11 @@ const PublishScriptsModal: React.FC<Props> = props => {
           toggleVisibility();
           api.papers
             .publish(paper.id)
-            .then(() => {
-              toast.success(`Scripts have been published successfully.`);
+            .then(response => {
+              const { publishedCount } = response.data;
+              toast.success(
+                `${publishedCount} scripts have been published successfully.`
+              );
             })
             .catch(errors => {
               toast.error(

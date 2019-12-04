@@ -260,9 +260,7 @@ export async function match(request: Request, response: Response) {
     );
   });
 
-  if (paper.publishedDate) {
-    await publishScripts(paper.id, paper.name);
-  }
+  await publishScripts(paper.id, paper.name, paper.publishedDate);
 
   return response.sendStatus(200);
 }

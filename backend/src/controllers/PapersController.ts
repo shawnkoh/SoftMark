@@ -162,10 +162,15 @@ export async function publish(request: Request, response: Response) {
     return;
   }
 
-  await getRepository(Paper).update(paper.id, { publishedDate: new Date() });
-  await publishScripts(paper.id, paper.name);
+  const publishedDate = new Date();
+  await getRepository(Paper).update(paper.id, { publishedDate });
+  const publishedCount = await publishScripts(
+    paper.id,
+    paper.name,
+    publishedDate
+  );
 
-  response.sendStatus(204);
+  response.status(200).json({ publishedCount });
 }
 
 export async function grading(request: Request, response: Response) {
