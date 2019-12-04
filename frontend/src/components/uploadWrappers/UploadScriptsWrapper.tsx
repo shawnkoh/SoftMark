@@ -25,7 +25,7 @@ const UploadScriptsWrapper: React.FC = props => {
           if (index < limit) {
             const key = keys[index];
             const file = files[key];
-            const fileName = file.name.split(".")[0].toUpperCase();
+            const fileName = file.name;
             const onSuccess = () => {
               scriptUploaded++;
               if (scriptsLeft === 0 || scriptUploaded % 30 === 0) {
