@@ -1,14 +1,22 @@
 import { createQueryBuilder, getRepository } from "typeorm";
+import Paper from "../entities/Paper";
 import Script from "../entities/Script";
 import { sendScriptEmail } from "./sendgrid";
 
 async function publishScripts(paperId: number, paperName: string) {
+  const publishedPaperQuery = createQueryBuilder()
+    .select("paper.id", "paperId")
+    .from(Paper, "paper")
+    .where("paper.paperId = :paperId", { paperId })
+    .andWhere("paper.discardedAt IS NULL")
+    .andWhere("paper.publishedDate IS NOT NULL");
+
   const matchedScriptsQuery = createQueryBuilder()
     .select("script.id", "id")
     .from(Script, "script")
     .innerJoin("script.student", "student", "student.discardedAt IS NULL")
     .innerJoin("student.user", "user", "user.discardedAt IS NULL")
-    .where("script.paperId = :paperId", { paperId })
+    .where(`script.paperId IN (${publishedPaperQuery.getQuery()})`)
     .andWhere("script.discardedAt IS NULL")
     .andWhere("script.publishedDate IS NULL");
 
