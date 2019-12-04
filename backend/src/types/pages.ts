@@ -1,4 +1,4 @@
-import { AnnotationListData, isAnnotationListData } from "./annotations";
+import { AnnotationData, isAnnotationData } from "./annotations";
 import { DiscardableData, isDiscardableData } from "./entities";
 
 export interface PageListData extends DiscardableData {
@@ -7,7 +7,7 @@ export interface PageListData extends DiscardableData {
 }
 
 export interface PageData extends PageListData {
-  annotations: AnnotationListData[];
+  annotations: AnnotationData[];
 }
 
 export function isPageListData(data: any): data is PageListData {
@@ -20,8 +20,7 @@ export function isPageListData(data: any): data is PageListData {
 
 export function isPageData(data: any): data is PageData {
   return (
-    data.annotations.every((annotation: any) =>
-      isAnnotationListData(annotation)
-    ) && isPageListData(data)
+    data.annotations.every((annotation: any) => isAnnotationData(annotation)) &&
+    isPageListData(data)
   );
 }

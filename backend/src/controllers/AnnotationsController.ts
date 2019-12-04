@@ -50,7 +50,7 @@ export async function replace(request: Request, response: Response) {
   }
   await getRepository(Annotation).save(annotation);
 
-  const data = await annotation.getData();
+  const data = annotation.getData();
   response.status(201).json({ annotation: data });
 }
 
@@ -86,7 +86,7 @@ export async function showSelf(request: Request, response: Response) {
     return response.sendStatus(204);
   }
 
-  const data = await (ownAnnotation as Annotation).getListData();
+  const data = ownAnnotation.getData();
   response.status(200).json({ annotation: data });
 }
 
@@ -116,7 +116,7 @@ export async function update(request: Request, response: Response) {
   }
   await getRepository(Annotation).save(annotation);
 
-  const data = await annotation.getData();
+  const data = annotation.getData();
   response.status(200).json({ annotation: data });
 }
 
