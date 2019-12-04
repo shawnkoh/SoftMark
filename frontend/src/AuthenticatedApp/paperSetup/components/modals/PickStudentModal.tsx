@@ -109,9 +109,6 @@ const PickStudentModal: React.FC<Props> = props => {
                 .then(resp => {
                   callbackScript(resp.data.script);
                   toggleVisibility();
-                  toast(
-                    `Script ${script.filename} has been updated successfully.`
-                  );
                   refreshUnmatchedStudents();
                 })
                 .catch(errors => {
