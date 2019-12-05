@@ -15,12 +15,16 @@ import UploadIcon from "@material-ui/icons/CloudUpload";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { CSVDownload } from "react-csv";
+import { toast } from "react-toastify";
+import api from "../../../../api";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptStudentMappingWrapper from "../../../../components/uploadWrappers/UploadScriptStudentMappingWrapper";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
+import usePaper from "../../../../contexts/PaperContext";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
 
@@ -28,8 +32,16 @@ const ScriptsTable: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
   const { scripts } = useScriptsAndStudents();
+  const paper = usePaper();
 
   const [searchText, setSearchText] = useState("");
+  const [isDownloading, setDownloading] = useState(false);
+  const [isLoadingUnmatchedScripts, setLoadingUnmatchedScripts] = useState(
+    true
+  );
+  const [unmatchedScripts, setUnmatchedScripts] = useState<
+    { filename: string }[]
+  >([]);
 
   const columns: TableColumn[] = [
     {
@@ -66,6 +78,23 @@ const ScriptsTable: React.FC = () => {
         matriculationNumber.toLowerCase().includes(lowerCaseSearchText))
     );
   });
+
+  useEffect(() => {
+    if (!isDownloading) return;
+    const getUnmatchedScripts = async () => {
+      setLoadingUnmatchedScripts(true);
+      try {
+        const response = await api.papers.getUnmatchedScripts(paper.id);
+        setUnmatchedScripts(response.data.scripts);
+      } catch (error) {
+        toast.error(
+          "An unexpected error occured when exporting the scripts. Please try refreshing the page."
+        );
+      }
+      setLoadingUnmatchedScripts(false);
+    };
+    getUnmatchedScripts();
+  }, [isDownloading]);
 
   return (
     <>
@@ -117,9 +146,13 @@ const ScriptsTable: React.FC = () => {
             variant="contained"
             color="primary"
             startIcon={<CloudDownload />}
+            onClick={() => setDownloading(true)}
           >
             Export Unmatched
           </RoundedButton>
+          {isDownloading && !isLoadingUnmatchedScripts && (
+            <CSVDownload data={unmatchedScripts} target="_blank" />
+          )}
         </Grid>
         {/* <Grid item>
           <DeleteAllScriptsModal
