@@ -40,7 +40,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   const [isLoadingAllStudents, setIsLoadingAllStudents] = useState(true);
 
   const getStudents = () => {
-    api.paperUsers
+    api.students
       .getStudents(paperId)
       .then(resp => {
         setAllStudents(resp.data.students);
@@ -59,8 +59,8 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   );
 
   const getUnmatchedStudents = () => {
-    api.paperUsers.getUnmatchedStudents(paperId).then(resp => {
-      setUnmatchedStudents(resp.data.paperUsers);
+    api.students.getUnmatchedStudents(paperId).then(resp => {
+      setUnmatchedStudents(resp.data.students);
     });
   };
 
