@@ -43,6 +43,9 @@ export class ApiServer {
 
     this.server = app.listen(port);
     this.server.timeout = 1200000;
+    await this.connection.query(
+      'CREATE UNIQUE INDEX mark_unique_constraint ON mark ("questionId", "markerId") WHERE mark."discardedAt" IS NULL'
+    );
   }
 
   async close() {
