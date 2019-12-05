@@ -24,13 +24,12 @@ const StudentsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
   const { matched } = props;
   const [student, setStudent] = useState(props.student);
-  const { matriculationNumber, user } = student;
-  const { name, email } = user;
+  const { matriculationNumber, name, email } = student;
 
   return (
     <TableRow>
-      <TableCell>{matriculationNumber ? matriculationNumber : ""}</TableCell>
-      <TableCell>{name ? name : "-"}</TableCell>
+      <TableCell>{matriculationNumber || ""}</TableCell>
+      <TableCell>{name || "-"}</TableCell>
       <TableCell>{email}</TableCell>
       <TableCell>
         <Typography className={matched ? classes.green : classes.red}>

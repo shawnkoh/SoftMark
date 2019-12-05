@@ -43,7 +43,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
     api.paperUsers
       .getStudents(paperId)
       .then(resp => {
-        setAllStudents(resp.data.paperUsers);
+        setAllStudents(resp.data.students);
       })
       .catch(() => {
         setIsRejected(true);

@@ -55,7 +55,7 @@ const PickStudentModal: React.FC<Props> = props => {
       const newOptions: StudentOption[] = unmatchedStudents.map(student => ({
         studentId: student.id,
         matriculationNumber: student.matriculationNumber,
-        studentEmail: student.user.email
+        studentEmail: student.email
       }));
       if (chosenStudent) {
         newOptions.push(chosenStudent);
@@ -80,7 +80,7 @@ const PickStudentModal: React.FC<Props> = props => {
 
               return option.matriculationNumber
                 ? option.matriculationNumber
-                : option.user.email;
+                : option.email;
             }}
             onChange={(event: object, value: any) => setChosenStudent(value)}
             renderInput={params => (

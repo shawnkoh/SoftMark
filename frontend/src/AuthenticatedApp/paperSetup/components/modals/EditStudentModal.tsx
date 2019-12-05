@@ -19,8 +19,7 @@ type Props = OwnProps;
 
 const EditStudentModal: React.FC<Props> = props => {
   const { student, callbackStudentData, render } = props;
-  const { matriculationNumber, user } = student;
-  const { name, email } = user;
+  const { matriculationNumber, name, email } = student;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 

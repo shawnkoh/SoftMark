@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { AuthenticationData } from "backend/src/types/auth";
 import {
   InviteData,
   InvitePostData,
@@ -11,7 +12,6 @@ import {
   StudentListData
 } from "../types/paperUsers";
 import client from "./client";
-import { AuthenticationData } from "backend/src/types/auth";
 
 const URL = "/paper_users";
 
@@ -39,10 +39,10 @@ export async function getMarkers(
   return client.get(`papers/${id}/markers`);
 }
 
-export async function getStudents(
-  id: number
-): Promise<AxiosResponse<{ paperUsers: StudentListData[] }>> {
-  return client.get(`papers/${id}/students`);
+export async function getStudents(paperId: number) {
+  return client.get<{ students: StudentListData[] }>(
+    `papers/${paperId}/students`
+  );
 }
 
 export async function getUnmatchedStudents(

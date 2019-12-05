@@ -1,9 +1,9 @@
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import React, { ReactNode, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../../api";
 import ConfirmationDialog from "../../../../components/dialogs/ConfirmationDialog";
 import { StudentListData } from "../../../../types/paperUsers";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 
 interface OwnProps {
   student: StudentListData;
@@ -18,8 +18,7 @@ const DeleteStudentModal: React.FC<Props> = props => {
     refreshUnmatchedStudents
   } = useScriptsAndStudents();
   const { student, render } = props;
-  const { user, matriculationNumber } = student;
-  const { name } = user;
+  const { name, matriculationNumber } = student;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
 
