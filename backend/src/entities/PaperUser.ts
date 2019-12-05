@@ -8,6 +8,7 @@ import {
 import {
   Column,
   Entity,
+  getConnection,
   getRepository,
   ManyToOne,
   OneToMany,
@@ -138,12 +139,22 @@ export class PaperUser extends Discardable {
     ...(await this.getListData())
   });
 
-  getStudentData = async (): Promise<StudentListData> => ({
-    ...this.getBase(),
-    user: this.user
-      ? this.user.getData()
-      : (await getRepository(User).findOneOrFail(this.userId)).getData(),
-    role: this.role,
-    matriculationNumber: this.matriculationNumber
-  });
+  getStudentData = async (): Promise<StudentListData> => {
+    const data = await getConnection().query(`
+      SELECT
+        student.id,
+        student.role,
+        student."matriculationNumber",
+        "user".email,
+        "user".name,
+        student."createdAt",
+        student."updatedAt",
+        student."discardedAt"
+      FROM paper_user student
+      INNER JOIN "user"
+      ON student."userId" = "user".id AND "user"."discardedAt" IS NULL
+      WHERE student.id = ${this.id}
+    `);
+    return data[0];
+  };
 }

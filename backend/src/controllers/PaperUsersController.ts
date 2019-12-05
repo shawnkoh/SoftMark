@@ -23,7 +23,7 @@ import {
 } from "../types/tokens";
 import { allowedRequester, allowedRequesterOrFail } from "../utils/papers";
 import { sendInviteEmail } from "../utils/sendgrid";
-import { sortByMatricNo, sortPaperUserByName } from "../utils/sorts";
+import { sortPaperUserByName } from "../utils/sorts";
 
 export async function create(request: Request, response: Response) {
   try {
@@ -111,82 +111,6 @@ export async function getMarkers(request: Request, response: Response) {
   } catch (error) {
     response.sendStatus(404);
   }
-}
-
-export async function getStudents(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const paperId = Number(request.params.id);
-  const allowed = await allowedRequester(
-    payload.userId,
-    paperId,
-    PaperUserRole.Marker
-  );
-  if (!allowed) {
-    response.sendStatus(404);
-    return;
-  }
-
-  const students = (await getRepository(PaperUser).find({
-    where: {
-      paperId,
-      role: PaperUserRole.Student,
-      discardedAt: IsNull()
-    },
-    relations: ["user"]
-  })).sort(sortByMatricNo);
-
-  const data = await Promise.all(
-    students.map(async (student: PaperUser) => await student.getStudentData())
-  );
-
-  return response.status(200).json({ paperUsers: data });
-}
-
-export async function getUnmatchedStudents(
-  request: Request,
-  response: Response
-) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const paperId = Number(request.params.id);
-  const allowed = await allowedRequester(
-    payload.userId,
-    paperId,
-    PaperUserRole.Owner
-  );
-  if (!allowed) {
-    response.sendStatus(404);
-    return;
-  }
-
-  const scripts = await getRepository(Script).find({
-    paperId,
-    discardedAt: IsNull()
-  });
-
-  // store studentIds that have been matched
-  const boundedStudentIdsSet: Set<number> = new Set();
-  for (let i = 0; i < scripts.length; i++) {
-    const studentId = scripts[i].studentId;
-    if (studentId) {
-      boundedStudentIdsSet.add(studentId);
-    }
-  }
-
-  const students = (await getRepository(PaperUser).find({
-    where: {
-      paperId,
-      role: PaperUserRole.Student,
-      discardedAt: IsNull()
-    },
-    relations: ["user"]
-  }))
-    .filter(student => !boundedStudentIdsSet.has(student.id))
-    .sort(sortByMatricNo);
-
-  const data = await Promise.all(
-    students.map(async (student: PaperUser) => await student.getStudentData())
-  );
-  return response.status(200).json({ paperUsers: data });
 }
 
 export async function update(request: Request, response: Response) {
@@ -544,24 +468,4 @@ export async function createMultipleStudents(
   } catch (error) {
     return response.sendStatus(400);
   }
-}
-
-export async function unmatchedStudents(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const { userId } = payload;
-  const { paperId } = request.params;
-  const allowed = await allowedRequester(userId, paperId, PaperUserRole.Owner);
-  if (!allowed) {
-    response.sendStatus(404);
-  }
-
-  const students = await createQueryBuilder()
-    .select("student.matriculationNumber", "matriculationNumber")
-    .from(PaperUser, "student")
-    .innerJoin("student.scripts", "script", "script.discardedAt IS NULL")
-    .where("student.paperId = :paperId", { paperId })
-    .andWhere("student.discardedAt IS NULL")
-    .getRawMany();
-
-  response.status(200).json({ students });
 }
