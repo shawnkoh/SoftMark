@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../../../api";
 import { CanvasWithToolbar } from "../../../components/Canvas";
+import { Point } from "../../../components/Canvas/types";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import ReversedChip from "../../../components/ReversedChip";
 import usePaper from "../../../contexts/PaperContext";
@@ -41,6 +42,13 @@ const ScriptView: React.FC = () => {
   }, []);
 
   const [pageNo, setPageNo] = useState(1);
+
+  const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
+  const [scale, setScale] = useState<number>(1.0);
+  const handleViewChange = (position: Point, scale: number) => {
+    setPosition(position);
+    setScale(scale);
+  };
 
   interface HeaderProps {
     subtitle: string;
@@ -87,32 +95,44 @@ const ScriptView: React.FC = () => {
 
     const { matriculationNumber, questions, pages, filename } = scriptViewData;
 
-    /*
-    const getCurrentPageQuestions = () => {
-      const currentPage = pages.find(page => page.pageNo === pageNo)!;
-      const currentPageQuestions = questions.filter(question =>
-        currentPage.questionIds.includes(question.id)
-      );
-      return currentPageQuestions;
-    };
-    */
-
     return (
       <div className={classes.container}>
         <Header subtitle={matriculationNumber || filename} />
-        {pages
-          .filter(page => page.pageNo === pageNo)
-          .map((page, index) => (
-            <div className={classes.grow} key={index}>
-              <CanvasWithToolbar
-                backgroundImageSource={page.imageUrl}
-                backgroundAnnotations={page.annotations.map(
-                  annotation => annotation["layer"]
-                )}
-                foregroundAnnotation={[]}
+        <div className={classes.canvasWithToolbarContainer}>
+          {pages
+            .filter(page => page.pageNo === pageNo)
+            .map((page, index) => (
+              <div className={classes.grow} key={index}>
+                <CanvasWithToolbar
+                  backgroundImageSource={page.imageUrl}
+                  backgroundAnnotations={page.annotations.map(
+                    annotation => annotation["layer"]
+                  )}
+                  foregroundAnnotation={[]}
+                  onViewChange={handleViewChange}
+                />
+              </div>
+            ))}
+          {questions
+            .filter(question => question.displayPage === pageNo)
+            .map((question, index) => (
+              <ReversedChip
+                key={index}
+                label={"Q" + question.name}
+                avatar={
+                  <Avatar>{`${
+                    question.score === null ? "-" : question.score
+                  } / ${question.maxScore || "-"}`}</Avatar>
+                }
+                color={question.score === null ? "default" : "primary"}
+                style={{
+                  position: "absolute",
+                  left: question.leftOffset * scale + position.x,
+                  top: question.topOffset * scale + position.y
+                }}
               />
-            </div>
-          ))}
+            ))}
+        </div>
         <AppBar
           position="fixed"
           color="inherit"

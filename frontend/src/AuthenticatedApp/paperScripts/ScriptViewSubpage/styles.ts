@@ -46,6 +46,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     questionBarItem: {
       marginRight: theme.spacing(1)
+    },
+    canvasWithToolbarContainer: {
+      position: "relative",
+      display: "flex",
+      flexGrow: 1
     }
   })
 );
