@@ -1,25 +1,27 @@
 import * as allocations from "./allocations";
 import * as annotations from "./annotations";
 import * as auth from "./auth";
-import * as paperUsers from "./paperUsers";
-import * as papers from "./papers";
-import * as scriptTemplates from "./scriptTemplates";
-import * as scripts from "./scripts";
-import * as questionTemplates from "./questionTemplates";
-import * as users from "./users";
 import * as marks from "./marks";
+import * as papers from "./papers";
+import * as paperUsers from "./paperUsers";
+import * as questionTemplates from "./questionTemplates";
+import * as scripts from "./scripts";
+import * as scriptTemplates from "./scriptTemplates";
+import * as students from "./students";
+import * as users from "./users";
 
 const api = {
   allocations,
   annotations,
   auth,
-  paperUsers,
+  marks,
   papers,
-  scriptTemplates,
-  scripts,
+  paperUsers,
   questionTemplates,
-  users,
-  marks
+  scripts,
+  scriptTemplates,
+  students,
+  users
 };
 
 Object.freeze(api);
