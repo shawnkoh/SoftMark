@@ -1,30 +1,42 @@
-import React, { useState } from "react";
-import api from "../../api";
-import { DropAreaBase } from "material-ui-file-dropzone";
-import { Dialog, DialogContent, DialogContentText } from "@material-ui/core";
-import { NominalRollPostData } from "backend/src/types/paperUsers";
-import { toast } from "react-toastify";
-import usePaper from "contexts/PaperContext";
-import { DialogTitle } from "@material-ui/core";
-import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from "@material-ui/core";
+import { ScriptMappingData } from "backend/src/types/paperUsers";
 import LoadingSpinner from "components/LoadingSpinner";
+import usePaper from "contexts/PaperContext";
+import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
+import { DropAreaBase } from "material-ui-file-dropzone";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../../api";
+
+const NONE = "None";
 
 interface Props {
   clickable?: boolean;
 }
 
-const UploadNominalRollWrapper: React.FC<Props> = props => {
+const UploadScriptStudentMappingWrapper: React.FC<Props> = props => {
   const paper = usePaper();
   const {
     refreshAllStudents,
-    refreshUnmatchedStudents
+    refreshUnmatchedStudents,
+    refreshScripts
   } = useScriptsAndStudents();
   const { children, clickable = true } = props;
 
-  const [isSavingStudents, setIsSavingStudents] = useState(false);
+  const [
+    isMatchingScriptsAndStudents,
+    setIsMatchingScriptsAndStudents
+  ] = useState(false);
   const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false);
-  const [studentsThatSucceeded, setStudentsThatSucceeded] = useState("None");
-  const [studentsThatFailed, setStudentsThatFailed] = useState("None");
+  const [studentMatched, setStudentsMatched] = useState(NONE);
+  const [studentsFailedToBeMatched, setStudentsFailedToBeMatched] = useState(
+    NONE
+  );
 
   const responseDialog = (
     <Dialog
@@ -32,26 +44,26 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
       open={isResponseDialogOpen}
       onClose={() => {
         setIsResponseDialogOpen(false);
-        setStudentsThatSucceeded("None");
-        setStudentsThatFailed("None");
+        setStudentsMatched(NONE);
+        setStudentsFailedToBeMatched(NONE);
       }}
     >
-      {isSavingStudents && (
-        <LoadingSpinner loadingMessage="Saving students..." />
+      {isMatchingScriptsAndStudents && (
+        <LoadingSpinner loadingMessage="Matching students to scripts..." />
       )}
-      {!isSavingStudents && (
+      {!isMatchingScriptsAndStudents && (
         <>
           <DialogTitle>Result of upload</DialogTitle>
           <DialogContent dividers>
-            <DialogContentText>Successfully added students</DialogContentText>
-            {splitStringIntoLines(studentsThatSucceeded)}
+            <DialogContentText>Successfully matched students</DialogContentText>
+            {splitStringIntoLines(studentMatched)}
             <br />
             <br />
             <br />
             <DialogContentText>
-              Students that were not successfully uploaded
+              Students that were not successfully matched
             </DialogContentText>
-            {splitStringIntoLines(studentsThatFailed)}
+            {splitStringIntoLines(studentsFailedToBeMatched)}
           </DialogContent>
         </>
       )}
@@ -65,25 +77,26 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
       multiple={false}
       onSelectFiles={files => {
         Object.keys(files).forEach(key => {
-          setIsSavingStudents(true);
+          setIsMatchingScriptsAndStudents(true);
           setIsResponseDialogOpen(true);
           const file = files[key];
           const reader = new FileReader();
           reader.onloadend = async (e: any) => {
-            const nominalRollPostData: NominalRollPostData = {
+            const scriptMappingData: ScriptMappingData = {
               csvFile: e.target.result
             };
-            api.paperUsers
-              .createStudents(paper.id, nominalRollPostData)
+            api.scripts
+              .matchScriptsToStudents(paper.id, scriptMappingData)
               .then(resp => {
-                setStudentsThatFailed(resp.data.failedToBeAdded);
-                setStudentsThatSucceeded(resp.data.successfullyAdded);
-                setIsSavingStudents(false);
+                setStudentsFailedToBeMatched(resp.data.failedToBeMatched);
+                setStudentsMatched(resp.data.successfullyMatched);
+                setIsMatchingScriptsAndStudents(false);
                 setIsResponseDialogOpen(true);
+                refreshScripts();
                 toast.success(`Account for students created successfully.`);
               })
               .catch(() => {
-                setIsSavingStudents(false);
+                setIsMatchingScriptsAndStudents(false);
                 setIsResponseDialogOpen(false);
                 toast.error(`Accounts for students could not be created.`);
               })
@@ -102,7 +115,7 @@ const UploadNominalRollWrapper: React.FC<Props> = props => {
   );
 };
 
-export default UploadNominalRollWrapper;
+export default UploadScriptStudentMappingWrapper;
 
 const splitStringIntoLines = (str: string) => {
   if (str.toLocaleLowerCase() === "none") {

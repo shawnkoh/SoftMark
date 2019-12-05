@@ -9,9 +9,11 @@ import {
   TableSortLabel,
   Typography
 } from "@material-ui/core";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useState } from "react";
+import { CSVLink } from "react-csv";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
@@ -55,15 +57,13 @@ const StudentsTable: React.FC = () => {
   ];
 
   const filteredStudents = allStudents.filter(student => {
-    const { user, matriculationNumber } = student;
-    const matricNo = matriculationNumber || "";
-    const studentName = user.name || "";
-    const email = user.email || "";
+    const { matriculationNumber, name, email } = student;
     const lowerCaseSearchText = searchText.toLowerCase();
     return (
       searchText === "" ||
-      matricNo.toLowerCase().includes(lowerCaseSearchText) ||
-      studentName.toLowerCase().includes(lowerCaseSearchText) ||
+      (matriculationNumber &&
+        matriculationNumber.toLowerCase().includes(lowerCaseSearchText)) ||
+      (name && name.toLowerCase().includes(lowerCaseSearchText)) ||
       email.toLowerCase().includes(lowerCaseSearchText)
     );
   });
@@ -113,6 +113,15 @@ const StudentsTable: React.FC = () => {
               </RoundedButton>
             )}
           />
+        </Grid>
+        <Grid item>
+          <RoundedButton
+            variant="contained"
+            color="primary"
+            startIcon={<CloudDownload />}
+          >
+            <CSVLink data={unmatchedStudents}>Export Unmatched</CSVLink>
+          </RoundedButton>
         </Grid>
         {/* <Grid item>
           <DeleteAllStudentsModal

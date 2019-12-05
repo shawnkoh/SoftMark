@@ -10,14 +10,17 @@ import {
   Tooltip,
   Typography
 } from "@material-ui/core";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import React, { useState } from "react";
+import { CSVLink } from "react-csv";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
+import UploadScriptStudentMappingWrapper from "../../../../components/uploadWrappers/UploadScriptStudentMappingWrapper";
 import UploadScriptsWrapper from "../../../../components/uploadWrappers/UploadScriptsWrapper";
 import ScriptsTableRow from "./ScriptTableRow";
 import useStyles from "./styles";
@@ -25,11 +28,7 @@ import useStyles from "./styles";
 const ScriptsTable: React.FC = () => {
   const classes = useStyles();
   const { scriptTemplate } = useScriptTemplate();
-  const {
-    scripts,
-    matchScriptsToStudents,
-    isMatchingScriptsToStudents
-  } = useScriptsAndStudents();
+  const { scripts } = useScriptsAndStudents();
 
   const [searchText, setSearchText] = useState("");
 
@@ -56,7 +55,7 @@ const ScriptsTable: React.FC = () => {
     }
   ];
 
-  const unmatchedScriptsCount = scripts.filter(s => !s.studentId).length;
+  const unmatchedScripts = scripts.filter(script => !script.studentId);
 
   const filteredScripts = scripts.filter(script => {
     const { filename, matriculationNumber } = script;
@@ -73,7 +72,7 @@ const ScriptsTable: React.FC = () => {
     <>
       <Typography variant="overline" className={classes.margin}>
         {`${scripts.length} script(s) in total ` +
-          `(${unmatchedScriptsCount} unmatched scripts)`}
+          `(${unmatchedScripts.length} unmatched scripts)`}
       </Typography>
       <Grid
         container
@@ -102,16 +101,26 @@ const ScriptsTable: React.FC = () => {
           </UploadScriptsWrapper>
         </Grid>
         <Grid item>
-          <Tooltip title="Match students to scripts">
-            <RoundedButton
-              variant="contained"
-              color="primary"
-              startIcon={<MatchIcon />}
-              onClick={matchScriptsToStudents}
-            >
-              Match
-            </RoundedButton>
-          </Tooltip>
+          <UploadScriptStudentMappingWrapper>
+            <Tooltip title="Match students to scripts">
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                startIcon={<MatchIcon />}
+              >
+                Match
+              </RoundedButton>
+            </Tooltip>
+          </UploadScriptStudentMappingWrapper>
+        </Grid>
+        <Grid item>
+          <RoundedButton
+            variant="contained"
+            color="primary"
+            startIcon={<CloudDownload />}
+          >
+            <CSVLink data={unmatchedScripts}>Export Unmatched</CSVLink>
+          </RoundedButton>
         </Grid>
         {/* <Grid item>
           <DeleteAllScriptsModal
@@ -150,7 +159,7 @@ const ScriptsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {!isMatchingScriptsToStudents && filteredScripts.length === 0 && (
+            {filteredScripts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={columns.length}>
                   <br />
@@ -161,7 +170,7 @@ const ScriptsTable: React.FC = () => {
             )}
             {filteredScripts.map(script => (
               <ScriptsTableRow
-                key={script.id}
+                key={JSON.stringify(script)}
                 scriptTemplatePagesCount={
                   scriptTemplate ? scriptTemplate.pageCount : -1
                 }

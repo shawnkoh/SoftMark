@@ -15,8 +15,6 @@ type ScriptsAndStudentsContextProps =
       refreshUnmatchedStudents: () => void;
       scripts: ScriptListData[];
       refreshScripts: () => void;
-      matchScriptsToStudents: () => void;
-      isMatchingScriptsToStudents: boolean;
     })
   | null;
 
@@ -42,10 +40,10 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   const [isLoadingAllStudents, setIsLoadingAllStudents] = useState(true);
 
   const getStudents = () => {
-    api.paperUsers
+    api.students
       .getStudents(paperId)
       .then(resp => {
-        setAllStudents(resp.data.paperUsers);
+        setAllStudents(resp.data.students);
       })
       .catch(() => {
         setIsRejected(true);
@@ -61,8 +59,8 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
   );
 
   const getUnmatchedStudents = () => {
-    api.paperUsers.getUnmatchedStudents(paperId).then(resp => {
-      setUnmatchedStudents(resp.data.paperUsers);
+    api.students.getUnmatchedStudents(paperId).then(resp => {
+      setUnmatchedStudents(resp.data.students);
     });
   };
 
@@ -87,28 +85,6 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
     getScripts();
     setIsLoadingScripts(false);
   }, [paper_id]);
-
-  const [
-    isMatchingScriptsToStudents,
-    setIsMatchingScriptsToStudents
-  ] = useState(false);
-
-  const matchScriptsToStudents = () => {
-    setIsMatchingScriptsToStudents(true);
-    toast("Attempting to match scripts to students...");
-    api.scripts
-      .matchScriptsToStudents(paperId)
-      .then(() => {
-        setScripts([]);
-        getScripts();
-        getUnmatchedStudents();
-        toast.success("Matching algorithm ran successfully");
-      })
-      .catch(() => {
-        toast.error("An error occurred when matching.");
-      })
-      .finally(() => setIsMatchingScriptsToStudents(false));
-  };
 
   if (isLoadingAllStudents) {
     return <LoadingSpinner loadingMessage="Loading students..." />;
@@ -135,9 +111,7 @@ export const ScriptsAndStudentsProvider: React.FC = props => {
               unmatchedStudents,
               refreshUnmatchedStudents: getUnmatchedStudents,
               scripts,
-              refreshScripts: getScripts,
-              matchScriptsToStudents,
-              isMatchingScriptsToStudents
+              refreshScripts: getScripts
             }
           : null
       }

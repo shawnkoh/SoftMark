@@ -8,6 +8,7 @@ import { isAllocated } from "../middlewares/canModifyMark";
 import { PaperUserRole } from "../types/paperUsers";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
+import publishScripts from "../utils/publication";
 
 export async function replace(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
@@ -33,7 +34,7 @@ export async function replace(request: Request, response: Response) {
     response.sendStatus(404);
     return;
   }
-  const { requester } = allowed;
+  const { requester, paper } = allowed;
   if (
     requester.role === PaperUserRole.Marker &&
     !(await isAllocated(questionTemplate, requester.id))
@@ -66,6 +67,8 @@ export async function replace(request: Request, response: Response) {
       throw error;
     }
   }
+
+  await publishScripts(paper.id, paper.name, paper.publishedDate);
 
   const data = mark.getData();
   response.status(200).json({ mark: data });

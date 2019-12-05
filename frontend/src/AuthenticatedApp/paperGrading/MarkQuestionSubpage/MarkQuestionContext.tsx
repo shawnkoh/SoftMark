@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { Point } from "../../../components/Canvas/types";
-import {
-  ScriptMarkingData,
-  PageViewData,
-  QuestionViewData
-} from "backend/src/types/view";
 import api from "api";
-import produce from "immer";
-import { useParams } from "react-router";
-import LoadingSpinner from "components/LoadingSpinner";
-import { toast } from "react-toastify";
 import { Annotation } from "backend/src/types/annotations";
+import {
+  PageViewData,
+  QuestionViewData,
+  ScriptMarkingData
+} from "backend/src/types/view";
+import LoadingSpinner from "components/LoadingSpinner";
+import produce from "immer";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { toast } from "react-toastify";
+import { Point } from "../../../components/Canvas/types";
 
 interface DynamicState {
   scriptMarkingData: ScriptMarkingData;
@@ -25,7 +25,11 @@ interface DynamicState {
 }
 
 interface StaticState {
-  updateQuestion: (questionId: number, score: number | null, markId: number | null) => void;
+  updateQuestion: (
+    questionId: number,
+    score: number | null,
+    markId: number | null
+  ) => void;
   handlePrevClick: () => void;
   handleNextClick: () => void;
   handleNextUnmarkedClick: () => void;
@@ -157,17 +161,24 @@ export const MarkQuestionProvider: React.FC = props => {
   if (isLoading) return <LoadingSpinner />;
 
   // Page data methods
-  const updateQuestion = (questionId: number, score: number | null, markId: number | null) => {
+  const updateQuestion = (
+    questionId: number,
+    score: number | null,
+    markId: number | null
+  ) => {
     if (scriptMarkingData !== null)
       setScriptMarkingData(
         produce(scriptMarkingData, draftState => {
           draftState.questions.map(q => {
             if (q.id === questionId)
-              return produce(q, ds => { ds.score = score; ds.markId = markId });
+              return produce(q, ds => {
+                ds.score = score;
+                ds.markId = markId;
+              });
             return q;
-          })
+          });
         })
-      )
+      );
   };
 
   const handlePrevClick = () => {

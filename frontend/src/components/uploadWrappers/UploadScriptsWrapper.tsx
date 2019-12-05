@@ -7,7 +7,7 @@ import api from "../../api";
 
 const UploadScriptsWrapper: React.FC = props => {
   const paper = usePaper();
-  const { refreshScripts, matchScriptsToStudents } = useScriptsAndStudents();
+  const { refreshScripts } = useScriptsAndStudents();
   const { children } = props;
 
   return (
@@ -25,7 +25,7 @@ const UploadScriptsWrapper: React.FC = props => {
           if (index < limit) {
             const key = keys[index];
             const file = files[key];
-            const fileName = file.name.split(".")[0].toUpperCase();
+            const fileName = file.name;
             const onSuccess = () => {
               scriptUploaded++;
               if (scriptsLeft === 0 || scriptUploaded % 30 === 0) {
@@ -47,7 +47,7 @@ const UploadScriptsWrapper: React.FC = props => {
             };
             const atLoadEnd = () => {
               if (scriptsLeft === 0) {
-                matchScriptsToStudents();
+                refreshScripts();
               }
               asynchronousPostScript(index + 1, limit);
             };

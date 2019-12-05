@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { ScriptMappingData } from "backend/src/types/paperUsers";
 import {
   ScriptData,
   ScriptListData,
@@ -21,10 +22,16 @@ export async function createScript(
     timeout: 250000
   });
 }
+
 export async function matchScriptsToStudents(
-  id: number
-): Promise<AxiosResponse> {
-  return client.patch(`/papers/${id}/scripts/match`, {}, { timeout: 120000 });
+  id: number,
+  scriptMappingData: ScriptMappingData
+): Promise<
+  AxiosResponse<{ successfullyMatched: string; failedToBeMatched: string }>
+> {
+  return client.patch(`/papers/${id}/scripts/match`, scriptMappingData, {
+    timeout: 120000
+  });
 }
 
 export async function getScript(

@@ -23,6 +23,10 @@ export interface NominalRollPostData {
   csvFile: string;
 }
 
+export interface ScriptMappingData {
+  csvFile: string;
+}
+
 export type PaperUserPatchData = Partial<{
   role: PaperUserRole;
   matriculationNumber: string | null;
@@ -38,7 +42,8 @@ export interface PaperUserListData extends DiscardableData {
 }
 
 export interface StudentListData extends DiscardableData {
-  user: UserData; // intentionally nested
+  email: string;
+  name: string | null;
   role: PaperUserRole;
   matriculationNumber: string | null;
 }

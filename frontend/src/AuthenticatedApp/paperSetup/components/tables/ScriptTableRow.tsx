@@ -29,7 +29,6 @@ interface Props {
 
 const ScriptsTableRow: React.FC<Props> = props => {
   const classes = useStyles();
-  const { matchScriptsToStudents } = useScriptsAndStudents();
   const { scriptTemplatePagesCount } = props;
 
   const [script, setScript] = useState<ScriptListData>(props.script);
@@ -39,7 +38,6 @@ const ScriptsTableRow: React.FC<Props> = props => {
     return api.scripts
       .patchScript(script.id, newValues)
       .then(resp => {
-        matchScriptsToStudents();
         setScript(resp.data.script);
         return false;
       })

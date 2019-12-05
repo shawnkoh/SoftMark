@@ -5,6 +5,7 @@ import * as PaperUsersController from "../../controllers/PaperUsersController";
 import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
 import * as ScriptsController from "../../controllers/ScriptsController";
 import * as ScriptTemplatesController from "../../controllers/ScriptTemplatesController";
+import * as StudentsController from "../../controllers/StudentsController";
 import { checkBearerToken } from "../../middlewares/checkBearerToken";
 import { BearerTokenType } from "../../types/tokens";
 
@@ -13,11 +14,6 @@ export const router = Router();
 router.use(checkBearerToken(BearerTokenType.AccessToken));
 
 router.get("/:id/markers", PaperUsersController.getMarkers);
-router.get("/:id/students", PaperUsersController.getStudents);
-router.get(
-  "/:id/unmatched_students",
-  PaperUsersController.getUnmatchedStudents
-);
 router.post("/:id/users", PaperUsersController.create);
 router.post(
   "/:id/multiple_students",
@@ -61,5 +57,12 @@ router.get(
 router.get("/:paperId/allocations/self", AllocationsController.selfAllocations);
 
 router.post("/:paperId/publish", PapersController.publish);
+router.get("/:paperId/unmatched_scripts", ScriptsController.unmatchedScripts);
+
+router.get("/:paperId/students", StudentsController.index);
+router.get(
+  "/:paperId/unmatched_students",
+  StudentsController.unmatchedStudents
+);
 
 export default router;
