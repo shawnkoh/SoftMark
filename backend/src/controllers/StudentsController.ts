@@ -8,7 +8,12 @@ import { allowedRequester } from "../utils/papers";
 export async function index(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
   const { userId } = payload;
-  const { paperId } = request.params;
+  const paperId = Number(request.params.paperId);
+  // Defend against SQL Injection
+  if (isNaN(paperId)) {
+    response.sendStatus(404);
+    return;
+  }
   const allowed = await allowedRequester(userId, paperId, PaperUserRole.Marker);
   if (!allowed) {
     response.sendStatus(404);
