@@ -92,6 +92,8 @@ const ScriptsTable: React.FC = () => {
         );
       }
       setLoadingUnmatchedScripts(false);
+      // Allow user to export again
+      setTimeout(() => setDownloading(false), 1000);
     };
     getUnmatchedScripts();
   }, [isDownloading]);
