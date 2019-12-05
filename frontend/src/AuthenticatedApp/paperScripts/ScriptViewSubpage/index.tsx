@@ -109,6 +109,7 @@ const ScriptView: React.FC = () => {
                 backgroundAnnotations={page.annotations.map(
                   annotation => annotation["layer"]
                 )}
+                foregroundAnnotation={[]}
               />
             </div>
           ))}
