@@ -66,6 +66,7 @@ function selectScriptData<T>(
     .addSelect("script.paperId", "paperId")
     .addSelect("script.filename", "filename")
     .addSelect("student.id", "studentId")
+    .addSelect("student.userId", "userId")
     .addSelect("student.matriculationNumber", "matriculationNumber");
 }
 
@@ -179,7 +180,7 @@ export async function downloadScript(request: Request, response: Response) {
  */
 export async function viewScript(request: Request, response: Response) {
   const payload = response.locals.payload as AccessTokenSignedPayload;
-  const requesterId = payload.userId;
+  const { userId } = payload;
   const scriptId = Number(request.params.id);
 
   const scriptQuery = () =>
@@ -191,20 +192,24 @@ export async function viewScript(request: Request, response: Response) {
   const script = await selectScriptData(scriptQuery())
     .leftJoin("script.student", "student", "student.discardedAt IS NULL")
     .getRawOne();
-  if (!script) {
+
+  if (
+    !script ||
+    (userId !== script.userId &&
+      !(await allowedRequesterBoolean(
+        userId,
+        script.paperId,
+        PaperUserRole.Marker
+      )))
+  ) {
+    console.log("userId", userId);
+    console.log("paperId", script.paperId);
+    console.log("script.userId", script.userId);
     response.sendStatus(404);
     return;
   }
 
-  const { filename, id, studentId, paperId, matriculationNumber } = script;
-  // Only allow the student to get his own script or any marker and above
-  if (
-    requesterId !== studentId &&
-    !allowedRequester(requesterId, paperId, PaperUserRole.Marker)
-  ) {
-    response.sendStatus(404);
-    return;
-  }
+  const { filename, id, studentId, matriculationNumber } = script;
 
   const questionsQuery = () =>
     scriptQuery()
