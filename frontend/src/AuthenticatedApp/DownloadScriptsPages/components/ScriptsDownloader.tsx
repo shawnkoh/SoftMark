@@ -61,7 +61,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
     const allImagesFullyLoaded = imageUrlArray.length === pages.length;
 
     if (allImagesFullyLoaded) {
-      let pdf = new jsPDF();
+      let pdf = new jsPDF(undefined, undefined, undefined, true);
       const width = pdf.internal.pageSize.getWidth();
       const height = pdf.internal.pageSize.getHeight();
       for (let i = 0; i < imageUrlArray.length; i++) {
@@ -69,7 +69,16 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
           pdf.addPage();
           pdf.setPage(i + 1);
         }
-        pdf.addImage(imageUrlArray[i], "JPEG", 0, 0, width, height);
+        pdf.addImage(
+          imageUrlArray[i],
+          "JPEG",
+          0,
+          0,
+          width,
+          height,
+          undefined,
+          "FAST"
+        );
       }
       pdf.save(`${script.matriculationNumber || script.filename}`);
 
