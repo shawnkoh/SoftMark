@@ -202,9 +202,6 @@ export async function viewScript(request: Request, response: Response) {
         PaperUserRole.Marker
       )))
   ) {
-    console.log("userId", userId);
-    console.log("paperId", script.paperId);
-    console.log("script.userId", script.userId);
     response.sendStatus(404);
     return;
   }
