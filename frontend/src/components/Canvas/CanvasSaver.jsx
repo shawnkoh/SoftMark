@@ -9,21 +9,12 @@ class CanvasSaver extends React.Component {
     this.handleLoad = this.handleLoad.bind(this);
   }
 
-  async componentDidMount() {
-    const stage = this.refs.stage.getStage();
-    // sends back image dataurl to parent component
-    setTimeout(async () => {
-      var dataURL = await stage.toDataURL({ pixelRatio: 0.8 });
-      this.props.callBackImageUrl(dataURL);
-    }, 3000);
-  }
-
-  componentDidUpdate() {
-    // shouldnt send the data URL back more than once
-  }
-
   handleLoad(width, height) {
-    this.setState({ width, height });
+    this.setState({ width, height }, () => {
+      const stage = this.refs.stage.getStage();
+      const dataURL = stage.toDataURL({ pixelRatio: 0.8 });
+      this.props.callBackImageUrl(dataURL);
+    });
   }
 
   render() {
