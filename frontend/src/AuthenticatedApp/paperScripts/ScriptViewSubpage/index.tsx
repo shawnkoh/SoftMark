@@ -43,6 +43,7 @@ const ScriptView: React.FC = () => {
         script.pages.forEach(page => pages.set(page.pageNo, page));
         setPages(pages);
         setScript(script);
+        setLoading(false);
       } catch (error) {
         toast.error(
           `An error occured while viewing Script #${scriptId}. Please try refreshing the page.`
@@ -50,7 +51,6 @@ const ScriptView: React.FC = () => {
       }
     };
     downloadScript(Number(scriptId));
-    setLoading(false);
   }, [scriptId]);
 
   if (isLoading) {
