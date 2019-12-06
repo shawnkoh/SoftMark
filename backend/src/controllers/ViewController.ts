@@ -149,6 +149,9 @@ export async function downloadScript(request: Request, response: Response) {
     )
     .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
     .where("question.scriptId = :scriptId", { scriptId })
+    .orderBy("questionTemplate.displayPage", "ASC")
+    .addOrderBy("questionTemplate.topOffset", "ASC")
+    .addOrderBy("questionTemplate.leftOffset", "ASC")
     .getRawMany();
 
   const allPages = await pagesPromise;
