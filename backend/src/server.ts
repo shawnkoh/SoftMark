@@ -44,8 +44,9 @@ export class ApiServer {
     this.server = app.listen(port);
     this.server.timeout = 1200000;
     await this.connection.query(
-      'CREATE UNIQUE INDEX mark_unique_constraint ON mark ("questionId", "markerId") WHERE mark."discardedAt" IS NULL'
+      'CREATE UNIQUE INDEX IF NOT EXISTS mark_unique_constraint ON mark ("questionId", "markerId") WHERE mark."discardedAt" IS NULL'
     );
+    await this.connection.query("CREATE EXTENSION IF NOT EXISTS tablefunc;");
   }
 
   async close() {
