@@ -34,10 +34,10 @@ afterAll(async () => {
   await server.close();
 });
 
-describe("GET /scripts/:id", () => {
+describe("GET /scripts/:id/download", () => {
   it("should allow a Paper's Owner to access this route", async () => {
     const response = await request(server.server)
-      .get(`${fixtures.api}/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}/download`)
       .set("Authorization", fixtures.ownerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -45,7 +45,7 @@ describe("GET /scripts/:id", () => {
 
   it("should allow a Paper's Marker to access this route", async () => {
     const response = await request(server.server)
-      .get(`${fixtures.api}/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}/download`)
       .set("Authorization", fixtures.markerAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -53,7 +53,7 @@ describe("GET /scripts/:id", () => {
 
   it("should allow a Script's Student to access this route", async () => {
     const response = await request(server.server)
-      .get(`${fixtures.api}/scripts/${script1.id}`)
+      .get(`${fixtures.api}/scripts/${script1.id}/download`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).not.toEqual(404);
@@ -61,7 +61,41 @@ describe("GET /scripts/:id", () => {
 
   it("should not allow a Student to access another Student's Script", async () => {
     const response = await request(server.server)
-      .get(`${fixtures.api}/scripts/${script2.id}`)
+      .get(`${fixtures.api}/scripts/${script2.id}/download`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).toEqual(404);
+  });
+});
+
+describe("GET /scripts/:id/view", () => {
+  it("should allow a Paper's Owner to access this route", async () => {
+    const response = await request(server.server)
+      .get(`${fixtures.api}/scripts/${script1.id}/view`)
+      .set("Authorization", fixtures.ownerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Paper's Marker to access this route", async () => {
+    const response = await request(server.server)
+      .get(`${fixtures.api}/scripts/${script1.id}/view`)
+      .set("Authorization", fixtures.markerAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should allow a Script's Student to access this route", async () => {
+    const response = await request(server.server)
+      .get(`${fixtures.api}/scripts/${script1.id}/view`)
+      .set("Authorization", fixtures.studentAccessToken)
+      .send();
+    expect(response.status).not.toEqual(404);
+  });
+
+  it("should not allow a Student to access another Student's Script", async () => {
+    const response = await request(server.server)
+      .get(`${fixtures.api}/scripts/${script2.id}/view`)
       .set("Authorization", fixtures.studentAccessToken)
       .send();
     expect(response.status).toEqual(404);

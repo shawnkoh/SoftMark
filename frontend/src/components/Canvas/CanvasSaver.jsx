@@ -1,6 +1,5 @@
 import React from "react";
-import { Stage, Layer, Line } from "react-konva";
-
+import { Layer, Line, Stage, Text } from "react-konva";
 import UrlImage from "./UrlImage";
 
 class CanvasSaver extends React.Component {
@@ -10,14 +9,14 @@ class CanvasSaver extends React.Component {
     this.handleLoad = this.handleLoad.bind(this);
   }
 
-  async componentDidMount() {   
-      const stage = this.refs.stage.getStage();
-      // sends back image dataurl to parent component
-      // if (this.state.width !== 0 && this.state.height !== 0) { will add this back later
-      setTimeout(async () => {
-          var dataURL = await stage.toDataURL();
-          this.props.callBackImageUrl(dataURL);
-      }, 3000);
+  async componentDidMount() {
+    const stage = this.refs.stage.getStage();
+    // sends back image dataurl to parent component
+    // if (this.state.width !== 0 && this.state.height !== 0) { will add this back later
+    setTimeout(async () => {
+      var dataURL = await stage.toDataURL();
+      this.props.callBackImageUrl(dataURL);
+    }, 3000);
   }
 
   componentDidUpdate() {
@@ -38,6 +37,7 @@ class CanvasSaver extends React.Component {
         scaleY={1}
         x={0}
         y={0}
+        fill="red"
       >
         <Layer>
           <UrlImage
@@ -45,6 +45,18 @@ class CanvasSaver extends React.Component {
             onLoad={this.handleLoad}
           />
         </Layer>
+        {this.props.questions.map((question, index) => (
+          <Layer key={index + " " + question.id}>
+            <Text
+              fontSize={30}
+              text={`${question.score} / ${question.maxScore}`}
+              wrap="char"
+              x={question.leftOffset}
+              y={question.topOffset}
+              fill="red"
+            />
+          </Layer>
+        ))}
         {this.props.backgroundAnnotations.map(
           (backgroundAnnotationLines, i) => (
             <Layer key={i}>

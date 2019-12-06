@@ -7,7 +7,6 @@ import { BearerTokenType } from "../../types/tokens";
 export const router = Router();
 
 router.use(checkBearerToken(BearerTokenType.AccessToken));
-router.get("/:id", ScriptsController.show);
 router.get("/:id/view", ViewController.viewScript);
 router.get("/:scriptId/download", ViewController.downloadScript);
 router.delete("/:id", ScriptsController.discard);
