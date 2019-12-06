@@ -60,7 +60,6 @@ const PageTemplateView: React.FC<{
             src={pageTemplate.imageUrl}
             onLoad={() => setImgLoaded(true)}
           />
-
           {Object.keys(leafQuestions)
             .filter(key => leafQuestions[key].displayPage === currentPageNo)
             .map(key => (
