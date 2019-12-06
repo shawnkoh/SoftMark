@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from "react";
-
-import api from "../../../../api";
-import { ScriptData, ScriptListData } from "backend/src/types/scripts";
-
 import { Dialog, DialogContent } from "@material-ui/core";
-import LoadingSpinner from "../../../../components/LoadingSpinner";
+import { ScriptListData } from "backend/src/types/scripts";
+import { ScriptDownloadData } from "backend/src/types/view";
+import React, { useEffect, useState } from "react";
+import api from "../../../../api";
 import DialogTitleWithCloseButton from "../../../../components/dialogs/DialogTitleWithCloseButton";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
 
-interface OwnProps {
+interface Props {
   script: ScriptListData;
   render: any;
 }
-
-type Props = OwnProps;
 
 const ViewScriptModal: React.FC<Props> = props => {
   const { script, render } = props;
   const [isOpen, setIsOpen] = useState(false);
   const toggleVisibility = () => setIsOpen(!isOpen);
-
-  const [scriptData, setScriptData] = useState<ScriptData | null>(null);
-
+  const [scriptData, setScriptData] = useState<ScriptDownloadData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getScript = async (scriptId: number) => {
+  const downloadScript = async (scriptId: number) => {
     setIsLoading(true);
     api.scripts
-      .getScript(scriptId)
+      .downloadScript(scriptId)
       .then(resp => {
         setScriptData(resp.data.script);
       })
@@ -35,7 +30,7 @@ const ViewScriptModal: React.FC<Props> = props => {
 
   useEffect(() => {
     if (isOpen && !scriptData) {
-      getScript(script.id);
+      downloadScript(script.id);
     }
   }, [isOpen]);
 

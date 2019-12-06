@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { CanvasSaver } from "../../../components/Canvas";
-import api from "../../../api";
-import jsPDF from "jspdf";
-import { Dialog, DialogTitle, DialogContent } from "@material-ui/core";
-import { ScriptData } from "backend/src/types/scripts";
+import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
+import { ScriptDownloadData } from "backend/src/types/view";
 import LoadingSpinner from "components/LoadingSpinner";
+import jsPDF from "jspdf";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import api from "../../../api";
+import { CanvasSaver } from "../../../components/Canvas";
 
 interface Props {
   scriptIds: number[];
@@ -13,15 +13,16 @@ interface Props {
 
 const DownloadAsPdfPage: React.FC<Props> = props => {
   const { scriptIds } = props;
-
-  const [script, setScript] = useState<ScriptData | null>(null);
-
+  const [script, setScript] = useState<ScriptDownloadData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [scriptIndex, setScriptIndex] = useState(0);
+  const incrementScriptIndex = () => setScriptIndex(scriptIndex + 1);
+  const [isDownloading, setIsDownloading] = useState(true);
 
-  const getScript = (scriptId: number) => {
+  const downloadScript = (scriptId: number) => {
     setIsLoading(true);
     api.scripts
-      .getScript(scriptId)
+      .downloadScript(scriptId)
       .then(resp => {
         setScript(resp.data.script);
       })
@@ -29,21 +30,16 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
       .finally(() => setIsLoading(false));
   };
 
-  const [scriptIndex, setScriptIndex] = useState(0);
-  const incrementScriptIndex = () => setScriptIndex(scriptIndex + 1);
-
   const getNextScript = () => {
     const isValidScriptIndex = scriptIndex < scriptIds.length;
     if (isValidScriptIndex) {
       const nextScriptId = scriptIds[scriptIndex];
-      getScript(nextScriptId);
+      downloadScript(nextScriptId);
       incrementScriptIndex();
     }
   };
 
   useEffect(getNextScript, []);
-
-  const [isDownloading, setIsDownloading] = useState(true);
 
   if (isLoading) {
     return <LoadingSpinner loadingMessage="Loading next script..." />;
@@ -88,6 +84,9 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
     }
   };
 
+  const getQuestionsByPageNo = (pageNo: number) =>
+    script.questions.filter(question => question.displayPage === pageNo);
+
   return (
     <div style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}>
       <Dialog open={isDownloading}>
@@ -107,6 +106,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
             callBackImageUrl={callBackImageUrl}
             backgroundAnnotations={backgroundAnnotations}
             backgroundImageSource={page.imageUrl}
+            questions={getQuestionsByPageNo(page.pageNo)}
           />
         );
       })}
