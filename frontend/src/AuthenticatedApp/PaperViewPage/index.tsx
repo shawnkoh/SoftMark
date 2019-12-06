@@ -2,10 +2,16 @@ import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import Check from "@material-ui/icons/Check";
 import People from "@material-ui/icons/People";
 import Settings from "@material-ui/icons/Settings";
+import { ScriptListData } from "backend/src/types/scripts";
 import usePaper from "contexts/PaperContext";
-import React, { useState } from "react";
+import { ScriptsAndStudentsProvider } from "contexts/ScriptsAndStudentsContext";
+import { ScriptTemplateProvider } from "contexts/ScriptTemplateContext";
+import React, { useEffect, useState } from "react";
 import { Redirect, RouteComponentProps, withRouter } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
+import { toast } from "react-toastify";
+import api from "../../api";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { PaperUserRole } from "../../types/paperUsers";
 import DownloadAllScriptsPage from "../DownloadScriptsPages/DownloadAllScriptsPage";
 import DownloadSingleScriptPage from "../DownloadScriptsPages/DownloadSingleScriptPage";
@@ -169,37 +175,45 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
 
   return (
     <>
-      {role === PaperUserRole.Owner && (
-        <Switch>
-          {downloadAllScriptsRoute}
-          {downloadSingleScriptRoute}
-          {scriptMarkRoute}
-          {questionAllocationRoute}
-          {setupScriptTemplateRoute}
-          {scriptMappingRoute}
-          {scriptViewRoute}
-          {markQuestionRoute}
-          {setupRoute}
-          {gradingRoute}
-          {scriptsListingRoute}
-        </Switch>
-      )}
-      {role === PaperUserRole.Marker && (
-        <Switch>
-          {downloadAllScriptsRoute}
-          {downloadSingleScriptRoute}
-          {scriptMarkRoute}
-          {markQuestionRoute}
-          {scriptViewRoute}
-          {gradingRoute}
-          {scriptsListingRoute}
-        </Switch>
-      )}
       {role === PaperUserRole.Student && (
         <Switch>
           {scriptViewRoute}
           {studentRedirectRoute}
         </Switch>
+      )}
+
+      {(role === PaperUserRole.Owner || role === PaperUserRole.Marker) && (
+        <ScriptTemplateProvider>
+          <ScriptsAndStudentsProvider>
+            {role === PaperUserRole.Owner && (
+              <Switch>
+                {downloadAllScriptsRoute}
+                {downloadSingleScriptRoute}
+                {scriptMarkRoute}
+                {questionAllocationRoute}
+                {setupScriptTemplateRoute}
+                {scriptMappingRoute}
+                {scriptViewRoute}
+                {markQuestionRoute}
+                {setupRoute}
+                {gradingRoute}
+                {scriptsListingRoute}
+              </Switch>
+            )}
+
+            {role === PaperUserRole.Marker && (
+              <Switch>
+                {downloadAllScriptsRoute}
+                {downloadSingleScriptRoute}
+                {scriptMarkRoute}
+                {markQuestionRoute}
+                {scriptViewRoute}
+                {gradingRoute}
+                {scriptsListingRoute}
+              </Switch>
+            )}
+          </ScriptsAndStudentsProvider>
+        </ScriptTemplateProvider>
       )}
     </>
   );
@@ -207,17 +221,35 @@ const PaperView: React.FC<RouteComponentProps> = ({ location, match }) => {
 
 export default withRouter(PaperView);
 
+// TODO: Handle this better. For now, there is only one script per student so this is ok.
 const StudentRedirectToScriptView: React.FC<RouteComponentProps> = ({
   match
 }) => {
   const paper = usePaper();
-  const role = paper.role;
+  const [isLoading, setLoading] = useState(true);
+  const [scripts, setScripts] = useState<ScriptListData[]>([]);
 
-  //TODO: get scriptID of the student
+  useEffect(() => {
+    const getScripts = async () => {
+      try {
+        const response = await api.scripts.getScripts(paper.id);
+        const { scripts } = response.data;
+        setScripts(scripts);
+      } catch (error) {
+        toast.error(
+          "An error occured while trying to load your scripts. Please try refreshing the page. Otherwise email shawnkoh@me.com"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    setLoading(true);
+    getScripts();
+  }, [paper]);
 
-  return role === PaperUserRole.Student ? (
-    <Redirect to={`/papers/${paper.id}/${SCRIPTS}/scriptId`} />
-  ) : (
-    <div />
-  );
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return <Redirect to={`/papers/${paper.id}/${SCRIPTS}/${scripts[0].id}`} />;
 };
