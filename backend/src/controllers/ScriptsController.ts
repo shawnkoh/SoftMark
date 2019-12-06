@@ -16,7 +16,7 @@ import { Question } from "../entities/Question";
 import QuestionTemplate from "../entities/QuestionTemplate";
 import { Script } from "../entities/Script";
 import { PaperUserRole, ScriptMappingData } from "../types/paperUsers";
-import { ScriptData, ScriptPatchData } from "../types/scripts";
+import { ScriptPatchData } from "../types/scripts";
 import { AccessTokenSignedPayload } from "../types/tokens";
 import { allowedRequester } from "../utils/papers";
 import publishScripts from "../utils/publication";
@@ -396,46 +396,6 @@ export async function index(request: Request, response: Response) {
   `);
 
   response.status(200).json({ scripts });
-}
-
-export async function show(request: Request, response: Response) {
-  const payload = response.locals.payload as AccessTokenSignedPayload;
-  const userId = payload.userId;
-  const scriptId = request.params.id;
-  const script = await getRepository(Script).findOne(scriptId, {
-    where: { discardedAt: IsNull() },
-    relations: ["pages", "pages.annotations"]
-  });
-  if (!script) {
-    response.sendStatus(404);
-    return;
-  }
-  const allowed = await allowedRequester(
-    userId,
-    script.paperId,
-    PaperUserRole.Student
-  );
-  if (!allowed) {
-    response.sendStatus(404);
-    return;
-  }
-  const { requester } = allowed;
-  if (
-    requester.role === PaperUserRole.Student &&
-    script.studentId !== requester.id
-  ) {
-    response.sendStatus(404);
-    return;
-  }
-
-  const data: ScriptData = {
-    filename: script.filename,
-    pages: (script.pages as Page[]).map((page: Page) => ({
-      ...page.getListData(),
-      annotations: page.annotations!
-    }))
-  };
-  response.status(200).json({ script: data });
 }
 
 export async function discard(request: Request, response: Response) {

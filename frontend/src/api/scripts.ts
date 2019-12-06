@@ -38,12 +38,6 @@ export async function matchScriptsToStudents(
   });
 }
 
-export async function getScript(
-  id: number
-): Promise<AxiosResponse<{ script: ScriptData }>> {
-  return client.get(`${URL}/${id}`);
-}
-
 export async function viewScript(id: number) {
   return await client.get<{ script: ScriptViewData }>(`${URL}/${id}/view`);
 }

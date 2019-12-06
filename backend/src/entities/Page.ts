@@ -32,7 +32,7 @@ export class Page extends Discardable {
 
   getListData = (): PageListData => ({
     ...this.getBase(),
-    pageNo: this.pageNo || -1,
-    imageUrl: this.imageUrl || ""
+    pageNo: this.pageNo,
+    imageUrl: this.imageUrl
   });
 }
