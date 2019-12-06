@@ -258,16 +258,14 @@ export async function match(request: Request, response: Response) {
     scriptsMap.set(script.filename.toLocaleUpperCase(), script);
   }
 
-  const { csvFile } = request.body as ScriptMappingData;
+  const { rows } = request.body as ScriptMappingData;
   let successfullyMatched = "";
   let failedToBeMatched = "";
-  const rows: string[] = csvFile.split("\n");
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    const cells = row.split("\r")[0].split(",");
-    if (cells.length >= 2) {
-      const filename = cells[0].toLocaleUpperCase();
-      const matriculationNumber = cells[1].toLocaleUpperCase();
+    if (row.length >= 2) {
+      const filename = row[0].toLocaleUpperCase();
+      const matriculationNumber = row[1].toLocaleUpperCase();
       const mappingDetails = matriculationNumber + " " + filename;
 
       const student = studentsMap.get(matriculationNumber);
