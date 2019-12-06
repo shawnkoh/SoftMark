@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { createQueryBuilder, getRepository } from "typeorm";
 import { Paper } from "../entities/Paper";
 import { PaperUser } from "../entities/PaperUser";
 import { PaperUserRole } from "../types/paperUsers";
@@ -42,3 +42,18 @@ export const allowedRequesterOrFail = async (
   }
   return allowed;
 };
+
+// TODO: Intended to replace allowedRequester
+export async function allowedRequesterBoolean(
+  userId: number,
+  paperId: number | string,
+  requiredRole: PaperUserRole
+) {
+  const paperUser = await createQueryBuilder()
+    .select("paperUser.role", "role")
+    .from(PaperUser, "paperUser")
+    .where("paperUser.userId = :userId", { userId })
+    .andWhere("paperUser.paperId = :paperId", { paperId })
+    .getRawOne();
+  return allowedRole(paperUser.role, requiredRole);
+}

@@ -3,14 +3,14 @@ import { AnnotationLine } from "./annotations";
 // TODO: Collapse all the types into their respective entities
 
 export interface QuestionViewData {
-  id: number;
-  name: string;
-  markId: number | null;
-  score: number | null;
-  maxScore: number;
-  topOffset: number;
-  leftOffset: number;
   displayPage: number;
+  id: number;
+  leftOffset: number;
+  markId: number | null;
+  maxScore: number;
+  name: string;
+  score: number | null;
+  topOffset: number;
 }
 
 export interface AnnotationViewData {
@@ -19,10 +19,11 @@ export interface AnnotationViewData {
 }
 
 export interface PageViewData {
-  id: number;
-  pageNo: number;
-  imageUrl: string;
   annotations: AnnotationViewData[];
+  id: number;
+  imageUrl: string;
+  pageNo: number;
+  // DEPRECATED - replaced with QuestionViewData.displayPage
   questionIds: number[];
 }
 
@@ -32,20 +33,26 @@ export interface QuestionTemplateViewData {
 }
 
 export interface ScriptViewData {
-  id: number;
-  // it can be null because of either
-  // 1. the student doesnt have a matriculation number tagged to it
-  // 2. or there is no student tagged to it
-  studentId: number | null; // refers to paperUserId
-  matriculationNumber: string | null;
-  questions: QuestionViewData[];
-  pages: PageViewData[];
   filename: string;
+  id: number;
+  matriculationNumber: string | null;
+  pages: PageViewData[];
+  questions: QuestionViewData[];
+  studentId: number | null;
 }
 
-export interface ScriptMarkingData extends ScriptViewData {
-  rootQuestionTemplate: QuestionTemplateViewData;
+export interface ScriptDownloadData {
+  filename: string;
+  id: number;
+  matriculationNumber: string | null;
+  pages: PageViewData[];
+  questions: QuestionViewData[];
+  studentId: number | null;
+}
+
+export interface ScriptMarkingData extends ScriptDownloadData {
   canMark: boolean;
-  previousScriptId: number | null;
   nextScriptId: number | null;
+  previousScriptId: number | null;
+  rootQuestionTemplate: QuestionTemplateViewData;
 }

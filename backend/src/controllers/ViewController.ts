@@ -3,10 +3,12 @@ import { Request, Response } from "express";
 import { chain } from "lodash";
 import {
   Brackets,
+  createQueryBuilder,
   getRepository,
   getTreeRepository,
   SelectQueryBuilder
 } from "typeorm";
+import { Annotation } from "../entities/Annotation";
 import { Page } from "../entities/Page";
 import { PageTemplate } from "../entities/PageTemplate";
 import { Question } from "../entities/Question";
@@ -21,7 +23,7 @@ import {
   ScriptMarkingData,
   ScriptViewData
 } from "../types/view";
-import { allowedRequester } from "../utils/papers";
+import { allowedRequester, allowedRequesterBoolean } from "../utils/papers";
 
 function selectQuestionViewData<T>(queryBuilder: SelectQueryBuilder<T>) {
   return queryBuilder
@@ -67,6 +69,109 @@ function selectScriptData<T>(
     .addSelect("student.matriculationNumber", "matriculationNumber");
 }
 
+export async function downloadScript(request: Request, response: Response) {
+  const payload = response.locals.payload as AccessTokenSignedPayload;
+  const { userId } = payload;
+  const scriptId = Number(request.params.scriptId);
+
+  const script: {
+    id: number;
+    filename: string;
+    paperId: number;
+    studentId: number | null;
+    userId: number | null;
+    matriculationNumber: string | null;
+  } = await createQueryBuilder()
+    .select("script.id", "id")
+    .addSelect("script.filename", "filename")
+    .addSelect("script.paperId", "paperId")
+    .addSelect("student.id", "studentId")
+    .addSelect("student.userId", "userId")
+    .addSelect("student.matriculationNumber", "matriculationNumber")
+    .from(Script, "script")
+    .leftJoin("script.student", "student", "student.discardedAt IS NULL")
+    .where("script.id = :scriptId", { scriptId })
+    .andWhere("script.discardedAt IS NULL")
+    .getRawOne();
+
+  if (
+    !script ||
+    (userId !== script.userId &&
+      !(await allowedRequesterBoolean(
+        userId,
+        script.paperId,
+        PaperUserRole.Marker
+      )))
+  ) {
+    response.sendStatus(404);
+    return;
+  }
+
+  // Optimisation: Do not inner join pages with annotations because it will duplicate
+  // imageUrls being loaded when there are multiple annotations for the same page
+  const pagesPromise = createQueryBuilder()
+    .select("page.id", "id")
+    .addSelect("page.pageNo", "pageNo")
+    .addSelect("page.imageUrl", "imageUrl")
+    .from(Page, "page")
+    .where("page.scriptId = :scriptId", { scriptId })
+    .andWhere("page.discardedAt IS NULL")
+    .getRawMany();
+
+  const annotationsPromise = createQueryBuilder()
+    .select("annotation.id", "id")
+    .addSelect("annotation.layer", "layer")
+    .addSelect("annotation.pageId", "pageId")
+    .from(Annotation, "annotation")
+    .innerJoin(
+      Page,
+      "page",
+      "page.discardedAt IS NULL AND page.scriptId = :scriptId",
+      { scriptId }
+    )
+    .getRawMany();
+
+  const questions = createQueryBuilder()
+    .select("question.id", "id")
+    .addSelect("questionTemplate.name", "name")
+    .addSelect("questionTemplate.score", "maxScore")
+    .addSelect("questionTemplate.displayPage", "displayPage")
+    .addSelect("questionTemplate.topOffset", "topOffset")
+    .addSelect("questionTemplate.leftOffset", "leftOffset")
+    .addSelect("mark.id", "markId")
+    .addSelect("mark.score", "score")
+    .from(Question, "question")
+    .innerJoin(
+      "question.questionTemplate",
+      "questionTemplate",
+      "questionTemplate.discardedAt IS NULL"
+    )
+    .leftJoin("question.marks", "mark", "mark.discardedAt IS NULL")
+    .where("question.scriptId = :scriptId", { scriptId })
+    .getRawMany();
+
+  const allPages = await pagesPromise;
+  const allAnnotations = await annotationsPromise;
+
+  const pages = allPages.map(page => ({
+    ...page,
+    annotations: allAnnotations.filter(
+      annotation => annotation.pageId === page.id
+    )
+  }));
+
+  const data: ScriptViewData = {
+    id: script.id,
+    matriculationNumber: script.matriculationNumber,
+    filename: script.filename,
+    studentId: script.studentId,
+    pages,
+    questions: await questions
+  };
+  response.status(200).json({ script: data });
+}
+
+// DEPRECATED FOR NOW - GOING TO REWRITE
 /**
  * Loads everything related to the Script.
  * Unlike questionToMark, does not filter the pages and questions based on the rootQuestionTemplate
