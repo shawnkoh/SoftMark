@@ -3,7 +3,8 @@ import {
   Avatar,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
+  Chip
 } from "@material-ui/core";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
@@ -13,6 +14,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import { CanvasWithToolbar } from "../../../components/Canvas";
+import { Point } from "../../../components/Canvas/types";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import ReversedChip from "../../../components/ReversedChip";
 import Header from "./Header";
@@ -24,9 +26,7 @@ const ScriptView: React.FC = () => {
 
   const [isLoading, setLoading] = useState(true);
   const [script, setScript] = useState<ScriptDownloadData | null>(null);
-  const [pageNo, setPageNo] = useState(1);
   const [pages, setPages] = useState<Map<number, PageViewData>>(new Map());
-
   useEffect(() => {
     setLoading(true);
     if (isNaN(Number(scriptId))) {
@@ -54,6 +54,19 @@ const ScriptView: React.FC = () => {
     downloadScript(Number(scriptId));
   }, [scriptId]);
 
+  const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
+  const [scale, setScale] = useState<number>(1.0);
+  const handleViewChange = (position: Point, scale: number) => {
+    setPosition(position);
+    setScale(scale);
+  };
+
+  const [pageNo, setPageNo] = useState(1);
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo => Math.min(pages.size, prevPageNo + 1));
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+
   if (isLoading) {
     return (
       <div className={classes.container}>
@@ -74,32 +87,65 @@ const ScriptView: React.FC = () => {
 
   const { matriculationNumber, questions, filename } = script;
   const page = pages.get(pageNo);
-
-  const incrementPageNo = () =>
-    setPageNo(prevPageNo => Math.min(pages.size, prevPageNo + 1));
-  const decrementPageNo = () =>
-    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+  const totalMarks = questions
+    .filter(question => question.score !== null)
+    .map(question => question.score!)
+    .reduce((accumulator, score) => accumulator + score, 0);
+  const maxMarks = questions
+    .map(question => question.maxScore)
+    .reduce((accumulator, maxScore) => accumulator + maxScore, 0);
 
   return (
     <div className={classes.container}>
       <Header subtitle={matriculationNumber || filename} />
-      <div className={classes.grow}>
-        <CanvasWithToolbar
-          backgroundImageSource={page!.imageUrl}
-          backgroundAnnotations={page!.annotations.map(
-            annotation => annotation["layer"]
-          )}
-          foregroundAnnotation={[]}
-        />
+      <div className={classes.canvasWithToolbarContainer}>
+        <div className={classes.grow}>
+          <CanvasWithToolbar
+            backgroundImageSource={page!.imageUrl}
+            backgroundAnnotations={page!.annotations.map(
+              annotation => annotation["layer"]
+            )}
+            foregroundAnnotation={[]}
+            onViewChange={handleViewChange}
+          />
+        </div>
+        {questions
+          .filter(question => question.displayPage === pageNo)
+          .map((question, index) => (
+            <ReversedChip
+              key={index}
+              label={"Q" + question.name}
+              avatar={
+                <Avatar>{`${
+                  question.score === null ? "-" : question.score
+                } / ${question.maxScore || "-"}`}</Avatar>
+              }
+              color={question.score === null ? "default" : "primary"}
+              style={{
+                position: "absolute",
+                left: question.leftOffset * scale + position.x,
+                top: question.topOffset * scale + position.y
+              }}
+            />
+          ))}
       </div>
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          <Typography variant="button" className={classes.questionBarItem}>
-            {matriculationNumber || filename} Page {pageNo} of {pages.size}
+          <Typography variant="caption" className={classes.backButton}>
+            Page {pageNo} of {pages.size}
           </Typography>
+          <Typography variant="overline" className={classes.questionBarItem}>
+            Total
+          </Typography>
+          <Chip
+            label={`${totalMarks} / ${maxMarks}`}
+            variant="outlined"
+            className={classes.questionBarItem}
+          />
           {questions.map(question => (
             <ReversedChip
               key={question.id}
+              onClick={() => setPageNo(question.displayPage)}
               avatar={
                 <Avatar>{`${
                   question.score === null ? "-" : question.score

@@ -484,9 +484,9 @@ const Canvas: React.FC<CanvasProps> = ({
       <Layer>
         <UrlImage src={backgroundImageSource} />
       </Layer>
-      {backgroundAnnotations.map((backgroundAnnotationLines, i) => (
-        <Layer key={i}>
-          {backgroundAnnotationLines.map((line, j) => (
+      <Layer>
+        {backgroundAnnotations.map((backgroundAnnotationLines, i) =>
+          backgroundAnnotationLines.map((line, j) => (
             <Line
               key={j}
               points={line.points}
@@ -497,9 +497,9 @@ const Canvas: React.FC<CanvasProps> = ({
               lineJoin="round"
               lineCap="round"
             />
-          ))}
-        </Layer>
-      ))}
+          ))
+        )}
+      </Layer>
       <Layer>
         {canvasState.lines.map((line, i) => (
           <Line
