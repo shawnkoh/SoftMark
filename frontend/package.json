@@ -34,6 +34,7 @@
     "konva": "^4.0.16",
     "material-ui-file-dropzone": "^0.1.2",
     "mdi-material-ui": "^6.8.0",
+    "papaparse": "^5.1.0",
     "pdfjs-dist": "^2.2.228",
     "react": "^16.10.2",
     "react-autosuggest": "^9.4.3",

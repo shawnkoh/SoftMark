@@ -12,6 +12,7 @@ import { DropAreaBase } from "material-ui-file-dropzone";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api";
+import Papa from "papaparse";
 
 const NONE = "None";
 
@@ -71,47 +72,49 @@ const UploadScriptStudentMappingWrapper: React.FC<Props> = props => {
   );
 
   return (
-    <DropAreaBase
-      accept={".csv"}
-      clickable={clickable}
-      multiple={false}
-      onSelectFiles={files => {
-        Object.keys(files).forEach(key => {
-          setIsMatchingScriptsAndStudents(true);
-          setIsResponseDialogOpen(true);
-          const file = files[key];
-          const reader = new FileReader();
-          reader.onloadend = async (e: any) => {
-            const scriptMappingData: ScriptMappingData = {
-              csvFile: e.target.result
-            };
-            api.scripts
-              .matchScriptsToStudents(paper.id, scriptMappingData)
-              .then(resp => {
-                setStudentsFailedToBeMatched(resp.data.failedToBeMatched);
-                setStudentsMatched(resp.data.successfullyMatched);
-                setIsMatchingScriptsAndStudents(false);
-                setIsResponseDialogOpen(true);
-                refreshScripts();
-                toast.success(`Account for students created successfully.`);
-              })
-              .catch(() => {
-                setIsMatchingScriptsAndStudents(false);
-                setIsResponseDialogOpen(false);
-                toast.error(`Accounts for students could not be created.`);
-              })
-              .finally(() => {
-                refreshUnmatchedStudents();
-                refreshAllStudents();
-              });
-          };
-          reader.readAsText(file);
-        });
-      }}
-    >
-      {children}
+    <>
+      <DropAreaBase
+        accept={".csv"}
+        clickable={clickable}
+        multiple={false}
+        onSelectFiles={files => {
+          Object.keys(files).forEach(key => {
+            setIsMatchingScriptsAndStudents(true);
+            setIsResponseDialogOpen(true);
+            const file = files[key];
+            Papa.parse(file, {
+              complete: results => {
+                const scriptMappingData: ScriptMappingData = {
+                  rows: results.data
+                };
+                api.scripts
+                  .matchScriptsToStudents(paper.id, scriptMappingData)
+                  .then(resp => {
+                    setStudentsFailedToBeMatched(resp.data.failedToBeMatched);
+                    setStudentsMatched(resp.data.successfullyMatched);
+                    setIsMatchingScriptsAndStudents(false);
+                    setIsResponseDialogOpen(true);
+                    refreshScripts();
+                    toast.success(`Account for students created successfully.`);
+                  })
+                  .catch(() => {
+                    setIsMatchingScriptsAndStudents(false);
+                    setIsResponseDialogOpen(false);
+                    toast.error(`Accounts for students could not be created.`);
+                  })
+                  .finally(() => {
+                    refreshUnmatchedStudents();
+                    refreshAllStudents();
+                  });
+              }
+            });
+          });
+        }}
+      >
+        {children}
+      </DropAreaBase>
       {responseDialog}
-    </DropAreaBase>
+    </>
   );
 };
 

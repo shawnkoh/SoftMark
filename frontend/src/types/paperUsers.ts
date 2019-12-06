@@ -20,11 +20,11 @@ export interface PaperUserPostData {
 }
 
 export interface NominalRollPostData {
-  csvFile: string;
+  rows: string[][];
 }
 
 export interface ScriptMappingData {
-  csvFile: string;
+  rows: string[][];
 }
 
 export type PaperUserPatchData = Partial<{

@@ -402,17 +402,15 @@ export async function createMultipleStudents(
       return response.sendStatus(404);
     }
     const { paper } = allowed;
-    const { csvFile } = request.body as NominalRollPostData;
+    const { rows } = request.body as NominalRollPostData;
     let successfullyAdded = "";
     let failedToBeAdded = "";
-    const rows: string[] = csvFile.split("\n");
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const cells = row.split("\r")[0].split(",");
-      if (cells.length >= 3) {
-        const matriculationNumber = cells[0];
-        const name = cells[1];
-        const email = cells[2];
+      if (row.length >= 3) {
+        const matriculationNumber = row[0];
+        const name = row[1];
+        const email = row[2];
         const role = PaperUserRole.Student;
         const studentDetails = matriculationNumber + " " + name + " " + email;
 
