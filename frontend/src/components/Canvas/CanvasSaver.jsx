@@ -12,7 +12,7 @@ class CanvasSaver extends React.Component {
   handleLoad(width, height) {
     this.setState({ width, height }, () => {
       const stage = this.refs.stage.getStage();
-      const dataURL = stage.toDataURL();
+      const dataURL = stage.toDataURL({ pixelRatio: 0.8 });
       this.props.callBackImageUrl(dataURL);
     });
   }
