@@ -71,7 +71,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
         }
         pdf.addImage(imageUrlArray[i], "JPEG", 0, 0, width, height);
       }
-      pdf.save(`${script.filename}.pdf`);
+      pdf.save(`${script.matriculationNumber || script.filename}`);
 
       // gets next script to download if there is one
       const isValidScriptIndex = scriptIndex < scriptIds.length;
