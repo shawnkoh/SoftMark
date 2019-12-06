@@ -19,6 +19,15 @@ export interface MarkData extends DiscardableData {
   // timeSpent: number;
 }
 
+export interface MarkExportData {
+  scriptId: number;
+  filename: string;
+  matriculationNumber: string | null;
+  name: string | null;
+  email: string | null;
+  total: number;
+}
+
 export function isMarkData(data: any): data is MarkData {
   return (
     typeof data.questionId === "number" &&
