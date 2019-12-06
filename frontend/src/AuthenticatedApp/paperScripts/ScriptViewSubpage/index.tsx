@@ -3,7 +3,8 @@ import {
   Avatar,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
+  Chip
 } from "@material-ui/core";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
@@ -86,6 +87,13 @@ const ScriptView: React.FC = () => {
 
   const { matriculationNumber, questions, filename } = script;
   const page = pages.get(pageNo);
+  const totalMarks = questions
+    .filter(question => question.score !== null)
+    .map(question => question.score!)
+    .reduce((accumulator, score) => accumulator + score, 0);
+  const maxMarks = questions
+    .map(question => question.maxScore)
+    .reduce((accumulator, maxScore) => accumulator + maxScore, 0);
 
   return (
     <div className={classes.container}>
@@ -123,9 +131,17 @@ const ScriptView: React.FC = () => {
       </div>
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          <Typography variant="button" className={classes.questionBarItem}>
-            {matriculationNumber || filename} Page {pageNo} of {pages.size}
+          <Typography variant="caption" className={classes.backButton}>
+            Page {pageNo} of {pages.size}
           </Typography>
+          <Typography variant="overline" className={classes.questionBarItem}>
+            Total
+          </Typography>
+          <Chip
+            label={`${totalMarks} / ${maxMarks}`}
+            variant="outlined"
+            className={classes.questionBarItem}
+          />
           {questions.map(question => (
             <ReversedChip
               key={question.id}
