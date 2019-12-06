@@ -25,9 +25,7 @@ const ScriptView: React.FC = () => {
 
   const [isLoading, setLoading] = useState(true);
   const [script, setScript] = useState<ScriptDownloadData | null>(null);
-  const [pageNo, setPageNo] = useState(1);
   const [pages, setPages] = useState<Map<number, PageViewData>>(new Map());
-
   useEffect(() => {
     setLoading(true);
     if (isNaN(Number(scriptId))) {
@@ -54,12 +52,28 @@ const ScriptView: React.FC = () => {
     };
     downloadScript(Number(scriptId));
   }, [scriptId]);
+
   const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1.0);
   const handleViewChange = (position: Point, scale: number) => {
     setPosition(position);
     setScale(scale);
   };
+
+  const [pageNo, setPageNo] = useState(1);
+  const incrementPageNo = () =>
+    setPageNo(prevPageNo => Math.min(pages.size, prevPageNo + 1));
+  const decrementPageNo = () =>
+    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
+
+  if (isLoading) {
+    return (
+      <div className={classes.container}>
+        <Header subtitle={`Loading Script #${scriptId}`} />
+        <LoadingSpinner loadingMessage="Loading script..." />
+      </div>
+    );
+  }
 
   if (!script) {
     return (
@@ -72,11 +86,6 @@ const ScriptView: React.FC = () => {
 
   const { matriculationNumber, questions, filename } = script;
   const page = pages.get(pageNo);
-
-  const incrementPageNo = () =>
-    setPageNo(prevPageNo => Math.min(pages.size, prevPageNo + 1));
-  const decrementPageNo = () =>
-    setPageNo(prevPageNo => Math.max(1, prevPageNo - 1));
 
   return (
     <div className={classes.container}>
@@ -120,6 +129,7 @@ const ScriptView: React.FC = () => {
           {questions.map(question => (
             <ReversedChip
               key={question.id}
+              onClick={() => setPageNo(question.displayPage)}
               avatar={
                 <Avatar>{`${
                   question.score === null ? "-" : question.score
