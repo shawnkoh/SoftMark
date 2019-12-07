@@ -39,7 +39,7 @@ class CanvasSaver extends React.Component {
           <Layer key={index + " " + question.id}>
             <Text
               fontSize={42}
-              text={`${question.score} / ${question.maxScore}`}
+              text={`${question.score || "UNMARKED"} / ${question.maxScore}`}
               wrap="char"
               x={question.leftOffset}
               y={question.topOffset}
