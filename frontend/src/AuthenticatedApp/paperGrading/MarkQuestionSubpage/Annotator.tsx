@@ -1,98 +1,53 @@
-import {
-  AppBar,
-  Avatar,
-  Chip,
-  Toolbar,
-  Typography,
-  FormControlLabel,
-  Switch
-} from "@material-ui/core";
+import { AppBar, Avatar, Chip, Toolbar, Typography } from "@material-ui/core";
 import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
-import {
-  PageViewData,
-  QuestionTemplateViewData,
-  QuestionViewData
-} from "backend/src/types/view";
-import { MarkData } from "backend/src/types/marks";
+import { PageViewData, QuestionViewData } from "backend/src/types/view";
 import clsx from "clsx";
-import LoadingSpinner from "components/LoadingSpinner";
 import produce from "immer";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getOwnAnnotation, saveAnnotation } from "../../../api/annotations";
+import { saveAnnotation } from "../../../api/annotations";
 import { CanvasWithToolbar } from "../../../components/Canvas";
-import { Point } from "../../../components/Canvas/types";
 import ReversedChip from "../../../components/ReversedChip";
+import useMarkQuestion from "./MarkQuestionContext";
 import MarkQuestionModal from "./MarkQuestionModal";
 import useStyles from "./styles";
 
-interface OwnProps {
+interface Props {
   page: PageViewData;
-  questions: QuestionViewData[];
-  rootQuestionTemplate: QuestionTemplateViewData;
-  matriculationNumber: string | null;
 }
 
-type Props = OwnProps;
+interface QuestionState {
+  isVisible: boolean;
+  question: QuestionViewData;
+}
 
-const Annotator: React.FC<Props> = ({
-  page,
-  questions,
-  rootQuestionTemplate,
-  matriculationNumber
-}: Props) => {
+const Annotator: React.FC<Props> = ({ page }: Props) => {
   const classes = useStyles();
 
-  const [showMarkingChipsOnPage, setShowMarkingChipsOnPage] = useState<boolean>(
-    true
-  );
-  const toggleShowMarkingChipsOnPage = () =>
-    setShowMarkingChipsOnPage(prev => !prev);
-
-  interface QuestionState {
-    isVisible: boolean;
-    question: QuestionViewData;
-  }
-  const initialQuestionStates = questions.map(question => ({
-    isVisible: false,
-    question
-  }));
-  const [questionStates, setQuestionStates] = useState<QuestionState[]>(
-    initialQuestionStates
-  );
+  const [questionStates, setQuestionStates] = useState<QuestionState[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
-  const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
-  const [scale, setScale] = useState<number>(1.0);
-  const handleViewChange = (position: Point, scale: number) => {
-    setPosition(position);
-    setScale(scale);
-  };
-
-  const [
+  const {
+    isPageLoading,
+    viewPosition,
+    viewScale,
+    currentQns,
+    updateQuestion,
+    handleViewChange,
     foregroundAnnotation,
-    setForegroundAnnotation
-  ] = useState<Annotation | null>(null);
-  const [
-    isLoadingForegroundAnnotation,
-    setIsLoadingForegroundAnnotation
-  ] = useState(true);
+    scriptMarkingData
+  } = useMarkQuestion();
 
-  const getForegroundAnnotation = () => {
-    getOwnAnnotation(page.id)
-      .then(res => {
-        const status = res.request.status;
-        if (status === 200) {
-          const savedAnnotation = res.data.annotation;
-          setForegroundAnnotation(savedAnnotation.layer);
-        } else if (status === 204) {
-          setForegroundAnnotation([]); // set no foreground annotation if none exists in db yet
-        }
-      })
-      .finally(() => setIsLoadingForegroundAnnotation(false));
-  };
+  const { matriculationNumber, rootQuestionTemplate } = scriptMarkingData;
 
-  useEffect(getForegroundAnnotation, []);
+  useEffect(() => {
+    setQuestionStates(
+      currentQns.map(question => ({
+        isVisible: false,
+        question
+      }))
+    );
+  }, [currentQns]);
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     const annotationPostData: AnnotationPostData = {
@@ -126,6 +81,7 @@ const Annotator: React.FC<Props> = ({
         draftState[index].question.markId = markId;
       })
     );
+    updateQuestion(questionStates[index].question.id, score, markId);
     setAnchorEl(null);
   };
 
@@ -140,19 +96,6 @@ const Annotator: React.FC<Props> = ({
       })
     );
   };
-
-  if (isLoadingForegroundAnnotation) {
-    return <LoadingSpinner loadingMessage="Loading annotations..." />;
-  }
-
-  if (!foregroundAnnotation) {
-    return (
-      <>
-        There was an error loading your annotations. Please try refreshing the
-        page and check your internet connection.
-      </>
-    );
-  }
 
   return (
     <div className={classes.canvasWithToolbarContainer}>
@@ -173,38 +116,38 @@ const Annotator: React.FC<Props> = ({
         foregroundAnnotation={foregroundAnnotation}
         onForegroundAnnotationChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
+        isLoading={isPageLoading}
       />
-      {showMarkingChipsOnPage &&
-        questionStates.map((questionState: QuestionState, index: number) => (
-          <ReversedChip
-            key={index}
-            onClick={event => handleChipClick(event, index)}
-            label={"Q" + questionState.question.name}
-            avatar={
-              <Avatar>{`${
-                questionState.question.score === null
-                  ? "-"
-                  : questionState.question.score
-              } / ${questionState.question.maxScore || "-"}`}</Avatar>
-            }
-            color={
-              questionState.question.score === null ? "default" : "primary"
-            }
-            style={{
-              position: "absolute",
-              left: questionState.question.leftOffset * scale + position.x,
-              top: questionState.question.topOffset * scale + position.y
-            }}
-          />
-        ))}
+      {questionStates.map((questionState: QuestionState, index: number) => (
+        <ReversedChip
+          key={index}
+          onClick={event => handleChipClick(event, index)}
+          label={"Q" + questionState.question.name}
+          avatar={
+            <Avatar>{`${
+              questionState.question.score === null
+                ? "-"
+                : questionState.question.score
+            } / ${questionState.question.maxScore || "-"}`}</Avatar>
+          }
+          color={questionState.question.score === null ? "default" : "primary"}
+          style={{
+            position: "absolute",
+            left:
+              questionState.question.leftOffset * viewScale + viewPosition.x,
+            top: questionState.question.topOffset * viewScale + viewPosition.y
+          }}
+        />
+      ))}
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
           <Typography
             variant="button"
             className={clsx(classes.grow, classes.questionBarItem)}
           >
-            Page {page.pageNo}
+            {matriculationNumber} page {page.pageNo}
           </Typography>
+
           <Chip
             label={"Q" + rootQuestionTemplate.name}
             variant="outlined"
@@ -228,16 +171,6 @@ const Annotator: React.FC<Props> = ({
               className={classes.questionBarItem}
             />
           ))}
-          <FormControlLabel
-            control={
-              <Switch
-                color="primary"
-                checked={showMarkingChipsOnPage}
-                onChange={toggleShowMarkingChipsOnPage}
-              />
-            }
-            label="Show on page"
-          />
         </Toolbar>
       </AppBar>
     </div>

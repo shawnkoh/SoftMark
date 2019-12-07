@@ -7,6 +7,7 @@ import {
   Typography,
   Hidden
 } from "@material-ui/core";
+import ViewIcon from "@material-ui/icons/FindInPage";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
@@ -19,7 +20,7 @@ import { Link } from "react-router-dom";
 import api from "../../../api";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import usePaper from "../../../contexts/PaperContext";
-import Annotator from "../../paperGrading/MarkQuestionSubpage/Annotator";
+import Annotator from "./Annotator";
 import useStyles from "../../paperGrading/MarkQuestionSubpage/styles";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -68,24 +69,6 @@ const ScriptMarkPage: React.FC = () => {
     if (pageNos.length) setPageNo(pageNos[0]);
   }, [pageNos]);
 
-  const handlePrevClick = event => {
-    if (scriptMarkingData) {
-      const prevScriptId = scriptMarkingData.previousScriptId;
-      if (prevScriptId) {
-        getScriptMarkingData(prevScriptId, questionTemplateId);
-      }
-    }
-  };
-
-  const handleNextClick = event => {
-    if (scriptMarkingData) {
-      const nextScriptId = scriptMarkingData.nextScriptId;
-      if (nextScriptId) {
-        getScriptMarkingData(nextScriptId, questionTemplateId);
-      }
-    }
-  };
-
   interface HeaderProps {
     subtitle: string;
   }
@@ -114,11 +97,40 @@ const ScriptMarkPage: React.FC = () => {
           <Hidden lgUp>
             <IconButton
               color="inherit"
+              component={Link}
+              target="_blank"
+              rel="noopener noreferrer"
+              to={`/papers/${paper.id}/scripts/${scriptId}`}
+              className={classes.button}
+            >
+              <ViewIcon />
+            </IconButton>
+          </Hidden>
+          <Hidden mdDown>
+            <Button
+              color="inherit"
+              component={Link}
+              target="_blank"
+              rel="noopener noreferrer"
+              to={`/papers/${paper.id}/scripts/${scriptId}`}
+              startIcon={<ViewIcon />}
+              className={classes.button}
+            >
+              View
+            </Button>
+          </Hidden>
+          <Hidden lgUp>
+            <IconButton
+              color="inherit"
               disabled={
                 !(scriptMarkingData && scriptMarkingData.previousScriptId)
               }
-              onClick={handlePrevClick}
-              className={classes.button}
+              component={Link}
+              to={
+                scriptMarkingData
+                  ? `/papers/${paper.id}/scripts/${scriptMarkingData.previousScriptId}/mark/${questionTemplateId}`
+                  : ""
+              }
             >
               <NavigateBeforeIcon />
             </IconButton>
@@ -129,7 +141,12 @@ const ScriptMarkPage: React.FC = () => {
               disabled={
                 !(scriptMarkingData && scriptMarkingData.previousScriptId)
               }
-              onClick={handlePrevClick}
+              component={Link}
+              to={
+                scriptMarkingData
+                  ? `/papers/${paper.id}/scripts/${scriptMarkingData.previousScriptId}/mark/${questionTemplateId}`
+                  : ""
+              }
               startIcon={<NavigateBeforeIcon />}
               className={classes.button}
             >
@@ -140,17 +157,27 @@ const ScriptMarkPage: React.FC = () => {
             <IconButton
               color="inherit"
               disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
-              onClick={handleNextClick}
+              component={Link}
+              to={
+                scriptMarkingData
+                  ? `/papers/${paper.id}/scripts/${scriptMarkingData.nextScriptId}/mark/${questionTemplateId}`
+                  : ""
+              }
             >
               <NavigateNextIcon />
             </IconButton>
           </Hidden>
           <Hidden mdDown>
             <Button
-              color="inherit"
               disabled={!(scriptMarkingData && scriptMarkingData.nextScriptId)}
-              onClick={handleNextClick}
+              component={Link}
+              to={
+                scriptMarkingData
+                  ? `/papers/${paper.id}/scripts/${scriptMarkingData.nextScriptId}/mark/${questionTemplateId}`
+                  : ""
+              }
               startIcon={<NavigateNextIcon />}
+              color="inherit"
               className={classes.button}
             >
               Next
@@ -164,9 +191,7 @@ const ScriptMarkPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className={classes.container}>
-        <Header
-          subtitle={`Marking script ID ${scriptId} question template ID ${questionTemplateId}`}
-        />
+        <Header subtitle={`Loading...`} />
         <LoadingSpinner loadingMessage="Loading script..." />
       </div>
     );
@@ -184,9 +209,7 @@ const ScriptMarkPage: React.FC = () => {
     if (!canMark) {
       return (
         <div className={classes.container}>
-          <Header
-            subtitle={`Marking script ID ${scriptId} Q${rootQuestionTemplate.name}`}
-          />
+          <Header subtitle={`Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               Cannot mark this script. Someone else may be marking it now. Try
@@ -200,9 +223,7 @@ const ScriptMarkPage: React.FC = () => {
     if (!pages) {
       return (
         <div className={classes.container}>
-          <Header
-            subtitle={`Marking script ID ${scriptId} Q${rootQuestionTemplate.name}`}
-          />
+          <Header subtitle={`Q${rootQuestionTemplate.name}`} />
           <Container maxWidth={false} className={classes.innerContainer}>
             <Typography variant="subtitle1">
               No pages to display for this script.
@@ -280,11 +301,9 @@ const ScriptMarkPage: React.FC = () => {
 
   return (
     <div className={classes.container}>
-      <Header
-        subtitle={`Marking script ID ${scriptId} question template ID ${questionTemplateId}`}
-      />
+      <Header subtitle="Error" />
       <Container maxWidth={false} className={classes.innerContainer}>
-        <Typography variant="subtitle1">An error occurred.</Typography>
+        <Typography variant="subtitle1">{`An error occurred when Marking script ID ${scriptId} question template ID ${questionTemplateId}.`}</Typography>
       </Container>
     </div>
   );
