@@ -15,6 +15,7 @@ interface Props {
 const CSVDownload: React.FC<Props> = props => {
   const { data, render, config, filename } = props;
   const [isExporting, setExporting] = useState(false);
+  const exportCsv = () => setExporting(true);
 
   React.useEffect(() => {
     if (!data || !isExporting) {
@@ -41,7 +42,7 @@ const CSVDownload: React.FC<Props> = props => {
     setExporting(false);
   }, [data, isExporting]);
 
-  return render(setExporting);
+  return render(exportCsv);
 };
 
 export default CSVDownload;

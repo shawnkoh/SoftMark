@@ -13,8 +13,8 @@ import CloudDownload from "@material-ui/icons/CloudDownload";
 import UploadIcon from "@material-ui/icons/CloudUpload";
 import AddIcon from "@material-ui/icons/PersonAdd";
 import React, { useState } from "react";
-import { CSVLink } from "react-csv";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
+import CSVDownload from "../../../../components/CSVDownload";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadNominalRollWrapper from "../../../../components/uploadWrappers/UploadNominalRollWrapper";
@@ -115,13 +115,21 @@ const StudentsTable: React.FC = () => {
           />
         </Grid>
         <Grid item>
-          <RoundedButton
-            variant="contained"
-            color="primary"
-            startIcon={<CloudDownload />}
-          >
-            <CSVLink data={unmatchedStudents}>Export Unmatched</CSVLink>
-          </RoundedButton>
+          <CSVDownload
+            data={unmatchedStudents}
+            filename="UnmatchedStudents.csv"
+            render={exportCsv => (
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                startIcon={<CloudDownload />}
+                onClick={exportCsv}
+                disabled={unmatchedStudents.length === 0}
+              >
+                Export Unmatched
+              </RoundedButton>
+            )}
+          />
         </Grid>
         {/* <Grid item>
           <DeleteAllStudentsModal

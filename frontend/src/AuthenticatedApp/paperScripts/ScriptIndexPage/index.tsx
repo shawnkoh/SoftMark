@@ -254,13 +254,13 @@ const ScriptIndex: React.FC = () => {
           <CSVDownload
             data={marks}
             filename="marks.csv"
-            render={setExporting => (
+            render={exportCsv => (
               <RoundedButton
                 variant="contained"
                 color="primary"
                 onClick={() => {
                   setLoadingMarks(true);
-                  setExporting(true);
+                  exportCsv();
                 }}
                 startIcon={<DownloadIcon />}
               >
