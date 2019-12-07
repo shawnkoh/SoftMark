@@ -144,7 +144,7 @@ export async function exportMarks(request: Request, response: Response) {
       student."matriculationNumber",
       student."name",
       student."email",
-      (${names.map(name => `mark."${name}"`).join(" + ")}) total,
+      (${names.map(name => `COALESCE(mark."${name}", 0)`).join(" + ")}) total,
       ${names.map(name => `mark."${name}"`).join(", ")}
       
     FROM script
