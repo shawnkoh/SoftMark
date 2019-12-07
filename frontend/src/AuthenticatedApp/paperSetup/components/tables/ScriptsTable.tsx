@@ -16,8 +16,8 @@ import useScriptsAndStudents from "contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "contexts/ScriptTemplateContext";
 import MatchIcon from "mdi-material-ui/ArrowCollapse";
 import React, { useState } from "react";
-import { CSVLink } from "react-csv";
 import RoundedButton from "../../../../components/buttons/RoundedButton";
+import CSVDownload from "../../../../components/CSVDownload";
 import SearchBar from "../../../../components/fields/SearchBar";
 import { TableColumn } from "../../../../components/tables/TableTypes";
 import UploadScriptStudentMappingWrapper from "../../../../components/uploadWrappers/UploadScriptStudentMappingWrapper";
@@ -114,13 +114,21 @@ const ScriptsTable: React.FC = () => {
           </UploadScriptStudentMappingWrapper>
         </Grid>
         <Grid item>
-          <RoundedButton
-            variant="contained"
-            color="primary"
-            startIcon={<CloudDownload />}
-          >
-            <CSVLink data={unmatchedScripts}>Export Unmatched</CSVLink>
-          </RoundedButton>
+          <CSVDownload
+            data={unmatchedScripts}
+            filename="UnmatchedScripts.csv"
+            render={exportCsv => (
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                startIcon={<CloudDownload />}
+                onClick={exportCsv}
+                disabled={unmatchedScripts.length === 0}
+              >
+                Export Unmatched
+              </RoundedButton>
+            )}
+          />
         </Grid>
         {/* <Grid item>
           <DeleteAllScriptsModal

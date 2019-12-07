@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Container,
   Grid,
   Paper,
@@ -15,12 +16,12 @@ import PublishIcon from "@material-ui/icons/Publish";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
-import Papa from "papaparse";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
+import CSVDownload from "../../../components/CSVDownload";
 import SearchBar from "../../../components/fields/SearchBar";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { TableColumn } from "../../../components/tables/TableTypes";
@@ -173,31 +174,7 @@ const ScriptIndex: React.FC = () => {
   });
 
   const [isLoadingMarks, setLoadingMarks] = useState(false);
-
-  // TODO: Find a way to reuse this
-  // Adapted from https://gist.github.com/dhunmoon/d743b327c673b589e7acfcbc5633ff4b
-  const exportToCsv = (filename: string, rows: string[][]) => {
-    const csv = Papa.unparse(rows);
-    const blob = new Blob([csv], { type: "text/csv; charset=utf-8;" });
-    if (navigator.msSaveBlob) {
-      // IE 10+
-      navigator.msSaveBlob(blob);
-      return true;
-    }
-
-    const link = document.createElement("a");
-    if (link.download === undefined) {
-      return false;
-    }
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    return true;
-  };
+  const [marks, setMarks] = useState<string[][] | null>(null);
 
   useEffect(() => {
     if (!isLoadingMarks) {
@@ -210,7 +187,7 @@ const ScriptIndex: React.FC = () => {
         const headers = [Object.keys(marks[0])];
         const rows = marks.map(mark => Object.values(mark));
         const data = headers.concat(rows);
-        exportToCsv("marks.csv", data);
+        setMarks(data);
       } catch (error) {
         toast.error(
           "An error occured while exporting marks. Please try refreshing the page."
@@ -274,14 +251,23 @@ const ScriptIndex: React.FC = () => {
           >
             Export Scripts
           </RoundedButton>
-          <RoundedButton
-            variant="contained"
-            color="primary"
-            onClick={() => setLoadingMarks(true)}
-            startIcon={<DownloadIcon />}
-          >
-            Export Marks
-          </RoundedButton>
+          <CSVDownload
+            data={marks}
+            filename="marks.csv"
+            render={exportCsv => (
+              <RoundedButton
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setLoadingMarks(true);
+                  exportCsv();
+                }}
+                startIcon={<DownloadIcon />}
+              >
+                {isLoadingMarks ? <CircularProgress /> : "Export Marks"}
+              </RoundedButton>
+            )}
+          />
         </Grid>
       </Grid>
       <Paper className={clsx(classes.margin, classes.tableWrapper)}>
