@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
-import { MarkData, MarkExportData, MarkPutData } from "backend/src/types/marks";
+import { MarkData, MarkPutData } from "backend/src/types/marks";
+import { UnparseObject } from "papaparse";
 import client from "./client";
 
 const URL = "/marks";
@@ -22,7 +23,7 @@ export async function undiscardMark(
 }
 
 export async function exportMarks(paperId: number) {
-  return client.get<{ marks: MarkExportData[] }>(
+  return client.get<{ marks: UnparseObject }>(
     `/papers/${paperId}/export_marks`
   );
 }

@@ -16,6 +16,7 @@ import PublishIcon from "@material-ui/icons/Publish";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
+import { UnparseObject } from "papaparse";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
@@ -174,7 +175,7 @@ const ScriptIndex: React.FC = () => {
   });
 
   const [isLoadingMarks, setLoadingMarks] = useState(false);
-  const [marks, setMarks] = useState<string[][] | null>(null);
+  const [marks, setMarks] = useState<UnparseObject | null>(null);
 
   useEffect(() => {
     if (!isLoadingMarks) {
@@ -184,10 +185,7 @@ const ScriptIndex: React.FC = () => {
       try {
         const response = await api.marks.exportMarks(paper.id);
         const { marks } = response.data;
-        const headers = [Object.keys(marks[0])];
-        const rows = marks.map(mark => Object.values(mark));
-        const data = headers.concat(rows);
-        setMarks(data);
+        setMarks(marks);
       } catch (error) {
         toast.error(
           "An error occured while exporting marks. Please try refreshing the page."
