@@ -3,7 +3,7 @@ import ArrowLeftIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowRightIcon from "@material-ui/icons/ArrowForwardIos";
 import LoadingSpinner from "components/LoadingSpinner";
 import React from "react";
-import AnnotatorTwo from "./AnnotatorTwo";
+import AnnotatorTwo from "./Annotator";
 import Header from "./Header";
 import useMarkQuestion, { MarkQuestionProvider } from "./MarkQuestionContext";
 import useStyles from "./styles";
