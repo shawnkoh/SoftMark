@@ -185,26 +185,18 @@ export async function exportMarks(request: Request, response: Response) {
     AND script."discardedAt" IS NULL
   `);
 
-  // Bug fix: Force an explicit ordering
-  const data = marks.map((mark: any) => {
-    const {
-      scriptId,
-      filename,
-      matriculationNumber,
-      name,
-      email,
-      ...questions
-    } = mark;
+  // Bug fix: Force an explicit ordering because javascript objects' order arent guaranteed
+  const fields = [
+    "scriptId",
+    "filename",
+    "matriculationNumber",
+    "name",
+    "email",
+    "total",
+    ...names
+  ];
 
-    return {
-      scriptId,
-      filename,
-      matriculationNumber,
-      name,
-      email,
-      ...questions
-    };
-  });
+  const data = marks.map((mark: any) => fields.map(field => mark[field]));
 
-  response.status(200).json({ marks: data });
+  response.status(200).json({ marks: { fields, data } });
 }
