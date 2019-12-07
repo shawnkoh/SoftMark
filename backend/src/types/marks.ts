@@ -26,6 +26,7 @@ export interface MarkExportData {
   name: string | null;
   email: string | null;
   total: number;
+  // Theres also N types based on the question templates, not sure how to type it since it's a runtime value
 }
 
 export function isMarkData(data: any): data is MarkData {
