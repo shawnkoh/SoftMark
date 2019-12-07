@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as AllocationsController from "../../controllers/AllocationsController";
+import * as MarksController from "../../controllers/MarksController";
 import * as PapersController from "../../controllers/PapersController";
 import * as PaperUsersController from "../../controllers/PaperUsersController";
 import * as QuestionTemplatesController from "../../controllers/QuestionTemplatesController";
@@ -64,5 +65,7 @@ router.get(
   "/:paperId/unmatched_students",
   StudentsController.unmatchedStudents
 );
+
+router.get("/:paperId/export_marks", MarksController.exportMarks);
 
 export default router;
