@@ -15,6 +15,7 @@ import PublishIcon from "@material-ui/icons/Publish";
 import { QuestionTemplateData } from "backend/src/types/questionTemplates";
 import { ScriptListData } from "backend/src/types/scripts";
 import clsx from "clsx";
+import Papa from "papaparse";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
@@ -26,7 +27,6 @@ import { TableColumn } from "../../../components/tables/TableTypes";
 import usePaper from "../../../contexts/PaperContext";
 import useScriptsAndStudents from "../../../contexts/ScriptsAndStudentsContext";
 import useScriptTemplate from "../../../contexts/ScriptTemplateContext";
-import { toCsv } from "../../../utils/csv";
 import PublishScriptsModal from "./PublishScriptsModal";
 import ScriptsTableRow from "./ScriptsTableRow";
 import useStyles from "./styles";
@@ -177,7 +177,8 @@ const ScriptIndex: React.FC = () => {
   // TODO: Find a way to reuse this
   // Adapted from https://gist.github.com/dhunmoon/d743b327c673b589e7acfcbc5633ff4b
   const exportToCsv = (filename: string, rows: string[][]) => {
-    const blob = toCsv(rows);
+    const csv = Papa.unparse(rows);
+    const blob = new Blob([csv], { type: "text/csv; charset=utf-8;" });
     if (navigator.msSaveBlob) {
       // IE 10+
       navigator.msSaveBlob(blob);
