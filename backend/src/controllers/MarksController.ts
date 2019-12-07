@@ -185,5 +185,26 @@ export async function exportMarks(request: Request, response: Response) {
     AND script."discardedAt" IS NULL
   `);
 
-  response.status(200).json({ marks });
+  // Bug fix: Force an explicit ordering
+  const data = marks.map((mark: any) => {
+    const {
+      scriptId,
+      filename,
+      matriculationNumber,
+      name,
+      email,
+      ...questions
+    } = mark;
+
+    return {
+      scriptId,
+      filename,
+      matriculationNumber,
+      name,
+      email,
+      ...questions
+    };
+  });
+
+  response.status(200).json({ marks: data });
 }
