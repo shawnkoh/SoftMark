@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import ViewIcon from "@material-ui/icons/FindInPage";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
@@ -47,6 +48,31 @@ const Header: React.FC = () => {
         <Typography variant="subtitle1" className={classes.text}>
           Script #{scriptMarkingData.id}
         </Typography>
+        <Hidden lgUp>
+          <IconButton
+            color="inherit"
+            component={Link}
+            target="_blank"
+            rel="noopener noreferrer"
+            to={`/papers/${paper.id}/scripts/${scriptMarkingData.id}`}
+            className={classes.button}
+          >
+            <ViewIcon />
+          </IconButton>
+        </Hidden>
+        <Hidden mdDown>
+          <Button
+            color="inherit"
+            component={Link}
+            target="_blank"
+            rel="noopener noreferrer"
+            to={`/papers/${paper.id}/scripts/${scriptMarkingData.id}`}
+            startIcon={<ViewIcon />}
+            className={classes.button}
+          >
+            View
+          </Button>
+        </Hidden>
         <Hidden lgUp>
           <IconButton
             color="inherit"
