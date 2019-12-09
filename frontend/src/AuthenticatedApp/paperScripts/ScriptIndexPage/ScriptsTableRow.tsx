@@ -93,7 +93,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             View
           </Button>
         </Tooltip>
-        <Tooltip title={`Download script of ${matriculationNumber || "-"}`}>
+        <Tooltip title={`Export script of ${matriculationNumber || "-"}`}>
           <Button
             component={Link}
             to={`${url}/${id}/save_script`}
@@ -101,7 +101,7 @@ const ScriptsTableRow: React.FC<Props> = props => {
             color="primary"
             className={classes.button}
           >
-            Download
+            Export
           </Button>
         </Tooltip>
       </TableCell>

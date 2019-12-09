@@ -9,7 +9,8 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Typography
+  Typography,
+  Button
 } from "@material-ui/core";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PublishIcon from "@material-ui/icons/Publish";
@@ -19,6 +20,7 @@ import clsx from "clsx";
 import { UnparseObject } from "papaparse";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import RoundedButton from "../../../components/buttons/RoundedButton";
@@ -241,14 +243,18 @@ const ScriptIndex: React.FC = () => {
           />
         </Grid>
         <Grid item>
-          <RoundedButton
+          <Button
             variant="contained"
             color="primary"
-            onClick={() => history.push(`/papers/${paper.id}/save_scripts`)}
+            component={Link}
+            to={`/papers/${paper.id}/save_scripts`}
             startIcon={<DownloadIcon />}
+            style={{ borderRadius: 24 }}
           >
             Export Scripts
-          </RoundedButton>
+          </Button>
+        </Grid>
+        <Grid item>
           <CSVDownload
             data={marks}
             filename="marks.csv"

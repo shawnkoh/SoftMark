@@ -12,7 +12,7 @@ class CanvasSaver extends React.Component {
   handleLoad(width, height) {
     this.setState({ width, height }, () => {
       const stage = this.refs.stage.getStage();
-      const dataURL = stage.toDataURL();
+      const dataURL = stage.toDataURL({ mimeType: "image/jpeg" });
       this.props.callBackImageUrl(dataURL);
     });
   }
@@ -35,9 +35,10 @@ class CanvasSaver extends React.Component {
             onLoad={this.handleLoad}
           />
         </Layer>
-        {this.props.questions.map((question, index) => (
-          <Layer key={index + " " + question.id}>
+        <Layer>
+          {this.props.questions.map((question, index) => (
             <Text
+              key={index}
               fontSize={42}
               text={`${
                 question.score !== null ? question.score : "UNMARKED"
@@ -47,25 +48,23 @@ class CanvasSaver extends React.Component {
               y={question.topOffset}
               fill="red"
             />
-          </Layer>
-        ))}
-        {this.props.backgroundAnnotations.map(
-          (backgroundAnnotationLines, i) => (
-            <Layer key={i}>
-              {backgroundAnnotationLines.map((line, j) => (
-                <Line
-                  key={j}
-                  points={line.points}
-                  stroke={line.color}
-                  strokeWidth={line.width}
-                  globalCompositeOperation={line.type}
-                  lineJoin="round"
-                  lineCap="round"
-                />
-              ))}
-            </Layer>
-          )
-        )}
+          ))}
+        </Layer>
+        <Layer>
+          {this.props.backgroundAnnotations.map(backgroundAnnotationLines =>
+            backgroundAnnotationLines.map((line, index) => (
+              <Line
+                key={index}
+                points={line.points}
+                stroke={line.color}
+                strokeWidth={line.width}
+                globalCompositeOperation={line.type}
+                lineJoin="round"
+                lineCap="round"
+              />
+            ))
+          )}
+        </Layer>
       </Stage>
     );
   }
