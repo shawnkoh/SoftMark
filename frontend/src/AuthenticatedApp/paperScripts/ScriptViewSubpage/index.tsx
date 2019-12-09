@@ -131,7 +131,7 @@ const ScriptView: React.FC = () => {
       </div>
       <AppBar position="fixed" color="inherit" className={classes.questionBar}>
         <Toolbar>
-          <Typography variant="caption" className={classes.backButton}>
+          <Typography variant="caption" className={classes.pageNumberDisplay}>
             Page {pageNo} of {pages.size}
           </Typography>
           <Typography variant="overline" className={classes.questionBarItem}>
