@@ -51,6 +51,10 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       display: "flex",
       flexGrow: 1
+    },
+    pageNumberDisplay: {
+      marginRight: theme.spacing(2),
+      whiteSpace: "nowrap"
     }
   })
 );
