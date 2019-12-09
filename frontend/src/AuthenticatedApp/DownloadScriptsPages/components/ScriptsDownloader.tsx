@@ -6,12 +6,15 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../api";
 import { CanvasSaver } from "../../../components/Canvas";
+import usePaper from "../../../contexts/PaperContext";
+import { Redirect } from "react-router-dom";
 
 interface Props {
   scriptIds: number[];
 }
 
 const DownloadAsPdfPage: React.FC<Props> = props => {
+  const paper = usePaper();
   const { scriptIds } = props;
   const [script, setScript] = useState<ScriptDownloadData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +64,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
     const allImagesFullyLoaded = imageUrlArray.length === pages.length;
 
     if (allImagesFullyLoaded) {
-      let pdf = new jsPDF(undefined, undefined, undefined, true);
+      let pdf = new jsPDF();
       const width = pdf.internal.pageSize.getWidth();
       const height = pdf.internal.pageSize.getHeight();
       for (let i = 0; i < imageUrlArray.length; i++) {
@@ -69,16 +72,7 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
           pdf.addPage();
           pdf.setPage(i + 1);
         }
-        pdf.addImage(
-          imageUrlArray[i],
-          "JPEG",
-          0,
-          0,
-          width,
-          height,
-          undefined,
-          "FAST"
-        );
+        pdf.addImage(imageUrlArray[i], "JPEG", 0, 0, width, height);
       }
       pdf.save(`${script.matriculationNumber || script.filename}`);
 
@@ -96,12 +90,14 @@ const DownloadAsPdfPage: React.FC<Props> = props => {
   const getQuestionsByPageNo = (pageNo: number) =>
     script.questions.filter(question => question.displayPage === pageNo);
 
+  if (!isDownloading) {
+    return <Redirect to={`/papers/${paper.id}/scripts`} />;
+  }
+
   return (
     <div style={{ minHeight: "100vh", minWidth: "100vw", display: "flex" }}>
-      <Dialog open={isDownloading}>
-        <DialogTitle>
-          Browser needs to be open in order to download the script(s).
-        </DialogTitle>
+      <Dialog open>
+        <DialogTitle>Keep browser open when downloading script(s).</DialogTitle>
         <DialogContent>
           <LoadingSpinner loadingMessage="Downloading scripts..." />
         </DialogContent>
