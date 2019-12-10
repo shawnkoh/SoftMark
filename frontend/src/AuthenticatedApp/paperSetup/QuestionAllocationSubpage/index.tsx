@@ -79,7 +79,7 @@ const QuestionAllocationPage: React.FC = props => {
   /** Markers hooks end */
 
   if (isLoadingQuestionTemplates) {
-    return <LoadingSpinner loadingMessage={`Loading scripts...`} />;
+    return <LoadingSpinner loadingMessage={`Loading question templates...`} />;
   } else if (isLoadingMarkers) {
     return <LoadingSpinner loadingMessage={`Loading markers...`} />;
   }
