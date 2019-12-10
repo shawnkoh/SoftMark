@@ -6,7 +6,8 @@ import {
   createQueryBuilder,
   getRepository,
   getTreeRepository,
-  SelectQueryBuilder
+  SelectQueryBuilder,
+  getConnection
 } from "typeorm";
 import { Annotation } from "../entities/Annotation";
 import { Page } from "../entities/Page";
@@ -119,18 +120,18 @@ export async function downloadScript(request: Request, response: Response) {
     .andWhere("page.discardedAt IS NULL")
     .getRawMany();
 
-  const annotationsPromise = createQueryBuilder()
-    .select("annotation.id", "id")
-    .addSelect("annotation.layer", "layer")
-    .addSelect("annotation.pageId", "pageId")
-    .from(Annotation, "annotation")
-    .innerJoin(
-      Page,
-      "page",
-      "page.discardedAt IS NULL AND page.scriptId = :scriptId",
-      { scriptId }
+  const annotationsPromise = getConnection().query(`
+    SELECT
+      annotation.id,
+      annotation.layer,
+      annotation."pageId"
+    FROM annotation
+    WHERE annotation."pageId" IN (
+      SELECT page.id "pageId"
+      FROM page
+      WHERE page."discardedAt" IS NULL AND page."scriptId" = ${scriptId}
     )
-    .getRawMany();
+  `);
 
   const questions = createQueryBuilder()
     .select("question.id", "id")
