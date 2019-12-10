@@ -161,7 +161,7 @@ export async function downloadScript(request: Request, response: Response) {
   const pages = allPages.map(page => ({
     ...page,
     annotations: allAnnotations.filter(
-      annotation => annotation.pageId === page.id
+      (annotation: any) => annotation.pageId === page.id
     )
   }));
 
