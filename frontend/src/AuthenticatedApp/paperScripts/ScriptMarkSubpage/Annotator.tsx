@@ -171,6 +171,8 @@ const Annotator: React.FC<Props> = ({
         backgroundImageSource={page.imageUrl || ""}
         backgroundLinesArray={[[]]}
         foregroundLines={foregroundAnnotation}
+        backgroundTextsArray={[[]]}
+        foregroundTexts={[]}
         onForegroundLinesChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
       />

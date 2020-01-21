@@ -106,6 +106,8 @@ const ScriptView: React.FC = () => {
               annotation => annotation["layer"]
             )}
             foregroundLines={[]}
+            backgroundTextsArray={[[]]}
+            foregroundTexts={[]}
             onViewChange={handleViewChange}
           />
         </div>
