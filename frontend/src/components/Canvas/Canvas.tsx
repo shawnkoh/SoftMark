@@ -3,7 +3,7 @@ import { Stage, Layer, Line } from "react-konva";
 import produce from "immer";
 import isEqual from "lodash/isEqual";
 
-import { AnnotationLine, Annotation } from "backend/src/types/annotations";
+import { AnnotationLine, AnnotationText } from "backend/src/types/annotations";
 import { Point, CanvasMode, CanvasProps } from "./types";
 import {
   getDistance,
@@ -14,7 +14,7 @@ import {
 import UrlImage from "./UrlImage";
 
 enum CanvasActionType {
-  ReplaceForegroundAnnotation = "replaceForegroundAnnotation",
+  ReplaceForegroundLines = "replaceForegroundLines",
   BeginLine = "beginLine",
   ContinueLine = "continueLine",
   EndLine = "endLine",
@@ -27,7 +27,7 @@ enum CanvasActionType {
 }
 
 type CanvasAction =
-  | { type: CanvasActionType.ReplaceForegroundAnnotation; payload: Annotation }
+  | { type: CanvasActionType.ReplaceForegroundLines; payload: AnnotationLine[] }
   | { type: CanvasActionType.BeginLine }
   | { type: CanvasActionType.ContinueLine; payload: Point }
   | { type: CanvasActionType.EndLine }
@@ -58,18 +58,14 @@ const createCanvasStateReducer = ({
   penColor,
   penWidth,
   scale,
-  onForegroundAnnotationChange,
+  onForegroundLinesChange,
   onViewChange
 }: Pick<
   CanvasProps,
-  | "penColor"
-  | "penWidth"
-  | "scale"
-  | "onForegroundAnnotationChange"
-  | "onViewChange"
+  "penColor" | "penWidth" | "scale" | "onForegroundLinesChange" | "onViewChange"
 >) => (state: CanvasState, action: CanvasAction): CanvasState => {
   let nextState = state;
-  let hasForegroundAnnotationChanged = false;
+  let hasForegroundLinesChanged = false;
   switch (action.type) {
     case CanvasActionType.ContinueLine:
       if (state.isDrawing) {
@@ -88,11 +84,11 @@ const createCanvasStateReducer = ({
       });
       onViewChange(action.payload.stagePosition, action.payload.stageScale);
       break;
-    case CanvasActionType.ReplaceForegroundAnnotation:
+    case CanvasActionType.ReplaceForegroundLines:
       nextState = produce(state, draftState => {
         draftState.lines = action.payload;
       });
-      hasForegroundAnnotationChanged = true;
+      hasForegroundLinesChanged = true;
       break;
     case CanvasActionType.BeginLine:
       nextState = produce(state, draftState => {
@@ -107,7 +103,7 @@ const createCanvasStateReducer = ({
       break;
     case CanvasActionType.EndLine:
       if (state.isDrawing) {
-        hasForegroundAnnotationChanged = true;
+        hasForegroundLinesChanged = true;
       }
       nextState = produce(state, draftState => {
         draftState.isDrawing = false;
@@ -127,7 +123,7 @@ const createCanvasStateReducer = ({
       nextState = produce(state, draftState => {
         draftState.lines.splice(action.payload, 1);
       });
-      hasForegroundAnnotationChanged = true;
+      hasForegroundLinesChanged = true;
       break;
     case CanvasActionType.Drag:
       onViewChange(action.payload, scale);
@@ -141,8 +137,8 @@ const createCanvasStateReducer = ({
     default:
       nextState = state;
   }
-  if (hasForegroundAnnotationChanged) {
-    onForegroundAnnotationChange(nextState.lines);
+  if (hasForegroundLinesChanged) {
+    onForegroundLinesChange(nextState.lines);
   }
   return nextState;
 };
@@ -151,18 +147,21 @@ const Canvas: React.FC<CanvasProps> = ({
   width,
   height,
   backgroundImageSource,
-  backgroundAnnotations,
-  foregroundAnnotation,
+  backgroundLinesArray,
+  foregroundLines,
+  backgroundTextsArray,
+  foregroundTexts,
   mode,
   penColor,
   penWidth,
   position,
   scale,
-  onForegroundAnnotationChange,
+  onForegroundLinesChange,
+  onForegroundTextsChange,
   onViewChange
 }: CanvasProps) => {
   const initialCanvasState: CanvasState = {
-    lines: foregroundAnnotation,
+    lines: foregroundLines,
     isDrawing: false,
     draggable: false,
     lastTouchDistance: 0,
@@ -174,10 +173,10 @@ const Canvas: React.FC<CanvasProps> = ({
       penColor,
       penWidth,
       scale,
-      onForegroundAnnotationChange,
+      onForegroundLinesChange: onForegroundLinesChange,
       onViewChange
     }),
-    [penColor, penWidth, onForegroundAnnotationChange, onViewChange]
+    [penColor, penWidth, onForegroundLinesChange, onViewChange]
   );
 
   const [canvasState, dispatch] = useReducer(
@@ -186,13 +185,13 @@ const Canvas: React.FC<CanvasProps> = ({
   );
 
   useEffect(() => {
-    if (!isEqual(foregroundAnnotation, canvasState.lines)) {
+    if (!isEqual(foregroundLines, canvasState.lines)) {
       dispatch({
-        type: CanvasActionType.ReplaceForegroundAnnotation,
-        payload: foregroundAnnotation
+        type: CanvasActionType.ReplaceForegroundLines,
+        payload: foregroundLines
       });
     }
-  }, [foregroundAnnotation]); // Ignore warning - do not change dependency array!
+  }, [foregroundLines]); // Ignore warning - do not change dependency array!
 
   const stageRef = useRef<any>(null);
 
@@ -485,8 +484,8 @@ const Canvas: React.FC<CanvasProps> = ({
         <UrlImage src={backgroundImageSource} />
       </Layer>
       <Layer>
-        {backgroundAnnotations.map((backgroundAnnotationLines, i) =>
-          backgroundAnnotationLines.map((line, j) => (
+        {backgroundLinesArray.map((backgroundLines, i) =>
+          backgroundLines.map((line, j) => (
             <Line
               key={j}
               points={line.points}

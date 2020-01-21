@@ -102,10 +102,10 @@ const ScriptView: React.FC = () => {
         <div className={classes.grow}>
           <CanvasWithToolbar
             backgroundImageSource={page!.imageUrl}
-            backgroundAnnotations={page!.annotations.map(
+            backgroundLinesArray={page!.annotations.map(
               annotation => annotation["layer"]
             )}
-            foregroundAnnotation={[]}
+            foregroundLines={[]}
             onViewChange={handleViewChange}
           />
         </div>

@@ -34,9 +34,9 @@ type DrilledProps = Partial<
   Pick<
     CanvasProps,
     | "backgroundImageSource"
-    | "backgroundAnnotations"
-    | "foregroundAnnotation"
-    | "onForegroundAnnotationChange"
+    | "backgroundLinesArray"
+    | "foregroundLines"
+    | "onForegroundLinesChange"
     | "onViewChange"
   >
 >;
@@ -69,9 +69,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CanvasWithToolbar: React.FC<Props> = ({
   backgroundImageSource = "",
-  backgroundAnnotations = [[]],
-  foregroundAnnotation = [],
-  onForegroundAnnotationChange = annotation => {},
+  backgroundLinesArray: backgroundAnnotations = [[]],
+  foregroundLines: foregroundAnnotation = [],
+  onForegroundLinesChange: onForegroundAnnotationChange = annotation => {},
   onViewChange = (position, scale) => {},
   transparentToolbar = false,
   drawable = false,
@@ -267,9 +267,9 @@ const CanvasWithToolbar: React.FC<Props> = ({
       ) : (
         <CanvasContainer
           backgroundImageSource={backgroundImageSource}
-          backgroundAnnotations={backgroundAnnotations}
-          foregroundAnnotation={thisForegroundAnnotation}
-          onForegroundAnnotationChange={handleForegroundAnnotationChange}
+          backgroundLinesArray={backgroundAnnotations}
+          foregroundLines={thisForegroundAnnotation}
+          onForegroundLinesChange={handleForegroundAnnotationChange}
           onViewChange={handleViewChange}
           mode={canvasMode}
           penColor={penColor}

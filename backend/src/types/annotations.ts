@@ -9,6 +9,15 @@ export interface AnnotationLine {
 
 export type Annotation = AnnotationLine[];
 
+export interface AnnotationText {
+  x: number;
+  y: number;
+  text: string;
+  fontSize: number;
+  fontFamily: number;
+  color: string;
+}
+
 export interface AnnotationPostData {
   layer: AnnotationLine[];
 }

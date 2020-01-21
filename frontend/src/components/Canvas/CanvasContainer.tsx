@@ -10,24 +10,21 @@ CanvasContainer component automatically fills space of its parent element
 if parent element is a flex container
 */
 
-/* For future improvement
-type StyleProps = {
-  backgroundColor: string;
-};
-*/
-
 type Props = Partial<
   Pick<
     CanvasProps,
     | "backgroundImageSource"
-    | "backgroundAnnotations"
-    | "foregroundAnnotation"
+    | "backgroundLinesArray"
+    | "foregroundLines"
+    | "backgroundTextsArray"
+    | "foregroundTexts"
     | "mode"
     | "penColor"
     | "penWidth"
     | "position"
     | "scale"
-    | "onForegroundAnnotationChange"
+    | "onForegroundLinesChange"
+    | "onForegroundTextsChange"
     | "onViewChange"
   >
 >;
@@ -44,14 +41,17 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CanvasContainer: React.FC<Props> = ({
   backgroundImageSource = "",
-  backgroundAnnotations = [[]],
-  foregroundAnnotation = [],
+  backgroundLinesArray = [[]],
+  foregroundLines = [],
+  backgroundTextsArray = [[]],
+  foregroundTexts = [],
   mode = CanvasMode.View,
   penColor = "ff0000",
   penWidth = 5,
   position = { x: 0, y: 0 },
   scale = 1.0,
-  onForegroundAnnotationChange = annotation => {},
+  onForegroundLinesChange = annotationLines => {},
+  onForegroundTextsChange = annotationTexts => {},
   onViewChange = (position, scale) => {}
 }: Props) => {
   const classes = useStyles();
@@ -82,14 +82,17 @@ const CanvasContainer: React.FC<Props> = ({
         width={width}
         height={height}
         backgroundImageSource={backgroundImageSource}
-        backgroundAnnotations={backgroundAnnotations}
-        foregroundAnnotation={foregroundAnnotation}
+        backgroundLinesArray={backgroundLinesArray}
+        foregroundLines={foregroundLines}
+        backgroundTextsArray={backgroundTextsArray}
+        foregroundTexts={foregroundTexts}
         mode={mode}
         penColor={penColor}
         penWidth={penWidth}
         position={position}
         scale={scale}
-        onForegroundAnnotationChange={onForegroundAnnotationChange}
+        onForegroundLinesChange={onForegroundLinesChange}
+        onForegroundTextsChange={onForegroundTextsChange}
         onViewChange={onViewChange}
       />
     </div>
