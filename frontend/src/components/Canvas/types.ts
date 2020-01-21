@@ -23,6 +23,9 @@ export interface CanvasProps {
   mode: CanvasMode;
   penColor: string;
   penWidth: number;
+  text: string;
+  textColor: string;
+  textSize: number;
   position: Point;
   scale: number;
   onForegroundLinesChange: (annotationLines: AnnotationLine[]) => void;

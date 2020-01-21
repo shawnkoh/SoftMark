@@ -21,6 +21,9 @@ type Props = Partial<
     | "mode"
     | "penColor"
     | "penWidth"
+    | "text"
+    | "textSize"
+    | "textColor"
     | "position"
     | "scale"
     | "onForegroundLinesChange"
@@ -48,6 +51,9 @@ const CanvasContainer: React.FC<Props> = ({
   mode = CanvasMode.View,
   penColor = "ff0000",
   penWidth = 5,
+  text = "Type here",
+  textColor = "ff0000",
+  textSize = 12,
   position = { x: 0, y: 0 },
   scale = 1.0,
   onForegroundLinesChange = annotationLines => {},
@@ -89,6 +95,9 @@ const CanvasContainer: React.FC<Props> = ({
         mode={mode}
         penColor={penColor}
         penWidth={penWidth}
+        text={text}
+        textColor={textColor}
+        textSize={textSize}
         position={position}
         scale={scale}
         onForegroundLinesChange={onForegroundLinesChange}

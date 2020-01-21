@@ -4,7 +4,7 @@ import isEqual from "lodash/isEqual";
 import useImageSize from "@use-hooks/image-size";
 import useComponentSize from "@rehooks/component-size";
 
-import { Annotation } from "backend/src/types/annotations";
+import { AnnotationLine, AnnotationText } from "backend/src/types/annotations";
 import { Point, CanvasMode, CanvasProps } from "./types";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -36,7 +36,10 @@ type DrilledProps = Partial<
     | "backgroundImageSource"
     | "backgroundLinesArray"
     | "foregroundLines"
+    | "backgroundTextsArray"
+    | "foregroundTexts"
     | "onForegroundLinesChange"
+    | "onForegroundTextsChange"
     | "onViewChange"
   >
 >;
@@ -69,9 +72,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CanvasWithToolbar: React.FC<Props> = ({
   backgroundImageSource = "",
-  backgroundLinesArray: backgroundAnnotations = [[]],
-  foregroundLines: foregroundAnnotation = [],
-  onForegroundLinesChange: onForegroundAnnotationChange = annotation => {},
+  backgroundLinesArray = [[]],
+  foregroundLines = [],
+  backgroundTextsArray = [[]],
+  foregroundTexts = [],
+  onForegroundLinesChange = annotationLines => {},
+  onForegroundTextsChange = annotationTexts => {},
   onViewChange = (position, scale) => {},
   transparentToolbar = false,
   drawable = false,
@@ -79,23 +85,39 @@ const CanvasWithToolbar: React.FC<Props> = ({
 }: Props) => {
   const classes = useStyles({});
 
-  const [thisForegroundAnnotation, setThisForegroundAnnotation] = useState<
-    Annotation
-  >(foregroundAnnotation);
+  const [thisForegroundLines, setThisForegroundLines] = useState<
+    AnnotationLine[]
+  >(foregroundLines);
+  const [thisForegroundTexts, setThisForegroundTexts] = useState<
+    AnnotationText[]
+  >(foregroundTexts);
 
-  const handleForegroundAnnotationChange = (annotation: Annotation) => {
-    setThisForegroundAnnotation(annotation); // update state
+  const handleForegroundLinesChange = (annotationLines: AnnotationLine[]) => {
+    setThisForegroundLines(annotationLines); // update state
   };
-  const handleClearAllClick = event => setThisForegroundAnnotation([]);
+  const handleForegroundTextsChange = (annotationTexts: AnnotationText[]) => {
+    setThisForegroundTexts(annotationTexts); // update state
+  };
+
+  const handleClearAllClick = event => {
+    setThisForegroundLines([]);
+    setThisForegroundTexts([]);
+  };
 
   useEffect(() => {
-    if (!isEqual(foregroundAnnotation, thisForegroundAnnotation))
-      onForegroundAnnotationChange(thisForegroundAnnotation);
-  }, [thisForegroundAnnotation]);
-
+    if (!isEqual(foregroundLines, thisForegroundLines))
+      onForegroundLinesChange(thisForegroundLines);
+  }, [thisForegroundLines]);
   useEffect(() => {
-    setThisForegroundAnnotation(foregroundAnnotation);
-  }, [foregroundAnnotation]);
+    setThisForegroundLines(foregroundLines);
+  }, [foregroundLines]);
+  useEffect(() => {
+    if (!isEqual(foregroundTexts, thisForegroundTexts))
+      onForegroundTextsChange(thisForegroundTexts);
+  }, [thisForegroundTexts]);
+  useEffect(() => {
+    setThisForegroundTexts(foregroundTexts);
+  }, [foregroundTexts]);
 
   const defaultPosition = { x: 0, y: 64 };
   const [position, setPosition] = useState<Point>(defaultPosition);
@@ -143,7 +165,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   useEffect(fitToViewport, [width, height, imgHeight, imgWidth]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
-    drawable ? CanvasMode.Pen : CanvasMode.View
+    drawable ? CanvasMode.Text : CanvasMode.View
   );
   const handleCanvasMode = (event: any, newCanvasMode: CanvasMode) => {
     setCanvasMode(newCanvasMode);
@@ -156,6 +178,13 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const [penColor, setPenColor] = useState<string>("#ff0000");
   const handlePenColorChange = event => setPenColor(event.target.value);
+
+  const [textSize, setTextSize] = useState<number>(12);
+  const handleTextSizeChange = event =>
+    setTextSize(event.target.value as number);
+
+  const [text, setText] = useState<string>("Type here");
+  const handleTextChange = event => setText(event.target.value);
 
   return (
     <div ref={ref} className={classes.container}>
@@ -170,6 +199,9 @@ const CanvasWithToolbar: React.FC<Props> = ({
               className={classes.padding}
             >
               <ToggleButton value={CanvasMode.Pen} aria-label="pen">
+                <PenIcon />
+              </ToggleButton>
+              <ToggleButton value={CanvasMode.Text} aria-label="text">
                 <PenIcon />
               </ToggleButton>
               <ToggleButton value={CanvasMode.Eraser} aria-label="eraser">
@@ -212,6 +244,49 @@ const CanvasWithToolbar: React.FC<Props> = ({
                   <MaxWidthIcon />
                 </Grid>
               </Grid>
+            </>
+          )}
+          {canvasMode === CanvasMode.Text && (
+            <>
+              <input
+                type="color"
+                onChange={handlePenColorChange}
+                value={penColor}
+                className={classes.padding}
+              />
+              <input
+                type="number"
+                list="sizes"
+                min={1}
+                max={100}
+                onChange={handleTextSizeChange}
+                value={textSize}
+                className={classes.padding}
+              />
+              <datalist id="sizes">
+                <option value={8} />
+                <option value={9} />
+                <option value={10} />
+                <option value={11} />
+                <option value={12} />
+                <option value={14} />
+                <option value={16} />
+                <option value={18} />
+                <option value={20} />
+                <option value={22} />
+                <option value={24} />
+                <option value={26} />
+                <option value={28} />
+                <option value={36} />
+                <option value={48} />
+                <option value={72} />
+              </datalist>
+              <input
+                type="text"
+                onChange={handleTextChange}
+                value={text}
+                className={classes.padding}
+              />
             </>
           )}
           {/*canvasMode === CanvasMode.Eraser && (
@@ -267,9 +342,12 @@ const CanvasWithToolbar: React.FC<Props> = ({
       ) : (
         <CanvasContainer
           backgroundImageSource={backgroundImageSource}
-          backgroundLinesArray={backgroundAnnotations}
-          foregroundLines={thisForegroundAnnotation}
-          onForegroundLinesChange={handleForegroundAnnotationChange}
+          backgroundLinesArray={backgroundLinesArray}
+          foregroundLines={thisForegroundLines}
+          backgroundTextsArray={backgroundTextsArray}
+          foregroundTexts={thisForegroundTexts}
+          onForegroundLinesChange={handleForegroundLinesChange}
+          onForegroundTextsChange={handleForegroundTextsChange}
           onViewChange={handleViewChange}
           mode={canvasMode}
           penColor={penColor}

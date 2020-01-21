@@ -1,5 +1,5 @@
 import React, { useReducer, useCallback, useRef, useEffect } from "react";
-import { Stage, Layer, Line } from "react-konva";
+import { Stage, Layer, Line, Text } from "react-konva";
 import produce from "immer";
 import isEqual from "lodash/isEqual";
 
@@ -15,25 +15,31 @@ import UrlImage from "./UrlImage";
 
 enum CanvasActionType {
   ReplaceForegroundLines = "replaceForegroundLines",
+  ReplaceForegroundTexts = "replaceForegroundTexts",
   BeginLine = "beginLine",
   ContinueLine = "continueLine",
   EndLine = "endLine",
+  MakeText = "makeText",
   Drag = "drag",
   BeginErase = "beginErase",
   EndErase = "endErase",
   DeleteLine = "deleteLine",
+  DeleteText = "deleteText",
   PanZoom = "panZoom",
   SetDraggable = "setDraggable"
 }
 
 type CanvasAction =
   | { type: CanvasActionType.ReplaceForegroundLines; payload: AnnotationLine[] }
+  | { type: CanvasActionType.ReplaceForegroundTexts; payload: AnnotationText[] }
   | { type: CanvasActionType.BeginLine }
   | { type: CanvasActionType.ContinueLine; payload: Point }
   | { type: CanvasActionType.EndLine }
+  | { type: CanvasActionType.MakeText; payload: Point }
   | { type: CanvasActionType.BeginErase }
   | { type: CanvasActionType.EndErase }
   | { type: CanvasActionType.DeleteLine; payload: number }
+  | { type: CanvasActionType.DeleteText; payload: number }
   | { type: CanvasActionType.Drag; payload: Point }
   | {
       type: CanvasActionType.PanZoom;
@@ -48,6 +54,7 @@ type CanvasAction =
 
 interface CanvasState {
   lines: AnnotationLine[];
+  texts: AnnotationText[];
   isDrawing: boolean;
   lastTouchDistance: number;
   draggable: boolean;
@@ -57,15 +64,28 @@ interface CanvasState {
 const createCanvasStateReducer = ({
   penColor,
   penWidth,
+  text,
+  textColor,
+  textSize,
   scale,
   onForegroundLinesChange,
+  onForegroundTextsChange,
   onViewChange
 }: Pick<
   CanvasProps,
-  "penColor" | "penWidth" | "scale" | "onForegroundLinesChange" | "onViewChange"
+  | "penColor"
+  | "penWidth"
+  | "text"
+  | "textColor"
+  | "textSize"
+  | "scale"
+  | "onForegroundLinesChange"
+  | "onForegroundTextsChange"
+  | "onViewChange"
 >) => (state: CanvasState, action: CanvasAction): CanvasState => {
   let nextState = state;
   let hasForegroundLinesChanged = false;
+  let hasForegroundTextsChanged = false;
   switch (action.type) {
     case CanvasActionType.ContinueLine:
       if (state.isDrawing) {
@@ -109,6 +129,17 @@ const createCanvasStateReducer = ({
         draftState.isDrawing = false;
       });
       break;
+    case CanvasActionType.MakeText:
+      nextState = produce(state, draftState => {
+        draftState.texts.push({
+          x: action.payload.x,
+          y: action.payload.y,
+          text: text,
+          fontSize: textSize,
+          color: textColor
+        });
+      });
+      break;
     case CanvasActionType.BeginErase:
       nextState = produce(state, draftState => {
         draftState.isDrawing = true;
@@ -125,6 +156,12 @@ const createCanvasStateReducer = ({
       });
       hasForegroundLinesChanged = true;
       break;
+    case CanvasActionType.DeleteText:
+      nextState = produce(state, draftState => {
+        draftState.texts.splice(action.payload, 1);
+      });
+      hasForegroundTextsChanged = true;
+      break;
     case CanvasActionType.Drag:
       onViewChange(action.payload, scale);
       break;
@@ -140,6 +177,9 @@ const createCanvasStateReducer = ({
   if (hasForegroundLinesChanged) {
     onForegroundLinesChange(nextState.lines);
   }
+  if (hasForegroundTextsChanged) {
+    onForegroundTextsChange(nextState.texts);
+  }
   return nextState;
 };
 
@@ -154,6 +194,9 @@ const Canvas: React.FC<CanvasProps> = ({
   mode,
   penColor,
   penWidth,
+  text,
+  textColor,
+  textSize,
   position,
   scale,
   onForegroundLinesChange,
@@ -162,6 +205,7 @@ const Canvas: React.FC<CanvasProps> = ({
 }: CanvasProps) => {
   const initialCanvasState: CanvasState = {
     lines: foregroundLines,
+    texts: foregroundTexts,
     isDrawing: false,
     draggable: false,
     lastTouchDistance: 0,
@@ -172,11 +216,24 @@ const Canvas: React.FC<CanvasProps> = ({
     createCanvasStateReducer({
       penColor,
       penWidth,
+      text,
+      textColor,
+      textSize,
       scale,
-      onForegroundLinesChange: onForegroundLinesChange,
+      onForegroundLinesChange,
+      onForegroundTextsChange,
       onViewChange
     }),
-    [penColor, penWidth, onForegroundLinesChange, onViewChange]
+    [
+      penColor,
+      penWidth,
+      text,
+      textColor,
+      textSize,
+      onForegroundLinesChange,
+      onForegroundTextsChange,
+      onViewChange
+    ]
   );
 
   const [canvasState, dispatch] = useReducer(
@@ -193,7 +250,42 @@ const Canvas: React.FC<CanvasProps> = ({
     }
   }, [foregroundLines]); // Ignore warning - do not change dependency array!
 
+  useEffect(() => {
+    if (!isEqual(foregroundTexts, canvasState.texts)) {
+      dispatch({
+        type: CanvasActionType.ReplaceForegroundTexts,
+        payload: foregroundTexts
+      });
+    }
+  }, [foregroundTexts]); // Ignore warning - do not change dependency array!
+
   const stageRef = useRef<any>(null);
+
+  const handleClick = event => {
+    if ((mode as CanvasMode) === CanvasMode.Text) {
+      const currentStageRef = stageRef.current;
+      if (currentStageRef) {
+        const stage = currentStageRef.getStage();
+        const point = getRelativePointerPosition(stage);
+        dispatch({ type: CanvasActionType.MakeText, payload: point });
+      }
+    }
+  };
+
+  const handleTap = event => {
+    if ((mode as CanvasMode) === CanvasMode.Text) {
+      dispatch({
+        type: CanvasActionType.SetDraggable,
+        payload: false
+      });
+      const currentStageRef = stageRef.current;
+      if (currentStageRef) {
+        const stage = currentStageRef.getStage();
+        const point = getRelativePointerPosition(stage);
+        dispatch({ type: CanvasActionType.MakeText, payload: point });
+      }
+    }
+  };
 
   const handleMouseDown = event => {
     if ((mode as CanvasMode) === CanvasMode.Pen) {
@@ -468,6 +560,8 @@ const Canvas: React.FC<CanvasProps> = ({
       draggable={
         (mode as CanvasMode) === CanvasMode.View && canvasState.draggable
       }
+      onClick={handleClick}
+      onTap={handleTap}
       onContentMousedown={handleMouseDown}
       onContentMousemove={handleMouseMove}
       onContentMouseup={handleMouseUp}
@@ -498,6 +592,18 @@ const Canvas: React.FC<CanvasProps> = ({
             />
           ))
         )}
+        {backgroundTextsArray.map((backgroundTexts, k) =>
+          backgroundTexts.map((text, l) => (
+            <Text
+              key={l}
+              x={text.x}
+              y={text.y}
+              text={text.text}
+              fontSize={text.fontSize}
+              fill={text.color}
+            />
+          ))
+        )}
       </Layer>
       <Layer>
         {canvasState.lines.map((line, i) => (
@@ -514,6 +620,20 @@ const Canvas: React.FC<CanvasProps> = ({
             onTap={() => handleLineClick(i)}
             onMouseEnter={() => handleLineEnter(i)}
             onTouchMove={() => handleLineEnter(i)}
+          />
+        ))}
+        {canvasState.texts.map((text, j) => (
+          <Text
+            key={j}
+            x={text.x}
+            y={text.y}
+            text={text.text}
+            fontSize={text.fontSize}
+            fill={text.color}
+            onClick={() => handleLineClick(j)}
+            onTap={() => handleLineClick(j)}
+            onMouseEnter={() => handleLineEnter(j)}
+            onTouchMove={() => handleLineEnter(j)}
           />
         ))}
       </Layer>

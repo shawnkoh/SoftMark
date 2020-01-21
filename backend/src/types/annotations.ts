@@ -14,7 +14,6 @@ export interface AnnotationText {
   y: number;
   text: string;
   fontSize: number;
-  fontFamily: number;
   color: string;
 }
 
