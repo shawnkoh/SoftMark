@@ -19,6 +19,7 @@ import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import PanIcon from "@material-ui/icons/PanTool";
 import PenIcon from "mdi-material-ui/Pen";
+import TextIcon from "mdi-material-ui/FormatText";
 import EraserIcon from "mdi-material-ui/Eraser";
 import MinWidthIcon from "mdi-material-ui/CircleMedium";
 import MaxWidthIcon from "mdi-material-ui/Circle";
@@ -165,7 +166,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
   useEffect(fitToViewport, [width, height, imgHeight, imgWidth]);
 
   const [canvasMode, setCanvasMode] = useState<CanvasMode>(
-    drawable ? CanvasMode.Text : CanvasMode.View
+    drawable ? CanvasMode.Pen : CanvasMode.View
   );
   const handleCanvasMode = (event: any, newCanvasMode: CanvasMode) => {
     setCanvasMode(newCanvasMode);
@@ -181,7 +182,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
 
   const [textSize, setTextSize] = useState<number>(12);
   const handleTextSizeChange = event =>
-    setTextSize(event.target.value as number);
+    setTextSize(parseInt(event.target.value, 10));
 
   const [text, setText] = useState<string>("Type here");
   const handleTextChange = event => setText(event.target.value);
@@ -202,7 +203,7 @@ const CanvasWithToolbar: React.FC<Props> = ({
                 <PenIcon />
               </ToggleButton>
               <ToggleButton value={CanvasMode.Text} aria-label="text">
-                <PenIcon />
+                <TextIcon />
               </ToggleButton>
               <ToggleButton value={CanvasMode.Eraser} aria-label="eraser">
                 <EraserIcon />
@@ -254,35 +255,31 @@ const CanvasWithToolbar: React.FC<Props> = ({
                 value={penColor}
                 className={classes.padding}
               />
-              <input
-                type="number"
-                list="sizes"
-                min={1}
-                max={100}
+              <select
                 onChange={handleTextSizeChange}
                 value={textSize}
                 className={classes.padding}
-              />
-              <datalist id="sizes">
-                <option value={8} />
-                <option value={9} />
-                <option value={10} />
-                <option value={11} />
-                <option value={12} />
-                <option value={14} />
-                <option value={16} />
-                <option value={18} />
-                <option value={20} />
-                <option value={22} />
-                <option value={24} />
-                <option value={26} />
-                <option value={28} />
-                <option value={36} />
-                <option value={48} />
-                <option value={72} />
-              </datalist>
+              >
+                <option value={8}>8</option>
+                <option value={9}>9</option>
+                <option value={10}>10</option>
+                <option value={11}>11</option>
+                <option value={12}>12</option>
+                <option value={14}>14</option>
+                <option value={16}>16</option>
+                <option value={18}>18</option>
+                <option value={20}>20</option>
+                <option value={22}>22</option>
+                <option value={24}>24</option>
+                <option value={26}>26</option>
+                <option value={28}>28</option>
+                <option value={36}>36</option>
+                <option value={48}>48</option>
+                <option value={72}>72</option>
+              </select>
               <input
                 type="text"
+                placeholder="Type here"
                 onChange={handleTextChange}
                 value={text}
                 className={classes.padding}
@@ -352,6 +349,9 @@ const CanvasWithToolbar: React.FC<Props> = ({
           mode={canvasMode}
           penColor={penColor}
           penWidth={penWidth}
+          text={text}
+          textColor={penColor}
+          textSize={textSize}
           position={position}
           scale={scale}
         />

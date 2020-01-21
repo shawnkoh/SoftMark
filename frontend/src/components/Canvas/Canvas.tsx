@@ -130,15 +130,17 @@ const createCanvasStateReducer = ({
       });
       break;
     case CanvasActionType.MakeText:
-      nextState = produce(state, draftState => {
-        draftState.texts.push({
-          x: action.payload.x,
-          y: action.payload.y,
-          text: text,
-          fontSize: textSize,
-          color: textColor
+      if (text) {
+        nextState = produce(state, draftState => {
+          draftState.texts.push({
+            x: action.payload.x,
+            y: action.payload.y,
+            text: text,
+            fontSize: textSize,
+            color: textColor
+          });
         });
-      });
+      }
       break;
     case CanvasActionType.BeginErase:
       nextState = produce(state, draftState => {
@@ -548,6 +550,18 @@ const Canvas: React.FC<CanvasProps> = ({
     }
   };
 
+  const handleTextClick = index => {
+    if (mode === CanvasMode.Eraser) {
+      dispatch({ type: CanvasActionType.DeleteText, payload: index });
+    }
+  };
+
+  const handleTextEnter = index => {
+    if (mode === CanvasMode.Eraser && canvasState.isDrawing) {
+      dispatch({ type: CanvasActionType.DeleteText, payload: index });
+    }
+  };
+
   return (
     <Stage
       ref={stageRef}
@@ -630,10 +644,10 @@ const Canvas: React.FC<CanvasProps> = ({
             text={text.text}
             fontSize={text.fontSize}
             fill={text.color}
-            onClick={() => handleLineClick(j)}
-            onTap={() => handleLineClick(j)}
-            onMouseEnter={() => handleLineEnter(j)}
-            onTouchMove={() => handleLineEnter(j)}
+            onClick={() => handleTextClick(j)}
+            onTap={() => handleTextClick(j)}
+            onMouseEnter={() => handleTextEnter(j)}
+            onTouchMove={() => handleTextEnter(j)}
           />
         ))}
       </Layer>
