@@ -3,29 +3,21 @@ import { Annotation, AnnotationPostData } from "backend/src/types/annotations";
 import { PageViewData, QuestionViewData } from "backend/src/types/view";
 import clsx from "clsx";
 import produce from "immer";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { saveAnnotation } from "../../../api/annotations";
 import { CanvasWithToolbar } from "../../../components/Canvas";
 import ReversedChip from "../../../components/ReversedChip";
 import useMarkQuestion from "./MarkQuestionContext";
-import MarkQuestionModal from "./MarkQuestionModal";
+import MarkQuestionSelect from "./MarkQuestionSelect";
 import useStyles from "./styles";
 
 interface Props {
   page: PageViewData;
 }
 
-interface QuestionState {
-  isVisible: boolean;
-  question: QuestionViewData;
-}
-
 const Annotator: React.FC<Props> = ({ page }: Props) => {
   const classes = useStyles();
-
-  const [questionStates, setQuestionStates] = useState<QuestionState[]>([]);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
   const {
     isPageLoading,
@@ -40,14 +32,7 @@ const Annotator: React.FC<Props> = ({ page }: Props) => {
 
   const { matriculationNumber, rootQuestionTemplate } = scriptMarkingData;
 
-  useEffect(() => {
-    setQuestionStates(
-      currentQns.map(question => ({
-        isVisible: false,
-        question
-      }))
-    );
-  }, [currentQns]);
+  const [questions, setQuestions] = useState<QuestionViewData[]>(currentQns);
 
   const handleForegroundAnnotationChange = (annotation: Annotation) => {
     const annotationPostData: AnnotationPostData = {
@@ -60,55 +45,22 @@ const Annotator: React.FC<Props> = ({ page }: Props) => {
     });
   };
 
-  const handleModalCancel = (index: number) => {
-    setQuestionStates(
-      produce(questionStates, draftState => {
-        draftState[index].isVisible = false;
-      })
-    );
-    setAnchorEl(null);
-  };
-
   const handleModalSave = (
     index: number,
     score: number | null,
     markId: number | null
   ) => {
-    setQuestionStates(
-      produce(questionStates, draftState => {
-        draftState[index].isVisible = false;
-        draftState[index].question.score = score;
-        draftState[index].question.markId = markId;
+    setQuestions(
+      produce(questions, draftState => {
+        draftState[index].score = score;
+        draftState[index].markId = markId;
       })
     );
-    updateQuestion(questionStates[index].question.id, score, markId);
-    setAnchorEl(null);
-  };
-
-  const handleChipClick = (
-    event: React.MouseEvent<HTMLDivElement>,
-    index: number
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setQuestionStates(
-      produce(questionStates, draftState => {
-        draftState[index].isVisible = true;
-      })
-    );
+    updateQuestion(questions[index].id, score, markId);
   };
 
   return (
     <div className={classes.canvasWithToolbarContainer}>
-      {questionStates.map((questionState: QuestionState, index: number) => (
-        <MarkQuestionModal
-          key={index}
-          anchorEl={anchorEl}
-          question={questionState.question}
-          isVisible={questionState.isVisible}
-          onCancel={() => handleModalCancel(index)}
-          onSave={(score, markId) => handleModalSave(index, score, markId)}
-        />
-      ))}
       <CanvasWithToolbar
         drawable
         backgroundImageSource={page.imageUrl || ""}
@@ -118,24 +70,26 @@ const Annotator: React.FC<Props> = ({ page }: Props) => {
         onViewChange={handleViewChange}
         isLoading={isPageLoading}
       />
-      {questionStates.map((questionState: QuestionState, index: number) => (
+      {questions.map((question: QuestionViewData, index: number) => (
         <ReversedChip
           key={index}
-          onClick={event => handleChipClick(event, index)}
-          label={"Q" + questionState.question.name}
+          label={"Q" + question.name}
           avatar={
-            <Avatar>{`${
-              questionState.question.score === null
-                ? "-"
-                : questionState.question.score
-            } / ${questionState.question.maxScore || "-"}`}</Avatar>
+            <Avatar>
+              <MarkQuestionSelect
+                question={question}
+                onSave={(score, markId) =>
+                  handleModalSave(index, score, markId)
+                }
+              />
+              {`/ ${question.maxScore || "-"}`}
+            </Avatar>
           }
-          color={questionState.question.score === null ? "default" : "primary"}
+          color={question.score === null ? "default" : "primary"}
           style={{
             position: "absolute",
-            left:
-              questionState.question.leftOffset * viewScale + viewPosition.x,
-            top: questionState.question.topOffset * viewScale + viewPosition.y
+            left: question.leftOffset * viewScale + viewPosition.x,
+            top: question.topOffset * viewScale + viewPosition.y
           }}
         />
       ))}
@@ -153,21 +107,22 @@ const Annotator: React.FC<Props> = ({ page }: Props) => {
             variant="outlined"
             className={classes.questionBarItem}
           />
-          {questionStates.map((questionState: QuestionState, index: number) => (
+          {questions.map((question: QuestionViewData, index: number) => (
             <ReversedChip
               key={index}
-              onClick={event => handleChipClick(event, index)}
-              label={"Q" + questionState.question.name}
+              label={"Q" + question.name}
               avatar={
-                <Avatar>{`${
-                  questionState.question.score === null
-                    ? "-"
-                    : questionState.question.score
-                } / ${questionState.question.maxScore || "-"}`}</Avatar>
+                <Avatar>
+                  <MarkQuestionSelect
+                    question={question}
+                    onSave={(score, markId) =>
+                      handleModalSave(index, score, markId)
+                    }
+                  />
+                  {`/ ${question.maxScore || "-"}`}
+                </Avatar>
               }
-              color={
-                questionState.question.score === null ? "default" : "primary"
-              }
+              color={question.score === null ? "default" : "primary"}
               className={classes.questionBarItem}
             />
           ))}
