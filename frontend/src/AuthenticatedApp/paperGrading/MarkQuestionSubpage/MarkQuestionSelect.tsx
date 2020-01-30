@@ -52,7 +52,14 @@ const MarkQuestionSelect: React.FC<Props> = ({ question, onSave }) => {
   };
 
   return (
-    <NativeSelect value={score === null ? "-" : score} onChange={handleChange}>
+    <NativeSelect
+      value={score === null ? "-" : score}
+      onChange={handleChange}
+      style={{
+        fontSize: "unset",
+        color: "unset"
+      }}
+    >
       <option value={"-"}>-</option>
       {range(0, maxScore + 0.5, 0.5).map((value, index) => (
         <option key={index} value={value}>
