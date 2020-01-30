@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { NativeSelect } from "@material-ui/core";
 import range from "lodash/range";
 import { QuestionViewData } from "backend/src/types/view";
@@ -55,10 +55,7 @@ const MarkQuestionSelect: React.FC<Props> = ({ question, onSave }) => {
     <NativeSelect
       value={score === null ? "-" : score}
       onChange={handleChange}
-      style={{
-        fontSize: "unset",
-        color: "unset"
-      }}
+      className={classes.select}
     >
       <option value={"-"}>-</option>
       {range(0, maxScore + 0.5, 0.5).map((value, index) => (

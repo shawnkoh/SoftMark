@@ -73,6 +73,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     flexWrap: {
       flexWrap: "wrap"
+    },
+    select: {
+      fontSize: "unset",
+      color: "unset"
     }
   })
 );
