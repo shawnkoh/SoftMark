@@ -22,13 +22,12 @@ const MarkQuestionSelect: React.FC<Props> = ({ question, onSave }) => {
     return await api.marks
       .replaceMark(questionId, { score })
       .then(res => {
-        if (res.data.mark)
-          return { score: res.data.mark.score, markId: res.data.mark.id };
-        return { score: score, markId: null };
+        const mark = res.data.mark;
+        return { score: mark.score, markId: mark.id };
       })
       .catch(() => {
         toast.error("An error was made when saving. Try refreshing the page.");
-        return { score: score, markId: null };
+        return null;
       });
   };
 
@@ -47,6 +46,9 @@ const MarkQuestionSelect: React.FC<Props> = ({ question, onSave }) => {
       onSave(null, null);
     } else {
       const newMark = await putMarkData(id, parseFloat(value));
+      if (!newMark) {
+        return;
+      }
       onSave(newMark.score, newMark.markId);
     }
   };

@@ -8,7 +8,7 @@ const URL = "/marks";
 export async function replaceMark(
   questionId: number,
   data: MarkPutData
-): Promise<AxiosResponse<{ mark: MarkData | null }>> {
+): Promise<AxiosResponse<{ mark: MarkData }>> {
   return client.put(`/questions/${questionId}/mark`, data);
 }
 
