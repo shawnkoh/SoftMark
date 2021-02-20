@@ -78,9 +78,11 @@ const Annotator: React.FC<Props> = ({ page }: Props) => {
       <CanvasWithToolbar
         drawable
         backgroundImageSource={page.imageUrl || ""}
-        backgroundAnnotations={[[]]}
-        foregroundAnnotation={foregroundAnnotation}
-        onForegroundAnnotationChange={handleForegroundAnnotationChange}
+        backgroundLinesArray={[[]]}
+        foregroundLines={foregroundAnnotation}
+        backgroundTextsArray={[[]]}
+        foregroundTexts={[]}
+        onForegroundLinesChange={handleForegroundAnnotationChange}
         onViewChange={handleViewChange}
         isLoading={isPageLoading}
       />
